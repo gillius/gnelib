@@ -32,9 +32,17 @@ ServerConnection::ServerConnection(int outRate, int inRate, NLsocket rsocket2)
 ServerConnection::~ServerConnection() {
 }
 
+/**
+ * \todo implement negotiation
+ * \bug this function relies on the fact that mutexes are recursive, which is
+ *      not true over all pthreads implementations.  When
+ *      ConnectionEventGenerator lauches each onReceive event in a new thread,
+ *      then this problem will go away.
+ */
 //##ModelId=3B0753810280
 void ServerConnection::run() {
   assert(rsocket != NL_INVALID);
+	//Do connection negotiaion here, and create the PacketStream
   onNewConn();
 }
 
