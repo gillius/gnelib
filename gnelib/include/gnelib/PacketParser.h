@@ -39,18 +39,18 @@ namespace PacketParser {
  * the user.  It is suggested that the user assign packet numbers by adding
  * to MIN_USER_ID.  (i.e. MIN_USER_ID + 5)
  */
-const NLubyte MIN_USER_ID = 16;
+const guint8 MIN_USER_ID = 16;
 
 /**
  * @see MIN_USER_ID
  */
-const NLubyte MAX_USER_ID = 254;
+const guint8 MAX_USER_ID = 254;
 
 /**
  * The network packet ends with this byte, meaning that no more GNE packets
  * exist in this network packet (end-of-data).
  */
-const NLubyte END_OF_PACKET = 255;
+const guint8 END_OF_PACKET = 255;
 
 /**
  * Registers a new type of packet, so GNE can recognize it.  In order for GNE
@@ -62,7 +62,7 @@ const NLubyte END_OF_PACKET = 255;
  * parts of GNE, there are asserts to make this does not happen, but when
  * using the optimized GNE these checks are not done.
  */
-void registerPacket(NLubyte id, Packet* (*createFunc)());
+void registerPacket(guint8 id, Packet* (*createFunc)());
 
 /**
  * Parses the next packet from the given RawPacket.  Returns NULL on error.

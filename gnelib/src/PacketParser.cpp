@@ -51,7 +51,7 @@ void registerGNEPackets() {
   packets[1] = CustomPacket::create;
 }
 
-void registerPacket(NLubyte id, Packet* (*createFunc)()) {
+void registerPacket(guint8 id, Packet* (*createFunc)()) {
   assert(id >= MIN_USER_ID && id <= MAX_USER_ID);
   mapSync.acquire();
   assert(packets[id] == NULL);
@@ -61,7 +61,7 @@ void registerPacket(NLubyte id, Packet* (*createFunc)()) {
 
 Packet* parseNextPacket(bool& endOfPackets, RawPacket& raw) {
   //Read next packet ID
-  NLubyte nextId;
+  guint8 nextId;
   raw >> nextId;
 
   //Check for end of packet, returning if it is the end.
