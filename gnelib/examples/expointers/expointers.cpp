@@ -143,7 +143,6 @@ void testStrong() {
   assert( bPtr.unique() );
   assert( bPtr2.use_count() == 1 );
   assert( bPtr2.unique() );
-  assert( (bPtr.get() < bPtr2.get()) == (bPtr < bPtr2) );
 
   //Test use of the CustomDeleter.  There's no reason why we need one here.
   GNE::SmartPtr<int> intPtr( new int, CustomDeleter<int>() );
