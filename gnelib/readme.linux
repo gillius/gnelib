@@ -44,3 +44,16 @@ Should you ever wish to uninstall these two installed files from your system
 use:
 
 make uninstall
+
+3. Documentation
+
+After installing, you may want to generate the documentation using doxygen.
+Doxygen can be found in many distributions, or at the Doxygen website (see
+the Readme file).
+
+You can also download the documentation, beginner's guide, and GNE tutorials
+from the GNE website.
+
+If you wish to generate the documentation, use the following command:
+
+doxygen doxygen.cfg
