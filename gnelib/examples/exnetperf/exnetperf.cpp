@@ -158,7 +158,8 @@ void updateGlobalStats() {
 }
 
 void errorExit(const char* error) {
-  gout << "Error: " << error << endl;
+  shutdownConsole();
+  cout << "Error: " << error << endl;
   exit(1);
 }
 
@@ -213,7 +214,7 @@ int main() {
 void doServer(int outRate, int inRate, int port) {
 #ifdef _DEBUG
   //Generate debugging logs to server.log if in debug mode.
-  initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "server.log");
+  initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL5, "server.log");
 #endif
   OurListener server;
   if (server.open(port))
@@ -229,7 +230,7 @@ void doServer(int outRate, int inRate, int port) {
 
 void doClient(int outRate, int inRate, int port) {
 #ifdef _DEBUG
-  initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "client.log");
+  initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL5, "client.log");
 #endif
   string host;
   gout << "Enter hostname or IP address: ";
