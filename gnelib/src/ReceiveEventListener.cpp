@@ -18,12 +18,12 @@
  */
 
 #include "gneintern.h"
-#include "ConnectionEventListener.h"
+#include "ReceiveEventListener.h"
 
 namespace GNE {
 
 //##ModelId=3B07538100E0
-ConnectionEventListener::~ConnectionEventListener() {
+ReceiveEventListener::~ReceiveEventListener() {
 }
 
 }

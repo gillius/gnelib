@@ -29,10 +29,10 @@ namespace GNE {
  * listeners.
  */
 //##ModelId=3B07538002DA
-class ConnectionEventListener {
+class ReceiveEventListener {
 public:
   //##ModelId=3B07538100E0
-  virtual ~ConnectionEventListener();
+  virtual ~ReceiveEventListener();
 
   /**
    * This function is called when data arrives on the socket.

@@ -23,7 +23,7 @@
 #include "gneintern.h"
 #include "Thread.h"
 #include "PacketStream.h"
-#include "ConnectionEventListener.h"
+#include "ReceiveEventListener.h"
 #include "ErrorGne.h"
 #include "SocketPair.h"
 
@@ -265,13 +265,13 @@ protected:
 
 private:
   //##ModelId=3B07538002A0
-  class ConnectionListener : public ConnectionEventListener {
+  class Listener : public ReceiveEventListener {
   public:
     //##ModelId=3B075381004E
-    ConnectionListener(Connection& listener, bool isReliable);
+    Listener(Connection& listener, bool isReliable);
 
     //##ModelId=3B0753810051
-    virtual ~ConnectionListener();
+    virtual ~Listener();
 
     //##ModelId=3B0753810053
     void onReceive();
@@ -294,17 +294,17 @@ private:
 	Mutex errorSync;
 
 	/**
-	 * Make ConnectionListener a friend so it can call our onRecieve(bool)
+	 * Make Listener a friend so it can call our onRecieve(bool)
 	 * event, which will properly parse the packets.
 	 */
-  friend class ConnectionListener;
+  friend class Listener;
 
 	//Possible ConnectionListeners that may or may not exist, but if they do we
 	//need to kill them on exit.
   //##ModelId=3B6E14AC00FB
-	ConnectionListener* rlistener;
+	Listener* rlistener;
   //##ModelId=3B6E14AC0100
-	ConnectionListener* ulistener;
+	Listener* ulistener;
 
   friend class PacketStream;
 

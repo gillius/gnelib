@@ -19,7 +19,7 @@
 
 #include "gneintern.h"
 #include "ConnectionEventGenerator.h"
-#include "ConnectionEventListener.h"
+#include "ReceiveEventListener.h"
 #include "ConditionVariable.h"
 #include "Connection.h"
 
@@ -63,7 +63,7 @@ void ConnectionEventGenerator::run() {
 				numsockets--;
 				for (; numsockets >= 0; numsockets--) {
 					mapCtrl.acquire();
-					std::map<NLsocket, ConnectionEventListener*>::iterator iter = connections.find(sockBuf[numsockets]);
+					std::map<NLsocket, ReceiveEventListener*>::iterator iter = connections.find(sockBuf[numsockets]);
 					//Check to make sure the listener didn't unregister while we were waiting.
 					if (iter != connections.end()) {
 						mapCtrl.release();
@@ -85,7 +85,7 @@ void ConnectionEventGenerator::run() {
 }
 
 //##ModelId=3B07538100BD
-void ConnectionEventGenerator::reg(NLsocket socket, ConnectionEventListener* conn) {
+void ConnectionEventGenerator::reg(NLsocket socket, ReceiveEventListener* conn) {
   mapCtrl.acquire();
   nlGroupAddSocket(group, socket);
   connections[socket] = conn;

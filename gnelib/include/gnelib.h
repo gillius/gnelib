@@ -26,7 +26,7 @@
 #include "gnelib/Connection.h"
 #include "gnelib/ErrorGne.h"
 #include "gnelib/ConnectionEventGenerator.h"
-#include "gnelib/ConnectionEventListener.h"
+#include "gnelib/ReceiveEventListener.h"
 #include "gnelib/Console.h"
 #include "gnelib/Counter.h"
 #include "gnelib/GNE.h"

@@ -176,16 +176,16 @@ void Connection::processError(const Error& error) {
 }
 
 //##ModelId=3B075381004E
-Connection::ConnectionListener::ConnectionListener(Connection& listener, bool isReliable) 
+Connection::Listener::Listener(Connection& listener, bool isReliable) 
 : conn(listener), reliable(isReliable) {
 }
 
 //##ModelId=3B0753810051
-Connection::ConnectionListener::~ConnectionListener() {
+Connection::Listener::~Listener() {
 }
 
 //##ModelId=3B0753810053
-void Connection::ConnectionListener::onReceive() {
+void Connection::Listener::onReceive() {
   conn.onReceive(reliable);
 }
 
@@ -193,13 +193,13 @@ void Connection::ConnectionListener::onReceive() {
 void Connection::reg(bool reliable, bool unreliable) {
 	if (reliable && rlistener == NULL) {
 		assert(sockets.r != NL_INVALID);
-		rlistener = new ConnectionListener(*this, true);
+		rlistener = new Listener(*this, true);
 		eGen->reg(sockets.r, rlistener);
 		gnedbgo1(3, "Registered reliable socket %i", sockets.r);
 	}
 	if (unreliable && ulistener == NULL) {
 		assert(sockets.u != NL_INVALID);
-		ulistener = new ConnectionListener(*this, false);
+		ulistener = new Listener(*this, false);
 		eGen->reg(sockets.u, ulistener);
 		gnedbgo1(3, "Registered unreliable socket %i", sockets.u);
 	}

@@ -21,7 +21,7 @@
  */
 
 #include "gneintern.h"
-#include "ConnectionEventListener.h"
+#include "ReceiveEventListener.h"
 #include "ServerConnectionCreator.h"
 #include "Connection.h"
 
@@ -99,7 +99,7 @@ public:
 
 private:
   //##ModelId=3B075380034A
-  class ServerListener : public ConnectionEventListener {
+  class ServerListener : public ReceiveEventListener {
   public:
     //##ModelId=3B07538102D0
     ServerListener(ServerConnectionListener& listener);

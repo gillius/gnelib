@@ -25,7 +25,7 @@
 #include "Thread.h"
 
 namespace GNE {
-class ConnectionEventListener;
+class ReceiveEventListener;
 
 /**
  * A class used internally by GNE to generate the events in Connection.  Users
@@ -47,7 +47,7 @@ public:
    * @param conn the Connection class associated with the socket.
    */
   //##ModelId=3B07538100BD
-  void reg(NLsocket socket, ConnectionEventListener* conn);
+  void reg(NLsocket socket, ReceiveEventListener* conn);
 
   /**
    * Removes a Connection.
@@ -75,7 +75,7 @@ private:
   NLint group;
 
   //##ModelId=3AE35A87032A
-  std::map<NLsocket, ConnectionEventListener*> connections;
+  std::map<NLsocket, ReceiveEventListener*> connections;
 
   //##ModelId=3B0167440348
   NLsocket* sockBuf;
