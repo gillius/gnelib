@@ -15,7 +15,8 @@ exhello -- Everyone knows the "Hello World" program.  Perhaps it's been coded
   too many times.  However, the GNE coders just plain don't care ;).
   This is an example to show the minimum code needed to connect and send
   data, in this case, "Hello Server (or Client)!" to the other end of the
-  connection.  This version uses asynchronous sockets.
+  connection.  This version uses asynchronous sockets.  This example program
+  should be compatable client and server with exsynchello.
 
 expacket -- Shows how to derive a new type of packet, and create the proper
   parsing functions interacting with RawPacket to allow GNE to use your packet.
@@ -27,3 +28,8 @@ exrawtest -- Basically a test of the RawPacket class.  Does show usage of the
   class is "hackish" ways.  The standard use of RawPackets is pretty trivial.
 
 exaddr -- A small test for the Address class that also shows its usage.
+
+exsynchello -- Same as exhello, but uses only SyncConnections.  exsynchello
+  and exhello should be able to talk to each other, but in practice it is
+  not recommended to mix event-driven and SyncConnections, because it makes
+  for more complex code, but it is entirely possible.

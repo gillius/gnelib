@@ -1,4 +1,6 @@
 GNE 0.003 to 0.4
+  A new example exsynchello which is fully compatable with exhello and does
+    the same thing, but with SyncConnection only.
   New include structure and method of inclusion, although more typing and
     perhaps less flexible, now works properly on all platforms without name
     changing and small cludges and hacks.

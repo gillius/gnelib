@@ -38,6 +38,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name exaddr
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name exsynchello
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -103,6 +106,21 @@ Package=<4>
 ###############################################################################
 
 Project: "exrawtest"=".\EXAMPLES\exrawtest\exrawtest.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name gne
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "exsynchello"=".\examples\exsynchello\exsynchello.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{

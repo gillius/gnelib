@@ -126,7 +126,7 @@ public:
 
 			//Send Response
 			mprintf("  Sending Response...\n");
-			HelloPacket response("Hello, client!");
+			HelloPacket response("Hello, client!  I'm the event-driven server!");
 			conn->stream().writePacket(response, true);
 		} else
 			mprintf("got bad packet.\n");
@@ -154,7 +154,7 @@ void OurListener::getNewConnectionParams(int& inRate, int& outRate, ConnectionLi
 }
 
 int main(int argc, char* argv[]) {
-  doMain("event-driven");
+  doMain("Event-Driven");
   return 0;
 }
 
@@ -185,7 +185,7 @@ void doClient(int outRate, int inRate, int port) {
 	if (client.isConnected()) {
 		
 		//Send our information
-		HelloPacket message("Hello, server!");
+		HelloPacket message("Hello, server!  I'm the event-driven client!");
 		client.stream().writePacket(message, true);
 		client.stream().waitToSendAll();
 		
