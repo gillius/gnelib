@@ -93,7 +93,9 @@ public:
    * otherwise undefined behavior (likely a crash) will result.
    */
   //##ModelId=3BC3CD0902E4
-  void open(const Address& dest, int localPort = 0) throw (Error);
+  void open(const Address& dest, int outRate = 0,
+            int inRate = 0, int localPort = 0,
+            bool wantUnreliable = true) throw (Error);
   
   /**
    * Attempts to connect to the remote side, and waits for the connection to

@@ -22,6 +22,7 @@
 #include "../include/gnelib/Packet.h"
 #include "../include/gnelib/Connection.h"
 #include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/RateAdjustPacket.h"
 #include "../include/gnelib/ExitPacket.h"
 #include "../include/gnelib/PacketParser.h"
 #include "../include/gnelib/Time.h"
@@ -29,11 +30,30 @@
 
 const int BUF_LEN = 1024;
 
+//This is the timestep size for the rate control in microseconds.
+//The current step is 1/10 of a second which allows for a rate granularity of
+//10 bps.
+const int TIME_STEP = 100000;
+const int TIME_STEPS_PER_SEC = 1000000 / TIME_STEP;
+
 namespace GNE {
 
 //##ModelId=3B07538101BD
-PacketStream::PacketStream(int outRate2, int inRate2, Connection& ourOwner)
-: Thread("PktStrm"), owner(ourOwner), inRate(inRate2), outRate(outRate2) {
+PacketStream::PacketStream(int reqOutRate2, int maxOutRate2, Connection& ourOwner)
+: Thread("PktStrm"), owner(ourOwner), reqOutRate(reqOutRate2),
+maxOutRate(maxOutRate2) {
+  assert(reqOutRate2 >= 0);
+  assert(maxOutRate2 >= 0);
+
+  //Calculate the current rate and step.
+  setupCurrRate();
+
+  //Set the amount we can send without waiting to the max.
+  outRemain = currOutRate;
+
+  //Set the last calculation time:
+  lastTime = Timer::getCurrentTime();
+
   gnedbgo(5, "created");
 }
 
@@ -43,12 +63,23 @@ PacketStream::~PacketStream() {
   assert(!isRunning());
 
   //Clear out our queues.
-  PacketStreamData* outQ = NULL;
-  Packet* inQ = NULL;
-  while ((outQ = getNextPacketToSend()) != NULL)
-    delete outQ;
-  while ((inQ = getNextPacket()) != NULL)
-    delete inQ;
+  Packet* temp = NULL;
+
+  //Empty out the outgoing queues.
+  outQCtrl.acquire();
+  while (!outRel.empty()) {
+    delete outRel.front();
+    outRel.pop();
+  }
+  while (!outUnrel.empty()) {
+    delete outUnrel.front();
+    outUnrel.pop();
+  }
+  outQCtrl.release();
+
+  //Empty the incoming queue.
+  while ((temp = getNextPacket()) != NULL)
+    delete temp;
 
   gnedbgo(5, "destroyed");
 }
@@ -63,10 +94,15 @@ int PacketStream::getInLength() const {
 }
 
 //##ModelId=3B07538101C4
-int PacketStream::getOutLength() const {
+int PacketStream::getOutLength(bool reliable) const {
   int ret;
   outQCtrl.acquire();
-  ret = out.size();
+
+  if (reliable)
+    ret = outRel.size();
+  else
+    ret = outUnrel.size();
+
   outQCtrl.release();
   return ret;
 }
@@ -90,46 +126,52 @@ Packet* PacketStream::getNextPacket() {
 
 //##ModelId=3B07538101C9
 void PacketStream::writePacket(const Packet& packet, bool reliable) {
-  //Create the new data to be in the queue
-  PacketStreamData* newNode = new PacketStreamData;
-  newNode->reliable = reliable;
-  newNode->packet = packet.makeClone();
-
   //Perform operations on the outgoing queue
   outQCtrl.acquire();
-  bool notify = out.empty();
-  out.push(newNode);
+  bool notify = false;
+  if (reliable) {
+    notify = outRel.empty();
+    outRel.push(packet.makeClone());
+  } else {
+    notify = outUnrel.empty();
+    outUnrel.push(packet.makeClone());
+  }
   outQCtrl.release();
 
   //If we need to, wake up the writer thread.
   if (notify)
-    outQCtrl.signal();
-}
-
-//##ModelId=3B07538101FD
-PacketStream::PacketStreamData* PacketStream::getNextPacketToSend() {
-  PacketStream::PacketStreamData* ret = NULL;
-  outQCtrl.acquire();
-  if (!out.empty()) {
-    ret = out.front();
-    out.pop();
-  }
-  outQCtrl.release();
-  return ret;
-}
-
-//##ModelId=3B07538101F5
-int PacketStream::getInRate() const {
-  return inRate;
+    outQCtrl.broadcast();
 }
 
 //##ModelId=3B07538101F7
 int PacketStream::getOutRate() const {
-  return outRate;
+  return currOutRate;
+}
+
+//##ModelId=3C783ACF0264
+void PacketStream::setRates(int reqOutRate2, int maxInRate2) {
+  //0 is reserved for "unlimited" in the future.  Negative values mean
+  //"leave unchanged."
+  assert(reqOutRate2 != 0);
+  assert(maxInRate2 != 0);
+
+  if (reqOutRate2 > 0) {
+    outQCtrl.acquire();
+    reqOutRate = reqOutRate2;
+    setupCurrRate();
+    outQCtrl.release();
+  }
+
+  //Now handle the inRate changes, sending a notice if needed.
+  if (maxInRate2 > 0) {
+    RateAdjustPacket notice;
+    notice.rate = maxInRate2;
+    writePacket(notice, true);
+  }
 }
 
 //##ModelId=3B07538101F9
-void PacketStream::waitToSendAll(int waitTime) {
+void PacketStream::waitToSendAll(int waitTime) const {
   assert(waitTime <= (INT_MAX / 1000));
   assert(waitTime > 0);
 
@@ -139,7 +181,7 @@ void PacketStream::waitToSendAll(int waitTime) {
   int ms = waitTime;
 
   outQCtrl.acquire();
-  while (!out.empty() && !shutdown && !timeOut) {
+  while ((!outRel.empty() || !outUnrel.empty()) && !shutdown && !timeOut) {
     outQCtrl.timedWait(ms);
 
     t = Timer::getCurrentTime();
@@ -160,41 +202,56 @@ void PacketStream::shutDown() {
 }
 
 /**
- * \todo combine packets, do throttling, optimize
  * \bug  we need a way to guarantee that the write won't block when trying
  *       to send the ExitPacket on shutdown.
  */
 //##ModelId=3B07538101FA
 void PacketStream::run() {
+  outQCtrl.acquire();
   while (!shutdown) {
-    outQCtrl.acquire();
-    while (out.empty() && !shutdown) {
+    while (outRel.empty() && outUnrel.empty() && !shutdown) {
       outQCtrl.wait();
     }
-    outQCtrl.release();
+    //Check which queue woke us up.  If they are both empty it will not
+    //matter as this means shutdown is true.  Doing the check this way gives
+    //absolute priority to reliable packets.
+    bool reliable = !outRel.empty();
+
     if (!shutdown) {
       //Do throttled writes
-      PacketStreamData* next = getNextPacketToSend();
-      RawPacket raw;
-      next->packet->writePacket(raw);
-      raw << PacketParser::END_OF_PACKET;
-      if (owner.sockets.rawWrite(next->reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
-        owner.processError( Error::createLowLevelError(Error::Write) );
+      updateRates();
+      if (outRemain > 0) {
+        //Yes, this check will let us dip below 0, but overall we will make
+        //up for it by waiting for it to go above 0 again.
+        RawPacket raw;
+        prepareSend( ((reliable) ? outRel : outUnrel), raw);
+        raw << PacketParser::END_OF_PACKET;
+        outRemain -= raw.getPosition();
+
+        //Release the mutex in case rawWrite blocks
+        outQCtrl.release();
+        if (owner.sockets.rawWrite(reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
+          owner.processError( Error::createLowLevelError(Error::Write) );
+        }
+        
+        //Discover if we are really done writing, and if so, queue the
+        //onDoneWriting event.
+        outQCtrl.acquire();
+        if (outRel.empty() && outUnrel.empty()) {
+          //Broadcast a wakeup in case someone is waiting in waitToSendAll.
+          outQCtrl.broadcast();
+          owner.onDoneWriting();
+        }
+      } else {
+        //Else we don't have any available bandwidth and we must wait!
+        outQCtrl.release();
+        Thread::sleep(TIME_STEP / 1000);
+        outQCtrl.acquire();
       }
-      delete next->packet;
-      delete next;
-      
-      //Discover if we are really done writing, and if so, queue the
-      //onDoneWriting event.
-      outQCtrl.acquire();
-      if (out.empty()) {
-        //Broadcast a wakeup in case someone is waiting in waitToSendAll.
-        outQCtrl.broadcast();
-        owner.onDoneWriting();
-      }
-      outQCtrl.release();
     }
   }
+  outQCtrl.release();
+
   //We want to try to send the required ExitPacket, if possible, over the
   //reliable connection.
   //We need a good way to make sure this doesn't block though, but the
@@ -216,6 +273,61 @@ void PacketStream::addIncomingPacket(Packet* packet) {
   inQCtrl.acquire();
   in.push(packet);
   inQCtrl.release();
+}
+
+//##ModelId=3C7867230185
+void PacketStream::prepareSend(std::queue<Packet*>& q, RawPacket& raw) {
+  //outQCtrl must be acquired for this function.
+  //While there are packets left and they won't overflow the RawPacket
+  while (!q.empty() &&
+         raw.getPosition() + q.front()->getSize() <
+         RawPacket::RAW_PACKET_LEN - sizeof(PacketParser::END_OF_PACKET)) {
+
+    q.front()->writePacket(raw);
+    delete q.front();
+    q.pop();
+  }
+}
+
+//##ModelId=3C7960970177
+void PacketStream::setupCurrRate() {
+  //Precalculate the current outgoing rate, keeping in mind that the value of
+  //is the "largest" and means unlimited rate (or "unchecked").  Unlimited is
+  //OK only if they are both at 0.
+  if (reqOutRate == 0)
+    currOutRate = maxOutRate;
+  else if (maxOutRate == 0)
+    currOutRate = reqOutRate;
+  else
+    currOutRate = (reqOutRate < maxOutRate) ? reqOutRate : maxOutRate;
+
+  //Discover the rate stepping.
+  outRateStep = currOutRate / TIME_STEPS_PER_SEC;
+
+}
+
+//##ModelId=3C783ACF028C
+void PacketStream::updateRates() {
+  //The out remain is part of the out queue, so outQCtrl must be locked when
+  //we call this function.
+
+  if (currOutRate > 0) {
+    //Find the time difference in number of steps
+    int timeDiff =
+      (Timer::getCurrentTime() - lastTime).getTotaluSec() / TIME_STEP;
+    
+    outRemain += outRateStep * timeDiff;
+    //Because of the math here, we compensate/take advatnage of integer
+    //rounding.
+    lastTime += TIME_STEP * timeDiff;
+    //We won't allow large bursts of data -- no more than 1 second's worth.
+    if (outRemain > currOutRate)
+      outRemain = currOutRate;
+
+  } else {
+    //Else, we are not rate limiting, so we set outRemain to some fake value.
+    outRemain = 1;
+  }
 }
 
 }

@@ -72,8 +72,6 @@ public:
     mprintf("  From us at %s/UDP to client at %s/UDP.\n",
       conn->getLocalAddress(false).toString().c_str(),
       conn->getRemoteAddress(false).toString().c_str());
-    mprintf("  Negotiated outbound data rate: %i bps\n",
-      conn->stream().getOutRate());
   }
 
   void onReceive() {
@@ -150,8 +148,6 @@ public:
     mprintf("  From us at %s/UDP to client at %s/UDP.\n",
       conn->getLocalAddress(false).toString().c_str(),
       conn->getRemoteAddress(false).toString().c_str());
-    mprintf("  Negotiated outbound data rate: %i bps\n",
-      conn->stream().getOutRate());
   }
 
   void onReceive() {
@@ -196,8 +192,8 @@ private:
 };
 
 void OurListener::getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
-  inRate = 3200;
-  outRate = 3200;
+  inRate = iRate;
+  outRate = oRate;
   listener = new OurServer();
 }
 
@@ -239,11 +235,18 @@ void doClient(int outRate, int inRate, int port) {
       //Send our information
       HelloPacket message("Hello, server!  I'm the event-driven client!");
       client->stream().writePacket(message, true);
-      client->stream().writePacket(message, false);
+      
+      //This line would also send the packet over the unreliable connection,
+      //were it uncommented, but it is left commented to be compatable with
+      //exsynchello.  SyncConnections are not for use with unreliable
+      //connections.  Uncommenting this line will make this program then work
+      //only with another exhello.
+      //client->stream().writePacket(message, false);
+
       //Wait a little for any responses.
-      gout << "Waiting a second for any responses..." << endl;
-      Thread::sleep(3000);
-      client->stream().waitToSendAll();
+      gout << "Waiting a couple of seconds for any responses..." << endl;
+      Thread::sleep(2000);
+      client->disconnectSendAll();
       
     }
     

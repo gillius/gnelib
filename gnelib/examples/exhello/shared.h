@@ -70,8 +70,8 @@ private:
 
 class OurListener : public ServerConnectionListener {
 public:
-  OurListener() 
-    : ServerConnectionListener() {
+  OurListener(int iRate2, int oRate2) 
+    : ServerConnectionListener(), iRate(iRate2), oRate(oRate2) {
   }
 
   virtual ~OurListener() {}
@@ -85,6 +85,8 @@ public:
   void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener);
 
 private:
+  int iRate;
+  int oRate;
 };
 
 void errorExit(const char* error) {
@@ -125,11 +127,11 @@ void doMain(const char* connType) {
     setTitle("GNE Basic Connections Example -- Server");
     gout << "Reminder: ports <= 1024 on UNIX can only be used by the superuser." << endl;
     port = getPort("listen on");
-    doServer(3000, 3000, port);
+    doServer(0, 0, port);
   } else {
     setTitle("GNE Basic Connections Example -- Client");
     port = getPort("connect to");
-    doClient(3000, 3000, port);
+    doClient(0, 0, port);
 
     gout << "Press a key to continue." << endl;
     getch();
@@ -141,7 +143,7 @@ void doServer(int outRate, int inRate, int port) {
   //Generate debugging logs to server.log if in debug mode.
   initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "server.log");
 #endif
-  OurListener server;
+  OurListener server(inRate, outRate);
   if (server.open(port))
     errorExit("Cannot open server socket.");
   if (server.listen())

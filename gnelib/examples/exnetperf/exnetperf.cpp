@@ -184,7 +184,7 @@ public:
   }
 
   void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
-    inRate = outRate = 0; //0 meaning no limits on rates.
+    inRate = outRate = 3200;
     listener = new PerfTester();
   }
 
@@ -236,11 +236,11 @@ int main() {
     setTitle("GNE Net Performance Tester -- Server");
     gout << "Reminder: ports <= 1024 on UNIX can only be used by the superuser." << endl;
     port = getPort("listen on");
-    doServer(0, 0, port);
+    doServer(3200, 3200, port);
   } else {
     setTitle("GNE Net Performance Tester -- Client");
     port = getPort("connect to");
-    doClient(0, 0, port);
+    doClient(3200, 3200, port);
   }
 
   delete sDisplay;

@@ -1,4 +1,11 @@
 GNE 0.45 to current
+  Modified the examples a little to use the rate controls more/better.
+  Implemented bandwidth control as per the GNE protocol spec.
+  Modified the PacketStream API to fit the new rate control scheme.
+  Created and implemented new Class, RateAdjustPacket, to implement the
+    packet from the GNE protocol spec.
+  Fixed a memory leak in the PacketStream destructor that did not properly
+    free all memory for used packets.
   Graceful disconnects are now detected and handled through the onExit event.
   ExitPackets are now sent when a connection closes, as per the GNE protocol
     specification.

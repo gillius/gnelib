@@ -64,8 +64,8 @@ public:
    */
   //##ModelId=3B07538003BB
   bool open(const Address& dest,
-            int outRate = 3200,
-            int inRate = 3200,
+            int outRate = 0,
+            int inRate = 0,
             int localPort = 0,
             bool wantUnreliable = true);
 

@@ -24,10 +24,12 @@
 #include "ConditionVariable.h"
 #include "Mutex.h"
 #include "Thread.h"
+#include "Time.h"
 
 namespace GNE {
 class Packet;
 class Connection;
+class RawPacket;
 
 /**
  * This class resembles a packet stream through a connection.  This class
@@ -42,9 +44,16 @@ class PacketStream : public Thread {
 public:
   /**
    * Creates a new PacketStream with the given flow control parameters.
+   * Passing a value 0 for a rate is interpreted as "unlimited" or
+   * unrestricted rates.  Passing a value less than 0 is not allowed.
+   * @param reqOutRate2 This is the out rate that we are requesting, or in
+   *                    other words, the maximum rate we are willing to send.
+   * @param maxOutRate2 The maximum rate the remote machine is letting us
+   *                    send.  The actual outgoing rate, therefore, is the
+   *                    minimum of the two outgoing rate values.
    */
   //##ModelId=3B07538101BD
-  PacketStream(int outRate2, int inRate2, Connection& ourOwner);
+  PacketStream(int reqOutRate2, int maxOutRate2, Connection& ourOwner);
 
   /**
    * Destroys this object.  Any data left remaining in the in or out queues
@@ -60,10 +69,15 @@ public:
   int getInLength() const;
 
   /**
-   * Returns the current outgoing queue length in packets.
+   * Returns the current outgoing queue length in packets.  This is meant
+   * as a possible hint for your application to tune its performance by
+   * knowning when the queues are starting to fill up.
+   *
+   * @param reliable true for the outgoing reliable packet queue.<br>
+   *                 false for the incoming reliable packet queue.
    */
   //##ModelId=3B07538101C4
-  int getOutLength() const;
+  int getOutLength(bool reliable) const;
 
   /**
    * Is there at least one packet in the incoming queue?  Note that this does
@@ -97,18 +111,25 @@ public:
   void writePacket(const Packet& packet, bool reliable);
 
   /**
-   * Returns the actual incoming data rate, which may be the same or less
-   * that what was originally requested on connection.
-   */
-  //##ModelId=3B07538101F5
-  int getInRate() const;
-
-  /**
    * Returns the actual outgoing data rate, which may be the same or less
-   * that what was originally requested on connection.
+   * that what was originally requested on connection.  This value is the
+   * minimum between the max requested rate from the remote computer, and our
+   * maximum outgoing rate.
    */
   //##ModelId=3B07538101F7
   int getOutRate() const;
+
+  /**
+   * Sets new values that we are willing to send or receive.  See the
+   * constructor for more information.  Pass a value less than 0 to leave one
+   * of the rates unchanged.  Pass the value 0 for "unrestricted" rates.
+   * Changing the rates might cause a packet to get added to the outgoing
+   * packet stream to communicate this change to the other side.
+   *
+   * @see PacketStream::PacketStream
+   */
+  //##ModelId=3C783ACF0264
+  void setRates(int reqOutRate2, int maxInRate2);
 
   /**
    * Blocks on this PacketStream until all packets have been sent.
@@ -116,7 +137,7 @@ public:
    *        packet queue to clear.
    */
   //##ModelId=3B07538101F9
-  void waitToSendAll(int waitTime = 10000);
+  void waitToSendAll(int waitTime = 10000) const;
 
   /**
    * Overrides Thread::shutDown so that the PacketStream daemon thread will
@@ -148,30 +169,66 @@ protected:
 
 private:
 
+  //##ModelId=3C7867230185
+  void prepareSend(std::queue<Packet*>& q, RawPacket& raw);
+
   //##ModelId=3B6B30250015
   Connection& owner;
 
   //##ModelId=3AE45A8302E4
   std::queue<Packet*> in;
 
-  //##ModelId=3B075380030E
-  struct PacketStreamData {
-    //##ModelId=3B0753810188
-    Packet* packet;
-    //##ModelId=3B075381018C
-    bool    reliable;
-  };
-  //##ModelId=3B07538101FD
-  PacketStreamData* getNextPacketToSend();
-
   //##ModelId=3AE45B56017C
-  std::queue<PacketStreamData*> out;
+  std::queue<Packet*> outUnrel;
 
-  //##ModelId=3B075381018E
-  int inRate;
+  std::queue<Packet*> outRel;
 
   //##ModelId=3B075381018F
-  int outRate;
+  int maxOutRate;
+
+  //##ModelId=3C783ACF021E
+  int reqOutRate;
+
+  //This is the precalculated min of maxOutRate and reqOutRate.
+  //##ModelId=3C783ACF0232
+  int currOutRate;
+
+  /**
+   * This is the current number of bytes we are allowed to send without
+   * waiting.  This value should increase per the outRateStep until it
+   * reaches a maximum value of currOutRate.
+   */
+  //##ModelId=3C783ACF023C
+  int outRemain;
+
+  /**
+   * This is the "step" that the out value increases for every step in
+   * time.  The size of the step is defined by the code.
+   */
+  //##ModelId=3C783ACF0246
+  int outRateStep;
+
+  /**
+   * The last time the rate was calculated.
+   */
+  //##ModelId=3C783ACF025B
+  Time lastTime;
+
+  /**
+   * Calculates the current rate and step based on the current values for
+   * maxOutRate and reqOutRate.
+   */
+  //##ModelId=3C7960970177
+  void setupCurrRate();
+
+  /**
+   * Discovers the amount of time passed and updates the currOutRemain so we
+   * know much data we can send.  This should be called almost everytime
+   * before we use currOutRemain.  outQCtrl MUST be acquired when you call
+   * this function.
+   */
+  //##ModelId=3C783ACF028C
+  void updateRates();
 
   /**
    * These are set to be mutable because of the const functions need

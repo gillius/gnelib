@@ -56,9 +56,11 @@ Connection* SyncConnection::getConnection() const {
  * \todo Check out possibility of a dynamic cast.
  */
 //##ModelId=3BC3CD0902E4
-void SyncConnection::open(const Address& dest, int localPort) throw (Error) {
+void SyncConnection::open(const Address& dest,
+                          int outRate, int inRate, 
+                          int localPort, bool wantUnreliable) throw (Error) {
   assert(!isReleased());
-  if (((ClientConnection*)conn)->open(dest, localPort))
+  if (((ClientConnection*)conn)->open(dest, outRate, inRate, localPort, wantUnreliable))
     throw Error(Error::CouldNotOpenSocket);
 }
 
