@@ -27,12 +27,10 @@ namespace GNE {
 const int ChannelPacket::ID = 5;
 
 ChannelPacket::ChannelPacket( int channel, int from, const Packet& packet )
-: Packet(ID), channel((guint8)channel), from((guint8)from) {
-  msg = packet.makeClone();
+: WrapperPacket(ID, &packet), channel((guint8)channel), from((guint8)from) {
 }
 
 ChannelPacket::~ChannelPacket() {
-  delete msg;
 }
 
 int ChannelPacket::getChannel() const {
@@ -53,35 +51,25 @@ void ChannelPacket::setSource( int source ) {
   from = (guint8)source;
 }
 
-const Packet& ChannelPacket::getData() const {
-  return *msg;
-}
-
-void ChannelPacket::setData( const Packet& packet ) {
-  delete msg;
-  msg = packet.makeClone();
-}
-
 Packet* ChannelPacket::makeClone() const {
-  return new ChannelPacket( channel, from, *msg );
+  assert( getData() != NULL );
+  return new ChannelPacket( channel, from, *getData() );
 }
 
 int ChannelPacket::getSize() const {
-  return RawPacket::getSizeOf( channel ) +
-    RawPacket::getSizeOf( from ) + msg->getSize();
+  return WrapperPacket::getSize() + RawPacket::getSizeOf( channel ) +
+    RawPacket::getSizeOf( from );
 }
 
 void ChannelPacket::writePacket(RawPacket& raw) const {
+  WrapperPacket::writePacket( raw );
   raw << channel << from;
-  msg->writePacket( raw );
 }
 
 void ChannelPacket::readPacket(RawPacket& raw) {
+  WrapperPacket::readPacket( raw );
   raw >> channel >> from;
-  bool dummy;
-  msg = PacketParser::parseNextPacket( dummy, raw );
-  assert( dummy == false );
-  assert( msg != NULL );
+  assert( getData() != NULL );
 }
 
 Packet* ChannelPacket::create() {

@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Packet.h"
+#include "WrapperPacket.h"
 
 namespace GNE {
 
@@ -30,7 +30,7 @@ namespace GNE {
  * to be used with the high-level API, and provides routing information for
  * the Server class.
  */
-class ChannelPacket : public Packet {
+class ChannelPacket : public WrapperPacket {
 public:
   /**
    * Inits a new ChannelPacket for the given channel, and from the given
@@ -74,17 +74,6 @@ public:
   void setSource( int source );
 
   /**
-   * Returns the encapsulated data in this ChannelPacket.
-   */
-  const Packet& getData() const;
-
-  /**
-   * Replaces the given packet with the current packet as this ChannelPacket's
-   * data.  The given packet is copied with the Packet::makeClone method.
-   */
-  void setData( const Packet& packet );
-
-  /**
    * Returns a newly allocated exact copy of this packet.
    */
   virtual Packet* makeClone() const;
@@ -114,7 +103,6 @@ private:
 
   guint8 channel;
   guint8 from;
-  Packet* msg;
 };
 
 } //namespace GNE
