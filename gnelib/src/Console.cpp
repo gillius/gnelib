@@ -20,6 +20,7 @@
 #include "gneintern.h"
 #include "Console.h"
 #include "gstreambufs.h"
+#include "Mutex.h"
 #include <ostream>
 #include <istream>
 
@@ -32,6 +33,9 @@ static Mutex outSync;
 static bool initialized = false;
 
 //Global iostreams to replace cout/cin
+Mutex goutSync;
+ConsoleMutex acquire(true, goutSync);
+ConsoleMutex release(false, goutSync);
 static goutbuf outbuf;
 std::ostream gout(&outbuf);
 static ginbuf inbuf;

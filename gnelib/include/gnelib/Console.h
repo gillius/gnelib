@@ -21,7 +21,6 @@
  */
 
 #include "gneintern.h"
-#include "Mutex.h"
 
 namespace GNE {
 /**
@@ -46,9 +45,19 @@ namespace GNE {
  * time, since they will move the cursor's location.
  */
 namespace Console {
+class ConsoleMutex;
   /**
    * An ostream that works after the console part of GNE has been initialized.
-   * Normally cout doesn't work after the console has been initalized.
+   * Normally cout doesn't work after the console has been initalized.  Note
+   * if you have redirected stdin or stdout then cout and cin will still work
+   * -- just not if they are writing or reading to the screen/keyboard.  This
+   * is why I opted to create a separate stream from cout and cin.\n
+   * Also, gout is not "quite" thread safe.  There is no way to know when you
+   * ended, plus the basic_ostream that uses the streambuf may not be thread
+   * safe so, use acquire and release like a mutex if you will be using gout
+   * from multiple threads.  These are not needed if using gout from a single
+   * threaded context:\n
+   * gout << acquire << "Hello World!" << x << y << endl << release;
    */
   extern std::ostream gout;
 
@@ -57,6 +66,22 @@ namespace Console {
    * @see gout
    */
   extern std::istream gin;
+
+  /**
+   * A manipulator for gout to lock the gout output.  This does not lock
+   * other threads from writing with other Console class functions, only for
+   * writing with gout.
+   * @see release
+   * @see gout
+   */
+  extern ConsoleMutex acquire;
+
+  /**
+   * A manipulator to release the gout output.
+   * @see acquire
+   * @see gout
+   */
+  extern ConsoleMutex release;
 
   /**
    * Initalizes the console part of GNE.  This may be called multiple times.

@@ -20,10 +20,38 @@
 #include "gneintern.h"
 #include "gstreambufs.h"
 #include "Console.h"
+#include "Mutex.h"
 #include <streambuf>
+
+//********************************
+//
+//    ConsoleMutex implementation
+//
+//********************************
+std::ostream& operator << (std::ostream& o, GNE::Console::ConsoleMutex& cm) {
+  cm.action();
+  return o;
+}
 
 namespace GNE {
 namespace Console {
+
+//##ModelId=3BF88CAB02E7
+ConsoleMutex::ConsoleMutex(bool isAcquiring, Mutex& syncMutex) 
+: acq(isAcquiring), sync(syncMutex) {
+}
+
+//##ModelId=3BF88CAB02EA
+ConsoleMutex::~ConsoleMutex() {
+}
+
+//##ModelId=3BF88CAB02EB
+void ConsoleMutex::action() {
+  if (acq)
+    sync.acquire();
+  else
+    sync.release();
+}
 
 //********************************
 //
@@ -129,3 +157,4 @@ std::streamsize goutbuf::xsputn(const char_type *ptr, std::streamsize count) {
   
 } //namespace Console
 } //namespace GNE
+
