@@ -57,7 +57,7 @@ public:
 
   /**
    * Returns the local address of this connection.  If the requested socket
-	 * has not been opened, results are undefined.
+	 * has not been opened, an Address is returned which is marked invalid.
    * @param reliable socket select
    */
   //##ModelId=3BB2CB41030C
@@ -65,7 +65,7 @@ public:
 
   /**
    * Returns the remote address of this connection, if it is connected,
-	 * otherwise, results are undefined.
+	 * otherwise, an Address is returned which is marked invalid.
    * @param reliable socket select
    */
   //##ModelId=3BB2CB41037A
