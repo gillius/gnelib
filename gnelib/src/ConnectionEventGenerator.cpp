@@ -106,8 +106,8 @@ void ConnectionEventGenerator::unreg(NLsocket socket) {
 
 //##ModelId=3B07538100DF
 void ConnectionEventGenerator::shutDown() {
-  mapCtrl.signal();
   Thread::shutDown();
+  mapCtrl.signal();
 }
 
 }
