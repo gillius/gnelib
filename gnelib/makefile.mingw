@@ -12,7 +12,7 @@ RMDIR                = rm -rf
 
 AR                   = ar
 
-EXAMPLE_LIBS         = $(LIB_STATIC) -lNL -lwsock32 -lpthreadGC
+EXAMPLE_LIBS         = $(LIB_STATIC) -lNL
 
 LDFLAGS              = -mthreads
 
@@ -22,10 +22,15 @@ OPTIMIZEFLAGS        = -Wall -O3 -s
 ifdef DEBUGMODE
 CPPFLAGS             = $(DEBUGFLAGS)
 CFLAGS               = $(DEBUGFLAGS)
+LIB_STATIC_NAME      = libgned.a
 else
 CPPFLAGS             = $(OPTIMIZEFLAGS)
 CFLAGS               = $(OPTIMIZEFLAGS)
+LDFLAGS             += -s
+LIB_STATIC_NAME      = libgne.a
 endif
+
+LIB_STATIC           = lib/mingw/$(LIB_STATIC_NAME)
 
 ifndef NO_OLD_CPP
 CPPFLAGS            += -DOLD_CPP
@@ -47,9 +52,6 @@ LIB_C_O              = $(LIB_C:.c=.o)
 LIB_O                = $(LIB_CPP_O) $(LIB_C_O)
 
 DEPENDENCIES         = $(notdir $(LIB_O:.o=.d))
-
-LIB_STATIC_NAME      = libgnelib.a
-LIB_STATIC           = lib/mingw/$(LIB_STATIC_NAME)
 
 VPATH                = $(dir $(EXAMPLE_CPP))
 

@@ -23,7 +23,6 @@
 #include "../include/gnelib/Mutex.h"
 #include "../include/gnelib/Time.h"
 #include "../include/gnelib/Timer.h"
-#include <limits>
 //There appears to be a max() macro defined that is messing things up in
 //at least MSVC.NET, and we don't use a max() define in this source file.
 #undef max
@@ -46,7 +45,11 @@ ConditionVariable::ConditionVariable(Mutex* m) {
 
 void ConditionVariable::initBoostCode() {
   m_gate = CreateSemaphore(0, 1, 1, 0);
+#ifndef OLD_CPP
   m_queue = CreateSemaphore(0, 0, std::numeric_limits<long>::max(), 0);
+#else
+  m_queue = CreateSemaphore(0, 0, INT_MAX, 0);
+#endif
   m_mutex = CreateMutex(0, 0, 0);
   assert(m_gate && m_queue && m_mutex);
 }
@@ -112,7 +115,11 @@ void ConditionVariable::wait() {
         m_gone = 0;
     }
   }
+#ifndef OLD_CPP
   else if (++m_gone == (std::numeric_limits<unsigned>::max() / 2))
+#else
+  else if (++m_gone == (INT_MAX / 2))
+#endif
   {
     // timeout occured, normalize the m_gone count
     // this may occur if many calls to wait with a timeout are made and
@@ -180,7 +187,11 @@ void ConditionVariable::timedWait(int ms) {
         m_gone = 0;
     }
   }
+#ifndef OLD_CPP
   else if (++m_gone == (std::numeric_limits<unsigned>::max() / 2))
+#else
+  else if (++m_gone == (INT_MAX / 2))
+#endif
   {
     // timeout occured, normalize the m_gone count
     // this may occur if many calls to wait with a timeout are made and
