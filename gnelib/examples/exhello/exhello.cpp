@@ -266,21 +266,26 @@ void doClient(int outRate, int inRate, int port) {
   cout << "Enter hostname or IP address: ";
   cin >> host;
 
-  NLaddress addr;
-  nlGetAddrFromName((NLbyte*)host.c_str(), &addr);
-  nlSetAddrPort(&addr, (NLushort)port);
-  
-  cout << "Connecting to: " << getAddressString(addr) << endl;
+	NLaddress temp;
+	nlGetAddrFromName((NLbyte*)host.c_str(), &temp);
+  cout << "Connecting to: " << getAddressString(temp) << ':' << port << endl;
+
   OurClient client(outRate, inRate);
-  if (client.open(addr)) //let port take 0 default, for any local port.
+  if (client.open(host, port)) //let localPort take 0 default, for any local port.
     errorExit("Cannot open client socket.");
+
   client.connect();
   client.join();     //join on the connection thread
+
+	//Send our information
 	HelloPacket message("Hello, server!");
 	client.stream().writePacket(message, true);
 	client.stream().waitToSendAll();
   //if we did not call join, we would have called client.detach(false)
   //instead for true async connections.
+
+	//When OurClient goes out of scope, the destructor will disconnect, so we
+	//need not call it explicitly.
 }
 
 

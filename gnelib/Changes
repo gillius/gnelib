@@ -1,4 +1,5 @@
 GNE 0.003 to 0.004
+  Made ClientConnection::open a little more friendly.
   Modifications to the event system, onDisconnect event, and error events
     split into two categories.  Error objects now passed by const reference.
   A few bug fixes.

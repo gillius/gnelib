@@ -55,23 +55,31 @@ public:
 
   /**
    * Opens the socket, ready for connect, but does not yet connect.
+	 * Normally this function does not block, but if you give a hostname that
+	 * needs to be resolved, a delay (possibly long) will occur while the
+	 * lookup occurs.
    * @param dest an address in the form of xxx.xxx.xxx.xxx:ppppp (for
-   *        internet sockets, or an appropriate NL format if not IP).  You
-   *        must use HawkNL to resolve the hostname, if needed.
-   * @param port local port to open on, default 0 for don't care.
+   *        internet sockets, or an appropriate NL format if not IP).
+	 *        You may use a host name rather than an IP address (ex:
+	 *        computer.domain.com:7878).\n
+	 *        In both cases the port is optional, but if you leave the port
+	 *        number out, set remotePort to the value you want.
+	 * @param remotePort if not 0, overrides any port that may have been
+	 *                   defined by dest for the remote connection.
+   * @param localPort local port to open on, default 0 for don't care.
    * @return true if the socket could not be opened.
    */
   //##ModelId=3B07538003BB
-  bool open(std::string dest, int port = 0);
+  bool open(std::string dest, int remotePort = 0, int LocalPort = 0);
 
   /**
    * Alternate version of open taking a native HawkNL address.
    * @param dest destination address and port.
-   * @param port local port to open on, default 0 for don't care.
+   * @param localPort local port to open on, default 0 for don't care.
    * @return true if the socket could not be opened.
    */
   //##ModelId=3B07538003BE
-  bool open(NLaddress dest, int port = 0);
+  bool open(NLaddress dest, int localPort = 0);
 
   /**
    * Starts connection to the specified target.  This method does not block,

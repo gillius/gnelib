@@ -51,17 +51,25 @@ void ClientConnection::run() {
   }
 }
 
+/**
+ * \bug check to see if the failure from nlGetAddrFromName is a valid thing
+ *      to give nlOpen, and if an error will be generated there.
+ */
 //##ModelId=3B07538003BB
-bool ClientConnection::open(std::string dest, int port) {
+bool ClientConnection::open(std::string dest, int remotePort, int localPort) {
   NLaddress addr;
-  nlStringToAddr((NLbyte*)dest.c_str(), &addr);
-  return open(addr, port);
+  nlGetAddrFromName((NLbyte*)dest.c_str(), &addr);
+
+	if (remotePort != 0) //Override any port possibly specifed in dest.
+		nlSetAddrPort(&addr, (NLushort)remotePort);
+
+  return open(addr, localPort);
 }
 
 //##ModelId=3B07538003BE
-bool ClientConnection::open(NLaddress dest, int port) {
+bool ClientConnection::open(NLaddress dest, int localPort) {
   address = dest;
-  sockets.r = nlOpen(port, NL_RELIABLE_PACKETS);
+  sockets.r = nlOpen(localPort, NL_RELIABLE_PACKETS);
   return (sockets.r == NL_INVALID);
 }
 
