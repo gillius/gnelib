@@ -91,29 +91,7 @@ void ServerConnection::run() {
 
   //Do the GNE protocol handshake.
   try {
-    //Receive the client's CRP.
-    gnedbgo(4, "Waiting for the client's CRP.");
-    Error err = getCRP();
-
-    if (err.getCode() == Error::GNETheirVersionHigh ||
-        err.getCode() == Error::GNETheirVersionLow ||
-        err.getCode() == Error::UserVersionMismatch) {
-      gnedbgo(4, "Versions don't match, sending refusal.");
-      sendRefusal();
-      throw err;
-    }
-    
-    //Else, we send the CAP
-    gnedbgo(4, "Got CRP, now sending CAP.");
-    sendCAP();
-
-    //Then we handle anything related to the unreliable connection if needed.
-    if (params->unrel) {
-      gnedbgo(4, "Unreliable requested.  Getting unrel info.");
-      getUnreliableInfo();
-    } else
-      gnedbgo(4, "Unreliable connection not requested.");
-
+    doHandshake();
   } catch (Error e) {
     params->creator->onListenFailure(e, getRemoteAddress(true), getListener());
     //We delete ourselves when we terminate since we were never seen by the
@@ -123,6 +101,7 @@ void ServerConnection::run() {
   }
   gnedbgo(4, "GNE Protocol Handshake Successful.");
 
+  //Start up the connecting SyncConnection and start the onNewConn event.
   bool onNewConnFinished = false;
   SyncConnection sConn(this);
   try {
@@ -131,8 +110,6 @@ void ServerConnection::run() {
     connecting = true;
     eventListener->start();
     reg(true, (sockets.u != NL_INVALID));
-
-    //Do GNE protocol connection negotiaion here
 
     gnedbgo2(2, "Starting onNewConn r: %i, u: %i", sockets.r, sockets.u);
     getListener()->onNewConn(sConn); //SyncConnection will relay this
@@ -159,11 +136,40 @@ void ServerConnection::run() {
   params = NULL;
 }
 
+//##ModelId=3C783ACF02BE
+void ServerConnection::doHandshake() throw (Error) {
+  //Receive the client's CRP.
+  gnedbgo(4, "Waiting for the client's CRP.");
+  try {
+    getCRP();
+  } catch (Error e) {
+    if (e.getCode() == Error::GNETheirVersionHigh ||
+      e.getCode() == Error::GNETheirVersionLow ||
+      e.getCode() == Error::UserVersionMismatch) {
+      gnedbgo(4, "Versions don't match, sending refusal.");
+      sendRefusal();
+    }
+    throw;
+  }
+  
+  //Else, we send the CAP
+  gnedbgo(4, "Got CRP, now sending CAP.");
+  sendCAP();
+  
+  //Then we handle anything related to the unreliable connection if needed.
+  if (params->unrel) {
+    gnedbgo(4, "Unreliable requested.  Getting unrel info.");
+    getUnreliableInfo();
+  } else {
+    gnedbgo(4, "Unreliable connection not requested.");
+  }
+}
+
 const int CRPLEN = sizeof(guint8) + sizeof(guint8) + sizeof(guint16) +
                    sizeof(guint32) + sizeof(guint32) + sizeof(gbool);
 
 //##ModelId=3C5CED0502CD
-Error ServerConnection::getCRP() {
+void ServerConnection::getCRP() throw (Error) {
   gbyte* crpBuf = new gbyte[RawPacket::RAW_PACKET_LEN];
   int check = sockets.rawRead(true, crpBuf, RawPacket::RAW_PACKET_LEN);
   if (check != CRPLEN) {
@@ -198,19 +204,11 @@ Error ServerConnection::getCRP() {
   //We are done with the CRP packet
   delete[] crpBuf;
 
-  try {
-    GNE::checkVersions(them, themUser);
-  } catch (Error e) {
-    return e;
-  }
+  //This will throw an Error of the versions are wrong.
+  GNE::checkVersions(them, themUser);
 
   //Now that we know the versions are OK, make the PacketStream
-  if ((int)maxOutRate < params->outRate)
-    params->outRate = (int)maxOutRate;
-  ps = new PacketStream(params->outRate, params->inRate, *this);
-
-  //We made it through without any errors!
-  return Error(Error::NoError);
+  ps = new PacketStream(params->outRate, maxOutRate, *this);
 }
 
 //##ModelId=3C5CED0502CE
@@ -256,7 +254,7 @@ void ServerConnection::getUnreliableInfo() throw (Error) {
     } else {
       gnedbgo2(1, "Protocol violation trying to get unrel info.  Got %d bytes expected %d",
         check, sizeof(guint16));
-      throw Error::createLowLevelError(Error::ProtocolViolation);
+      throw Error(Error::ProtocolViolation);
     }
   }
 

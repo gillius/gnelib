@@ -113,6 +113,12 @@ protected:
 
 private:
   /**
+   * Does the GNE protocol handshake, throwing an exception on error.
+   */
+  //##ModelId=3C783ACF0192
+  void doHandshake() throw (Error);
+
+  /**
    * Sends the CRP, throwing an Error on error.
    */
   //##ModelId=3C5CED05016E

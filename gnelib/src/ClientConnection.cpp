@@ -100,24 +100,7 @@ void ClientConnection::run() {
     //Try to connect using the GNE protocol before we mess with any of the
     //user stuff.
     try {
-      //Start the GNE protocol connection process.
-      //The first packet is from client to server, and is the connection
-      //request packet (CRP).
-      gnedbgo(4, "Sending the CRP.");
-      sendCRP();
-
-      //Now we expect to receive the connection accepted packet (CAP) or the
-      //refused connection packet, and then based on that set up the
-      //unreliable connection.
-      Address temp = getCAP();
-      gnedbgo(4, "Received the CAP.");
-
-      if (params->unrel) {
-        gnedbgo(4, "Setting up the unreliable connection");
-        setupUnreliable(temp);
-      } else
-        gnedbgo(4, "Unreliable connection not requested.");
-
+      doHandshake();
     } catch (Error e) {
       gnedbgo1(1, "Connection failure during GNE handshake: %s", e.toString().c_str());
       getListener()->onConnectFailure(e);
@@ -185,6 +168,28 @@ void ClientConnection::run() {
   }
 }
 
+//##ModelId=3C783ACF0192
+void ClientConnection::doHandshake() throw (Error) {
+  //Start the GNE protocol connection process.
+  //The first packet is from client to server, and is the connection
+  //request packet (CRP).
+  gnedbgo(4, "Sending the CRP.");
+  sendCRP();
+  
+  //Now we expect to receive the connection accepted packet (CAP) or the
+  //refused connection packet, and then based on that set up the
+  //unreliable connection.
+  Address temp = getCAP();
+  gnedbgo(4, "Received the CAP.");
+  
+  if (params->unrel) {
+    gnedbgo(4, "Setting up the unreliable connection");
+    setupUnreliable(temp);
+  } else {
+    gnedbgo(4, "Unreliable connection not requested.");
+  }
+}
+
 //##ModelId=3C5CED05016E
 void ClientConnection::sendCRP() throw (Error) {
   GNEProtocolVersionNumber ver = GNE::getGNEProtocolVersion();
@@ -241,10 +246,7 @@ Address ClientConnection::getCAP() throw (Error) {
     cap >> maxOutRate;
 
     //Now we have enough info to create our PacketStream.
-    //Take the lowest of the out rates.
-    if ((int)maxOutRate < params->outRate)
-      params->outRate = (int)maxOutRate;
-    ps = new PacketStream(params->outRate, params->inRate, *this);
+    ps = new PacketStream(params->outRate, maxOutRate, *this);
 
     Address ret = params->dest;
     if (params->unrel) {

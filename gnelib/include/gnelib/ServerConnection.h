@@ -77,8 +77,11 @@ protected:
   void run();
 
 private:
+  //##ModelId=3C783ACF02BE
+  void doHandshake() throw (Error);
+
   //##ModelId=3C5CED0502CD
-  Error getCRP();
+  void getCRP() throw (Error);
 
   //##ModelId=3C5CED0502CE
   void sendRefusal();
