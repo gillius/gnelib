@@ -18,58 +18,44 @@
  */
 
 #include "gneintern.h"
-#include "Packet.h"
-#include "RawPacket.h"
+#include "ConnectionListener.h"
 
 namespace GNE {
 
-//##ModelId=3B0753810151
-Packet::Packet(int id) : type((NLubyte)id) {
-	timestamp = 0;
+//##ModelId=3BCA817C0046
+ConnectionListener::~ConnectionListener() {
 }
 
-//##ModelId=3B0753810153
-Packet::~Packet() {
+//##ModelId=3BCA83910078
+void ConnectionListener::onConnect(SyncConnection* conn) {
 }
 
-//##ModelId=3B0753810155
-Packet* Packet::makeClone() const {
-  return new Packet(*this);
+//##ModelId=3BCA83920262
+void ConnectionListener::onConnectFailure(const Error& error) {
 }
 
-//##ModelId=3B0753810157
-int Packet::getType() const {
-  return (int)type;
+//##ModelId=3BCFAE5900AA
+void ConnectionListener::onNewConn(SyncConnection* newConn) {
 }
 
-//##ModelId=3B0753810159
-int Packet::getSize() const {
-  return sizeof(timestamp) + sizeof(type);
+//##ModelId=3BCA83BA02F8
+void ConnectionListener::onDisconnect() {
 }
 
-//##ModelId=3B075381015B
-void Packet::writePacket(RawPacket& raw) const {
-  raw << type << timestamp;
+//##ModelId=3BCA83C600B4
+void ConnectionListener::onError(const Error& error) {
 }
 
-//##ModelId=3B075381015E
-void Packet::readPacket(RawPacket& raw) {
-  raw >> timestamp;
+//##ModelId=3BCA83C803A2
+void ConnectionListener::onFailure(const Error& error) {
 }
 
-//##ModelId=3B089AE802BC
-Packet* Packet::create() {
-  return new Packet();
+//##ModelId=3BCA83CF0208
+void ConnectionListener::onReceive() {
 }
 
-//##ModelId=3BDB10A500BE
-Packet& Packet::operator = (const Packet& rhs) {
-	//The type should already by the same
-	assert(type == rhs.type);
-	timestamp = rhs.timestamp;
-	return *this;
+//##ModelId=3BCA83D101F4
+void ConnectionListener::onDoneWriting() {
 }
 
-}
-
-
+} //namespace GNE

@@ -22,6 +22,7 @@
 
 #include "gnelib/Address.h"
 #include "gnelib/ClientConnection.h"
+#include "gnelib/ConnectionListener.h"
 #include "gnelib/ConditionVariable.h"
 #include "gnelib/Connection.h"
 #include "gnelib/ErrorGne.h"
@@ -37,7 +38,7 @@
 #include "gnelib/PacketParser.h"
 #include "gnelib/RawPacket.h"
 #include "gnelib/ServerConnectionListener.h"
-#include "gnelib/ServerConnectionCreator.h"
+#include "gnelib/SyncConnection.h"
 #include "gnelib/ServerConnection.h"
 #include "gnelib/Thread.h"
 #include "gnelib/TimeGne.h"

@@ -19,14 +19,16 @@
 
 #include "gneintern.h"
 #include "ClientConnection.h"
+#include "ConnectionListener.h"
 #include "ErrorGne.h"
 #include "Address.h"
+#include "SyncConnection.h"
 
 namespace GNE {
 
 //##ModelId=3B075380037F
-ClientConnection::ClientConnection(int outRate, int inRate)
-: Connection(outRate, inRate) {
+ClientConnection::ClientConnection(int outRate, int inRate, ConnectionListener* listener)
+: Connection(outRate, inRate, listener) {
 	gnedbgo(5, "created");
 }
 
@@ -43,18 +45,34 @@ void ClientConnection::run() {
 	gnedbgo1(1, "Trying to connect to %s", address.toString().c_str());
   NLboolean check = nlConnect(sockets.r, &address.getAddress());
   if (check == NL_TRUE) {
-		reg(true, false);
-		ps->start();
 		gnedbgo2(2, "connection r: %i, u: %i", sockets.r, sockets.u);
-    connected = true;
-    onConnect();
+		assert(eventListener != NULL);
+		try {
+			SyncConnection sync(this);
+			reg(true, false);
+			ps->start();
+			connecting = true;
+			eventListener->onConnect(&sync); //SyncConnection will relay this
+			sync.release();
+			connected = true;
+			connecting = false;
+		} catch (Error e) {
+			//The client should catch any errors in onConnect, but release can
+			//give an error, so we catch it.
+			gnedbgo1(1, "Connection failure: %s", e.toString().c_str());
+			eventListener->onConnectFailure(e);
+		}
   } else {
-    onConnectFailure(Error::createLowLevelError().setCode(Error::ConnectionTimeOut));
+		assert(eventListener != NULL);
+		Error err = Error::createLowLevelError();
+		err.setCode(Error::ConnectionTimeOut);
+		gnedbgo1(1, "Connection failure: %s", err.toString().c_str());
+    eventListener->onConnectFailure(err);
   }
 }
 
 //##ModelId=3B07538003BB
-bool ClientConnection::open(Address dest, int localPort) {
+bool ClientConnection::open(const Address& dest, int localPort) {
 	if (!dest)
 		return true;
 	else {

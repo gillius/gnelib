@@ -44,6 +44,7 @@ public:
     CouldNotOpenSocket,
     ConnectionTimeOut,
 		ConnectionDropped,
+		SyncConnectionReleased,
 		Read,
 		Write,
 		UnknownPacket,

@@ -26,21 +26,20 @@
 #include "Address.h"
 
 namespace GNE {
+class ConnectionListener;
 
 /**
- * A class that can connect to a remote target.  Inherit from this class,
- * overriding the functions from Connection and ClientConnection based on the
- * events you wish to respond to.
+ * A class that can connect to a remote target.
  */
 //##ModelId=3B0753800270
 class ClientConnection : public Connection, public Thread {
 public:
   /**
    * Initializes this ClientConnection.
-   * @see Connection#Connection(int, int, std::string)
+   * @see Connection#Connection(int, int, ConnectionListener*)
    */
   //##ModelId=3B075380037F
-  ClientConnection(int outRate, int inRate);
+  ClientConnection(int outRate, int inRate, ConnectionListener* listener = NULL);
 
   //##ModelId=3B07538003B8
   virtual ~ClientConnection();
@@ -51,7 +50,7 @@ public:
    * @return true if the socket could not be opened.
    */
   //##ModelId=3B07538003BB
-  bool open(Address dest, int localPort = 0);
+  bool open(const Address& dest, int localPort = 0);
 
   /**
    * Starts connection to the specified target.  This method does not block,
@@ -74,26 +73,6 @@ public:
    */
   //##ModelId=3B07538003C1
   void connect();
-
-  /**
-   * Event triggered after there is a successful connection.  The connection
-	 * process will not be considered complete until this function completes.
-   */
-  //##ModelId=3B07538003C2
-  virtual void onConnect() = 0;
-
-  /**
-   * Event triggered when a connection failed.  Note that if
-   * you are joining on this object, the calling thread will still block
-   * until this function returns.\n
-	 * After a connection failure, the connection is as if disconnect() was
-	 * called, therefore you cannot reconnect this connection instance.\n
-	 * Note that for this case, the event onDisconnect IS NOT CALLED, since
-	 * the Connection was never in a connected state.
-	 * @see Connection::disconnect()
-   */
-  //##ModelId=3B07538003C4
-  virtual void onConnectFailure(const Error& error) = 0;
 
 protected:
   /**

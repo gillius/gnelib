@@ -105,7 +105,7 @@ SOURCE=.\src\ConnectionEventGenerator.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ConnectionEventListener.cpp
+SOURCE=.\src\ConnectionListener.cpp
 # End Source File
 # Begin Source File
 
@@ -153,11 +153,11 @@ SOURCE=.\src\RawPacket.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ServerConnection.cpp
+SOURCE=.\src\ReceiveEventListener.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ServerConnectionCreator.cpp
+SOURCE=.\src\ServerConnection.cpp
 # End Source File
 # Begin Source File
 
@@ -166,6 +166,10 @@ SOURCE=.\src\ServerConnectionListener.cpp
 # Begin Source File
 
 SOURCE=.\src\SocketPair.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\SyncConnection.cpp
 # End Source File
 # Begin Source File
 
@@ -213,7 +217,7 @@ SOURCE=.\include\gnelib\ConnectionEventGenerator.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\include\gnelib\ConnectionEventListener.h
+SOURCE=.\include\gnelib\ConnectionListener.h
 # End Source File
 # Begin Source File
 
@@ -265,11 +269,11 @@ SOURCE=.\include\gnelib\RawPacket.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\include\gnelib\ServerConnection.h
+SOURCE=.\include\gnelib\ReceiveEventListener.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\include\gnelib\ServerConnectionCreator.h
+SOURCE=.\include\gnelib\ServerConnection.h
 # End Source File
 # Begin Source File
 
@@ -278,6 +282,10 @@ SOURCE=.\include\gnelib\ServerConnectionListener.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\SocketPair.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\SyncConnection.h
 # End Source File
 # Begin Source File
 

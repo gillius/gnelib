@@ -22,11 +22,12 @@
 
 #include "gneintern.h"
 #include "ReceiveEventListener.h"
-#include "ServerConnectionCreator.h"
 #include "Connection.h"
 
 namespace GNE {
 class Address;
+class ConnectionListener;
+class ServerConnection;
 
 /**
  * A connection that listens for other connections.  Inherit from this class,
@@ -38,14 +39,9 @@ class ServerConnectionListener {
 public:
   /**
    * Initalizes this class.
-   * @param outRate max outbandwith per client
-   * @param inRate max clients can send to us.
-   * @param port the port number to listen on.
-   * @param creator2 the class to create your custom ServerConnection objects.
-   *                 This object will be destroyed with the class.
    */
   //##ModelId=3B07538102E4
-  ServerConnectionListener(int outRate2, int inRate2, ServerConnectionCreator* creator2);
+  ServerConnectionListener();
 
   /**
    * The destructor will close down a listening object, so when you are done
@@ -67,7 +63,6 @@ public:
    * connection has been negotiated and error checked.  When you are
    * finished, delete this object and the dtor will clean things up.
    * @see onListenFailure
-   * @see #onNewConn(Connection*)
    * @return true, if there was an error.
    */
   //##ModelId=3B0753810307
@@ -80,24 +75,55 @@ public:
   bool isListening() const;
 
   /**
-   * There was a failure when trying to listen on this socket.  This is not
-   * called when the actual low-level listen fails (that error is returned
-   * from listen), but instead high-level errors while connecting such as a
-   * version mismatch are sent here.
-   * Note you must call this function explicity from your overridden
-   * function FIRST so the underlying functions recieve this event.
-   * @param errorType the type of error
-   */
-  //##ModelId=3B075381030A
-  virtual void onListenFailure(Error error);
-
-  /**
-   * Returns the address of the listening socket.
+   * Returns the address of the listening socket.  The socket must be opened
+	 * when this function is called, but does not have to be listening.
    */
   //##ModelId=3B075381030D
   Address getLocalAddress() const;
 
+protected:
+  /**
+   * There was a failure when trying to listen on this socket.  This is not
+   * called when the actual low-level listen fails (that error is returned
+   * from listen), but instead high-level errors while connecting such as a
+   * version mismatch are sent here.\n
+	 * This function may be called from multiple threads at the same time, and
+	 * may block if it wishes; it does not have the "non-blocking" restriction
+	 * most GNE events have.\n
+	 * If the connection failed very early, the address and listener parameters
+	 * will be NULL (this happens if the low-level accept() call fails).
+   * @param error the type of error
+	 * @param from the remote address the failed attempt came from
+	 * @param listener the unused ConnectionListener that was obtained from
+	 *                 getNewConnectionParams.  If it is NULL, then
+	 *                 getNewConnectionParams was never called.
+   */
+  //##ModelId=3B075381030A
+  virtual void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) = 0;
+
+	/**
+	 * A new connection is starting, and now we want the parameters for this
+	 * new connection.  The three parameters passed should be modified to give
+	 * the new connection's flow control parameters and listener.\n
+	 * The third parameter should be set to the initial event listener for the
+	 * ServerConnection that is being created.  This could be an entirely new
+	 * ConnectionListener or an already existing one, it doesn't matter.  The
+	 * returned listener cannot be NULL, since onNewConn must be called or a
+	 * memory leak will occur.\n
+	 * This pointer will be returned to you through the socket failure event
+	 * (in this case it was never used, but it is returned in case you need to
+	 * delete it).  If the connection is successful you can get your pointer
+	 * back through the resulting ServerConnection class by using
+	 * Connection::getListener.\n
+	 * This function can be called from multiple threads at the same time.
+	 */
+  //##ModelId=3BCFAE5A0064
+	virtual void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) = 0;
+
 private:
+	//This is simply so that ServerConnection can call onListenFailure when it fails.
+	friend class ServerConnection;
+
   //##ModelId=3B075380034A
   class ServerListener : public ReceiveEventListener {
   public:
@@ -126,17 +152,8 @@ private:
   //##ModelId=3B07538102D9
   ServerListener* listener;
 
-  //##ModelId=3B07538102DD
-  int inRate;
-
-  //##ModelId=3B07538102DE
-  int outRate;
-
   //##ModelId=3B01D48100DC
   NLsocket socket;
-
-  //##ModelId=3B07538102E0
-  ServerConnectionCreator* creator;
 };
 
 }

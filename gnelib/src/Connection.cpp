@@ -19,6 +19,7 @@
 
 #include "gneintern.h"
 #include "Connection.h"
+#include "ConnectionListener.h"
 #include "RawPacket.h"
 #include "PacketParser.h"
 #include "ConnectionEventGenerator.h"
@@ -30,8 +31,9 @@
 namespace GNE {
 
 //##ModelId=3B0753810073
-Connection::Connection(int outRate, int inRate)
-: connected(false), rlistener(NULL), ulistener(NULL) {
+Connection::Connection(int outRate, int inRate, ConnectionListener* listener)
+: connecting(false), connected(false), eventListener(listener),
+rlistener(NULL), ulistener(NULL) {
 	ps = new PacketStream(outRate, inRate, *this);
 }
 
@@ -39,6 +41,16 @@ Connection::Connection(int outRate, int inRate)
 Connection::~Connection() {
 	disconnect();
   delete ps;
+}
+
+//##ModelId=3BCE75A80280
+ConnectionListener* Connection::getListener() const {
+	return eventListener;
+}
+
+//##ModelId=3BCE75A80282
+void Connection::setListener(ConnectionListener* listener) {
+	eventListener = listener;
 }
 
 //##ModelId=3B0753810078
@@ -69,7 +81,7 @@ bool Connection::isConnected() const {
 //##ModelId=3B0753810083
 void Connection::disconnect() {
 	sync.acquire();
-	if (connected) {
+	if (connecting || connected) {
 		//This is nessacary because we can't join on ps if it has already been
 		//  shutdown and/or never started
 		unreg(true, true);
@@ -78,7 +90,7 @@ void Connection::disconnect() {
 		ps->join();
 		onDisconnect();
 		sockets.disconnect();
-		connected = false;
+		connected = connecting = false;
 	}
 	sync.release();
 }
@@ -93,22 +105,32 @@ void Connection::disconnectSendAll() {
 
 //##ModelId=3BB4208C0104
 void Connection::onDisconnect() {
+	assert(eventListener != NULL);
+	eventListener->onDisconnect();
 }
 
 //##ModelId=3B0753810085
 void Connection::onFailure(const Error& error) {
+	assert(eventListener != NULL);
+	eventListener->onFailure(error);
 }
 
 //##ModelId=3BB4208C01E0
 void Connection::onError(const Error& error) {
+	assert(eventListener != NULL);
+	eventListener->onError(error);
 }
 
 //##ModelId=3B07538100AC
 void Connection::onReceive() {
+	assert(eventListener != NULL);
+	eventListener->onReceive();
 }
 
 //##ModelId=3B07538100AE
 void Connection::onDoneWriting() {
+	assert(eventListener != NULL);
+	eventListener->onDoneWriting();
 }
 
 //##ModelId=3B07538100B0

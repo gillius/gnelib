@@ -25,59 +25,49 @@
 #include "Thread.h"
 
 namespace GNE {
+class ConnectionListener;
+class ServerConnectionListener;
 
 /**
- * The server-side connection.  Once it is connected, there's very little to
- * no difference between ClientConnection and ServerConnection at this level.
+ * A GNE "internal" class.  Users will use this class, but probably only as
+ * its base class -- a Connection.  This class is created by
+ * ServerConnectionListener when incoming connections are comming in.
  */
 //##ModelId=3B0753800310
 class ServerConnection : public Connection, public Thread {
 public:
   /**
-   * Intializes this class, given the flow control parameters.
-   * @param outRate the maximum rate in bytes per second to send.
-   * @param inRate the maximum rate we allow the sender to send to us in
-   *        bytes per second.
+   * Intializes this class.
+   * @see Connection#Connection(int, int, ConnectionListener*)
+	 * @param rsocket2 the reliable socket received from the accept command.
+	 * @param creator the ServerConnectionListener that created us, so that we
+	 *                may call its onListenFailure event.
    */
   //##ModelId=3B075381027A
-  ServerConnection(int outRate, int inRate, NLsocket rsocket2);
+  ServerConnection(int outRate, int inRate, ConnectionListener* listener, 
+		               NLsocket rsocket2, ServerConnectionListener* creator);
 
   //##ModelId=3B075381027E
   virtual ~ServerConnection();
 
-  /**
-   * Event triggered when a new connection has been negotiated and error
-   * checked.  This object is a newly allocated object created from your
-   * ServerConnectionCreator object, and this function will be the first time
-   * you code has "seen" this object, so you will have to register it into
-   * some internal list so you can interact with and delete it later.  This
-   * functionality could exist in your ServerConnectionCreator::create(),
-   * though rather than in this function.\n
-   * If the connection failed, though, the function onConnFailure instead of
-   * this function is called.\n
-   */
-  //##ModelId=3B0753810281
-  virtual void onNewConn() = 0;
-
-  /**
-   * Event triggered when the connection failed.  Either this function or
-   * onNewConn will be called when a new connection is made.  If you want to
-   * get rid of this object right now, call detach(true) in this function. If
-   * you want the object to stick around, like onNewConn, you must save a
-   * pointer elsewhere so you can interact with and delete this object later.
-   * @see onNewConn
-   */
-  //##ModelId=3B0753810283
-  virtual void onConnFailure(const Error& error) = 0;
-
 protected:
   /**
    * This thread performs the connection process.  The thread will have
-	 * finished before onNewConn is called.
+	 * finished before onNewConn is called.  If the connection was successful,
+	 * detach(false) is called, else on failure detach(true) is called to
+	 * delete this object once ServerConnectionListener::onListenFailure
+	 * completes.
    */
   //##ModelId=3B0753810280
   void run();
 
+private:
+	/**
+	 * Used only while connecting to transmit an error if necessary.
+	 * @see run
+	 */
+  //##ModelId=3BCFAE590227
+	ServerConnectionListener* ourCreator;
 };
 
 }

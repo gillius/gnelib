@@ -28,6 +28,7 @@
 #include "SocketPair.h"
 
 namespace GNE {
+class ConnectionListener;
 
 /**
  * A class resembling any type of connection to a remote computer.  A
@@ -35,7 +36,9 @@ namespace GNE {
  * constructed the passed inRate and outRate parameters set a maximum
  * bandwith usage for either direction.  These values might stay the same or
  * reduce after a connection to the remote machine is made, based on that
- * machine's requested maximums.
+ * machine's requested maximums.\n
+ * When you create a new Connection, you will want to register a
+ * ConnectionListener for it so you can receive its events.
  */
 //##ModelId=3B075380029E
 class Connection {
@@ -64,24 +67,39 @@ public:
    * @param outRate the maximum rate in bytes per second to send.
    * @param inRate the maximum rate we allow the sender to send to us in
    *        bytes per second.
+	 * @param listener the ConnectionListener instance that will be setup as
+	 *        the initial listener for the events.  It can be NULL to start
+	 *        with but must be set before performing any operation that
+	 *        that generates events, but preferably as soon as possible.
    */
   //##ModelId=3B0753810073
-  Connection(int outRate, int inRate);
+  Connection(int outRate, int inRate, ConnectionListener* listener = NULL);
 
 	/**
 	 * A Connection will automatically disconnect if it is connected when it
-	 * is destructed.  It is NOT reccomended to disconnect in this way because
-	 * onDisconnect is a virtual function, and virtual functions do not work in
-	 * constructors and destructors.\n
-	 * In order for that event to work, you must add the following code to your
-	 * derived class:\n
-	 * if (isConnected()) onDisconnect();\n
-	 * You may choose to add this code at your own discretion.  Placing it
-	 * there acts only as a safety, so there is no disadvantage in adding it.
-	 * @see onDisconnect()
+	 * is destructed.  Connections won't allocate or deallocate their listeners,
+	 * so you may want to delete your listener that was registered
 	 */
   //##ModelId=3B0753810076
   virtual ~Connection();
+
+	/**
+	 * Returns the currently registered event Listener.  This can be useful to
+	 * delete your registered user right after disconnection, so you won't have
+	 * to keep track of the pointer after you allocate it.
+	 */
+  //##ModelId=3BCE75A80280
+	ConnectionListener* getListener() const;
+
+	/**
+	 * Sets a new event listener.  All new events will be sent to the new
+	 * listener.  If events are still being processed by the old listener, this
+	 * change will not affect those running events, however, depending on the
+	 * event it could block events for the new listener until it completes.
+	 * The passed listener cannot be NULL.
+	 */
+  //##ModelId=3BCE75A80282
+	void setListener(ConnectionListener* listener);
 
   /**
    * Returns the PacketStream associated with this class.  Writing and
@@ -93,7 +111,8 @@ public:
   /**
    * If stats is enabled, returns Connection stats.
    * @return various connection stats.
-   * @see ConnectionStats
+   * @see Stats
+	 * @see GNE::enableStats
    */
   //##ModelId=3B0753810079
   Stats getStats() const;
@@ -148,75 +167,28 @@ public:
   //##ModelId=3B0753810084
   void disconnectSendAll();
 
-	/**
-	 * An event triggered when a socket is closing for any reason.  This event
-	 * is always called once and only once if a socket was connected.  At the
-	 * time this event is called, the sockets are still connected, so you can
-	 * get their address (for logging and/or reporting reasons), but you cannot
-	 * send any more data or receive any from this event.\n
-	 * Note that this event is not called if the socket is disconnected through
-	 * the destructor, unless you add some code to your derived class's
-	 * destructor.  See Connection::~Connection for more details.
-	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread.  Therefore, some events for any 
-	 * connection will not be called until this function completes.
-	 * @see ~Connection()
-	 */
-  //##ModelId=3BB4208C0104
-	virtual void onDisconnect();
-
-  /**
-   * This event is triggered when a fatal error occurs in a connection.
-	 * When a fatal error occurs, communications cannot contiune and the
-	 * socket will be disconnected.  An onDisconnect() event will occur
-	 * immediately after this event completes.  Most errors in GNE are fatal.
-	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread.  Therefore, some events for any 
-	 * connection will not be called until this function completes.
-	 * @see onError()
-   */
-  //##ModelId=3B0753810085
-  virtual void onFailure(const Error& error);
-
-	/**
-	 * This event is triggered when a non-fatal error occurs in a connection
-	 * that does not force the connection to close, for example an unknown
-	 * packet encounted is an error, but the connection can still proceed.\n
-	 * After this event is processed, connections resume normally.
-	 * disconnect() may also be called at this point if you wish to terminate
-	 * the connection anyways.
-	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread.  Therefore, some events for any 
-	 * connection will not be called until this function completes.
-	 * @see onFailure()
-	 * @see disconnect()
-   */
-  //##ModelId=3BB4208C01E0
-	virtual void onError(const Error& error);
-
-  /**
-   * Event triggered when one or more packets have been recieved.
-	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread.  Therefore, some events for any 
-	 * connection will not be called until this function completes.
-   */
-  //##ModelId=3B07538100AC
-  virtual void onReceive();
-
-  /**
-   * Event triggered when the write buffer was filled and is now empty.
-   * Note that this does not mean that data is immediately ready to be sent
-   * again -- there could still be a flow control delay.\n
-   * Note you must call this function explicity from your overridden
-   * function FIRST so the underlying functions recieve this event.
-	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single writer thread per connection.  Therefore, no more
-	 * writing will take place until this function completes.
-   */
-  //##ModelId=3B07538100AE
-  virtual void onDoneWriting();
-
 protected:
+	//The listener for our events.  All on* events go here.  This is protected
+	//so ClientConnection can send events as well.
+  //##ModelId=3BCE75A80245
+	ConnectionListener* eventListener;
+
+	//For information about events, see the ConnectionListener class.
+  //##ModelId=3BB4208C0104
+	void onDisconnect();
+
+  //##ModelId=3B0753810085
+  void onFailure(const Error& error);
+
+  //##ModelId=3BB4208C01E0
+	void onError(const Error& error);
+
+  //##ModelId=3B07538100AC
+  void onReceive();
+
+  //##ModelId=3B07538100AE
+  void onDoneWriting();
+
 	/**
 	 * The pair of sockets.
 	 */
@@ -229,6 +201,14 @@ protected:
    */
   //##ModelId=3B075381006E
   PacketStream* ps;
+
+	/**
+	 * Is this connecting?  We need to know this so we don't report as ready
+	 * for communications, but still want to disconnect.  This will be set
+	 * after the sockets are registered and the PacketStream is active.
+	 */
+  //##ModelId=3BDB10A302F8
+	bool connecting;
 
   /**
    * Is this Connection active and ready for communications?
@@ -299,8 +279,8 @@ private:
 	 */
   friend class Listener;
 
-	//Possible ConnectionListeners that may or may not exist, but if they do we
-	//need to kill them on exit.
+	//Possible ReceiveEventListeners that may or may not exist, but if they do
+	//we need to kill them on exit.
   //##ModelId=3B6E14AC00FB
 	Listener* rlistener;
   //##ModelId=3B6E14AC0100

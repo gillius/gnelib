@@ -19,12 +19,19 @@
 
 #include "gneintern.h"
 #include "ServerConnection.h"
+#include "ConnectionListener.h"
+#include "SyncConnection.h"
+#include "ServerConnectionListener.h"
+#include "Address.h"
 
 namespace GNE {
 
 //##ModelId=3B075381027A
-ServerConnection::ServerConnection(int outRate, int inRate, NLsocket rsocket2)
-: Connection(outRate, inRate) {
+ServerConnection::ServerConnection(int outRate, int inRate, 
+																	 ConnectionListener* listener, 
+																	 NLsocket rsocket2, 
+																	 ServerConnectionListener* creator)
+: Connection(outRate, inRate, listener), ourCreator(creator) {
 	gnedbgo(5, "created");
   sockets.r = rsocket2;
 }
@@ -40,16 +47,22 @@ ServerConnection::~ServerConnection() {
 //##ModelId=3B0753810280
 void ServerConnection::run() {
   assert(sockets.r != NL_INVALID);
-	//Do connection negotiaion here
-	reg(true, false);
-	ps->start();
 	gnedbgo2(2, "connection r: %i, u: %i", sockets.r, sockets.u);
-	connected = true;
-  onNewConn();
-}
 
-//##ModelId=3B0753810283
-void ServerConnection::onConnFailure(const Error& error) {
+	assert(eventListener != NULL);
+	connecting = true;
+	try {
+		SyncConnection sync(this);
+		//Do connection negotiaion here
+		reg(true, false);
+		ps->start();
+		eventListener->onNewConn(&sync); //SyncConnection will relay this
+		sync.release();
+		connected = true;
+		connecting = false;
+	} catch (Error e) {
+		ourCreator->onListenFailure(e, getRemoteAddress(true), eventListener);
+	}
 }
 
 }

@@ -32,7 +32,6 @@
 
 #include "../../include/gnelib.h"
 #include <iostream>
-#include <cstring>
 #include <string>
 
 using namespace std;
@@ -77,34 +76,38 @@ public:
 		return message;
 	}
 
+	virtual HelloPacket& operator = (HelloPacket& rhs) {
+		Packet::operator =(rhs);
+		message = rhs.message;
+		return *this;
+	}
+
 private:
 	string message;
 };
 
-class OurClient : public ClientConnection {
+class OurClient : public ConnectionListener {
 public:
-  OurClient(int outRate, int inRate) 
-    : ClientConnection(outRate, inRate) {
-		mprintf("Client instance created.\n");
+	OurClient() : conn(NULL) {
+		mprintf("Client listener created.\n");
 	}
 
-	virtual ~OurClient() {
-		//Because we allow disconnects by destruction, we have to add this line
-		//of code if we always want onDisconnect called properly.
-		if (isConnected()) onDisconnect();
-		mprintf("Client instance killed.\n");
+	~OurClient() {
+		mprintf("Client listener destroyed.\n");
 	}
 
 	void onDisconnect() { 
 		mprintf("Client just disconnected.\n");
+		delete this;
 	}
 
-  void onConnect() {
+  void onConnect(SyncConnection* conn2) {
+		conn = conn2->getConnection();
     mprintf("Connection to server successful.\n");
   }
 
 	void onReceive() {
-		Packet* message = stream().getNextPacket();
+		Packet* message = conn->stream().getNextPacket();
 		if (message->getType() == MIN_USER_ID) {
 			HelloPacket* helloMessage = (HelloPacket*)message;
 			mprintf("got message: \"");
@@ -121,7 +124,7 @@ public:
 
 	void onError(const Error& error) {
 		mprintf("Socket error: %s\n", error.toString().c_str());
-		disconnect();
+		conn->disconnect();
 	}
 
   void onConnectFailure(const Error& error) {
@@ -129,38 +132,33 @@ public:
 		mprintf("GNE reported error: %s\n", error.toString().c_str());
   }
 private:
+	Connection* conn;
 };
 
-class OurServer : public ServerConnection {
+class OurServer : public ConnectionListener {
 public:
-  OurServer(int outRate, int inRate, NLsocket rsocket2)
-    : ServerConnection(outRate, inRate, rsocket2), received(false) {
+  OurServer() : conn(NULL), received(false) {
 		mprintf("Server instance created\n");
 	}
 
   virtual ~OurServer() {
-		//Because we allow disconnects by destruction, we have to add this line
-		//of code if we always want onDisconnect called properly.
-		if (isConnected()) onDisconnect();
 		mprintf("ServerConnection instance killed\n");
 	}
 
 	void onDisconnect() { 
 		mprintf("ServerConnection just disconnected.\n");
-	}
-
-  void onNewConn() {
-    mprintf("Connection received from %s; waiting for message...\n", getRemoteAddress(true).toString().c_str());
-		quit.acquire();
-		quit.timedWait(5000);
-		quit.release();
 		if (!received)
 			mprintf("No message received.\n");
-    detach(true);
+		delete this;
+	}
+
+  void onNewConn(SyncConnection* conn2) {
+		conn = conn2->getConnection();
+    mprintf("Connection received from %s; waiting for message...\n", conn->getRemoteAddress(true).toString().c_str());
   }
 
 	void onReceive() {
-		Packet* message = stream().getNextPacket();
+		Packet* message = conn->stream().getNextPacket();
 		if (message->getType() == MIN_USER_ID) {
 			HelloPacket* helloMessage = (HelloPacket*)message;
 			mprintf("got message: \"");
@@ -171,7 +169,7 @@ public:
 			//Send Response
 			mprintf("  Sending Response...\n");
 			HelloPacket response("Hello, client!");
-			stream().writePacket(response, true);
+			conn->stream().writePacket(response, true);
 		} else
 			mprintf("got bad packet.\n");
 		delete message;
@@ -183,35 +181,33 @@ public:
 
 	void onError(const Error& error) {
 		mprintf("Socket error: %s\n", error.toString().c_str());
-		disconnect();
+		conn->disconnect();
 	}
 
-  void onConnFailure(const Error& error) {
-    mprintf("Connection failure while connecting.\n");
-    detach(true);
-  }
 private:
-	ConditionVariable quit;
+	Connection* conn;
 	bool received;
-};
-
-class OurCreator : public ServerConnectionCreator {
-public:
-  OurCreator() {}
-  virtual ~OurCreator() {}
-
-  ServerConnection* create(int outRate, int inRate, NLsocket rsocket2) {
-    return new OurServer(outRate, inRate, rsocket2);
-  }
 };
 
 class OurListener : public ServerConnectionListener {
 public:
-  OurListener(int outRate, int inRate) 
-    : ServerConnectionListener(outRate, inRate, new OurCreator()) {
+  OurListener() 
+    : ServerConnectionListener() {
   }
 
   virtual ~OurListener() {}
+
+  void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) {
+		mprintf("Connection error: %s\n", error.toString().c_str());
+		mprintf("  Error received from %s", from.toString().c_str());
+		delete listener;
+	}
+
+	void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
+		inRate = 3200;
+		outRate = 3200;
+		listener = new OurServer();
+	}
 
 private:
 };
@@ -271,7 +267,7 @@ void doServer(int outRate, int inRate, int port) {
 	//Generate debugging logs to server.log if in debug mode.
 	initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "server.log");
 #endif
-  OurListener server(outRate, inRate);
+  OurListener server;
   if (server.open(port))
     errorExit("Cannot open server socket.");
   if (server.listen())
@@ -281,7 +277,6 @@ void doServer(int outRate, int inRate, int port) {
   cout << "Press a key to shutdown server." << endl;
   getch();
   //When the server class is destructed, it will stop listening and shutdown.
-	//We added the onDisconnect line similar to the client side connection.
 }
 
 void doClient(int outRate, int inRate, int port) {
@@ -294,9 +289,11 @@ void doClient(int outRate, int inRate, int port) {
 
 	Address address(host);
 	address.setPort(port);
+	if (!address)
+		errorExit("Invalid address.");
   cout << "Connecting to: " << address << endl;
 
-  OurClient client(outRate, inRate);
+	ClientConnection client(outRate, inRate, new OurClient());
   if (client.open(address, 0)) //localPort = 0, for any local port.
     errorExit("Cannot open client socket.");
 
@@ -305,16 +302,15 @@ void doClient(int outRate, int inRate, int port) {
   //if we did not call join, we would have called client.detach(false)
   //instead for true async connections.
 
-	//Send our information
-	HelloPacket message("Hello, server!");
-	client.stream().writePacket(message, true);
-	client.stream().waitToSendAll();
-	//When OurClient goes out of scope, the destructor will disconnect, so we
-	//need not call it explicitly.  But to do this correctly you have to add a
-	//line of code in the destructor!  See OurClient::~OurClient.
-
-	//If we called disconnect directly or we didn't want to guarantee the
-	//processing of onDisconnect, we could leave that line out of the dtor.
+	//Check if our connection was successful.
+	if (client.isConnected()) {
+		
+		//Send our information
+		HelloPacket message("Hello, server!");
+		client.stream().writePacket(message, true);
+		client.stream().waitToSendAll();
+		
+	}
 }
 
 

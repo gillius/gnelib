@@ -1,4 +1,10 @@
 GNE 0.003 to 0.4
+  Added SyncConnection class for syncronous communications over a Connection.
+  Added ConnectionListener class.  Events go there now.
+  ServerConnectionCreator class is gone now.  ServerConnectionListener now
+    has the needed function, and other event handling changes in that class
+	as well.
+  Completely changed the Connection API
   Added onDisconnect event.
   Improvements with Error generation and handling.
   Added test/example exaddr for the Address class.

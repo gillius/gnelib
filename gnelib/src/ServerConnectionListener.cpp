@@ -19,9 +19,9 @@
 
 #include "gneintern.h"
 #include "ServerConnectionListener.h"
-#include "ServerConnectionCreator.h"
 #include "ConnectionEventGenerator.h"
 #include "ServerConnection.h"
+#include "ConnectionListener.h"
 #include "Connection.h"
 #include "GNE.h"
 #include "Address.h"
@@ -29,8 +29,8 @@
 namespace GNE {
 
 //##ModelId=3B07538102E4
-ServerConnectionListener::ServerConnectionListener(int outRate2, int inRate2, ServerConnectionCreator* creator2)
-: listening(false), listener(NULL), inRate(inRate2), outRate(outRate2), creator(creator2) {
+ServerConnectionListener::ServerConnectionListener()
+: listening(false), listener(NULL) {
   listener = new ServerListener(*this);
 }
 
@@ -42,7 +42,6 @@ ServerConnectionListener::~ServerConnectionListener() {
     nlClose(socket);
   }
   delete listener;
-  delete creator;
 }
 
 //##ModelId=3B0753810305
@@ -68,17 +67,22 @@ bool ServerConnectionListener::isListening() const {
   return listening;
 }
 
-//##ModelId=3B075381030A
-void ServerConnectionListener::onListenFailure(Error error) {
-}
-
 //##ModelId=3B075381030F
 void ServerConnectionListener::onReceive() {
   NLsocket sock = nlAcceptConnection(socket);
-  assert(sock != NL_INVALID);
-  ServerConnection* newConn = creator->create(outRate, inRate, sock);
-	gnedbgo2(4, "Spawning a new ServerConnection %x on socket %i", newConn, sock);
-  newConn->start();
+  if (sock != NL_INVALID) {
+		int inRate, outRate;
+		ConnectionListener* listener;
+		getNewConnectionParams(inRate, outRate, listener);
+
+		ServerConnection* newConn = new ServerConnection(outRate, inRate, listener, sock, this);
+		gnedbgo2(4, "Spawning a new ServerConnection %x on socket %i", newConn, sock);
+		newConn->start();
+	} else {
+		Error err = Error::createLowLevelError();
+		gnedbgo1(1, "Listening failure (accept failed): %s", err.toString().c_str());
+		onListenFailure(err, NULL, NULL);
+	}
 }
 
 //##ModelId=3B075381030D
