@@ -31,7 +31,9 @@ namespace Console {
 /**
  * A class derived from streambuf that uses the functions in the Console class.
  * This allows cin or another istream to work under GNE by using the Console
- * class for multithreaded I/O.\n
+ * class for multithreaded I/O.  You should use the GNE::Console::gin object
+ * rather than using this class directly.
+ *
  * For specifics on these functions, consult a standard C++ library reference.
  */
 class ginbuf : public std::streambuf {
@@ -49,7 +51,9 @@ private:
 /**
  * A class derived from streambuf that uses the functions in the Console class.
  * This allows cout or another ostream to work under GNE by using the Console
- * class for multithreaded I/O.\n
+ * class for multithreaded I/O.  You should use the GNE::Console::gout object
+ * rather than using this class directly.
+ *
  * For specifics on these functions, consult a standard C++ library reference.
  */
 class goutbuf : public std::streambuf {

@@ -19,6 +19,7 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ConsoleBuffer.h"
+#include "../include/gnelib/ConsoleStream.h"
 
 using namespace std;
 
@@ -234,6 +235,11 @@ bool ConsoleBuffer::isOptDelim( char ch ) {
   bool ret = ( optDelims.find( ch ) != string::npos );
   release();
   return ret;
+}
+
+ConsoleBuffer& ConsoleBuffer::operator << (const Console::ConsoleMutex& rhs) {
+  rhs.action( *this );
+  return *this;
 }
 
 ConsoleBuffer& ConsoleBuffer::operator << (CBFType f) {

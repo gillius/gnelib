@@ -27,15 +27,9 @@
 #include <sstream>
 
 namespace GNE {
-  class ConsoleBuffer;
-
-
   namespace Console {
-    class ConsoleManipulator;
+    class ConsoleMutex;
   }
-}
-
-namespace GNE {
 
 /**
  * An abstracted Console.  A console is defined as a rectangle in units.  What
@@ -138,6 +132,12 @@ public:
       update();
     return *this;
   }
+
+  //GCC 2 doesn't like member template specialization.  The code compiles
+  //with these lines commented in MSVC.NET or less, and GCC2, so I leave
+  //them commented out.
+  //template <>
+  ConsoleBuffer& operator << (const Console::ConsoleMutex& rhs);
 
   typedef std::ostream& (*CBFType)(std::ostream&);
 

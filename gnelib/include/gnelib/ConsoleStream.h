@@ -22,35 +22,36 @@
 
 namespace GNE {
 class Mutex;
+class SynchronizedObject;
 
 namespace Console {
+class GOut;
 
 class ConsoleManipulator {
 public:
   virtual ~ConsoleManipulator() {};
 
-  virtual void action(std::ostream& o) const = 0;
+  virtual void action(GOut& o) const = 0;
 };
 
 /**
- * A class for syncronizing the gout stream.  You won't create this class
- * directly, but instead will use the GNE::Console::acquire and
- * GNE::Console::release variables.
+ * A class for syncronizing the gout stream or a ConsoleBuffer.  You won't
+ * create this class directly, but instead will use the GNE::Console::acquire
+ * and GNE::Console::release variables.
  */
 class ConsoleMutex : public ConsoleManipulator {
 public:
-  ConsoleMutex(bool isAcquiring, Mutex& syncMutex);
+  ConsoleMutex(bool isAcquiring);
   virtual ~ConsoleMutex();
 
+  void action(GOut& o) const;
+
   //Perform a release or an acquire, based on acq.
-  void action(std::ostream& o) const;
+  void action(SynchronizedObject& o) const;
 
 private:
   //acq is true if we are trying to acquire, false if release.
   bool acq;
-
-  //sync is the mutex we are wrapping
-  Mutex& sync;
 };
 
 /**
@@ -73,14 +74,13 @@ public:
   moveTo(int xLoc, int yLoc);
   virtual ~moveTo();
 
-  void action(std::ostream& o) const;
+  void action(GOut& o) const;
 private:
+  moveTo();
   int x, y;
 };
 
 }
 }
-
-std::ostream& operator << (std::ostream& o, const GNE::Console::ConsoleManipulator& cm);
 
 #endif

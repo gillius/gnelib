@@ -45,7 +45,8 @@ void TextConsole::render( int x, int y, string text, int renderHints ) {
     int numSpaces = getWidth() - x + getXOffset() - stringWidth( text );
     text.append( string( numSpaces, ' ' ) );
   }
-  gout << Console::acquire << moveTo( x, y ) << text << flush << Console::release;
+  gout << Console::acquire;
+  gout << moveTo( x, y ) << text << flush << Console::release;
 }
 
 } //namespace Console

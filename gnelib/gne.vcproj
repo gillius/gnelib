@@ -135,9 +135,6 @@
 				RelativePath="src\ConsoleBuffer.cpp">
 			</File>
 			<File
-				RelativePath="src\ConsoleBufferLock.cpp">
-			</File>
-			<File
 				RelativePath=".\src\ConsoleStream.cpp">
 			</File>
 			<File
@@ -257,9 +254,6 @@
 			</File>
 			<File
 				RelativePath="include\gnelib\ConsoleBuffer.h">
-			</File>
-			<File
-				RelativePath="include\gnelib\ConsoleBufferLock.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ConsoleStream.h">

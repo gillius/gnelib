@@ -20,6 +20,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "SynchronizedObject.h"
+#include "ConsoleStreambuf.h"
+
+#ifdef OLD_CPP
+  #include <ostream.h>
+#else
+  #include <ostream>
+#endif
 
 namespace GNE {
 /**
@@ -46,7 +54,52 @@ namespace GNE {
  * time, since they will move the cursor's location.
  */
 namespace Console {
+class ConsoleManipulator;
 class ConsoleMutex;
+class moveTo;
+
+  /**
+   * The class for GNE::Console::gout.  You shouldn't need to create an object
+   * of this class, but instead use the gout object.
+   */
+  class GOut : public std::ostream, public SynchronizedObject {
+  public:
+    explicit GOut( goutbuf* buf );
+    ~GOut();
+
+    template <class T>
+    GOut& operator << ( const T& rhs ) {
+      ((std::ostream&)*this) << rhs;
+      return *this;
+    }
+
+    //GCC 2 doesn't like member template specialization.  The code compiles
+    //with these lines commented in MSVC.NET or less, and GCC2, so I leave
+    //them commented out.
+    //template <>
+    GOut& operator << ( const ConsoleMutex& cm );
+
+    //template <>
+    GOut& operator << ( const moveTo& cm );
+
+    //template <>
+    GOut& operator << ( const ConsoleManipulator& cm );
+
+#if _MSC_VER < 1300
+    //You know what?  I don't get why I need this at all.  MSVC6 thinks there
+    //is ambiguity for const char* unless this is here.  MSVC.NET doesn't need
+    //this method.
+    GOut& operator << ( const char* x ) {
+      ((std::ostream&)*this) << x;
+      return *this;
+    }
+#endif
+
+    typedef std::ostream& (*GOFType)(std::ostream&);
+
+    GOut& operator << ( GOFType f );
+  };
+
   /**
    * An ostream that works after the console part of GNE has been initialized.
    * Normally cout doesn't work after the console has been initalized.  Note
@@ -62,7 +115,7 @@ class ConsoleMutex;
    *
    * gout << acquire << "Hello World!" << x << y << endl << release;
    */
-  extern std::ostream gout;
+  extern GOut gout;
 
   /**
    * Similar thing with gout, but unlike gout, gin does not work in a

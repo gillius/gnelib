@@ -37,9 +37,9 @@ public:
   }
 
   void run() {
-    cb << acquirecb << "This line should not ";
+    cb << acquire << "This line should not ";
     sleep( 1000 );
-    cb << "be broken up." << endl << releasecb;
+    cb << "be broken up." << endl << release;
   }
 
 private:
@@ -80,8 +80,8 @@ int main(int argc, char* argv[]) {
   ConsoleTest tester( console );
   tester.start();
   Thread::sleep( 250 );
-  console << acquirecb << "This line should also be together."
-    << endl << releasecb;
+  console << acquire << "This line should also be together."
+    << endl << release;
   tester.join();
   getch();
   console.clear();

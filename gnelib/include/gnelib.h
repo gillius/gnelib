@@ -39,7 +39,6 @@
 #include "gnelib/ConnectionStats.h"
 #include "gnelib/Console.h"
 #include "gnelib/ConsoleBuffer.h"
-#include "gnelib/ConsoleBufferLock.h"
 #include "gnelib/ConsoleStream.h"
 #include "gnelib/Counter.h"
 #include "gnelib/CustomPacket.h"

@@ -125,10 +125,6 @@ SOURCE=.\src\ConsoleBuffer.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ConsoleBufferLock.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\ConsoleStream.cpp
 # End Source File
 # Begin Source File
@@ -286,10 +282,6 @@ SOURCE=.\include\gnelib\Console.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\ConsoleBuffer.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\gnelib\ConsoleBufferLock.h
 # End Source File
 # Begin Source File
 

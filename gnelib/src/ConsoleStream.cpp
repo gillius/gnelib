@@ -19,19 +19,10 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ConsoleStream.h"
+#include "../include/gnelib/SynchronizedObject.h"
+#include "../include/gnelib/Console.h"
 #include "../include/gnelib/ConsoleStreambuf.h"
 #include "../include/gnelib/Mutex.h"
-
-#ifdef OLD_CPP
-  #include <ostream.h>
-#else
-  #include <ostream>
-#endif
-
-std::ostream& operator << (std::ostream& o, const GNE::Console::ConsoleManipulator& cm) {
-  cm.action(o);
-  return o;
-}
 
 namespace GNE {
 namespace Console {
@@ -41,18 +32,22 @@ namespace Console {
 //  ConsoleMutex implementation
 //
 //--------------------------------
-ConsoleMutex::ConsoleMutex(bool isAcquiring, Mutex& syncMutex) 
-: acq(isAcquiring), sync(syncMutex) {
+ConsoleMutex::ConsoleMutex(bool isAcquiring) 
+: acq(isAcquiring) {
 }
 
 ConsoleMutex::~ConsoleMutex() {
 }
 
-void ConsoleMutex::action(std::ostream& o) const {
-  if (acq)
-    sync.acquire();
+void ConsoleMutex::action(GOut& o) const {
+  action( (SynchronizedObject&)o );
+}
+
+void ConsoleMutex::action(SynchronizedObject& o) const {
+  if ( acq )
+    o.acquire();
   else
-    sync.release();
+    o.release();
 }
 
 //--------------------------------
@@ -66,7 +61,7 @@ moveTo::moveTo(int xLoc, int yLoc) : x(xLoc), y(yLoc) {
 moveTo::~moveTo() {
 }
 
-void moveTo::action(std::ostream& o) const {
+void moveTo::action(GOut& o) const {
   ((goutbuf*)(o.rdbuf()))->setNextWriteLoc(x, y);
 }
 

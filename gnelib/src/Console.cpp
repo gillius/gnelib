@@ -38,17 +38,46 @@ static Mutex outSync;
 static bool initialized = false;
 
 //Global iostreams to replace cout/cin
-Mutex goutSync;
-ConsoleMutex acquire(true, goutSync);
-ConsoleMutex release(false, goutSync);
+ConsoleMutex acquire(true);
+ConsoleMutex release(false);
 static goutbuf outbuf;
-std::ostream gout(&outbuf);
+GOut gout(&outbuf);
 static ginbuf inbuf;
 std::istream gin(&inbuf);
 
 //Our global key codes for enter and backspace
 int ENTER;
 int BACKSPACE;
+
+//MSVC6 has a strange buf about qualifing the std namespace here, so we import
+//the std namespace.
+using namespace std;
+
+GOut::GOut( goutbuf* buf ) : ostream( (streambuf*)buf ) {
+}
+
+GOut::~GOut() {
+}
+
+GOut& GOut::operator << ( const ConsoleMutex& cm ) {
+  cm.action( *this );
+  return *this;
+}
+
+GOut& GOut::operator << ( const moveTo& cm ) {
+  cm.action( *this );
+  return *this;
+}
+
+GOut& GOut::operator << ( const ConsoleManipulator& cm ) {
+  cm.action( *this );
+  return *this;
+}
+
+GOut& GOut::operator << ( GOFType f ) {
+  f( *this );
+  return *this;
+}
 
 bool initConsole(int (*atexit_ptr)(void (*func)(void))) {
   if (!initialized) {
