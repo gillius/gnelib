@@ -30,7 +30,7 @@ namespace GNE {
 
 //##ModelId=3B07538101BD
 PacketStream::PacketStream(int outRate2, int inRate2, Connection& ourOwner)
-: owner(ourOwner), inRate(inRate2), outRate(outRate2) {
+: Thread("PktStrm"), owner(ourOwner), inRate(inRate2), outRate(outRate2) {
   gnedbgo(5, "created");
 }
 

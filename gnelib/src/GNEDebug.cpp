@@ -22,6 +22,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/GNEDebug.h"
 #include "../include/gnelib/Mutex.h"
+#include "../include/gnelib/Thread.h"
 #include <ctime>
 #include <cstring>
 
@@ -71,6 +72,16 @@ void doTrace(int level, const char* fn, int lineno, const char* msg, ...) {
 		va_list arg;  
 		va_start(arg, msg);
 
+    //Get the current thread's name:
+    Thread* currThr = Thread::currentThread();
+    std::string thrName;
+    if (currThr) {
+      thrName = currThr->getName();
+    } else {
+      //The main thread has no Thread object.
+      thrName = "main";
+    }
+
 		sync->acquire();
 		vsprintf(buf, msg, arg);
 
@@ -84,7 +95,8 @@ void doTrace(int level, const char* fn, int lineno, const char* msg, ...) {
 				temp++;
 		} else
 			temp++;
-		fprintf(logFile, "%30s, line %4i: %s\n", temp, lineno, buf);
+		fprintf(logFile, "%30s, line %4i, thrd %8s: %s\n",
+            temp, lineno, thrName.c_str(), buf);
 		fflush(logFile); //Try to be resiliant to errors.
 		sync->release();
 

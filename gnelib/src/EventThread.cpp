@@ -28,8 +28,9 @@ namespace GNE {
 
 //##ModelId=3C106F0203D4
 EventThread::EventThread(ConnectionListener* listener)
-: started(false), eventListener(listener), onReceiveEvent(false),
-onDoneWritingEvent(false), onDisconnectEvent(false), failure(NULL) {
+: Thread("EventThr"), started(false), eventListener(listener),
+onReceiveEvent(false), onDoneWritingEvent(false), onDisconnectEvent(false),
+failure(NULL) {
   gnedbgo(5, "created");
 }
 

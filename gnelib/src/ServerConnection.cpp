@@ -32,7 +32,8 @@ ServerConnection::ServerConnection(int outRate, int inRate,
 																	 ConnectionListener* listener, 
 																	 NLsocket rsocket2, 
 																	 ServerConnectionListener* creator)
-: Connection(outRate, inRate, listener), ourCreator(creator) {
+: Connection(outRate, inRate, listener), Thread("SrvrConn"),
+ourCreator(creator) {
 	gnedbgo(5, "created");
   sockets.r = rsocket2;
 }

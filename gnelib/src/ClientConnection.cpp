@@ -29,7 +29,7 @@ namespace GNE {
 
 //##ModelId=3B075380037F
 ClientConnection::ClientConnection(int outRate, int inRate, ConnectionListener* listener)
-  : Connection(outRate, inRate, listener) {
+  : Connection(outRate, inRate, listener), Thread("CliConn") {
   gnedbgo(5, "created");
 }
 
