@@ -147,7 +147,6 @@ void Connection::onReceive(bool reliable) {
 		if (errorCheck == false) {
 			//These are level 4 since the explicit event log is generated in onFailure
 			gnedbgo1(4, "Unknown packet encountered in a message that has %i bytes", temp);
-			gnedbgo2(4, "First bytes are %i and %i", (int)buf[0], (int) buf[1]);
 			processError(Error::UnknownPacket);
 		} else {
 			gnedbgo1(4, "onReceive event triggered, %i bytes recv", temp);
