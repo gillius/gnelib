@@ -47,10 +47,12 @@ public:
 		gout << acquire << "ServerConnection just disconnected." << endl;
 		if (!received)
 			gout << "  No message received." << endl << release;
+    delete ourConn;
 		delete this;
 	}
 
   void onNewConn(SyncConnection& conn) {
+    ourConn = conn.getConnection();
     gout << acquire << "Connection received from "
          << conn.getConnection()->getRemoteAddress(true)
          << "; waiting for message..." << endl;
@@ -71,6 +73,8 @@ public:
   }
 
 private:
+  //This is used only to delete the connection when it is disconnected.
+  Connection* ourConn;
 	bool received;
 };
 
