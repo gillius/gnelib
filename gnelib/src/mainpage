@@ -8,7 +8,7 @@
 See the Readme file and the specific readme for your compiler (ie readme.vc
 for MSVC) for requirements and installation instructions.
 
-\section toc Table Of Contents:
+\section toc Table Of Contents
 <ul>
   <li> \ref beg </li>
     <ul>
@@ -31,7 +31,8 @@ you to the examples and documentation to learn to code for %GNE.
 Do not forget that there are lots of examples and tests in the examples
 directory.  After reading this guide you'll probably want to examine the
 examples to see some sample code.  exaddr, expacket, and exhello are good
-examples to look at first.
+examples to look at first.  The example expong is the first example game
+using %GNE and shows the basics of how to create a framework for a %GNE game.
 
 There are several parts and services that the %GNE library provides.
 
@@ -48,8 +49,10 @@ Throughout this guide, there will be classes marked with a star (*).  These
 classes are ones that you probably could not make program without using them,
 and you'll probably want to learn them first.
 
-Classes that are not listed are ones that are used mostly by GNE itself and
+Classes that are not listed are ones that are used mostly by %GNE itself and
 you'll probably not need to use them directly in normal circumstances.
+
+\ref toc
 
   \subsection base Base API
 
@@ -63,6 +66,8 @@ you'll probably not need to use them directly in normal circumstances.
           names</li>
     <li> GNE::Error - to represent error messages </li>
   </ul>
+
+  \ref toc
 
   \subsection threads Threading API
 
@@ -99,6 +104,8 @@ you'll probably not need to use them directly in normal circumstances.
   the area of detaching, joining, and mutexes.  After you read that check the
   documentation for the %GNE classes to see the differences.
 
+  \ref toc
+
   \subsection console Console API
 
   The following things are in the Console API:
@@ -121,9 +128,11 @@ you'll probably not need to use them directly in normal circumstances.
 
   %GNE provides multithreaded console I/O which you can use to make
   text-based servers, consoles, or chat programs.  See the exinput example
-  for sample code using the %GNE Console API, although every GNE example makes
-  use of the %GNE Console API.
+  for sample code using the %GNE Console API, although every %GNE example
+  makes use of the %GNE Console API.
   
+  \ref toc
+
   \subsection core Core Connection API
 
   This is the heart of %GNE.  The Connection API consists of:
@@ -189,6 +198,8 @@ you'll probably not need to use them directly in normal circumstances.
   completely compatable with each other -- so they are doing the SAME thing
   over the network but are simply just two ways of doing it.
   
+  \ref toc
+
   \subsection highlevel High Level API
 
   The high level API will sit on top of all of the previously described
@@ -199,6 +210,8 @@ you'll probably not need to use them directly in normal circumstances.
   This API will contain classes to manage unique player IDs and data, manage
   a list of players, and handle things like text communication amongst the
   players.
+
+  \ref toc
 
   \subsection lists List Server API
 
@@ -222,6 +235,8 @@ I encourage you to join the discussions about %GNE on the gnelib-users list, or
 simply provide feedback, suggestions, and comments on your experience with %GNE
 to me at the %GNE website.
 
+\ref toc
+
 \section moreinfo More Information
 
 For more information, try the %GNE website: http://www.rit.edu/~jpw9607/ <br>
@@ -230,4 +245,6 @@ Or the %GNE SourgeForge site: http://www.sf.net/projects/gnelib/
 There is also a mailing list called gnelib-users on the sourceforge website:
 http://lists.sourceforge.net/mailman/listinfo/gnelib-users
   
+\ref toc
+
 */
