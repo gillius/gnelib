@@ -28,10 +28,11 @@ This section has some information that will help you get started with using
 instead as overview to understand the basics of how %GNE works and to point
 you to the examples and documentation to learn to code for %GNE.
 
-In the future I intend to write a small "first %GNE program tutorial," but
-as with all things I'm limited in time, and I'd rather concentrate on %GNE
-code.  If you want to contribute documentation, feel free to contact me via
-the %GNE website.
+There is now available a new %GNE tutorial for making %GNE programs, meant for
+the beginning user.  You can find it in the docs package or on the %GNE
+website.  Originally this beginner's guide was the only help for %GNE, so the
+tutorial overlaps this guide.  However, the tutorial goes in depth and
+explains the code, whereas this guide is a general outline of the library.
 
 Do not forget that there are lots of examples and tests in the examples
 directory.  After reading this guide you'll probably want to examine the
