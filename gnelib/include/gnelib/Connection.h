@@ -266,6 +266,8 @@ private:
   Mutex sync;
   //##ModelId=3BC3B98001C8
   Mutex errorSync;
+  //Used for reg and unreg functions.
+  Mutex regSync;
 
   /**
    * Make Listener a friend so it can call our onRecieve(bool)

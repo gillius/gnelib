@@ -20,31 +20,30 @@ Dependancies
 The following things are needed for GNE:
 
   * ANSI C++ compiler
-    + Out-of-the-Box for MSVC 6, Linux gcc 3.x, Linux gcc 2.9x, MingW.
-    + Planned support for Solaris 8 (this might already work using the Linux
-      makefiles with GNU make, need testers!)
+    + Out-of-the-Box for 
+      - Windows: MSVC 6, MingW.
+      - Linux: gcc 2.9x, 3.x.
+      - Solaris: gcc 2.9x, 3.x using the GNU tools.
     + MSVC 4 or 5 might also work, and other *NIX as well, but testers are
       needed for this!
-  * The HawkNL networking library from HawkSoft, version 1.4 final or higher.
+  * The HawkNL networking library from HawkSoft, version 1.42 or higher.
     The download link is on the left sidebar when you are in the HawkNL
-    section.
+    section.  Versions 1.4 and 1.41 may be used but are less stable and
+    have a problem with stats reporting.
   * pthreads implementation (pthreads-win32 for Windows used for Windows),
     UNIX already has pthreads support.
-  * libncurses5.2 or later will be needed for *NIX versions of GNE.
-
-MingW32 should also be supported if you use the new GCC I think. The old
-libstdc++ that was used with gcc 2.9x is not compatable (since it is not ISO
-C++ 98 compliant). The new one that is used with gcc 3 is. In the future a
-backport to gcc 2.9x will be done, hopefully for GNE 0.45. MSVC 6 and the Sun
-CC compiler used on Solaris 8 and gcc 3.x are ISO 98 compliant.
+  * A curses implementation such as ncurses will be needed to use GNE under
+    a UNIX platform
 
 ALPHA NOTES -- IMPORTANT:
 This version is only an alpha version of GNE. So that means take a look at what
 the tests do and the capabilities of GNE. Note that the API can still change
 significantly from this release to the beta, at which time I plan on trying to
-freeze the API as much as possible until final release.
+freeze the API as much as possible until final release. At this current point
+in the alpha though I'm not expecting much changes any longer on the core API
+that is implemented now.
 
-At this time most of the functions are implemented somewhat, but still a few of
+At this time most of the functions are implemented, but still a few of
 the functions do not fully follow their post-conditions and are minimal
 functionality -- for example you can send and recieve data, but it is not yet
 throttled, connections do actually connect, but don't handshake or check for

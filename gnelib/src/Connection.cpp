@@ -239,6 +239,7 @@ void Connection::Listener::onReceive() {
 
 //##ModelId=3B6E14AC0104
 void Connection::reg(bool reliable, bool unreliable) {
+  regSync.acquire();
   if (reliable && rlistener == NULL) {
     assert(sockets.r != NL_INVALID);
     rlistener = new Listener(*this, true);
@@ -251,10 +252,12 @@ void Connection::reg(bool reliable, bool unreliable) {
     eGen->reg(sockets.u, ulistener);
     gnedbgo1(3, "Registered unreliable socket %i", sockets.u);
   }
+  regSync.release();
 }
 
 //##ModelId=3B6E14AC01D6
 void Connection::unreg(bool reliable, bool unreliable) {
+  regSync.acquire();
   if (reliable && rlistener != NULL) {
     eGen->unreg(sockets.r);
     delete rlistener;
@@ -267,6 +270,7 @@ void Connection::unreg(bool reliable, bool unreliable) {
     ulistener = NULL;
     gnedbgo1(3, "Unregistered unreliable socket %i", sockets.u);
   }
+  regSync.release();
 }
 
 } //Namespace GNE

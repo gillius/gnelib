@@ -1,4 +1,6 @@
-GNE 0.4 to Current
+GNE 0.4 to 0.45
+  Fixed a threading bug in the Connection class that needed mutexes that
+    caused problems on shutdown and startup.
   onConnect and onNewConn can now decide to refuse connections at that point
     by throwing an Error of type ConnectionRefused.
   PacketStream::run() leaked memory as it forgot to destroy the packets that
