@@ -149,7 +149,7 @@ void setGameInformation(std::string gameName, guint32 version) {
   assert(initialized);
   assert(gameName.length() <= GNE::MAX_GAME_NAME_LEN);
   //We do this assert since this function should only be called once.
-  assert(gameNameBuf[0] = 0);
+  assert(gameNameBuf[0] == 0);
 
   userVersion = version;
   strncpy(gameNameBuf, gameName.c_str(), MAX_GAME_NAME_LEN);
