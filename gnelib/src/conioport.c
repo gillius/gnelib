@@ -131,7 +131,14 @@ void conio_putchar(int ch) {
 }
 
 int conio_vprintf(const char* format, va_list ap) {
+#ifdef SOLARISGNE
+  //It seems it doesn't have vw_printw
+  char buf[256];
+  int ret = vsprintf(buf, format, ap);
+  printw("%s", buf);
+#else
   int ret = vw_printw(stdscr, format, ap);
+#endif //SOLARISGNE
   refresh();
   return ret;
 }

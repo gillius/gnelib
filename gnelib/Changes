@@ -1,4 +1,7 @@
 GNE 0.4 to Current
+  Solaris makefiles and fix script added.  Compiles on Solaris using the GNU
+    tools and compiler.  Officially tested with gcc 2.95.2 and an UltraSparc
+    processor, but should also work with Intel and/or gcc 3.x.
   getch() doesn't busy-wait and cause 100% CPU usage under UNIX anymore.
   Fixed obscure and ironically small race condition while setting the
     connecting flags which could cause recursive deletions and onDisconnects.
