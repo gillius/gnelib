@@ -650,19 +650,37 @@
 			result     	"int"
 			concurrency 	"Sequential"
 			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "clearStats"
+			quid       	"3AFF64290316"
+			stereotype 	"static"
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "setUserVersion"
+			quid       	"3AFF642A000A"
+			stereotype 	"static"
+			parameters 	(list Parameters
+			    (object Parameter "version"
+				quid       	"3AFF642A00AA"
+				type       	"int"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
 			uid        	0))
 		class_attributes 	(list class_attribute_list
 		    (object ClassAttribute "VER"
 			quid       	"3AE26F6A035C"
 			type       	"const double"
-			initv      	"0.1"
+			initv      	"0.002"
 			exportControl 	"Public"
 			static     	TRUE)
 		    (object ClassAttribute "VER_STR"
 			quid       	"3AE26FC000A0"
 			type       	"const std::string"
 			initv      	
-|"GNE v0.1 pre-alpha"
+|"GNE v0.002"
 			
 			exportControl 	"Public"
 			static     	TRUE)
@@ -676,6 +694,18 @@
 			quid       	"3AF8D89F00E6"
 			type       	"bool"
 			initv      	"false"
+			static     	TRUE)
+		    (object ClassAttribute "NO_NET"
+			quid       	"3AFF3E3500FA"
+			type       	"const NLenum"
+			initv      	"128"
+			exportControl 	"Public"
+			static     	TRUE)
+		    (object ClassAttribute "userVersion"
+			quid       	"3AFF6429023A"
+			type       	"int"
+			initv      	"0"
+			exportControl 	"Public"
 			static     	TRUE))
 		module     	"Component View::gne"
 		quidu      	"3AE11D860046"
@@ -1344,7 +1374,10 @@
 				type       	"TimerCallback*")
 			    (object Parameter "rate"
 				quid       	"3AEB9AB402B2"
-				type       	"int"))
+				type       	"int")
+			    (object Parameter "destroy"
+				quid       	"3AFF642C00C8"
+				type       	"bool"))
 			concurrency 	"Sequential"
 			opExportControl 	"Public"
 			uid        	0)
@@ -1400,6 +1433,9 @@
 			type       	"int")
 		    (object ClassAttribute "running"
 			quid       	"3AEB9AB401E0"
+			type       	"bool")
+		    (object ClassAttribute "destroyListener"
+			quid       	"3AFF642B03D4"
 			type       	"bool"))
 		module     	"Component View::gne"
 		quidu      	"3AE11D860046"
@@ -1805,6 +1841,31 @@
 			result     	"int"
 			concurrency 	"Sequential"
 			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "setTitle"
+			quid       	"3AFF64270366"
+			stereotype 	"static"
+			parameters 	(list Parameters
+			    (object Parameter "title"
+				quid       	"3AFF6428005A"
+				type       	"const char*"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "getConsoleSize"
+			quid       	"3AFF64280168"
+			stereotype 	"static"
+			parameters 	(list Parameters
+			    (object Parameter "x"
+				quid       	"3AFF64280208"
+				type       	"int*")
+			    (object Parameter "y"
+				quid       	"3AFF64280352"
+				type       	"int*"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
 			uid        	0))
 		class_attributes 	(list class_attribute_list
 		    (object ClassAttribute "outSync"
@@ -2089,7 +2150,7 @@
 		zoom       	75
 		max_height 	28350
 		max_width  	21600
-		origin_x   	5892
+		origin_x   	6309
 		origin_y   	0
 		items      	(list diagram_item_list
 		    (object ClassView "Class" "Logical View::Thread" @1
@@ -2134,7 +2195,7 @@
 			    fill_color 	16777215
 			    anchor     	2
 			    nlines     	28
-			    max_width  	784)
+			    max_width  	815)
 			width      	806
 			height     	1486
 			annotation 	8
@@ -2181,7 +2242,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	7
-			    max_width  	630)
+			    max_width  	640)
 			width      	652
 			height     	436
 			annotation 	8
@@ -2228,7 +2289,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	7
-			    max_width  	613)
+			    max_width  	631)
 			width      	634
 			height     	436
 			annotation 	8
@@ -2275,7 +2336,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	8
-			    max_width  	513)
+			    max_width  	531)
 			width      	534
 			height     	486
 			annotation 	8
@@ -2322,7 +2383,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	5
-			    max_width  	692)
+			    max_width  	706)
 			width      	714
 			height     	336
 			annotation 	8
@@ -2434,7 +2495,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	9
-			    max_width  	509)
+			    max_width  	521)
 			width      	530
 			height     	648
 			annotation 	8
@@ -2553,7 +2614,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	2
-			    max_width  	296)
+			    max_width  	300)
 			width      	400
 			height     	298
 			annotation 	8
@@ -2600,7 +2661,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	7
-			    max_width  	500)
+			    max_width  	525)
 			width      	522
 			height     	436
 			annotation 	8
@@ -2767,7 +2828,7 @@
 			    fill_color 	16777215
 			    anchor     	2
 			    nlines     	4
-			    max_width  	567)
+			    max_width  	590)
 			width      	588
 			height     	286
 			annotation 	8
@@ -2788,7 +2849,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@21
-			    location   	(5588, 2144)
+			    location   	(5588, 2119)
 			    fill_color 	13434879
 			    nlines     	1
 			    max_width  	574
@@ -2800,7 +2861,7 @@
 			quidu      	"3AE8680C029E"
 			compartment 	(object Compartment
 			    Parent_View 	@21
-			    location   	(5588, 2205)
+			    location   	(5588, 2180)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -2813,14 +2874,14 @@
 			    icon_style 	"Icon"
 			    fill_color 	16777215
 			    anchor     	2
-			    nlines     	11
+			    nlines     	12
 			    max_width  	571)
 			width      	592
-			height     	636
+			height     	686
 			annotation 	8
 			autoResize 	TRUE)
 		    (object AssociationViewNew "$UNNAMED$23" @22
-			location   	(5875, 2999)
+			location   	(5875, 3012)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -2836,7 +2897,7 @@
 			roleview_list 	(list RoleViews
 			    (object RoleView "listener" @23
 				Parent_View 	@22
-				location   	(3950, -776)
+				location   	(3950, -763)
 				font       	(object Font
 				    size       	10
 				    face       	"Arial"
@@ -2848,7 +2909,7 @@
 				    default_color 	TRUE)
 				label      	(object SegLabel @24
 				    Parent_View 	@23
-				    location   	(5917, 3184)
+				    location   	(5917, 3186)
 				    font       	(object Font
 					size       	10
 					face       	"Arial"
@@ -2875,7 +2936,7 @@
 				line_style 	0)
 			    (object RoleView "$UNNAMED$24" @25
 				Parent_View 	@22
-				location   	(3950, -776)
+				location   	(3950, -763)
 				stereotype 	TRUE
 				line_color 	3342489
 				quidu      	"3AE86968026E"
@@ -2924,7 +2985,7 @@
 			    fill_color 	16777215
 			    anchor     	2
 			    nlines     	19
-			    max_width  	509)
+			    max_width  	534)
 			width      	530
 			height     	1036
 			annotation 	8
@@ -3056,7 +3117,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	14
-			    max_width  	650)
+			    max_width  	665)
 			width      	672
 			height     	786
 			annotation 	8
@@ -3124,7 +3185,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	5
-			    max_width  	617)
+			    max_width  	637)
 			width      	638
 			height     	336
 			annotation 	8
@@ -3175,10 +3236,10 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@40
-			    location   	(2308, 3044)
+			    location   	(2373, 2944)
 			    fill_color 	13434879
 			    nlines     	1
-			    max_width  	984
+			    max_width  	854
 			    justify    	0
 			    label      	"GNE")
 			icon_style 	"Icon"
@@ -3187,7 +3248,7 @@
 			quidu      	"3AE26ED703DE"
 			compartment 	(object Compartment
 			    Parent_View 	@40
-			    location   	(2308, 3105)
+			    location   	(2373, 3005)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -3200,10 +3261,10 @@
 			    icon_style 	"Icon"
 			    fill_color 	13434879
 			    anchor     	2
-			    nlines     	12
-			    max_width  	980)
-			width      	1002
-			height     	686
+			    nlines     	16
+			    max_width  	850)
+			width      	872
+			height     	886
 			annotation 	8
 			autoResize 	TRUE)
 		    (object ClassView "Class" "Logical View::ConditionVariable" @41
@@ -3248,7 +3309,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	12
-			    max_width  	617)
+			    max_width  	640)
 			width      	638
 			height     	686
 			annotation 	8
@@ -3401,7 +3462,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	16
-			    max_width  	730)
+			    max_width  	753)
 			width      	752
 			height     	886
 			annotation 	8
@@ -3768,20 +3829,20 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	8
-			    max_width  	913)
+			    max_width  	940)
 			width      	934
 			height     	486
 			annotation 	8
 			autoResize 	TRUE)
 		    (object AssociationViewNew "$UNNAMED$5" @69
-			location   	(3088, 2862)
+			location   	(3117, 2812)
 			stereotype 	TRUE
 			line_color 	3342489
 			quidu      	"3AE34D930082"
 			roleview_list 	(list RoleViews
 			    (object RoleView "$UNNAMED$6" @70
 				Parent_View 	@69
-				location   	(2613, 1712)
+				location   	(2642, 1662)
 				font       	(object Font
 				    size       	10
 				    face       	"Arial"
@@ -3793,7 +3854,7 @@
 				    default_color 	TRUE)
 				label      	(object SegLabel @71
 				    Parent_View 	@70
-				    location   	(3048, 3018)
+				    location   	(3101, 2928)
 				    font       	(object Font
 					size       	10
 					face       	"Arial"
@@ -3821,7 +3882,7 @@
 				line_style 	0)
 			    (object RoleView "eGen" @72
 				Parent_View 	@69
-				location   	(2613, 1712)
+				location   	(2642, 1662)
 				font       	(object Font
 				    size       	10
 				    face       	"Arial"
@@ -3833,7 +3894,7 @@
 				    default_color 	TRUE)
 				label      	(object SegLabel @73
 				    Parent_View 	@72
-				    location   	(3202, 2748)
+				    location   	(3207, 2738)
 				    font       	(object Font
 					size       	10
 					face       	"Arial"
@@ -3860,7 +3921,7 @@
 				line_style 	0
 				label      	(object SegLabel @74
 				    Parent_View 	@72
-				    location   	(3129, 2684)
+				    location   	(3132, 2679)
 				    font       	(object Font
 					size       	10
 					face       	"Arial"
@@ -3935,7 +3996,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	6
-			    max_width  	505)
+			    max_width  	512)
 			width      	526
 			height     	386
 			annotation 	8
@@ -4404,14 +4465,14 @@
 				    height     	54
 				    orientation 	0))))
 		    (object AssociationViewNew "$UNNAMED$21" @104
-			location   	(3021, 4306)
+			location   	(2899, 4294)
 			stereotype 	TRUE
 			line_color 	3342489
 			quidu      	"3AE4E2E301EA"
 			roleview_list 	(list RoleViews
 			    (object RoleView "$UNNAMED$22" @105
 				Parent_View 	@104
-				location   	(1321, 1906)
+				location   	(1199, 1894)
 				font       	(object Font
 				    size       	10
 				    face       	"Arial"
@@ -4423,7 +4484,7 @@
 				    default_color 	TRUE)
 				label      	(object SegLabel @106
 				    Parent_View 	@105
-				    location   	(3440, 3101)
+				    location   	(3284, 3079)
 				    font       	(object Font
 					size       	10
 					face       	"Arial"
@@ -4449,14 +4510,13 @@
 				client     	@104
 				supplier   	@68
 				vertices   	(list Points
-				    (3021, 4306)
-				    (3549, 4173)
-				    (3549, 3374)
-				    (3383, 2693))
+				    (2899, 4294)
+				    (3325, 4178)
+				    (3325, 2693))
 				line_style 	0)
 			    (object RoleView "mapCtrl" @107
 				Parent_View 	@104
-				location   	(1321, 1906)
+				location   	(1199, 1894)
 				font       	(object Font
 				    size       	10
 				    face       	"Arial"
@@ -4468,7 +4528,7 @@
 				    default_color 	TRUE)
 				label      	(object SegLabel @108
 				    Parent_View 	@107
-				    location   	(1426, 4667)
+				    location   	(1401, 4659)
 				    font       	(object Font
 					size       	10
 					face       	"Arial"
@@ -4495,7 +4555,7 @@
 				line_style 	0
 				label      	(object SegLabel @109
 				    Parent_View 	@107
-				    location   	(1251, 4808)
+				    location   	(1238, 4802)
 				    font       	(object Font
 					size       	10
 					face       	"Arial"
@@ -4674,7 +4734,7 @@
 			ShowCompartmentStereotypes 	TRUE
 			IncludeAttribute 	TRUE
 			IncludeOperation 	TRUE
-			location   	(4650, 875)
+			location   	(4975, 925)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -4686,7 +4746,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@119
-			    location   	(4371, 469)
+			    location   	(4696, 469)
 			    fill_color 	13434879
 			    nlines     	1
 			    max_width  	558
@@ -4698,7 +4758,7 @@
 			quidu      	"3AF8A1A0033E"
 			compartment 	(object Compartment
 			    Parent_View 	@119
-			    location   	(4371, 530)
+			    location   	(4696, 530)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -4711,10 +4771,10 @@
 			    icon_style 	"Icon"
 			    fill_color 	13434879
 			    anchor     	2
-			    nlines     	15
+			    nlines     	17
 			    max_width  	555)
 			width      	576
-			height     	836
+			height     	936
 			annotation 	8
 			autoResize 	TRUE)
 		    (object InheritView "" @120
@@ -4724,7 +4784,7 @@
 			client     	@21
 			supplier   	@1
 			vertices   	(list Points
-			    (5588, 2131)
+			    (5578, 2120)
 			    (5334, 1849)
 			    (4253, 1376))
 			line_style 	0)))
@@ -5139,6 +5199,23 @@
 			line_color 	3342489
 			fill_color 	13434879
 			quidu      	"3AE8691D0032"
+			compartment 	(object Compartment
+			    Parent_View 	@139
+			    location   	(96, 2305)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    icon_style 	"Icon"
+			    fill_color 	16777215
+			    anchor     	2
+			    nlines     	7
+			    max_width  	456)
 			width      	476
 			height     	436
 			annotation 	8
@@ -5159,7 +5236,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@140
-			    location   	(33, 1819)
+			    location   	(33, 1769)
 			    fill_color 	13434879
 			    nlines     	1
 			    max_width  	584
@@ -5170,7 +5247,7 @@
 			fill_color 	13434879
 			quidu      	"3AE868D6019A"
 			width      	602
-			height     	186
+			height     	286
 			annotation 	8
 			autoResize 	TRUE)
 		    (object InheritView "" @141
@@ -5206,6 +5283,23 @@
 			line_color 	3342489
 			fill_color 	13434879
 			quidu      	"3AE8680C029E"
+			compartment 	(object Compartment
+			    Parent_View 	@142
+			    location   	(828, 1655)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    icon_style 	"Icon"
+			    fill_color 	16777215
+			    anchor     	2
+			    nlines     	12
+			    max_width  	591)
 			width      	612
 			height     	636
 			annotation 	8
@@ -5318,29 +5412,29 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@149
-			    location   	(1722, 1494)
+			    location   	(1661, 1394)
 			    fill_color 	13434879
 			    nlines     	1
-			    max_width  	406
+			    max_width  	528
 			    justify    	0
 			    label      	"Time")
 			icon_style 	"Icon"
 			line_color 	3342489
 			fill_color 	13434879
 			quidu      	"3AEB9AD500A0"
-			width      	424
-			height     	836
+			width      	546
+			height     	1036
 			annotation 	8
 			autoResize 	TRUE)
 		    (object AssociationViewNew "$UNNAMED$25" @150
-			location   	(1571, 1900)
+			location   	(1541, 1900)
 			stereotype 	TRUE
 			line_color 	3342489
 			quidu      	"3AEBA39702C6"
 			roleview_list 	(list RoleViews
 			    (object RoleView "$UNNAMED$26" @151
 				Parent_View 	@150
-				location   	(1071, 400)
+				location   	(1041, 400)
 				font       	(object Font
 				    size       	10
 				    face       	"Arial"
@@ -5352,7 +5446,7 @@
 				    default_color 	TRUE)
 				label      	(object SegLabel @152
 				    Parent_View 	@151
-				    location   	(1459, 1942)
+				    location   	(1453, 1942)
 				    font       	(object Font
 					size       	10
 					face       	"Arial"
@@ -5380,7 +5474,7 @@
 				line_style 	0)
 			    (object RoleView "nextTime" @153
 				Parent_View 	@150
-				location   	(1071, 400)
+				location   	(1041, 400)
 				font       	(object Font
 				    size       	10
 				    face       	"Arial"
@@ -5392,7 +5486,7 @@
 				    default_color 	TRUE)
 				label      	(object SegLabel @154
 				    Parent_View 	@153
-				    location   	(1548, 1947)
+				    location   	(1524, 1947)
 				    font       	(object Font
 					size       	10
 					face       	"Arial"
@@ -5570,7 +5664,7 @@
 			tool       	"Cplusplus"
 			name       	"FilesEncoding"
 			value      	(value Text 
-|v1:UClientConnection.cpp,3af2275a
+|v1:UClientConnection.cpp,3aff46e4
 |SClientConnection.h,3af2275a
 |HCon.cpp,0
 |FCon.h,0
@@ -5582,12 +5676,12 @@
 |aConnectionEventGenerator.h,3af2275a
 |UConnectionWriter.cpp,3af2275a
 |SConnectionWriter.h,3af2275a
-|LConsole.cpp,3afdb51a
-|JConsole.h,3afdb51a
-|LCounter.cpp,3af2275a
-|JCounter.h,3af2275a
-|HGNE.cpp,3af8d89e
-|FGNE.h,3af8d89e
+|LConsole.cpp,3aff6428
+|JConsole.h,3aff6428
+|LCounter.cpp,3aff438c
+|JCounter.h,3aff439c
+|HGNE.cpp,3aff642a
+|FGNE.h,3aff642a
 |YListServerConnection.cpp,3af2275a
 |WListServerConnection.h,3af2275a
 |JMutex.cpp,3af2275a
@@ -5600,12 +5694,12 @@
 |LRawPacket.h,3af2275a
 |UServerConnection.cpp,3af2275a
 |SServerConnection.h,3af2275a
-|KThread.cpp,3af2275a
+|KThread.cpp,3aff57e0
 |IThread.h,3af2275a
 |ITime.cpp,3afb6dc8
 |GTime.h,3afb6d5a
-|JTimer.cpp,3af9fee4
-|HTimer.h,3af82ffe
+|JTimer.cpp,3aff45be
+|HTimer.h,3aff642c
 |RTimerCallback.cpp,3af78bc0
 |PTimerCallback.h,3af78bba
 |
@@ -5686,9 +5780,9 @@
 			value      	
 |v3:ClientConnection,t,C,3AE59EBB001E,A,504,b38
 |ClientConnection::ClientConnection,f,B,3AE59FAB0000,Uint,int,std::string,,3d9,46e
-|ClientConnection::connect,f,B,3AE59FD4019A,A,4ef,52c
-|ClientConnection::onConnect,f,B,3AE59FBB01A4,A,52e,56d
-|ClientConnection::onConnectFailure,f,B,3AE59FCA0168,MFailureType,,56f,5ca
+|ClientConnection::connect,f,B,3AE59FD4019A,A,516,553
+|ClientConnection::onConnect,f,B,3AE59FBB01A4,A,555,594
+|ClientConnection::onConnectFailure,f,B,3AE59FCA0168,MFailureType,,596,5f1
 |ClientConnection::run,f,B,3AE5AF7A0384,A,4b4,4ed
 |ClientConnection::~ClientConnection,f,B,3AE59FAB003C,A,470,4b2
 |ConditionVariable,t,G,3AE20D770230,A,526,cda
@@ -5722,9 +5816,10 @@
 |ConnectionWriter::ConnectionWriter,f,L,3AE4C448001E,TConditionVariable&,,3fa,465
 |ConnectionWriter::run,f,L,3AE4C4B60140,A,4ab,4e4
 |ConnectionWriter::~ConnectionWriter,f,L,3AE4C448005A,A,467,4a9
-|Console,t,O,3AF8A1A0033E,A,79d,13de
+|Console,t,O,3AF8A1A0033E,A,79d,162e
 |Console::BACKSPACE,f,N,3AFDB5190302,A,4e1,51b
 |Console::ENTER,f,N,3AFDB5190226,A,51c,553
+|Console::getConsoleSize,f,N,3AFF64280168,Kint*,int*,,e29,e89
 |Console::getch,f,N,3AF8AADF0050,A,76e,7b7
 |Console::gotoxy,f,N,3AF8A3AE001E,Iint,int,,6ae,721
 |Console::init,f,N,3AF8A1E2038E,aint(*)(void(*func)(void)),,555,631
@@ -5736,25 +5831,30 @@
 |Console::mprintf,f,N,3AF8A7EC026C,Kchar*,...,,7b9,892
 |Console::mputchar,f,N,3AFB7047005A,Eint,,994,a08
 |Console::outSync,f,N,3AF8A1F80226,A,474,4a4
+|Console::setTitle,f,N,3AFF64270366,Mconst char*,,dc8,e27
 |Console::shutdown,f,N,3AF8A1ED037A,A,633,6ac
 |Counter,t,Q,3AE8691D0032,A,482,871
-|Counter::Counter,f,P,3AE8693F0104,A,3d0,3ff
-|Counter::getCount,f,P,3AED05900154,A,46f,4af
-|Counter::setCount,f,P,3AED05960226,Eint,,4b1,4f2
-|Counter::timerCallback,f,P,3AE8694203AC,A,433,46d
-|Counter::~Counter,f,P,3AE8693F0140,A,401,431
-|GNE,t,S,3AE26ED703DE,A,4a3,e75
-|GNE::UDP_HEADER_SIZE,f,R,3AE4DF7A03AC,A,43c,479
-|GNE::VER,f,R,3AE26F6A035C,A,3cc,401
-|GNE::VER_STR,f,R,3AE26FC000A0,A,47b,4ca
-|GNE::disableStats,f,R,3AE4CA2803AC,A,754,789
-|GNE::enableStats,f,R,3AE4CA1D0122,A,71e,752
-|GNE::getBytesRead,f,R,3AEDEDE100AA,A,607,6bd
-|GNE::getBytesWritten,f,R,3AE4C988000A,A,6bf,71c
-|GNE::getOpenConnections,f,R,3AE4D10803CA,A,78b,7ed
-|GNE::init,f,R,3AE270BF0078,hNLenum,int(*)(void(*func)(void)),,4cc,5a0
-|GNE::initialized,f,R,3AF8D89F00E6,A,403,43a
-|GNE::shutdown,f,R,3AE270CE033E,A,5a2,605
+|Counter::Counter,f,P,3AE8693F0104,A,3d0,40a
+|Counter::getCount,f,P,3AED05900154,A,4b3,536
+|Counter::setCount,f,P,3AED05960226,Eint,,538,5bb
+|Counter::timerCallback,f,P,3AE8694203AC,A,43e,4b1
+|Counter::~Counter,f,P,3AE8693F0140,A,40c,43c
+|GNE,t,S,3AE26ED703DE,A,4a3,12f2
+|GNE::NO_NET,f,R,3AFF3E3500FA,A,4d0,508
+|GNE::UDP_HEADER_SIZE,f,R,3AE4DF7A03AC,A,43e,47b
+|GNE::VER,f,R,3AE26F6A035C,A,3cc,403
+|GNE::VER_STR,f,R,3AE26FC000A0,A,47d,4ce
+|GNE::clearStats,f,R,3AFF64290316,A,936,982
+|GNE::disableStats,f,R,3AE4CA2803AC,A,8e1,934
+|GNE::enableStats,f,R,3AE4CA1D0122,A,88e,8df
+|GNE::getBytesRead,f,R,3AEDEDE100AA,A,7cf,82d
+|GNE::getBytesWritten,f,R,3AE4C988000A,A,82f,88c
+|GNE::getOpenConnections,f,R,3AE4D10803CA,A,984,9e6
+|GNE::init,f,R,3AE270BF0078,hNLenum,int(*)(void(*func)(void)),,53e,756
+|GNE::initialized,f,R,3AF8D89F00E6,A,405,43c
+|GNE::setUserVersion,f,R,3AFF642A000A,Eint,,9e8,a43
+|GNE::shutdown,f,R,3AE270CE033E,A,758,7cd
+|GNE::userVersion,f,R,3AFF6429023A,A,50a,53c
 |ListServerConnection,t,U,3AE2736B017C,A,5ae,8df
 |ListServerConnection::ListServerConnection,f,T,3AE4AA420046,Mstd::string,,3dd,45c
 |ListServerConnection::getGameList,f,T,3AE4AB3A0000,A,501,546
@@ -5801,19 +5901,19 @@
 |Thread::Thread,f,f,3AE12014000A,A,5f6,684
 |Thread::Thread,f,f,3AE1224001CC,Qstd::string,int,,686,733
 |Thread::currentThread,f,f,3AE126EF00D2,A,765,8a9
-|Thread::detach,f,f,3AEE3C5D00BE,A,a0d,b7e
-|Thread::end,f,f,3AEE3C5D02E4,A,bd1,cfb
-|Thread::getID,f,f,3AE20B3F02E4,Fconst,eb0,f00
-|Thread::getName,f,f,3AE126FD00DC,Fconst,944,993
-|Thread::getPriority,f,f,3AE20B3402EE,Fconst,e5f,eae
-|Thread::hasEnded,f,f,3AEE3C5E0154,Fconst,d4c,d96
-|Thread::isDetached,f,f,3AEE3C5D0168,Fconst,b80,bcf
-|Thread::isRunning,f,f,3AEE3C5D0384,Fconst,cfd,d4a
-|Thread::join,f,f,3AE1DFB40186,A,995,a0b
+|Thread::detach,f,f,3AEE3C5D00BE,A,a34,ba5
+|Thread::end,f,f,3AEE3C5D02E4,A,bf8,d22
+|Thread::getID,f,f,3AE20B3F02E4,Fconst,ed7,f27
+|Thread::getName,f,f,3AE126FD00DC,Fconst,96b,9ba
+|Thread::getPriority,f,f,3AE20B3402EE,Fconst,e86,ed5
+|Thread::hasEnded,f,f,3AEE3C5E0154,Fconst,d73,dbd
+|Thread::isDetached,f,f,3AEE3C5D0168,Fconst,ba7,bf6
+|Thread::isRunning,f,f,3AEE3C5D0384,Fconst,d24,d71
+|Thread::join,f,f,3AE1DFB40186,A,9bc,a32
 |Thread::mapSync,f,f,3AEE3C5D008D,A,4ee,51d
-|Thread::remove,f,f,3AECE4A00046,IThread*,,f02,f88
-|Thread::sleep,f,f,3AEEF76701E0,Eint,,8ab,942
-|Thread::start,f,f,3AE1DFC70230,A,d98,e5d
+|Thread::remove,f,f,3AECE4A00046,IThread*,,f29,faf
+|Thread::sleep,f,f,3AEEF76701E0,Eint,,8ab,969
+|Thread::start,f,f,3AE1DFC70230,A,dbf,e84
 |Thread::threads,f,f,3AE11D5F023A,A,3ee,434
 |Thread::~Thread,f,f,3AE120140046,A,735,763
 |Time,t,i,3AEB9AD500A0,A,4ec,f0d
@@ -5832,15 +5932,15 @@
 |Time::setSec,f,h,3AEBA4BE0226,Eint,,5ab,5f7
 |Time::setuSec,f,h,3AEBA4C80032,Eint,,5f9,664
 |Time::~Time,f,h,3AEBA04C03DE,A,48d,4b7
-|Timer,t,k,3AE8680C029E,A,4e6,c64
-|Timer::Timer,f,j,3AE868370122,TTimerCallback*,int,,3fb,480
-|Timer::getAbsoluteTime,f,j,3AF4797001CC,A,68d,779
-|Timer::getCurrentTime,f,j,3AE86872030C,A,4f7,667
-|Timer::isRunning,f,j,3AED05E7029E,A,a0c,a52
-|Timer::run,f,j,3AE868A30294,A,899,a0a
-|Timer::startTimer,f,j,3AEB9AB50050,A,77b,82b
-|Timer::stopTimer,f,j,3AEB9AB500BE,A,82d,897
-|Timer::~Timer,f,j,3AE8686C00BE,A,482,4d1
+|Timer,t,k,3AE8680C029E,A,4e6,d00
+|Timer::Timer,f,j,3AE868370122,YTimerCallback*,int,bool,,3fb,4a8
+|Timer::getAbsoluteTime,f,j,3AF4797001CC,A,6cd,7b9
+|Timer::getCurrentTime,f,j,3AE86872030C,A,537,6a7
+|Timer::isRunning,f,j,3AED05E7029E,A,a4c,a92
+|Timer::run,f,j,3AE868A30294,A,8d9,a4a
+|Timer::startTimer,f,j,3AEB9AB50050,A,7bb,86b
+|Timer::stopTimer,f,j,3AEB9AB500BE,A,86d,8d7
+|Timer::~Timer,f,j,3AE8686C00BE,A,4aa,511
 |TimerCallback,t,m,3AE868D6019A,A,486,5ad
 |TimerCallback::TimerCallback,f,l,3AF78B950190,A,3d6,411
 |TimerCallback::~TimerCallback,f,l,3AF78B9501CC,A,413,44f
