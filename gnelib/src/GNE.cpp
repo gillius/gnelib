@@ -37,6 +37,7 @@ static bool initialized = false;
 bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
   if (!initialized) {
     atexit_ptr(shutdownGNE);
+    PacketParser::registerGNEPackets();
     if (networkType != NO_NET) {
       if (nlInit() == NL_FALSE)
         return true;
@@ -45,7 +46,6 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
       nlEnable(NL_BLOCKING_IO);
       nlEnable(NL_TCP_NO_DELAY);
       nlDisable(NL_SOCKET_STATS);
-      PacketParser::registerGNEPackets();
       eGen = new ConnectionEventGenerator();
       eGen->start();
       initialized = true; //We need only to set this to true if we are using HawkNL
