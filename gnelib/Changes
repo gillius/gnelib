@@ -1,4 +1,12 @@
 GNE 0.002 to 0.003
+  Implemented an internal debugging system that is started and configured on
+    the user's demands.  The user can also use functions to write to this
+	conditionally generated log file.  Each message has a type/level number
+	assigned to it, so you can phase out certain messages.
+  Fixed deadlock bug in event handlers.
+  More work on error codes and error reporting.
+  ConnectionEventGenerator now creates threads for onReceive events
+  New class OnReceiveEventThread
   Implemented code in Connection to parse packets and use PacketStream
   Implemented the PacketStream class
   Added PacketParser namespace with packet parsing functions, which will be
