@@ -1,6 +1,10 @@
-Contributers of GNE, in order of appearance:
+Contributors of GNE, in order of appearance:
 
 --------------------------------------------------------------------------------
 
 Jason Winnebeck (gillius@webzone.net)
   Started the library.  Did everything someone else didn't.
+
+Elias Pschernig (elias@users.sourceforge.net)
+  Created and maintains MingW makefile, helps with rest of makefile system.
+  Created the Allegro example exballs.

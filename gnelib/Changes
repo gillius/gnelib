@@ -1,4 +1,9 @@
 GNE 0.003 to 0.004
+  Removed the OnReceiveEventClass.  onReceive events are now forced to be
+    "non-blocking" as there is now only a single event thread.  Multiple
+	event threads were found to be overly confusing and complex to the
+	developers and users, with very little to no potential benefits.  If you
+	need to "block" in an event (other than onNewConn), spawn a new thread.
   Created a new class, Error, that replaces the Connection::FailureType enum,
     and allows the user some shortcuts and a better way to get a textual
     description of the error.

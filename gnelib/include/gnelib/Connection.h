@@ -113,7 +113,9 @@ public:
    * Immediately disconnects this socket.  No more data will be recieved or
    * sent on this socket.  If you want to disconnect more nicely, use
    * disconnectSendAll.  It is okay to call this function even when this
-	 * Connection is already disconnected.
+	 * Connection is already disconnected.\n
+	 * NOTE: You may not reconnect this connection object after calling
+	 * disconnect.
    * @see #disconnectSendAll()
    */
   //##ModelId=3B0753810083
@@ -133,15 +135,18 @@ public:
    * This is called when something bad happens, such as a timeout.
    * Note you must call this function explicity from your overridden
    * function FIRST so the underlying functions recieve this event.
+	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
+	 * is only a single event thread.  Therefore, no receive events for any 
+	 * connection will be called until this function completes.
    */
   //##ModelId=3B0753810085
   virtual void onFailure(Error error);
 
   /**
-   * Event triggered when one or more packets have been recieved.  Note that
-	 * it is possible for multiple threads to be firing onRecieve on this class
-	 * at the same time, so if you need a "serial order" of processing, use a
-	 * mutex or condition variable.
+   * Event triggered when one or more packets have been recieved.
+	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
+	 * is only a single event thread.  Therefore, no receive events for any 
+	 * connection will be called until this function completes.
    */
   //##ModelId=3B07538100AC
   virtual void onReceive();
@@ -149,9 +154,12 @@ public:
   /**
    * Event triggered when the write buffer was filled and is now empty.
    * Note that this does not mean that data is immediately ready to be sent
-   * again -- there could still be a flow control delay.
+   * again -- there could still be a flow control delay.\n
    * Note you must call this function explicity from your overridden
    * function FIRST so the underlying functions recieve this event.
+	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
+	 * is only a single writer thread per connection.  Therefore, no more
+	 * writing will take place until this function completes.
    */
   //##ModelId=3B07538100AE
   virtual void onDoneWriting();

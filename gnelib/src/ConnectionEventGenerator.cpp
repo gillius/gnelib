@@ -22,7 +22,6 @@
 #include "ConnectionEventListener.h"
 #include "ConditionVariable.h"
 #include "Connection.h"
-#include "OnReceiveEventThread.h"
 
 namespace GNE {
 
@@ -68,9 +67,7 @@ void ConnectionEventGenerator::run() {
 					//Check to make sure the listener didn't unregister while we were waiting.
 					if (iter != connections.end()) {
 						mapCtrl.release();
-						OnReceiveEventThread event(*iter->second);
-						event.start();
-						event.join();
+						iter->second->onReceive();
 					} else
 						mapCtrl.release();
 				}

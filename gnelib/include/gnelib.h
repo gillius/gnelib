@@ -31,7 +31,6 @@
 #include "gnelib/GNE.h"
 #include "gnelib/ListServerConnection.h"
 #include "gnelib/Mutex.h"
-#include "gnelib/OnReceiveEventThread.h"
 #include "gnelib/Packet.h"
 #include "gnelib/PacketStream.h"
 #include "gnelib/PacketParser.h"

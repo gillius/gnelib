@@ -133,10 +133,6 @@ SOURCE=.\src\Mutex.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\OnReceiveEventThread.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\Packet.cpp
 # End Source File
 # Begin Source File
@@ -238,10 +234,6 @@ SOURCE=.\include\gnelib\ListServerConnection.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\Mutex.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\gnelib\OnReceiveEventThread.h
 # End Source File
 # Begin Source File
 

@@ -96,9 +96,8 @@ public:
   void connect();
 
   /**
-   * Event triggered after there is a successful connection.  Note that if
-   * you are joining on this object, the calling thread will still block
-   * until this function returns.
+   * Event triggered after there is a successful connection.  The connection
+	 * process will not be considered complete until this function completes.
    */
   //##ModelId=3B07538003C2
   virtual void onConnect() = 0;
@@ -106,7 +105,10 @@ public:
   /**
    * Event triggered when a connection failed.  Note that if
    * you are joining on this object, the calling thread will still block
-   * until this function returns.
+   * until this function returns.\n
+	 * After a connection failure, the connection is as if disconnect() was
+	 * called, therefore you cannot reconnect this connection instance.
+	 * @see Connection::disconnect()
    */
   //##ModelId=3B07538003C4
   virtual void onConnectFailure(Error error) = 0;
