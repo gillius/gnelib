@@ -143,12 +143,6 @@ public:
   int getPriority() const;
 
   /**
-   * Returns the underlying pthread_t for this thread.
-   */
-  //##ModelId=3B07538103A8
-  pthread_t getID() const;
-
-  /**
    * The default priority of a thread.
    */
   //##ModelId=3B0753810334
@@ -189,6 +183,12 @@ protected:
   virtual void run() = 0;
 
 private:
+  /**
+   * Returns the underlying pthread_t for this thread.
+   */
+  //##ModelId=3B07538103A8
+  pthread_t getID() const;
+
   /**
    * Internal Thread function for the pthread_start callback to start a new
    * thread and call run().

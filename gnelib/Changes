@@ -1,4 +1,6 @@
 GNE 0.45 to current
+  GNE::Thread::getID is now a private method, because the underlying thread
+    implementation might change in the future.
   GNE now compiles against the C runtime dynamically rather than statically,
     which is better in many different ways and starts to pave the path
     towards GNE becoming a DLL itself.  The examples are 1/2 to 1/3 the size!
