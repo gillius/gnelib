@@ -92,6 +92,24 @@ int main() {
   return 0;
 }
 
+/**
+ * The PingSender class is a little thing I just added to send PingPackets
+ * every so often over a connection to do a ping counter down in the corner.
+ * This code has no affect on the gameplay.
+ */
+class PingSender : public TimerCallback {
+public:
+  PingSender(Connection* Conn) : conn(Conn) {}
+
+  void timerCallback() {
+    PingPacket p;
+    conn->stream().writePacket(p, true);
+  }
+
+private:
+  Connection* conn;
+};
+
 void doServer(int port) {
 #ifdef _DEBUG
   //Generate debugging logs to server.log if in debug mode.
@@ -117,10 +135,16 @@ void doServer(int port) {
   PongClient* remotePeer = server.waitForPlayer();
 
   if (remotePeer != NULL) {
+    //Start the pingTimer to allow a ping meter
+    Timer pingTimer(new PingSender(remotePeer->getConnection()), 500, true);
+    pingTimer.startTimer();
+
     local.paddle().setListener(remotePeer);
     //Start and play the Game.
     Game game(&local, &remote);
     doGameLoop(game);
+
+    pingTimer.stopTimer(true);
 
     delete remotePeer->getConnection();
     delete remotePeer;
@@ -159,9 +183,16 @@ void doClient(int port) {
   client.join();
 
   if (client.isConnected()) {
+    //Start the pingTimer to allow a ping meter
+    Timer pingTimer(new PingSender(&client), 500, true);
+    pingTimer.startTimer();
+
     local.paddle().setListener(&peer);
     Game game(&local, &remote);
     doGameLoop(game);
+
+    pingTimer.stopTimer(true);
+
   } else {
     gout << "An error occured while connecting." << endl;
     gout << "Press a key to continue." << endl;

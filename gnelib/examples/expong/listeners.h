@@ -126,6 +126,16 @@ public:
       } else if (type == BallMissed::ID) {
         localPlayer->incrementScore();
 
+      } else if (type == PingPacket::ID) {
+        //We reply to ping requests, and check ping times on replies.
+        PingPacket& ping = *((PingPacket*)next);
+        if (ping.isRequest()) {
+          ping.makeReply();
+          conn->stream().writePacket(ping, true);
+        } else {
+          mlprintf(63, 24, "Ping: %ss", ping.getPing().toString().c_str());
+        }
+
       } else {
         mlprintf(0, 24, "Unexpected packet type %d received!", type);
       }
@@ -197,23 +207,34 @@ public:
    */
   OurListener(Player* RemotePlayer, Player* LocalPlayer)
     : ServerConnectionListener(), remotePlayer(RemotePlayer),
-    localPlayer(LocalPlayer), player(NULL), accept(true) {
+    localPlayer(LocalPlayer), player(NULL), connecting(NULL), accept(true) {
   }
 
   virtual ~OurListener() {}
 
   void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) {
     sync.acquire();
-    if (listener == player) {
+    if (listener == connecting) {
       //Only display an error for our real player.  We don't want to see the
       //ConnectionRefused errors.
       gout << acquire << "Connection error: " << error << endl;
       gout << "  Error received from " << from << endl << release;
+      connecting = NULL;
     }
+    sync.broadcast();
     sync.release();
 
     //If listener is NULL, that is OK even.
     delete listener;
+  }
+
+  void onListenSuccess(ConnectionListener* listener) {
+    sync.acquire();
+    player = connecting;
+    connecting = NULL;
+    accept = false;
+    sync.broadcast();
+    sync.release();
   }
 
   void getNewConnectionParams(int& inRate, int& outRate,
@@ -223,11 +244,11 @@ public:
 
     inRate = outRate = 0;
     allowUnreliable = false;
-    if (player || !accept) {
-      listener = new RefuseClient();
+    if (accept && !connecting) {
+      //If no one is connecting and we are accepting connections
+      listener = connecting = new PongClient(remotePlayer, localPlayer);
     } else {
-      //If no one is playing and we are accepting connections
-      listener = player = new PongClient(remotePlayer, localPlayer);
+      listener = new RefuseClient();
     }
 
     sync.release();
@@ -237,6 +258,7 @@ public:
   //process was aborted by the user.
   PongClient* waitForPlayer() {
     sync.acquire();
+
     while (!player && !kbhit()) {
       //We wait for 250ms to recheck kbhit for pressed keys.
       sync.timedWait(250);
@@ -244,6 +266,22 @@ public:
     if (!player) {
       //We were woken up by a keypress, so refuse any further connections.
       accept = false;
+      if (connecting) {
+        //We have a client connecting when we pressed a key, and we have to
+        //wait for that connection to complete so we can delete the connection
+        //that we don't want anymore.
+        while (connecting) {
+          sync.wait();
+        }
+        //When connecting becomes NULL, check for a successful connect, and if
+        //it was, close it.
+        if (player) {
+          player->getConnection()->disconnect();
+          delete player->getConnection();
+          delete player;
+          player = NULL;
+        }
+      }
     }
 
     sync.release();
@@ -258,6 +296,10 @@ private:
   //This variable will be non-null when there is a player, so we refuse any
   //other incoming connections.
   PongClient* player;
+
+  //player will be stored here while he is connecting, then moved to player
+  //when the connection was successful.
+  PongClient* connecting;
 
   //If this is false, then the user canceled the connection process, we we
   //shouldn't even accept the first player.
