@@ -364,17 +364,10 @@ private:
   };
 
   /**
-   * A weak reference to the EventThread that will we will keep forever, that
-   * comes from eventListenerTemp.
+   * This SmartPtr participates in a cycle, so we have to be careful to reset
+   * it when we disconnect.
    */
-  WeakPtr<EventThread> eventThread;
-
-  /**
-   * We can't have any cycles, but we at least have to keep the EventThread
-   * alive temporarily until it starts.  We will call reset on this as soon as
-   * we start that thread.
-   */
-  SmartPtr<EventThread> eventThreadTemp;
+  SmartPtr<EventThread> eventThread;
 
   /**
    * Make Listener a friend so it can call our onRecieve(bool)
@@ -383,14 +376,10 @@ private:
   friend class Listener;
 
   /**
-   * Used to keep some functions thread-safe.
+   * Used to keep some functions thread-safe.  Guards access to sockets, and
+   * eventThread.
    */
-  Mutex sync;
-  //Used for reg and unreg functions.
-  Mutex regSync;
-
-  Listener::wptr rlistener;
-  Listener::wptr ulistener;
+  mutable Mutex sync;
 
   //PacketStream might call our processError function.
   friend class PacketStream;

@@ -51,31 +51,35 @@ Connection::~Connection() {
 }
 
 ConnectionListener::sptr Connection::getListener() const {
-  EventThread::sptr et = eventThread.lock();
-  if ( et )
-    return et->getListener();
+  LockMutex lock( sync );
+
+  if ( eventThread )
+    return eventThread->getListener();
   else
     return ConnectionListener::sptr();
 }
 
 void Connection::setListener(const ConnectionListener::sptr& listener) {
-  EventThread::sptr et = eventThread.lock();
-  if ( et )
-    et->setListener( listener );
+  LockMutex lock( sync );
+
+  if ( eventThread )
+    eventThread->setListener( listener );
 }
 
 int Connection::getTimeout() {
-  EventThread::sptr et = eventThread.lock();
-  if ( et )
-    return et->getTimeout();
+  LockMutex lock( sync );
+
+  if ( eventThread )
+    return eventThread->getTimeout();
   else
     return 0;
 }
 
 void Connection::setTimeout(int ms) {
-  EventThread::sptr et = eventThread.lock();
-  if ( et )
-    et->setTimeout(ms);
+  LockMutex lock( sync );
+
+  if ( eventThread )
+    eventThread->setTimeout(ms);
 }
 
 PacketStream& Connection::stream() {
@@ -84,14 +88,17 @@ PacketStream& Connection::stream() {
 }
 
 ConnectionStats Connection::getStats(int reliable) const {
+  LockMutex lock( sync );
   return sockets.getStats(reliable);
 }
 
 Address Connection::getLocalAddress(bool reliable) const {
+  LockMutex lock( sync );
   return Address(sockets.getLocalAddress(reliable));
 }
 
 Address Connection::getRemoteAddress(bool reliable) const {
+  LockMutex lock( sync );
   return Address(sockets.getRemoteAddress(reliable));
 }
 
@@ -110,9 +117,9 @@ void Connection::disconnect() {
     ps->join();
 
     //Shutdown the EventThread.
-    EventThread::sptr et = eventThread.lock();
-    assert( et ); //if we are connected we HAVE to have a valid EventThread
-    et->onDisconnect();
+    assert( eventThread ); //if we are connected we HAVE to have a valid EventThread
+    eventThread->onDisconnect();
+    eventThread.reset(); //Kill the cycle we participate in
 
     connected = connecting = false;
   }
@@ -131,13 +138,11 @@ void Connection::disconnectSendAll(int waitTime) {
 
 void Connection::setThisPointer( const wptr& weakThis ) {
   this_ = weakThis;
-  eventThreadTemp = EventThread::create( weakThis.lock() );
-  eventThread = eventThreadTemp;
+  eventThread = EventThread::create( weakThis.lock() );
 }
 
 void Connection::startEventThread() {
-  eventThreadTemp->start();
-  eventThreadTemp.reset();
+  eventThread->start();
 }
 
 void Connection::addHeader(RawPacket& raw) {
@@ -187,9 +192,11 @@ void Connection::checkVersions(RawPacket& raw) {
 }
 
 void Connection::onReceive() {
-  EventThread::sptr et = eventThread.lock();
-  assert( et );
-  et->onReceive();
+  //we don't need to lock sync because we are being called from the CEG.
+  //disconnect doesn't modify eventThread until we are unreg'd.
+  //in fact locking sync would cause deadlock.
+  assert( eventThread );
+  eventThread->onReceive();
 }
 
 void Connection::finishedConnecting() {
@@ -235,9 +242,11 @@ void Connection::onReceive(bool reliable) {
       //We want to intercept ExitPackets, else we just add it.
       if (next->getType() == ExitPacket::ID) {
         exiting = true;
-        EventThread::sptr et = eventThread.lock();
-        assert( et );
-        et->onExit();
+        //we don't need to lock sync because we are being called from the CEG.
+        //disconnect doesn't modify eventThread until we are unreg'd.
+        //in fact locking sync would cause deadlock.
+        assert( eventThread );
+        eventThread->onExit();
       } else
         ps->addIncomingPacket(next);
     }
@@ -266,9 +275,11 @@ void Connection::processError(const Error& error) {
   switch(error.getCode()) {
   case Error::UnknownPacket:
     if (!exiting) {
-      EventThread::sptr et = eventThread.lock();
-      assert( et );
-      et->onError(error);
+      //we don't need to lock sync because we are being called from the CEG.
+      //disconnect doesn't modify eventThread until we are unreg'd.
+      //in fact locking sync would cause deadlock.
+      assert( eventThread );
+      eventThread->onError(error);
     }
     break;
   default:
@@ -278,12 +289,15 @@ void Connection::processError(const Error& error) {
     //But if we don't disconnect we generate endless error messages because
     //we need to unregister immediately.  So we do that.
     unreg(true, true);
+
     //We call onFailure after unreg because a deadlock will occur if the
     //EventThread tries to disconnect before we unreg.
     if (!exiting) {
-      EventThread::sptr et = eventThread.lock();
-      assert( et );
-      et->onFailure(error);
+      //we don't need to lock sync because we are being called from the CEG.
+      //disconnect doesn't modify eventThread until we are unreg'd.
+      //in fact locking sync would cause deadlock.
+      assert( eventThread );
+      eventThread->onFailure(error);
     }
     break;
   }
@@ -301,32 +315,26 @@ void Connection::Listener::onReceive() {
 }
 
 void Connection::reg(bool reliable, bool unreliable) {
-  LockMutex lock( regSync );
+  LockMutex lock( sync );
 
-  if (reliable && rlistener.expired()) {
-    assert(sockets.r != NL_INVALID);
-    Listener::sptr temp = Listener::sptr( new Listener( this_.lock(), true ) );
-    rlistener = temp;
-    eGen->reg( sockets.r, temp );
+  if (reliable) {
+    eGen->reg( sockets.r, Listener::sptr( new Listener( this_.lock(), true ) ) );
     gnedbgo1(3, "Registered reliable socket %i", sockets.r);
   }
-  if (unreliable && rlistener.expired()) {
-    assert(sockets.u != NL_INVALID);
-    Listener::sptr temp = Listener::sptr( new Listener( this_.lock(), false ) );
-    ulistener = temp;
-    eGen->reg( sockets.u, temp );
+  if (unreliable) {
+    eGen->reg( sockets.u, Listener::sptr( new Listener( this_.lock(), false ) ) );
     gnedbgo1(3, "Registered unreliable socket %i", sockets.u);
   }
 }
 
 void Connection::unreg(bool reliable, bool unreliable) {
-  LockMutex lock( regSync );
+  LockMutex lock( sync );
 
-  if (reliable && rlistener.lock()) {
+  if (reliable) {
     eGen->unreg(sockets.r);
     gnedbgo1(3, "Unregistered reliable socket %i", sockets.r);
   }
-  if (unreliable && ulistener.lock()) {
+  if (unreliable) {
     eGen->unreg(sockets.u);
     gnedbgo1(3, "Unregistered unreliable socket %i", sockets.u);
   }
