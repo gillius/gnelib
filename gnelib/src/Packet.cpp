@@ -25,7 +25,7 @@ namespace GNE {
 
 const int Packet::ID = 0;
 
-Packet::Packet(int id) : type((guint8)id) {
+Packet::Packet(int id) : type((guint8)id), chan( 0 ) {
 }
 
 Packet::~Packet() {
@@ -39,15 +39,26 @@ int Packet::getType() const {
   return (int)type;
 }
 
+int Packet::getChannel() const {
+  return (int)chan;
+}
+
+void Packet::setChannel( int chan ) {
+  assert( chan >= 0 && chan <= 255 );
+  this->chan = chan;
+}
+
 int Packet::getSize() const {
-  return RawPacket::getSizeOf(type);
+  return RawPacket::getSizeOf(type) + RawPacket::getSizeOf( chan );
 }
 
 void Packet::writePacket(RawPacket& raw) const {
   raw << type;
+  raw << chan;
 }
 
 void Packet::readPacket(RawPacket& raw) {
+  raw >> chan;
 }
 
 Packet* Packet::create() {
