@@ -92,9 +92,7 @@ static void addStats(NLsocket s, ConnectionStats& st) {
 
 ConnectionStats SocketPair::getStats(int reliable) const {
   ConnectionStats ret;
-  ret.avgBytesRecv = ret.avgBytesSent = ret.bytesRecv = ret.bytesSent
-    = ret.maxAvgBytesRecv = ret.maxAvgBytesSent = ret.packetsRecv
-    = ret.packetsSent = 0;
+  memset((void*)&ret, 0, sizeof(ret));
   if (reliable != 0 && r != NL_INVALID) //Add in reliable socket stats
     addStats(r, ret);
   if (reliable <= 0 && u != NL_INVALID) //Add in unrel socket stats
