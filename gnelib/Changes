@@ -1,4 +1,7 @@
 GNE 0.49 to current
+  Added the ConnectionParams class to help simplify setting up connections and
+    to allow better forward compatability to ease the addition of expected
+    expansions of abilities of connections.
   Implemented thread priorities for Win32.
   Ported the threading implementation from pthreads-win32 to use native win32
     threads.  That in conjuction with HawkNL's NL_WIN_THREADS option means
