@@ -20,6 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/Thread.h"
 #include "../include/gnelib/ConditionVariable.h"
+#include "../include/gnelib/Error.h"
 
 namespace GNE {
 
@@ -36,11 +37,19 @@ const std::string Thread::DEF_NAME = "Thread";
 
 //##ModelId=3BB805C60186
 void* Thread::threadStart( void* thread ) {
-  Thread* thr = ( ( Thread* )( thread ) );
-  mapSync.acquire(); //This is to make sure the map is updated before we
-  mapSync.release(); //start running
-  thr->run();
-  thr->end();
+  try {
+    Thread* thr = ( ( Thread* )( thread ) );
+    mapSync.acquire(); //This is to make sure the map is updated before we
+    mapSync.release(); //start running
+    thr->run();
+    thr->end();
+  } catch (Error e) {
+    gnedbg2(1, "Unhandled exception, thread terminated. Error %d: %s",
+      e.getCode(), e.toString().c_str());
+  }
+  //We don't do a catch all because interestingly enough, the MSVC debugger
+  //is started by throwing an exception, and placing a catch all here will
+  //keep the debugger from starting.
   return NULL;
 }
 

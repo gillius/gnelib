@@ -40,3 +40,8 @@ exnetperf -- Shows how to use the statistical functions in GNE.  This
 
 exping -- Shows how to use the PingPacket API and how to create and respond
   to PingPackets.  Also functions as a test of the PingPacket class.
+
+expong -- It's console pong.  Over the internet.  What kind of nonsense is
+  this?  Anyways, this is a COMPLETE game example showing how to do a simple
+  framework for a fully functional and correct GNE game that will expand to
+  fit most projects.  This means all error handling and the whole shebang.

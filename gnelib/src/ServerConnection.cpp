@@ -87,19 +87,22 @@ ServerConnection::~ServerConnection() {
 void ServerConnection::run() {
   assert(sockets.r != NL_INVALID);
   assert(eventListener != NULL);
-  gnedbgo1(1, "New connection incoming from %s", getRemoteAddress(true).toString().c_str());
+  //We cache the remote address because after an error occurs we may not be
+  //able to get it to pass to the listen failure function.
+  Address rAddr = getRemoteAddress(true);
+  gnedbgo1(1, "New connection incoming from %s", rAddr.toString().c_str());
 
   //Do the GNE protocol handshake.
   try {
     doHandshake();
   } catch (Error e) {
-    params->creator->onListenFailure(e, getRemoteAddress(true), getListener());
+    params->creator->onListenFailure(e, rAddr, getListener());
     //We delete ourselves when we terminate since we were never seen by the
     //user and no one has seen us yet.
     detach(true);
     return;
   }
-  gnedbgo(4, "GNE Protocol Handshake Successful.");
+  gnedbgo(2, "GNE Protocol Handshake Successful.");
 
   //Start up the connecting SyncConnection and start the onNewConn event.
   bool onNewConnFinished = false;
@@ -122,8 +125,16 @@ void ServerConnection::run() {
     sConn.release();
   } catch (Error e) {
     if (!onNewConnFinished) {
-      sConn.endConnect(false);
-      params->creator->onListenFailure(e, getRemoteAddress(true), getListener());
+      //endConnect will set the null listener to discard the events, so we
+      //have to cache the current listener.
+      ConnectionListener* cached = getListener();
+
+      try {
+        sConn.endConnect(false);
+      } catch (Error e) {
+        //The error might be re-reported, so we ignore it.
+      }
+      params->creator->onListenFailure(e, rAddr, cached);
       //We delete ourselves when we terminate since we were never seen by the
       //user and no one has seen us yet.
       detach(true);
@@ -139,29 +150,29 @@ void ServerConnection::run() {
 //##ModelId=3C783ACF02BE
 void ServerConnection::doHandshake() throw (Error) {
   //Receive the client's CRP.
-  gnedbgo(4, "Waiting for the client's CRP.");
+  gnedbgo(2, "Waiting for the client's CRP.");
   try {
     getCRP();
   } catch (Error e) {
     if (e.getCode() == Error::GNETheirVersionHigh ||
       e.getCode() == Error::GNETheirVersionLow ||
       e.getCode() == Error::UserVersionMismatch) {
-      gnedbgo(4, "Versions don't match, sending refusal.");
+      gnedbgo(2, "Versions don't match, sending refusal.");
       sendRefusal();
     }
     throw;
   }
   
   //Else, we send the CAP
-  gnedbgo(4, "Got CRP, now sending CAP.");
+  gnedbgo(2, "Got CRP, now sending CAP.");
   sendCAP();
   
   //Then we handle anything related to the unreliable connection if needed.
   if (params->unrel) {
-    gnedbgo(4, "Unreliable requested.  Getting unrel info.");
+    gnedbgo(2, "Unreliable requested.  Getting unrel info.");
     getUnreliableInfo();
   } else {
-    gnedbgo(4, "Unreliable connection not requested.");
+    gnedbgo(2, "Unreliable connection not requested.");
   }
 }
 
@@ -237,6 +248,7 @@ void ServerConnection::sendCAP() throw (Error) {
   }
 
   int check = sockets.rawWrite(true, cap.getData(), (NLint)cap.getPosition());
+  gnedbgo1(5, "Sent a CAP with %d bytes.", check);
   //The write should succeed and have sent all of our data.
   if (check != cap.getPosition())
     throw Error::createLowLevelError(Error::Write);

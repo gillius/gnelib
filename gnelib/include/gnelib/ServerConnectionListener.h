@@ -86,13 +86,16 @@ protected:
    * There was a failure when trying to listen on this socket.  This is not
    * called when the actual low-level listen fails (that error is returned
    * from listen), but instead high-level errors while connecting such as a
-   * version mismatch are sent here.  Only errors that occur BEFORE the
-   * ConnectionListener::onNewConn event are sent here.\n
+   * version mismatch are sent here.  Only errors that occur before or during
+   * the ConnectionListener::onNewConn event are sent here.
+   *
    * This function may be called from multiple threads at the same time, and
    * may block if it wishes; it does not have the "non-blocking" restriction
-   * most GNE events have.\n
-   * If the connection failed very early, the address and listener parameters
-   * will be NULL (this happens if the low-level accept() call fails).
+   * most GNE events have.
+   *
+   * Depending on when and under what circumstances the failure happened, in
+   * any case, from might be an invalid address, and listener may be NULL.
+   *
    * @param error the type of error
    * @param from the remote address the failed attempt came from
    * @param listener the unused ConnectionListener that was obtained from

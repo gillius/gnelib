@@ -39,15 +39,19 @@ class ServerConnection;
  * connecting or performing trivial connections/communications.  Many times
  * if you want to perform non-game transfers, for example a server-query
  * connection or another simple service it might be simpler to spawn a new
- * thread and run the SyncConnection while the rest of the program runs.\n
+ * thread and run the SyncConnection while the rest of the program runs.
+ *
  * SyncConnections throw an Error class on an error, so you must use
  * try/catch blocks.  Note that the Error class can't describe everything
  * about an error, so sometimes more specific information is available in the
- * debug logs (enable them with GNE::initDebug).\n
+ * debug logs (enable them with GNE::initDebug).
+ *
  * All transfers with SyncConnection are reliable (using TCP, SPX, or similar
- * protocol).\n
+ * protocol).
+ *
  * If an error occurs, the connection was terminated.  The underlying
- * connection is disconnected, and this SyncConnection becomes released.\n
+ * connection is disconnected, and this SyncConnection becomes released.
+ *
  * When you wrap a Connection with this class, the event listener for that
  * Connection is suspended and SyncConnection "takes over" until it is
  * release()d.  So while in syncronous mode you will receive no events
@@ -57,7 +61,8 @@ class ServerConnection;
  * wrap the Connection.  If there was already data pending that you did not
  * receive in asyncronous mode -- it was not lost, but you will get it from
  * the next packet read.  If you start out with a SyncConnection, then you
- * can be certain no unexpected packets will be arriving.\n
+ * can be certain no unexpected packets will be arriving.
+ *
  * See the example exsynchello for more help with the usage of this class.
  */
 //##ModelId=3BC3C5B200BE
@@ -75,6 +80,7 @@ public:
    * function is declared as being able to throw an Error object, but this
    * guaranteed not to fail if the SyncConnection is released already, since
    * the only error that can occur is one given by release.
+   *
    * @see release()
    */
   //##ModelId=3BC3CB1703B7
@@ -89,7 +95,8 @@ public:
   /**
    * Just like ClientConnection::open, this will open the port, ready for
    * connection.  If the open failed, an Error is thrown.
-   * \nIt is important that the wrapped Connection is a ClientConnection, 
+   *
+   * It is important that the wrapped Connection is a ClientConnection, 
    * otherwise undefined behavior (likely a crash) will result.
    */
   //##ModelId=3BC3CD0902E4
@@ -104,7 +111,8 @@ public:
    * repressed just like onDisconnect is not repressed.  Many times though,
    * when using this method you won't have a need for onConnect, but if you
    * do create one, connect will wait until onConnect is finished.
-   * \nIt is important that the wrapped Connection is a ClientConnection, 
+   *
+   * It is important that the wrapped Connection is a ClientConnection, 
    * otherwise undefined behavior (likely a crash) will result.
    */
   //##ModelId=3BC3CD090320
@@ -124,12 +132,14 @@ public:
    * it is essentially in an invalid state and should not be used anymore
    * (with the exception of the dtor, getConnection(), isReleased(), and
    * this function).  This function throws an Error if some underlying
-   * pending operations failed since the last call on this SyncConnection.\n
+   * pending operations failed since the last call on this SyncConnection.
+   *
    * If release is called when the SyncConnection is already released, no
-   * errors will be thrown.\n
+   * errors will be thrown.
+   *
    * onReceive will be called in the original listener after release if
    * necessary, and onDoneWriting will be called after release if any data
-   * since writing packets 
+   * since writing packets.
    */
   //##ModelId=3BDB10A50316
   void release() throw (Error);
@@ -148,7 +158,8 @@ public:
    * right packet is being read.  If there is a mismatch, an Error is thrown.
    * The passed packet is untouched, and the connection remains connected;
    * however, the data just received (the incorrect packet) is lost.
-   * The connection will remain connected in this case.\n
+   * The connection will remain connected in this case.
+   *
    * An error is also thrown if a socket failure or error occurs since the
    * last interaction with this object.
    */
@@ -163,7 +174,8 @@ public:
    * network performance, and allows you to perform reads while the
    * connection is still writing.  All of this is transparent to your logic,
    * though.  release() will block until all writes are completed, and the
-   * destructor and disconnect() function call release() if needed.\n
+   * destructor and disconnect() function call release() if needed.
+   *
    * An error is thrown if a socket failure or error occurs since the
    * last interaction with this object, or during this interaction.
    */
@@ -178,7 +190,8 @@ private:
    * want to release.  This is used only by the GNE protocol connecting code,
    * and is used there to help guarantee that onNewConn/onConnect is the
    * first event, and onDisconnect the last if onNewConn/onConnect ever
-   * finished.  Basically this "delays" the release of this SyncConnection.\n
+   * finished.  Basically this "delays" the release of this SyncConnection.
+   *
    * This must be called BEFORE any events can possibly be received (so
    * before registration into ConnectionEventGenerator).
    */
@@ -189,8 +202,11 @@ private:
    * Complement function with startConnect, this must be called if
    * startConnect was called.  Pass true to passEvents if the connection was
    * successful and onFailure and onDisconnect should be passed onto the old
-   * listener.  Pass false if the connection failed and the events should be
-   * discarded and not passed on.
+   * listener.
+   *
+   * Pass false if the connection failed and the events should be discarded
+   * and not passed on.  If false was passed, the listener for the connection
+   * was set to ConnectionListener::getNullListener() to discard the events.
    */
   //##ModelId=3C4116C30248
   void endConnect(bool passEvents) throw (Error);

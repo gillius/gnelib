@@ -54,17 +54,18 @@ ConnectionListener* EventThread::getListener() const {
 
 //##ModelId=3C106F0203DA
 void EventThread::setListener(ConnectionListener* listener) {
-  //Acquire eventSync because of the wait loop check
-  eventSync.acquire();
-
   //Acquire listenSync to wait for the current event to complete.
   listenSync.acquire();
+
+  //Acquire eventSync because of the wait loop check
+  eventSync.acquire();
   eventListener = listener;
-  listenSync.release();
 
   //Signal the event thread in case it is waiting for a listener.
   eventSync.signal();
   eventSync.release();
+
+  listenSync.release();
 }
 
 //##ModelId=3C106F0203DC

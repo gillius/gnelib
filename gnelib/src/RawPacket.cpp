@@ -212,6 +212,8 @@ RawPacket& RawPacket::operator >> (std::string& x) {
     std::string temp((char*)&data[currLoc], (int)length);
     x = temp;
     currLoc += (int)length;
+  } else {
+    x = "";
   }
 
   assert(currLoc <= RAW_PACKET_LEN);

@@ -94,32 +94,25 @@ void SyncConnection::startConnect() {
 //##ModelId=3C4116C30248
 void SyncConnection::endConnect(bool passEvents) throw (Error) {
   assert(connectMode);
-  sync.acquire();
+  //We use a LockMutex to lock sync so that if an exception occurs, sync will
+  //automatically be unlocked.
+  LockMutex lock(sync);
+
   //If the connection failed we need to ignore any further events as
   //onNewConn or onConnect did not successfully finish and that listener
   //shouldn't get onFailure or onDisconnect.
   if (!passEvents)
     oldListener = ConnectionListener::getNullListener();
   connectMode = false;
-  try {
-    doRelease();
-  } catch (Error e) {
-    sync.release();
-    throw;
-  }
-  sync.release();
+  doRelease();
 }
 
 //##ModelId=3BDB10A50316
 void SyncConnection::release() throw (Error) {
-  sync.acquire();
-  try {
-    doRelease();
-  } catch (Error e) {
-    sync.release();
-    throw;
-  }
-  sync.release();
+  //We use a LockMutex to lock sync so that if an exception occurs, sync will
+  //automatically be unlocked.
+  LockMutex lock(sync);
+  doRelease();
 }
 
 //##ModelId=3C4116C30249

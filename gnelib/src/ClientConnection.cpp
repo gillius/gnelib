@@ -106,7 +106,7 @@ void ClientConnection::run() {
       getListener()->onConnectFailure(e);
       return;
     }
-    gnedbgo(4, "GNE Protocol Handshake Successful.");
+    gnedbgo(2, "GNE Protocol Handshake Successful.");
 
     //We don't want to doubly-wrap SyncConnections, so we check for a wrapped
     //one here and else make our own.
@@ -148,11 +148,15 @@ void ClientConnection::run() {
 
     } catch (Error e) {
       if (!onConnectFinished) {
+        //endConnect will set the null listener to discard the events, so we
+        //have to cache the current listener.
+        ConnectionListener* cached = getListener();
+        
         if (ourSConn)
           sConn.endConnect(false);
-        getListener()->onConnectFailure(e);
+        
+        cached->onConnectFailure(e);
       }
-      //else onDisconnect should get called.
       if (ourSConn)
         delete params->sConnPtr;
 
@@ -173,20 +177,20 @@ void ClientConnection::doHandshake() throw (Error) {
   //Start the GNE protocol connection process.
   //The first packet is from client to server, and is the connection
   //request packet (CRP).
-  gnedbgo(4, "Sending the CRP.");
+  gnedbgo(2, "Sending the CRP.");
   sendCRP();
   
   //Now we expect to receive the connection accepted packet (CAP) or the
   //refused connection packet, and then based on that set up the
   //unreliable connection.
+  gnedbgo(2, "Waiting for the CAP.");
   Address temp = getCAP();
-  gnedbgo(4, "Received the CAP.");
   
   if (params->unrel) {
-    gnedbgo(4, "Setting up the unreliable connection");
+    gnedbgo(2, "Setting up the unreliable connection");
     setupUnreliable(temp);
   } else {
-    gnedbgo(4, "Unreliable connection not requested.");
+    gnedbgo(2, "Unreliable connection not requested.");
   }
 }
 
@@ -224,7 +228,8 @@ Address ClientConnection::getCAP() throw (Error) {
   //refusal packet.
   if (check < (int)sizeof(gbool)) {
     delete[] capBuf;
-    throw new Error(Error::ProtocolViolation);
+    gnedbgo1(1, "Response to CRP is too small (size is %d).", check);
+    throw Error(Error::ProtocolViolation);
   }
 
   //Now parse the CAP (or refusal packet)
@@ -236,9 +241,15 @@ Address ClientConnection::getCAP() throw (Error) {
     //Check to make sure packet sizes match.
     //The size should be CAPLEN if we are not expecting the unreliable info.
     //but if we are expecting it we'll get another guint16.
-    if (check != ((params->unrel) ? (CAPLEN + (int)sizeof(guint16)) : CAPLEN)){
+    int expecting = CAPLEN;
+    if (params->unrel)
+      expecting += (int)sizeof(guint16);
+
+    if (check != expecting){
       delete[] capBuf;
-      throw new Error(Error::ProtocolViolation);
+      gnedbgo2(1, "Expected a CAP of size %d but got %d bytes instead.",
+        expecting, check);
+      throw Error(Error::ProtocolViolation);
     }
 
     //Get the max rate the remote end allows.
@@ -263,7 +274,9 @@ Address ClientConnection::getCAP() throw (Error) {
   //else we got a refusal packet
   if (check != REFLEN) {
     delete[] capBuf;
-    throw new Error(Error::ProtocolViolation);
+    gnedbgo2(1, "Expected a refusal of size %d but got %d bytes instead.",
+      REFLEN, check);
+    throw Error(Error::ProtocolViolation);
   }
 
   //Get the version numbers
@@ -282,7 +295,7 @@ Address ClientConnection::getCAP() throw (Error) {
 
   //If the version numbers are all the same our connection was simply
   //just refused.
-  throw new Error(Error::ConnectionRefused);
+  throw Error(Error::ConnectionRefused);
 
   //We should never reach this point.
   assert(false);

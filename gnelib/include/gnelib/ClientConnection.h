@@ -84,7 +84,7 @@ public:
    * finished, when onConnect or onConnectFailure will be called.  When the
    * called function exits, the thread will stop and join will return.  If
    * you do not need asyncronous sockets, you do not need to overload these
-   * functions and can rely on the isConnection function.  You still need to
+   * functions and can rely on the isConnected method.  You still need to
    * overload onConnectFailure to get a description of the error, however.
    *
    * The version number for the library and your own version number will be

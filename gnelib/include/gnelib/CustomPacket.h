@@ -62,6 +62,13 @@ public:
   RawPacket& getData();
 
   /**
+   * This method resets the underlying data, and prepares it for write
+   * access.  Essentially, this method "recreates" the CustomPacket instance.
+   */
+  //##ModelId=3C7E97B80267
+  void reset();
+
+  /**
    * Returns a newly allocated exact copy of this packet.  Due to the nature
    * of RawPacket not knowing its size on reading (this should be inferred by
    * the packet types in it), this only copies the data up to the current
@@ -126,6 +133,14 @@ private:
    */
   //##ModelId=3C65C7A201EB
   gbyte* ourBuf;
+
+  /**
+   * We have to be copyable to work with SyncConnection.  When we are read in
+   * we know our contentLength at least until getData is called.  When this
+   * variable is -1 we do not know the size of the CustomPacket.
+   */
+  //##ModelId=3C7E6B2203AF
+  int contentLen;
 };
 
 } //namespace GNE

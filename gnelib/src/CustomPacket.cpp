@@ -28,7 +28,9 @@ namespace GNE {
 const int CustomPacket::ID = 1;
 
 //##ModelId=3C0B257E03C4
-CustomPacket::CustomPacket() : Packet(ID), data(NULL), ourBuf(NULL) {}
+CustomPacket::CustomPacket()
+  : Packet(ID), data(NULL), ourBuf(NULL), contentLen(-1) {
+}
 
 //##ModelId=3C0B257E03C5
 CustomPacket::~CustomPacket() {
@@ -41,7 +43,14 @@ RawPacket& CustomPacket::getData() {
     //create a new RawPacket for writing
     data = new RawPacket();
   }
+  //Once we let the user access the data, we are unsure of its length.
+  contentLen = -1;
   return *data;
+}
+
+//##ModelId=3C7E97B80267
+void CustomPacket::reset() {
+  destroyData();
 }
 
 //##ModelId=3C0B257E03C8
@@ -68,11 +77,13 @@ int CustomPacket::getMaxUserDataSize() {
 //##ModelId=3C0B257E03CC
 void CustomPacket::writePacket(RawPacket& raw) const {
   assert(data != NULL);
-  assert(data->getPosition() > 0 && data->getPosition() <= getMaxUserDataSize());
+  //We might have a cached contentLen which we kept only to be 
+  int pos = (contentLen >= 0) ? contentLen : data->getPosition();
+  assert(pos > 0 && pos <= getMaxUserDataSize());
 
   Packet::writePacket(raw);
-  raw << (guint16)data->getPosition();
-  raw.writeRaw(data->getData(), data->getPosition());
+  raw << (guint16)pos;
+  raw.writeRaw(data->getData(), pos);
 }
 
 //##ModelId=3C0B257E03CF
@@ -80,8 +91,9 @@ void CustomPacket::readPacket(RawPacket& raw) {
   Packet::readPacket(raw);
   destroyData();
   
-  guint16 contentLen;
-  raw >> contentLen;
+  guint16 temp;
+  raw >> temp;
+  contentLen = (int)temp;
 
   ourBuf = new gbyte[contentLen];
   raw.readRaw(ourBuf, contentLen);
@@ -99,6 +111,7 @@ void CustomPacket::destroyData() {
   delete data;
   ourBuf = NULL;
   data = NULL;
+  contentLen = -1;
 }
 
 } //namespace GNE

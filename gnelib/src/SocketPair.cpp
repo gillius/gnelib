@@ -109,7 +109,12 @@ int SocketPair::rawRead(bool reliable, const gbyte* buf, int bufSize) const {
   else
     act = u;
   assert(act != NL_INVALID);
-  return int(nlRead(act, (NLvoid*)buf, (NLint)bufSize));
+  int chk = nlRead(act, (NLvoid*)buf, (NLint)bufSize);
+  gnedbgo1(5, "Read %d bytes.", chk);
+  if (chk >= 2) {
+    gnedbgo2(5, "  First two bytes are %d and %d", (int)buf[0], (int)buf[1]);
+  }
+  return chk;
 }
 
 //##ModelId=3B6B302401D6
@@ -120,7 +125,12 @@ int SocketPair::rawWrite(bool reliable, const gbyte* buf, int bufSize) const {
   else //if u is invalid, send over r anyways.
     act = (u != NL_INVALID) ? u : r;
   assert(act != NL_INVALID);
-  return int(nlWrite(act, (NLvoid*)buf, (NLint)bufSize));
+  int chk = nlWrite(act, (NLvoid*)buf, (NLint)bufSize);
+  gnedbgo1(1, "Sent %d bytes.", chk);
+  if (chk >= 2) {
+    gnedbgo2(5, "  First two bytes are %d and %d", (int)buf[0], (int)buf[1]);
+  }
+  return chk;
 }
 
 } //Namespace GNE
