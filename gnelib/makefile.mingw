@@ -55,6 +55,6 @@ DEPENDENCIES         = $(notdir $(LIB_O:.o=.d))
 
 VPATH                = $(dir $(EXAMPLE_CPP))
 
-LIBDIR               = $(MINGDIR)/lib
+LIBDIR               = $(MINGDIR)/lib/
 
-INCDIR               = $(MINGDIR)/include
+INCDIR               = $(MINGDIR)/include/

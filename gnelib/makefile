@@ -45,6 +45,8 @@ veryclean: clean
 install: $(LIB_STATIC)
 	$(CP) $< $(LIBDIR)
 	$(CP) include/gnelib.h $(INCDIR)
+	-$(MKDIR) $(INCDIR)gnelib
+	$(CP) include/gnelib/*.h $(INCDIR)gnelib
 
 uninstall:
 	$(RM) $(LIBDIR)$(LIB_STATIC_NAME)
