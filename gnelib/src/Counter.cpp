@@ -33,7 +33,8 @@ Counter::~Counter() {
 //##ModelId=3B07538100EE
 void Counter::timerCallback() {
   countSync.acquire();
-  count++;
+  ++count;
+  countSync.broadcast();
   countSync.release();
 }
 
@@ -46,6 +47,7 @@ int Counter::getCount() {
 void Counter::setCount(int newCount) {
   countSync.acquire();
   count = newCount;
+  countSync.broadcast();
   countSync.release();
 }
 
@@ -53,6 +55,17 @@ void Counter::setCount(int newCount) {
 void Counter::adjustCount(int val) {
   countSync.acquire();
   count += val;
+  countSync.broadcast();
+  countSync.release();
+}
+
+//##ModelId=3C7C0AFD0391
+void Counter::waitAndDecrement() {
+  countSync.acquire();
+  while (count <= 0) {
+    countSync.wait();
+  }
+  --count;
   countSync.release();
 }
 
