@@ -41,7 +41,7 @@ using namespace GNE::Console;
 void errorExit(const char* error);
 int getPort(const char* prompt);
 void displayAddress();
-string getAddressString(NLaddress& addr);
+string getAddressString(NLaddress addr);
 void doServer(int outRate, int inRate, int port);
 void doClient(int outRate, int inRate, int port);
 
@@ -158,7 +158,7 @@ void displayAddress() {
   cout << "Local address: " << buf << endl;
 }
 
-string getAddressString(NLaddress& addr) {
+string getAddressString(NLaddress addr) {
   char buf[NL_MAX_STRING_LENGTH];
   nlAddrToString(&addr, (NLbyte*)buf);
   return string(buf);
