@@ -22,7 +22,7 @@
 
 //##ModelId=3AE4AA420046
 ListServerConnection::ListServerConnection(std::string address) 
-: ClientConnection(0, 0, address) {
+: ClientConnection(0, 0) {
 }
 
 //##ModelId=3AE4AA420078
