@@ -260,8 +260,6 @@ private:
    */
   //##ModelId=3BC3B98001C3
   Mutex sync;
-  //##ModelId=3BC3B98001C8
-  Mutex errorSync;
   //Used for reg and unreg functions.
   //##ModelId=3C46133F02D5
   Mutex regSync;

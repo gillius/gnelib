@@ -1,4 +1,7 @@
 GNE 0.45 to current
+  A mutex was no longer needed in Connection and was causing deadlocks, so it
+    was removed.  The mutex was left over from the old event system before it
+    was rewritten.
   Handshaking as specified in the GNE protocol specs is now implemented.
   When an unreliable connection does not exist, packets marked as being sent
     over the unreliable packet stream are sent over the reliable stream

@@ -48,9 +48,6 @@ Connection::~Connection() {
       //This section of code allows the ConnectionListeners to delete their
       //associated Connections.
       eventListener->detach(true);
-      //Make sure processError has finished if it has already started.
-      errorSync.acquire();
-      errorSync.release();
     } else {
       eventListener->join();
       delete eventListener;
@@ -213,15 +210,11 @@ void Connection::onReceive(bool reliable) {
 void Connection::processError(const Error& error) {
   switch(error.getCode()) {
   case Error::UnknownPacket:
-    errorSync.acquire();
     onError(error);
-    errorSync.release();
     break;
   default:
-    errorSync.acquire();
     onFailure(error);
     disconnect();
-    errorSync.release();
     break;
   }
 }
