@@ -36,7 +36,7 @@ guint32 PingPacket::nextReqId = 0;
 std::map<guint32, Time> PingPacket::requests;
 
 //##ModelId=3C65C6D000CD
-PingPacket::PingPacket(bool makeReq) : isReq(gTrue) {
+PingPacket::PingPacket(bool makeReq) : Packet(ID), isReq(gTrue) {
   //makeReq is false when creating a packet just for reading.
   if (makeReq) {
     sync.acquire();
