@@ -1,1 +1,10 @@
 Examples for GNE
+
+exthreads -- shows the basics of creating, starting, and syncronizing with
+  threads.
+
+exuptime -- Very small example using Timer::getCurrentTime, which uses the
+  rdtsc instruction where possible.  On many systems, this is time in CPU
+  cycles since system start, so this is one way of getting system uptime.
+
+extimer -- Shows usage of the Timer class.
