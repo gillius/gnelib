@@ -118,9 +118,6 @@
 				RelativePath="src\ChannelProvider.cpp">
 			</File>
 			<File
-				RelativePath="src\Client.cpp">
-			</File>
-			<File
 				RelativePath=".\src\ClientConnection.cpp">
 			</File>
 			<File
@@ -238,9 +235,6 @@
 				RelativePath=".\src\ReceiveEventListener.cpp">
 			</File>
 			<File
-				RelativePath="src\Server.cpp">
-			</File>
-			<File
 				RelativePath=".\src\ServerConnection.cpp">
 			</File>
 			<File
@@ -308,16 +302,7 @@
 				RelativePath="include\gnelib\ChannelProvider.h">
 			</File>
 			<File
-				RelativePath="include\gnelib\Client.h">
-			</File>
-			<File
 				RelativePath=".\include\gnelib\ClientConnection.h">
-			</File>
-			<File
-				RelativePath="include\gnelib\ClientListener.h">
-			</File>
-			<File
-				RelativePath="include\gnelib\ClientPeer.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ConditionVariable.h">
@@ -374,9 +359,6 @@
 				RelativePath=".\include\gnelib\GNEDebug.h">
 			</File>
 			<File
-				RelativePath="include\gnelib\HighLevelListener.h">
-			</File>
-			<File
 				RelativePath=".\include\gnelib\ListServerConnection.h">
 			</File>
 			<File
@@ -428,15 +410,6 @@
 				RelativePath=".\include\gnelib\PingPacket.h">
 			</File>
 			<File
-				RelativePath="include\gnelib\Player.h">
-			</File>
-			<File
-				RelativePath="include\gnelib\PlayerData.h">
-			</File>
-			<File
-				RelativePath="include\gnelib\PlayerList.h">
-			</File>
-			<File
 				RelativePath=".\include\gnelib\RateAdjustPacket.h">
 			</File>
 			<File
@@ -446,19 +419,10 @@
 				RelativePath=".\include\gnelib\ReceiveEventListener.h">
 			</File>
 			<File
-				RelativePath="include\gnelib\Server.h">
-			</File>
-			<File
 				RelativePath=".\include\gnelib\ServerConnection.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ServerConnectionListener.h">
-			</File>
-			<File
-				RelativePath="include\gnelib\ServerPlayer.h">
-			</File>
-			<File
-				RelativePath="include\gnelib\ServerPlayerListener.h">
 			</File>
 			<File
 				RelativePath="include\gnelib\SmartPtr.h">
