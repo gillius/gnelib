@@ -126,7 +126,7 @@ void doMain(const char* connType) {
   //with each other.
   setGameInformation("hello examples", 1);
 
-  initConsole(atexit);
+  initConsole();
   setTitle("GNE Basic Connections Example");
 
   //register HelloPacket using default behavior and allocators.

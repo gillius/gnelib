@@ -27,12 +27,10 @@
 
 class PersonPacket : public Packet {
 public:
-  PersonPacket() : Packet(MIN_USER_ID) {}
+  PersonPacket() : Packet(ID) {}
   virtual ~PersonPacket() {}
 
-  Packet* makeClone() const {
-    return new PersonPacket(*this);
-  }
+  static const int ID;
 
   int getSize() const {
     return Packet::getSize() + RawPacket::getSizeOf(age) +
@@ -51,14 +49,12 @@ public:
     raw >> age >> firstName >> lastName;
   }
 
-  static Packet* create() {
-    return new PersonPacket();
-  }
-
-  NLubyte age;
+  guint8 age;
   string firstName; //max size 10
   string lastName;  //max size 20
 };
+
+const int PersonPacket::ID = MIN_USER_ID;
 
 /**
  * This is a packet class we purposely do not register so we can test the
@@ -67,12 +63,10 @@ public:
  */
 class UnknownPacket : public Packet {
 public:
-  UnknownPacket() : Packet(MIN_USER_ID + 1) {}
+  UnknownPacket() : Packet(ID) {}
   virtual ~UnknownPacket() {}
 
-  Packet* makeClone() const {
-    return new UnknownPacket(*this);
-  }
+  static const int ID;
 
   int getSize() const {
     return Packet::getSize();
@@ -85,11 +79,9 @@ public:
   void readPacket(RawPacket& raw) {
     Packet::readPacket(raw);
   }
-
-  static Packet* create() {
-    return new UnknownPacket();
-  }
 };
+
+const int UnknownPacket::ID = MIN_USER_ID + 1;
 
 void packetTest(const PersonPacket&, const PersonPacket&);
 void parseTest(const Packet&, const Packet&);

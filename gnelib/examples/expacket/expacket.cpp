@@ -32,9 +32,9 @@
  * connect in network games they are loading a saved game state.
  */
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
 using namespace std;
 using namespace GNE;
@@ -45,9 +45,9 @@ using namespace GNE::Console;
 
 int main(int argc, char* argv[]) {
   initGNE(NO_NET, atexit);
-  initConsole(atexit);
+  initConsole();
   Console::setTitle("GNE Packet Test");
-  registerPacket(MIN_USER_ID, PersonPacket::create);
+  defaultRegisterPacket<PersonPacket>();
   //we don't register UnknownPacket to try to trigger an error later so we
   //can test error handling of the parser.
   
@@ -76,7 +76,7 @@ void packetTest(const PersonPacket& jason, const PersonPacket& elias) {
   jason.writePacket(raw);
   Packet* temp = elias.makeClone();
   temp->writePacket(raw);
-  delete temp;
+  PacketParser::destroyPacket( temp );
 
   raw.reset();
 
@@ -95,6 +95,7 @@ void packetTest(const PersonPacket& jason, const PersonPacket& elias) {
   raw >> dummy;
   raw >> t2;
 
+  //Maybe I should make a "toString" method for PersonPacket, or an operator <<?
   gout << t1.firstName << ' ' << t1.lastName << ", " << (int)t1.age
     << " years.  (size/type: " << t1.getSize() << '/' << t1.getType() << ')' << endl;
   gout << t2.firstName << ' ' << t2.lastName << ", " << (int)t2.age
@@ -119,7 +120,7 @@ void parseTest(const Packet& jason, const Packet& elias) {
   gout << end << ", " << next << ", " << next->getType() << endl;
   if (end == true || next == NULL || next->getType() != 0)
     gout << "(1)Unexpected values." << endl;
-  delete next;
+  PacketParser::destroyPacket( next );
 
   //This one should fail as we did not register UnknownPacket.
   next = parseNextPacket(end, raw1);
@@ -129,7 +130,7 @@ void parseTest(const Packet& jason, const Packet& elias) {
 
   raw1.reset();
   //After we register, we should be able to completely read the RawPacket.
-  registerPacket(packet2.getType(), UnknownPacket::create);
+  defaultRegisterPacket<UnknownPacket>();
 
   while(!end) {
     next = parseNextPacket(end, raw1);
@@ -139,7 +140,7 @@ void parseTest(const Packet& jason, const Packet& elias) {
       gout << "(4)Unexpected values." << endl;
     if (!end) {
       gout << end << ", " << next << ", " << next->getType() << endl;
-      delete next;
+      PacketParser::destroyPacket( next );
     }
   }
   gout << end << ", " << next << endl;

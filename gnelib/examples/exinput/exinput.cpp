@@ -32,7 +32,7 @@
 // identically, meaning they aren't random.  So I generate some seed for each
 // star.
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -42,8 +42,12 @@ using namespace GNE;
 using namespace GNE::Console;
 
 class Star : public Thread {
-public:
-  Star(int width, int height) : running(true) {
+public: //typedefs
+  typedef SmartPtr<Star> sptr;
+  typedef WeakPtr<Star> wptr;
+
+protected:
+  Star(int width, int height) {
     randSeed = rand();
     x = rand() % width;
     y = rand() % height;
@@ -54,21 +58,24 @@ public:
       star = '.';
   }
 
-  virtual ~Star() {
+public:
+  static sptr create( int width, int height ) {
+    sptr ret( new Star( width, height ) );
+    ret->setThisPointer( ret );
+    return ret;
   }
 
-  void stop() {
-    running = false;
+  virtual ~Star() {
   }
 
 protected:
   void run() {
     srand(randSeed); //See above on why I do this.
-    while (running) {
+    while (!shutdown) {
       mlputchar(x, y, star);
       Thread::sleep(rand() % 3500 + 1000);
       mlputchar(x, y, ' ');
-      if (running)
+      if (!shutdown)
         Thread::sleep(rand() % 500 + 100);
     }
   }
@@ -76,16 +83,15 @@ protected:
 private:
   int x, y;
   char star;
-  bool running;
   int randSeed; 
 };
 
 const int NUM_STARS = 80;
-Star* stars[NUM_STARS];
+Star::sptr stars[NUM_STARS];
 
 int main(int argc, char* argv[]) {
   initGNE(NO_NET, atexit);
-  initConsole(atexit);
+  initConsole();
   setTitle("GNE Console Input Test");
 
   int width, height;
@@ -99,7 +105,7 @@ int main(int argc, char* argv[]) {
 
   int c;
   for (c = 0; c < NUM_STARS; c++)
-    stars[c] = new Star(width, height-2);
+    stars[c] = Star::create(width, height-2);
 
   for (c = 0; c < NUM_STARS; c++)
     stars[c]->start();
@@ -130,13 +136,10 @@ int main(int argc, char* argv[]) {
   mlprintf(0, height-2, "You typed: \"%s\"(%i == %i). Goodnight stars!", str, size, strlen(str));
 
   for (c = 0; c < NUM_STARS; c++)
-    stars[c]->stop();
+    stars[c]->shutDown();
 
   for (c = 0; c < NUM_STARS; c++)
     stars[c]->join();
-
-  for (c = 0; c < NUM_STARS; c++)
-    delete stars[c];
 
   return 0;
 }
