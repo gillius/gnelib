@@ -5,9 +5,9 @@ error:
 	@echo Run one of the fix* scripts to set up the makefile to your OS.
 endif
 
-# start of main makefile
+include makefile.os
 
--include makefile.os
+# start of main makefile
 
 .PHONY: clean lib examples install
 
@@ -15,7 +15,7 @@ all: lib examples
 
 lib: $(LIB_STATIC)
 
-examples: lib $(EXAMPLE_EXE)
+examples: $(EXAMPLES_DIR) lib $(EXAMPLE_EXE)
 
 $(LIB_STATIC): $(LIB_O)
 	$(AR) rs $@ $^
@@ -28,6 +28,13 @@ $(EXAMPLE_EXE): $(EXE_MASK): $(EXAMPLE_DIR) %.o
 
 $(EXAMPLE_O): %.o: %.cpp
 	$(CPP) -c -o $@ $(CPPFLAGS) $<
+
+ifdef EXAMPLES_DIR
+
+$(EXAMPLES_DIR):
+	mkdir $@
+
+endif
 
 clean:
 	$(RM) -f $(EXAMPLE_O) $(EXAMPLE_EXE) $(LIB_O) $(LIB_STATIC)
