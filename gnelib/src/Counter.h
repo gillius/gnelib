@@ -50,8 +50,8 @@ public:
   void timerCallback();
 
   /**
-   * Returns the current count of this Counter.  This function is syncronized
-   * with its own mutex so it is safe to call from multiple threads.
+   * Returns the current count of this Counter.  This function is safe to 
+	 * call from multiple threads.
    */
   //##ModelId=3B0753810118
   int getCount();

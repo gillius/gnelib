@@ -37,15 +37,9 @@ void Counter::timerCallback() {
   countSync.release();
 }
 
-/**
- * \todo I don't think we need to use the mutex for a read-only operation.
- */
 //##ModelId=3B0753810118
 int Counter::getCount() {
-  countSync.acquire();
-  int ret = count;
-  countSync.release();
-  return ret;
+	return count;
 }
 
 //##ModelId=3B0753810119
