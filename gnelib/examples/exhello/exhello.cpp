@@ -97,17 +97,18 @@ private:
 class OurServer : public ConnectionListener {
 public:
   OurServer() : conn(NULL), received(false) {
-		mprintf("Server instance created\n");
+		mprintf("Server listener created\n");
 	}
 
   virtual ~OurServer() {
-		mprintf("ServerConnection instance killed\n");
+		mprintf("Server listener killed\n");
 	}
 
 	void onDisconnect() { 
 		mprintf("ServerConnection just disconnected.\n");
 		if (!received)
 			mprintf("No message received.\n");
+    delete conn;
 		delete this;
 	}
 
