@@ -1,0 +1,46 @@
+MingW specific information for GNE.
+
+1. About HawkNL and mingw
+
+HawkNL doesn't include a makefile for mingw as of writing this, but it should
+do when you are reading this.
+
+2. About pthreads and mingw32
+
+For me, the following files worked, found at
+http://sources.redhat.com/pthreads-win32/
+in any of the FTP links on that site:
+
+pthreads-dll-2001-07-12/include/pthread.h
+pthreads-dll-2001-07-12/include/sched.h
+pthreads-dll-2001-07-12/include/semaphore.h
+
+Put this 3 files in your mingw/include folder.
+
+pthreads-dll-2001-07-12/lib/libpthreadGC.a
+
+Put this in your mingw/lib folder.
+
+pthreads-dll-2001-07-12/lib/pthreadGC.dll
+
+Put this in your windows shared libraries folder.
+
+3. Installation
+
+Inside a DOS-prompt, type:
+
+fixming
+
+Which should give you a short description of the makefile options. Now type:
+
+make
+
+To compiel the library and examples. Now type:
+
+make install
+
+To install GNE. Should you ever wish to uninstall all the files installed by
+this from your system (and it might be a good idea before upgrading to a newer
+version as well), use:
+
+make uninstall
