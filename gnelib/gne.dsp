@@ -49,7 +49,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /out:"lib\gne.lib"
+# ADD LIB32 /nologo /out:"lib\msvc\gne.lib"
 
 !ELSEIF  "$(CFG)" == "gne - Win32 Debug"
 
@@ -63,8 +63,8 @@ LIB32=link.exe -lib
 # PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ  /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX"gneintern.h" /FD /GZ  /c
+# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX"gneintern.h" /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -72,7 +72,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /out:"lib\gned.lib"
+# ADD LIB32 /nologo /out:"lib\msvc\gned.lib"
 
 !ENDIF 
 
@@ -228,5 +228,29 @@ SOURCE=.\src\Timer.h
 SOURCE=.\src\TimerCallback.h
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\Authors
+# End Source File
+# Begin Source File
+
+SOURCE=.\Changes
+# End Source File
+# Begin Source File
+
+SOURCE=.\doxygen.cfg
+# End Source File
+# Begin Source File
+
+SOURCE=.\docs\gnereq.doc
+# End Source File
+# Begin Source File
+
+SOURCE=.\Readme
+# End Source File
+# Begin Source File
+
+SOURCE=.\readme.vc
+# End Source File
 # End Target
 # End Project

@@ -1,0 +1,5 @@
+MSVC-specific information for GNE.
+
+The main platform support for GNE is MSVC, so this port should be the least
+quirky.  The MSVC workspace file in the root directory of the project should
+contain everything needed to compile the library and the examples.

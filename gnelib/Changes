@@ -1,0 +1,10 @@
+GNE 0.001 -- Initial Release
+  Released for those wanting to help with GNE's makefiles and packaging.
+  Contains stubs, doxygen cfg file, requirements document, UML models.
+  Also contains project files for MSVC.
+  Classes Implemented:
+    Thread
+    Mutex
+    ConditionVariable
+  Example programs:
+    exthreads
