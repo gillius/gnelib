@@ -169,13 +169,13 @@ namespace GNE {
   /**
    * A numeric representation of the current version of this library.
    */
-  const double VER = 0.60;
+  const double VER = 0.56;
 
   /**
    * A string representation of the name of the library and the current
    * version.
    */
-  const std::string VER_STR = "GNE v0.60 alpha CVS";
+  const std::string VER_STR = "GNE v0.56 alpha CVS";
 
   /**
    * The low-level header size of a UDP header, which is used with the HawkNL
