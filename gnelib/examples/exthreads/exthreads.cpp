@@ -48,8 +48,9 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-  GNE::init(NL_IP, atexit);
+  GNE::init(GNE::NO_NET, atexit);
   Console::init(atexit);
+  Console::setTitle("GNE Threads Example");
 
   HelloWorld* bob = new HelloWorld("Bob");
   bob->start();  //Tells bob to start his job.

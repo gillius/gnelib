@@ -41,9 +41,32 @@ private:
   std::string name;
 };
 
+class CounterWatcher : public TimerCallback {
+public:
+  CounterWatcher(int x2, int y2, int counterRate)
+    : x(x2), y(y2), timer(&counter, counterRate, false) {
+    //false == don't let Timer kill the callback (counter)
+    timer.startTimer();
+  }
+
+  virtual ~CounterWatcher() {
+    timer.stopTimer();
+  }
+
+  void timerCallback() {
+    Console::mlprintf(x, y, "Count: %i", counter.getCount());
+  }
+
+private:
+  int x, y;
+  Counter counter;
+  Timer timer;
+};
+  
 int main() {
-  GNE::init(NL_IP, atexit);
+  GNE::init(GNE::NO_NET, atexit);
   Console::init(atexit);
+  Console::setTitle("GNE Timers Example");
 
   //Doing some tests on Time class
   Console::mprintf("Time class tests:\n");
@@ -57,10 +80,12 @@ int main() {
   Console::mprintf("%is, %ius\n", t.getSec(), t.getuSec());
   Console::mprintf("Timer class tests, press a key to quit:\n");
 
-  //Create the timers
-  Timer t1(new TimeClass(3, 8, "Bob"), 1000);
-  Timer t2(new TimeClass(5, 10, "Sally"), 1250);
-  Timer t3(new TimeClass(1, 12, "Joe"), 200);
+  //Create the timers, and pass true to allow our timer objects to
+  //also destroy their callbacks when they die.
+  Timer t1(new TimeClass(3, 8, "Bob"), 1000, true);
+  Timer t2(new TimeClass(5, 10, "Sally"), 1250, true);
+  Timer t3(new TimeClass(1, 12, "Joe"), 200, true);
+  Timer t4(new CounterWatcher(40, 3, 10), 500, true);
 
   //Start the timers
   t1.startTimer();
@@ -69,15 +94,16 @@ int main() {
   assert(t2.isRunning());
   t3.startTimer();
   assert(t3.isRunning());
+  t4.startTimer();
+  assert(t4.isRunning());
 
-  while(!Console::kbhit()) { //Wait for keypress
-    Thread::sleep(100); //sleep to give up the CPU for a bit.
-  }
+  Console::getch(); //Wait for a keypress.
 
   Console::mlprintf(0, 14, "Shutting down timers, please wait...");
   t1.stopTimer();
   t2.stopTimer();
   t3.stopTimer();
+  t4.stopTimer();
 
   return 0;
 }

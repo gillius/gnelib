@@ -38,10 +38,10 @@
 
 class Star : public Thread {
 public:
-  Star() : running(true) {
+  Star(int width, int height) : running(true) {
     randSeed = rand();
-    x = rand() % 80;
-    y = rand() % 23;
+    x = rand() % width;
+    y = rand() % height;
     star = rand() % 2;
     if (star)
       star = '*';
@@ -78,19 +78,27 @@ const int NUM_STARS = 45;
 Star* stars[NUM_STARS];
 
 int main(int argc, char* argv[]) {
-  GNE::init(NL_IP, atexit);
+  GNE::init(GNE::NO_NET, atexit);
   Console::init(atexit);
+  Console::setTitle("GNE Console Input Test");
+
+  int width, height;
+  Console::getConsoleSize(&width, &height);
+  if (width == 0)
+    width = 80; //our best guess
+  if (height == 0)
+    height = 25;//our best guess
 
   srand(time(0));
 
   int c;
   for (c = 0; c < NUM_STARS; c++)
-    stars[c] = new Star();
+    stars[c] = new Star(width, height-2);
 
   for (c = 0; c < NUM_STARS; c++)
     stars[c]->start();
 
-  Console::mlprintf(0, 23, "Please press a key.");
+  Console::mlprintf(0, height-2, "Please press a key.");
 
   while (!Console::kbhit()) {}
   int ch = Console::getch();
@@ -104,14 +112,14 @@ int main(int argc, char* argv[]) {
   else
     sprintf(buf, "%c(%i)", (char)ch, ch);
 
-  Console::mlprintf(0, 23, "You pressed: %s, now please type up to 30 chars below and hit enter:", buf);
+  Console::mlprintf(0, height-2, "You pressed: %s, now please type up to 30 chars below and hit enter:", buf);
   char str[31];
-  int size = Console::lgetString(0, 24, str, 30);
+  int size = Console::lgetString(0, height-1, str, 30);
   //since we don't know the size of the string we clear everything first.
   //We could do it better perhaps using strlen but who cares?
   //We just don't want the screen to scroll though by putting too many spaces.
-  Console::mlprintf(0, 23, "                                                                           ");
-  Console::mlprintf(0, 23, "You typed: \"%s\"(%i == %i). Goodnight stars!", str, size, strlen(str));
+  Console::mlprintf(0, height-2, "                                                                           ");
+  Console::mlprintf(0, height-2, "You typed: \"%s\"(%i == %i). Goodnight stars!", str, size, strlen(str));
 
   for (c = 0; c < NUM_STARS; c++)
     stars[c]->stop();

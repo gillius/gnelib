@@ -20,8 +20,9 @@
 #include "../../src/gnelib.h"
 
 int main() {
-  GNE::init(NL_IP, atexit);
+  GNE::init(GNE::NO_NET, atexit);
   Console::init(atexit);
+  Console::setTitle("GNE Timer Example");
   
   Console::mprintf("The time in seconds, is:\n");
   Console::mprintf("Time is from some arbitrary point in the past.\n");
