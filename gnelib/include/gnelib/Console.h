@@ -40,7 +40,10 @@ namespace GNE {
  * getConsoleSize(int*, int*) to find the width and height if possible.
  * Note that the input functions are not thread-safe since there's only one
  * keyboard to be used ;).  It is okay, however, to be using the console
- * output functions at the same time you are using the input functions.
+ * output functions at the same time you are using the locatable input
+ * functions.  If you are using the inputfunctions that do not take
+ * locations (like getString and gin), you cannot be doing output at the same
+ * time, since they will move the cursor's location.
  */
 namespace Console {
   /**
@@ -71,8 +74,7 @@ namespace Console {
   /**
    * Returns non-zero if a key is waiting in the buffer to be received by
    * getch.  You cannot use this call while an lgetstring is being processed.
-   * This is the same as kbhit(), but since kbhit is a macro in some cases it
-   * messes up this function.
+   * You can use this function while output is being displayed.
    * @see getch
    * @see lgetString
    */
@@ -81,7 +83,8 @@ namespace Console {
   /**
    * Returns the next character in the input, blocking if no character is
    * ready to be returned.  You cannot use this call while an lgetstring
-   * is being processed.
+   * is being processed, but you can use this while output is being written
+   * (getch does not echo to the screen).
    * @return the next character
    * @see kbhit
    * @see lgetString
@@ -118,8 +121,8 @@ namespace Console {
    * no other threads can be using kbhit or getch.  It is recommended that
    * only one thread be in charge of input from the console.  It is okay,
    * however, to be using the console output functions at the same time you
-   * are using the input functions.  When the user presses enter the input
-   * is complete.
+   * are using this function.  When the user presses enter the input is
+   * complete.
    * @param str a char* with size maxlen+1 where input will be stored.
    * @param maxlen the maximum number of characters the user can input.
    * @return the length of the string returned, from 0 <= x <= maxlen
