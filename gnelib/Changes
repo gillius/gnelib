@@ -1,9 +1,16 @@
 GNE 0.003 to 0.4
+  Implemented new streambufs to be used with ostream and istream, so now two
+    classes gout and gin exist that work even when curses is active, since they
+    make use of the Console class I/O functions.  Both styles of I/O may be
+    mixed.  The examples have been updated due to this change.
+  Lots of improvements, additions, and optimizations for the Console class and
+    API.
+  Making GNE work with Linux out of the box.
   Added SyncConnection class for syncronous communications over a Connection.
   Added ConnectionListener class.  Events go there now.
   ServerConnectionCreator class is gone now.  ServerConnectionListener now
     has the needed function, and other event handling changes in that class
-	as well.
+    as well.
   Completely changed the Connection API
   Added onDisconnect event.
   Improvements with Error generation and handling.
