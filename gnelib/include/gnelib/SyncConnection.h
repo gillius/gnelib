@@ -49,13 +49,14 @@ class Packet;
  * When you wrap a Connection with this class, the event listener for that
  * Connection is suspended and SyncConnection "takes over" until it is
  * release()d.  So while in syncronous mode you will receive no events
- * through your asyncrounous event listener, with the exception of
- * onDisconnect and onConnect.  It is best only to use
- * SyncConnection while connection, because of possible side-effects when you
+ * through your asyncronous event listener, with the exception of
+ * onDisconnect and onConnect.  It is best only to use SyncConnection
+ * while connecting, because of possible side-effects when you
  * wrap the Connection.  If there was already data pending that you did not
  * receive in asyncronous mode -- it was not lost, but you will get it from
  * the next packet read.  If you start out with a SyncConnection, then you
- * can be certain no unexpected packets will be arriving.
+ * can be certain no unexpected packets will be arriving.\n
+ * See the example exsynchello for more help with the usage of this class.
  */
 //##ModelId=3BC3C5B200BE
 class SyncConnection : public ConnectionListener {
