@@ -19,3 +19,5 @@ exhello -- Everyone knows the "Hello World" program.  Perhaps it's been coded
 
 expacket -- Shows how to derive a new type of packet, and create the proper
   parsing functions interacting with RawPacket to allow GNE to use your packet.
+  This example does NOT show how to use the packet over the network or how
+  to register the packet for parsing.  See exhello for that.
