@@ -5,7 +5,7 @@ MingW specific information for GNE.
 HawkNL doesn't include a makefile for mingw as of writing this, but it should
 do when you are reading this.
 
-2. About pthreads and mingw32
+2. About pthreads and mingw
 
 For me, the following files worked, found at
 http://sources.redhat.com/pthreads-win32/
@@ -15,7 +15,7 @@ pthreads-dll-2001-07-12/include/pthread.h
 pthreads-dll-2001-07-12/include/sched.h
 pthreads-dll-2001-07-12/include/semaphore.h
 
-Put this 3 files in your mingw/include folder.
+Put these 3 files in your mingw/include folder.
 
 pthreads-dll-2001-07-12/lib/libpthreadGC.a
 
@@ -35,7 +35,7 @@ Which should give you a short description of the makefile options. Now type:
 
 make
 
-To compiel the library and examples. Now type:
+To compile the library and examples. Now type:
 
 make install
 
