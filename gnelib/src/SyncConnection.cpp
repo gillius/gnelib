@@ -27,6 +27,7 @@
 #include "../include/gnelib/PacketStream.h"
 #include "../include/gnelib/ConnectionListener.h"
 #include "../include/gnelib/Packet.h"
+#include "../include/gnelib/RawPacket.h"
 
 namespace GNE {
 
@@ -112,6 +113,8 @@ bool SyncConnection::isReleased() const {
 
 /**
  * \todo consider timed waits in the future.
+ * \todo This probably could be optimized quite a bit -- each packet gets
+ *       copied twice!
  */
 //##ModelId=3BC3CFE50014
 SyncConnection& SyncConnection::operator >> (Packet& packet) throw (Error) {
@@ -138,7 +141,19 @@ SyncConnection& SyncConnection::operator >> (Packet& packet) throw (Error) {
 			       recv->getType(), packet.getType());
 		throw Error(Error::PacketTypeMismatch);
 	}
-	packet = *recv;
+
+  //Copy the packet.
+  //The original method was to use operator=() but doing it this way makes
+  //things complicated in several ways, including how to overload it, and the
+  //fact that you can't copy the children to children w/o another operator.
+  //This should be optimized in the future.  This new method will be easier
+  //to optimize later to allow better optimizations.
+	RawPacket temp;
+  recv->writePacket(temp);
+  temp.reset();
+  NLubyte dummy;
+  temp >> dummy; //Skip the ID code.
+  packet.readPacket(temp);
 
 	return *this;
 }
@@ -155,19 +170,16 @@ SyncConnection& SyncConnection::operator << (const Packet& packet) throw (Error)
 
 //##ModelId=3BDB10A50353
 void SyncConnection::onNewConn(SyncConnection& newConn) {
-	//Only ServerConnection sends this event, so we pass it on.  newConn should
-	//be this, otherwise someone else sent this event, and we would need some
-	//additional syncronization that we don't have.
+  //newConn doesn't HAVE to be this, if there was a doubly-wrapped
+  //SyncConnection, which can happen if we wrap then call connect (since
+  //connect makes a new SyncConnection).
 	assert(!isReleased());
-	assert(this == &newConn);
 	oldListener->onNewConn(newConn);
 }
 
 //##ModelId=3BDB10A6000A
 void SyncConnection::onConnect(SyncConnection& conn) {
-	//Only ClientConnection sends this event.  See comment for onNewConn.
 	assert(!isReleased());
-	assert(this == &conn);
 	oldListener->onConnect(conn);
 }
 
