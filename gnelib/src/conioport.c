@@ -103,8 +103,10 @@ int conio_getch () {
   //We need to do conversions when KEY_ENTER and KEY_BACKSPACE don't work
   if (cached_value == '\r')
     cached_value = KEY_ENTER;
-  else if (cached_value == 127)
+  else if (cached_value == 127 || cached_value == 8)
     //Some UNIX & LINUX map backspace to ^? (127), like Mandrake.
+    //And yet, some do keep the value of 8 and don't report KEY_BACKSPACE.
+    // On my Solaris box, delete is ^? and backspace is 8.
     cached_value = KEY_BACKSPACE;
   return cached_value;
 }
