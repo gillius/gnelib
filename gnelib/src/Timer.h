@@ -35,12 +35,13 @@ class Timer : public Thread {
 public:
   /**
    * Initalize a timer callback.
-   * @param callback A newly allocated object to perform callbacks on.  This
-   *        object will be deleted when the Timer is destroyed.
+   * @param callback A newly allocated object to perform callbacks on.
    * @param rate the callback rate in milliseconds.
+   * @param destroy should the callback be destroyed when this object is
+   *        destroyed?
    */
   //##ModelId=3AE868370122
-  Timer(TimerCallback* callback, int rate);
+  Timer(TimerCallback* callback, int rate, bool destroy);
 
   //##ModelId=3AE8686C00BE
   virtual ~Timer();
@@ -108,6 +109,12 @@ private:
 
   //##ModelId=3AE86968026C
   TimerCallback* listener;
+
+  /**
+   * Should listener be destroyed with this object?
+   */
+  //##ModelId=3AFF642B03D4
+  bool destroyListener;
 
 };
 

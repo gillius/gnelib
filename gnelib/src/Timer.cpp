@@ -23,14 +23,16 @@
 #include "TimerCallback.h"
 
 //##ModelId=3AE868370122
-Timer::Timer(TimerCallback* callback, int rate)
-: running(false), callbackRate(rate), listener(callback) {
+Timer::Timer(TimerCallback* callback, int rate, bool destroy)
+: running(false), callbackRate(rate),
+listener(callback), destroyListener(destroy) {
 }
 
 //##ModelId=3AE8686C00BE
 Timer::~Timer() {
   stopTimer();
-  delete(listener);
+  if (destroyListener)
+    delete listener;
 }
 
 /**
