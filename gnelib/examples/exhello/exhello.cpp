@@ -114,6 +114,10 @@ public:
   }
 
   void onDisconnect() { 
+    //Call receivePackets one last time to make sure we got all data.
+    //It is VERY possible for data still left unread if we get this event,
+    //even though we read all data from onReceive.
+    receivePackets();
     mprintf("ServerConnection just disconnected.\n");
     if (!received)
       mprintf("No message received.\n");
@@ -127,6 +131,24 @@ public:
   }
 
   void onReceive() {
+    receivePackets();
+  }
+
+  void onFailure(const Error& error) {
+    mprintf("Socket failure: %s\n", error.toString().c_str());
+  }
+
+  void onError(const Error& error) {
+    mprintf("Socket error: %s\n", error.toString().c_str());
+    conn->disconnect();
+  }
+
+  //Tries to receive and process packets.
+  //This function responds to any requests.  Note that it is called in
+  //onDisconnect and it is perfectly valid to send data from onDisconnect --
+  //it just won't ever be sent ;), but there is no reason to pass in a param
+  //and check for disconnection just so we don't send the data.
+  void receivePackets() {
     Packet* message = NULL;
     while ( (message = conn->stream().getNextPacket() ) != NULL) {
       if (message->getType() == MIN_USER_ID) {
@@ -142,15 +164,6 @@ public:
         mprintf("got bad packet.\n");
       delete message;
     }
-  }
-
-  void onFailure(const Error& error) {
-    mprintf("Socket failure: %s\n", error.toString().c_str());
-  }
-
-  void onError(const Error& error) {
-    mprintf("Socket error: %s\n", error.toString().c_str());
-    conn->disconnect();
   }
 
 private:
@@ -204,7 +217,8 @@ void doClient(int outRate, int inRate, int port) {
       client->stream().writePacket(message, true);
       client->stream().writePacket(message, false);
       //Wait a little for any responses.
-      Thread::sleep(500);
+      gout << "Waiting a second for any responses..." << endl;
+      Thread::sleep(1000);
       client->stream().waitToSendAll();
       
     }
