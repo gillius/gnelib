@@ -141,6 +141,14 @@ SOURCE=.\src\ServerConnection.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\ServerConnectionCreator.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ServerConnectionListener.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Thread.cpp
 # End Source File
 # Begin Source File
@@ -222,6 +230,14 @@ SOURCE=.\src\RawPacket.h
 # Begin Source File
 
 SOURCE=.\src\ServerConnection.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ServerConnectionCreator.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ServerConnectionListener.h
 # End Source File
 # Begin Source File
 
