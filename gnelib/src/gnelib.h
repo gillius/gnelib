@@ -32,6 +32,8 @@
 #include "ConnectionEventGenerator.h"
 #include "ConnectionEventListener.h"
 #include "ServerConnection.h"
+#include "ServerConnectionListener.h"
+#include "ServerConnectionCreator.h"
 #include "ClientConnection.h"
 #include "Timer.h"
 #include "TimerCallback.h"
