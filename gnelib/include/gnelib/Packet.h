@@ -66,7 +66,12 @@ public:
   /**
    * Returns the current size of this packet in bytes.  When overloading this
    * function, call getSize on the parent class then add the sizes of your
-   * additional variables.\n
+   * additional variables.  If the size cannot be determined, then getSize
+   * should return a value <= RawPacket::RAW_PACKET_LEN but >= its possible
+   * size -- so in other words if the size cannot be determined, it should
+   * return the largest possible size that given packet could be.  This is
+   * discouraged as much as possible since GNE allocates packets in the data
+   * stream based on this value, and large values will hinder performance.
    */
   //##ModelId=3B0753810159
   virtual int getSize() const;

@@ -193,6 +193,7 @@ protected:
    * The connecting has just finished and the flags need to be changed.
    * Since this needs a mutex, we make a function to handle this.
    */
+  //##ModelId=3C30E3FF01DE
   void finishedConnecting();
 
   /**

@@ -141,6 +141,7 @@ private:
   /**
    * Provides syncronization for some functions to make them thread safe.
    */
+  //##ModelId=3C30E3FF029D
   Mutex sync;
 
 };
