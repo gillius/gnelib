@@ -3,3 +3,25 @@ MSVC-specific information for GNE.
 The main platform support for GNE is MSVC, so this port should be the least
 quirky.  The MSVC workspace file in the root directory of the project should
 contain everything needed to compile the library and the examples.
+
+Pick set active configuration in build.  You have several options here.
+The buildall project builds the GNE library and all of the examples.  Select
+  debug or relase mode, depending on your preference.
+You may also choose only to select the GNE project itself, to skip building of
+  the examples.
+
+------------------------------------------------------------------------------
+
+When you get the libary compiled, copy the include sub tree into your MSVC
+include directory.  gnelib.h should be in the actual include directory itself,
+and the subdirectory gnelib should exist under it.  This is to keep your
+includes directory as clean as possible.
+
+There will be a gned.lib file and gne.lib file (the first is debug, the second
+is release mode) in the /lib/msvc directory.  Copy these files into the lib
+directory for MSVC.
+
+Once this is done, you should be able to #include <gnelib.h> and link in the
+gned.lib or gne.lib file into your project and be up and running.  If you run
+into any troubles, please visit the website or contact the authors -- these
+links listed in the main readme file.
