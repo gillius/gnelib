@@ -1785,6 +1785,26 @@
 			result     	"void"
 			concurrency 	"Sequential"
 			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "lgetString"
+			quid       	"3AFD8D7801A4"
+			stereotype 	"static"
+			parameters 	(list Parameters
+			    (object Parameter "x"
+				quid       	"3AFD8DB003AC"
+				type       	"int")
+			    (object Parameter "y"
+				quid       	"3AFD8DB100A0"
+				type       	"int")
+			    (object Parameter "str"
+				quid       	"3AFD8DE9019A"
+				type       	"char*")
+			    (object Parameter "maxlen"
+				quid       	"3AFD8DE90276"
+				type       	"int"))
+			result     	"int"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
 			uid        	0))
 		class_attributes 	(list class_attribute_list
 		    (object ClassAttribute "outSync"
@@ -1795,6 +1815,18 @@
 		    (object ClassAttribute "initialized"
 			quid       	"3AF8ADDB0280"
 			type       	"bool"
+			static     	TRUE)
+		    (object ClassAttribute "ENTER"
+			quid       	"3AFDB5190226"
+			type       	"const int"
+			initv      	"13"
+			exportControl 	"Public"
+			static     	TRUE)
+		    (object ClassAttribute "BACKSPACE"
+			quid       	"3AFDB5190302"
+			type       	"const int"
+			initv      	"8"
+			exportControl 	"Public"
 			static     	TRUE))
 		module     	"Component View::gne"
 		quidu      	"3AE11D860046"
@@ -2102,7 +2134,7 @@
 			    fill_color 	16777215
 			    anchor     	2
 			    nlines     	28
-			    max_width  	815)
+			    max_width  	784)
 			width      	806
 			height     	1486
 			annotation 	8
@@ -2149,7 +2181,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	7
-			    max_width  	640)
+			    max_width  	630)
 			width      	652
 			height     	436
 			annotation 	8
@@ -2196,7 +2228,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	7
-			    max_width  	631)
+			    max_width  	613)
 			width      	634
 			height     	436
 			annotation 	8
@@ -2243,7 +2275,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	8
-			    max_width  	531)
+			    max_width  	513)
 			width      	534
 			height     	486
 			annotation 	8
@@ -2290,7 +2322,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	5
-			    max_width  	706)
+			    max_width  	692)
 			width      	714
 			height     	336
 			annotation 	8
@@ -2402,7 +2434,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	9
-			    max_width  	521)
+			    max_width  	509)
 			width      	530
 			height     	648
 			annotation 	8
@@ -2521,7 +2553,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	2
-			    max_width  	300)
+			    max_width  	296)
 			width      	400
 			height     	298
 			annotation 	8
@@ -2568,7 +2600,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	7
-			    max_width  	525)
+			    max_width  	500)
 			width      	522
 			height     	436
 			annotation 	8
@@ -2735,7 +2767,7 @@
 			    fill_color 	16777215
 			    anchor     	2
 			    nlines     	4
-			    max_width  	590)
+			    max_width  	567)
 			width      	588
 			height     	286
 			annotation 	8
@@ -2782,7 +2814,7 @@
 			    fill_color 	16777215
 			    anchor     	2
 			    nlines     	11
-			    max_width  	600)
+			    max_width  	571)
 			width      	592
 			height     	636
 			annotation 	8
@@ -2892,7 +2924,7 @@
 			    fill_color 	16777215
 			    anchor     	2
 			    nlines     	19
-			    max_width  	534)
+			    max_width  	509)
 			width      	530
 			height     	1036
 			annotation 	8
@@ -3024,7 +3056,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	14
-			    max_width  	665)
+			    max_width  	650)
 			width      	672
 			height     	786
 			annotation 	8
@@ -3092,7 +3124,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	5
-			    max_width  	637)
+			    max_width  	617)
 			width      	638
 			height     	336
 			annotation 	8
@@ -3169,7 +3201,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	12
-			    max_width  	1006)
+			    max_width  	980)
 			width      	1002
 			height     	686
 			annotation 	8
@@ -3216,7 +3248,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	12
-			    max_width  	640)
+			    max_width  	617)
 			width      	638
 			height     	686
 			annotation 	8
@@ -3369,7 +3401,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	16
-			    max_width  	753)
+			    max_width  	730)
 			width      	752
 			height     	886
 			annotation 	8
@@ -3736,7 +3768,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	8
-			    max_width  	940)
+			    max_width  	913)
 			width      	934
 			height     	486
 			annotation 	8
@@ -3903,7 +3935,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	6
-			    max_width  	512)
+			    max_width  	505)
 			width      	526
 			height     	386
 			annotation 	8
@@ -4524,7 +4556,7 @@
 			    fill_color 	16777215
 			    anchor     	2
 			    nlines     	7
-			    max_width  	465)
+			    max_width  	455)
 			width      	476
 			height     	436
 			annotation 	8
@@ -4642,7 +4674,7 @@
 			ShowCompartmentStereotypes 	TRUE
 			IncludeAttribute 	TRUE
 			IncludeOperation 	TRUE
-			location   	(4625, 750)
+			location   	(4650, 875)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -4654,10 +4686,10 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@119
-			    location   	(4396, 419)
+			    location   	(4371, 469)
 			    fill_color 	13434879
 			    nlines     	1
-			    max_width  	458
+			    max_width  	558
 			    justify    	0
 			    label      	"Console")
 			icon_style 	"Icon"
@@ -4666,7 +4698,7 @@
 			quidu      	"3AF8A1A0033E"
 			compartment 	(object Compartment
 			    Parent_View 	@119
-			    location   	(4396, 480)
+			    location   	(4371, 530)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -4679,10 +4711,10 @@
 			    icon_style 	"Icon"
 			    fill_color 	13434879
 			    anchor     	2
-			    nlines     	12
-			    max_width  	475)
-			width      	476
-			height     	686
+			    nlines     	15
+			    max_width  	555)
+			width      	576
+			height     	836
 			annotation 	8
 			autoResize 	TRUE)
 		    (object InheritView "" @120
@@ -5550,8 +5582,8 @@
 |aConnectionEventGenerator.h,3af2275a
 |UConnectionWriter.cpp,3af2275a
 |SConnectionWriter.h,3af2275a
-|LConsole.cpp,3afb714c
-|JConsole.h,3afb710c
+|LConsole.cpp,3afdb51a
+|JConsole.h,3afdb51a
 |LCounter.cpp,3af2275a
 |JCounter.h,3af2275a
 |HGNE.cpp,3af8d89e
@@ -5690,18 +5722,21 @@
 |ConnectionWriter::ConnectionWriter,f,L,3AE4C448001E,TConditionVariable&,,3fa,465
 |ConnectionWriter::run,f,L,3AE4C4B60140,A,4ab,4e4
 |ConnectionWriter::~ConnectionWriter,f,L,3AE4C448005A,A,467,4a9
-|Console,t,O,3AF8A1A0033E,A,519,c1b
-|Console::getch,f,N,3AF8AADF0050,A,6fb,744
-|Console::gotoxy,f,N,3AF8A3AE001E,Iint,int,,63b,6ae
-|Console::init,f,N,3AF8A1E2038E,aint(*)(void(*func)(void)),,4e2,5be
+|Console,t,O,3AF8A1A0033E,A,79d,13de
+|Console::BACKSPACE,f,N,3AFDB5190302,A,4e1,51b
+|Console::ENTER,f,N,3AFDB5190226,A,51c,553
+|Console::getch,f,N,3AF8AADF0050,A,76e,7b7
+|Console::gotoxy,f,N,3AF8A3AE001E,Iint,int,,6ae,721
+|Console::init,f,N,3AF8A1E2038E,aint(*)(void(*func)(void)),,555,631
 |Console::initialized,f,N,3AF8ADDB0280,A,4a5,4e0
-|Console::kbhit,f,N,3AF8AADE038E,A,6b0,6f9
-|Console::mlprintf,f,N,3AF8A7ED00AA,Sint,int,char*,...,,821,91f
-|Console::mlputchar,f,N,3AFB705602B2,Mint,int,int,,997,a2a
-|Console::mprintf,f,N,3AF8A7EC026C,Kchar*,...,,746,81f
-|Console::mputchar,f,N,3AFB7047005A,Eint,,921,995
+|Console::kbhit,f,N,3AF8AADE038E,A,723,76c
+|Console::lgetString,f,N,3AFD8D7801A4,Sint,int,char*,int,,a9f,dc6
+|Console::mlprintf,f,N,3AF8A7ED00AA,Sint,int,char*,...,,894,992
+|Console::mlputchar,f,N,3AFB705602B2,Mint,int,int,,a0a,a9d
+|Console::mprintf,f,N,3AF8A7EC026C,Kchar*,...,,7b9,892
+|Console::mputchar,f,N,3AFB7047005A,Eint,,994,a08
 |Console::outSync,f,N,3AF8A1F80226,A,474,4a4
-|Console::shutdown,f,N,3AF8A1ED037A,A,5c0,639
+|Console::shutdown,f,N,3AF8A1ED037A,A,633,6ac
 |Counter,t,Q,3AE8691D0032,A,482,871
 |Counter::Counter,f,P,3AE8693F0104,A,3d0,3ff
 |Counter::getCount,f,P,3AED05900154,A,46f,4af
