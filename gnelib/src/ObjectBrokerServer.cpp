@@ -37,42 +37,36 @@ ObjectBrokerServer::~ObjectBrokerServer() {
 
 ObjectCreationPacket::pointer
 ObjectBrokerServer::getCreationPacket( NetworkObject& obj ) {
-
+  LockMutex lock(sync);
+  
   if ( !obj.hasValidId() )
     if ( !assignNextId( obj ) )
       return ObjectCreationPacket::pointer( (ObjectCreationPacket*)NULL );
-#ifdef _DEBUG
-  else {
-    LockMutex lock(sync);
-    assert( exists( obj.getObjectId() ) );
-  }
-#endif
-
+  assert( exists( obj.getObjectId() ) );
+  
   Packet* packet = obj.createCreationPacket();
   assert( packet != NULL );
-  ObjectCreationPacket* ret =
-    new ObjectCreationPacket( obj.getObjectId(), *packet );
+  ObjectCreationPacket* ret = new ObjectCreationPacket( obj.getObjectId(), *packet );
   delete packet;
 
   return ObjectCreationPacket::pointer( ret );
 }
 
-ObjectUpdatePacket::pointer ObjectBrokerServer::getUpdatePacket(
-  NetworkObject& obj, const void* param ) {
-#ifdef _DEBUG
-  assert( obj.hasValidId() );
-  sync.acquire();
-  assert( exists( obj.getObjectId() ) );
-  sync.release();
-#endif
+ObjectUpdatePacket::pointer
+ObjectBrokerServer::getUpdatePacket( NetworkObject& obj, const void* param ) {
+  LockMutex lock(sync);
+  
+  if( exists( obj.getObjectId() ) ) {
+    Packet* packet = obj.createUpdatePacket( param );
+    assert( packet != NULL );
 
-  Packet* packet = obj.createUpdatePacket( param );
-  assert( packet != NULL );
-  ObjectUpdatePacket* ret =
-    new ObjectUpdatePacket( obj.getObjectId(), *packet );
-  delete packet;
+    ObjectUpdatePacket* ret = new ObjectUpdatePacket( obj.getObjectId(), *packet );
+    delete packet;
 
-  return ObjectUpdatePacket::pointer( ret );
+    return ObjectUpdatePacket::pointer( ret );
+    
+  } else
+    return ObjectUpdatePacket::pointer( (ObjectUpdatePacket*)NULL );  
 }
 
 ObjectUpdatePacket::pointer
@@ -82,19 +76,17 @@ ObjectBrokerServer::getUpdatePacket( NetworkObject& obj ) {
 
 ObjectDeathPacket::pointer
 ObjectBrokerServer::getDeathPacket( NetworkObject& obj ) {
-#ifdef _DEBUG
-  assert( obj.hasValidId() );
-  sync.acquire();
-  assert( exists( obj.getObjectId() ) );
-  sync.release();
-#endif
+  LockMutex lock(sync);
+  
+  if( exists( obj.getObjectId() ) ) {
+    Packet* packet = obj.createDeathPacket();
+    ObjectDeathPacket* ret = new ObjectDeathPacket( obj.getObjectId(), packet );
+    delete packet;
 
-  Packet* packet = obj.createDeathPacket();
-  ObjectDeathPacket* ret =
-    new ObjectDeathPacket( obj.getObjectId(), packet );
-  delete packet;
+    return ObjectDeathPacket::pointer( ret );
 
-  return ObjectDeathPacket::pointer( ret );
+  } else
+    return ObjectDeathPacket::pointer( (ObjectDeathPacket*)NULL );
 }
 
 /**
@@ -102,7 +94,6 @@ ObjectBrokerServer::getDeathPacket( NetworkObject& obj ) {
  * iterator over the map.
  */
 bool ObjectBrokerServer::assignNextId( NetworkObject& o ) {
-  LockMutex lock(sync);
   if ( numObjects() >= 65535 )
     return false;
 

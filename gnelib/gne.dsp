@@ -89,6 +89,18 @@ SOURCE=.\src\Address.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\ChannelPacket.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ChannelProvider.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\Client.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\ClientConnection.cpp
 # End Source File
 # Begin Source File
@@ -173,6 +185,38 @@ SOURCE=.\src\Mutex.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\NetworkObject.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ObjectBroker.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ObjectBrokerClient.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ObjectBrokerPacket.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ObjectBrokerServer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ObjectCreationPacket.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ObjectDeathPacket.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ObjectUpdatePacket.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Packet.cpp
 # End Source File
 # Begin Source File
@@ -198,6 +242,10 @@ SOURCE=.\src\RawPacket.cpp
 # Begin Source File
 
 SOURCE=.\src\ReceiveEventListener.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\Server.cpp
 # End Source File
 # Begin Source File
 
@@ -235,6 +283,10 @@ SOURCE=.\src\Timer.cpp
 
 SOURCE=.\src\TimerCallback.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\WrapperPacket.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -245,7 +297,27 @@ SOURCE=.\include\gnelib\Address.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\gnelib\ChannelPacket.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ChannelProvider.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\Client.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\gnelib\ClientConnection.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ClientListener.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ClientPeer.h
 # End Source File
 # Begin Source File
 
@@ -329,6 +401,14 @@ SOURCE=.\include\gnelib\gneintern.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\gnelib\gnetypes.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\HighLevelListener.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\gnelib\ListServerConnection.h
 # End Source File
 # Begin Source File
@@ -338,6 +418,42 @@ SOURCE=.\include\gnelib\Mutex.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\MutexData.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\NetworkObject.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ObjectBroker.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ObjectBrokerClient.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ObjectBrokerPacket.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ObjectBrokerServer.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ObjectCreationPacket.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ObjectDeathPacket.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ObjectUpdatePacket.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\OldConsoleStreambuf.h
 # End Source File
 # Begin Source File
 
@@ -361,6 +477,18 @@ SOURCE=.\include\gnelib\PingPacket.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\gnelib\Player.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\PlayerData.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\PlayerList.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\gnelib\RateAdjustPacket.h
 # End Source File
 # Begin Source File
@@ -373,11 +501,23 @@ SOURCE=.\include\gnelib\ReceiveEventListener.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\gnelib\Server.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\gnelib\ServerConnection.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\include\gnelib\ServerConnectionListener.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ServerPlayer.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ServerPlayerListener.h
 # End Source File
 # Begin Source File
 
@@ -410,6 +550,10 @@ SOURCE=.\include\gnelib\Timer.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\TimerCallback.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\WrapperPacket.h
 # End Source File
 # End Group
 # Begin Source File

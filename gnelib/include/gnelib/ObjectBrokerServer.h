@@ -107,8 +107,8 @@ public:
 
 private:
   /**
-   * Returns the next valid ID, and marks it as taken.  This method is thread
-   * safe through the "sync" Mutex.  Returns false if there are no IDs
+   * Returns the next valid ID, and marks it as taken.  The "sync" mutex must
+   * be locked when this method is called.  Returns false if there are no IDs
    * remaining.
    */
   bool assignNextId( NetworkObject& o );

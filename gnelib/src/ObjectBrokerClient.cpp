@@ -70,13 +70,13 @@ NetworkObject* ObjectBrokerClient::usePacket( const Packet& packet,
     if ( func == NULL )
       throw Error( Error::InvalidCreationPacketType );
 
+    LockMutex lock(sync);
+    if ( exists( objectId ) )
+      throw Error( Error::DuplicateObjectId );
     ret = func( objectId, *ocp.getData() );
     assert ( ret != NULL );
     assert ( ret->getObjectId() == objectId );
 
-    LockMutex lock(sync);
-    if ( exists( objectId ) )
-      throw Error( Error::DuplicateObjectId );
     objects[objectId] = ret;
 
   } else if ( type == ObjectUpdatePacket::ID ) {
@@ -85,21 +85,19 @@ NetworkObject* ObjectBrokerClient::usePacket( const Packet& packet,
     assert( oup.getData() != NULL );
 
     LockMutex lock(sync);
-    if ( !exists( objectId ) )
+    ret = getObjectById( objectId );
+    if ( ret == NULL )
       throw Error( Error::UnknownObjectId );
-    ret = objects[objectId];
     ret->incomingUpdatePacket( *oup.getData() );
 
   } else if ( type == ObjectDeathPacket::ID ) {
     const ObjectDeathPacket& odp = static_cast<const ObjectDeathPacket&>(packet);
     objectId = odp.getObjectId();
 
-    {
-      LockMutex lock(sync);
-      if ( !exists( objectId ) )
-        throw Error( Error::UnknownObjectId );
-      ret = objects[objectId];
-    }
+    LockMutex lock(sync);
+    ret = getObjectById( objectId );
+    if ( ret == NULL )
+      throw Error( Error::UnknownObjectId );
     ret->incomingDeathPacket( odp.getData() );
 
     deregisterObject( *ret );
