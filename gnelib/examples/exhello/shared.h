@@ -64,12 +64,6 @@ public:
 		return message;
 	}
 
-	virtual HelloPacket& operator = (HelloPacket& rhs) {
-		Packet::operator =(rhs);
-		message = rhs.message;
-		return *this;
-	}
-
 private:
 	string message;
 };
