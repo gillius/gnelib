@@ -34,12 +34,23 @@ class RawPacket;
  * to send a few things one time.  This packet type will allow you to send
  * whatever you want.  Basically, CustomPacket is just a packet that contains
  * a RawPacket.  You can use the RawPacket to put in data and pull it out.
- * Remember RawPacket does endian and processor-type conversions for you.\n
+ * Remember RawPacket does endian and processor-type conversions for you.
+ *
  * See the documentation for Packet for more info on some of these functions.
+ *
+ * \bug unfortunately it is only possible to makeClone a CustomPacket that was
+ *      was used for writing.  RawPacket doesn't know how much data it contains
+ *      on reading -- this needs to be fixed someday.
  */
 class CustomPacket : public Packet {
+public: //typedefs
+  typedef SmartPtr<CustomPacket> sptr;
+  typedef WeakPtr<CustomPacket> wptr;
+
 public:
   CustomPacket();
+
+  CustomPacket( const CustomPacket& o );
 
   virtual ~CustomPacket();
 
@@ -62,18 +73,6 @@ public:
    * access.  Essentially, this method "recreates" the CustomPacket instance.
    */
   void reset();
-
-  /**
-   * Returns a newly allocated exact copy of this packet.  Due to the nature
-   * of RawPacket not knowing its size on reading (this should be inferred by
-   * the packet types in it), this only copies the data up to the current
-   * position.  So makeClone works perfectly on packets that are being used
-   * for writing, but only clones the data read so far on packets that are
-   * being used for reading.\n
-   * Since makeClone is used by GNE when sending packets, the RawPackets were
-   * just used for writing this function works acceptably.
-   */
-  virtual Packet* makeClone() const;
 
   /**
    * @see Packet::getSize()
@@ -100,11 +99,6 @@ public:
    * will be destroyed and replaced by the new data.
    */
   virtual void readPacket(RawPacket& raw);
-
-  /**
-   * Returns a new instance of this class.
-   */
-  static Packet* create();
 
 private:
   /**

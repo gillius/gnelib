@@ -35,12 +35,4 @@ ObjectUpdatePacket::ObjectUpdatePacket( int objectId, const Packet& data )
 ObjectUpdatePacket::~ObjectUpdatePacket() {
 }
   
-Packet* ObjectUpdatePacket::makeClone() const {
-  return new ObjectUpdatePacket( *this );
-}
-
-Packet* ObjectUpdatePacket::create() {
-  return new ObjectUpdatePacket();
-}
-
 } //namespace GNE

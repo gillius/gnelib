@@ -27,7 +27,15 @@ namespace GNE {
 const int CustomPacket::ID = 1;
 
 CustomPacket::CustomPacket()
-  : Packet(ID), data(NULL), ourBuf(NULL), contentLen(-1) {
+: Packet(ID), data(NULL), ourBuf(NULL), contentLen(-1) {
+}
+
+CustomPacket::CustomPacket( const CustomPacket& o )
+: Packet(ID), data(NULL), ourBuf(NULL), contentLen(-1) {
+  assert(o.data != NULL);
+  assert(o.data->getPosition() > 0 && o.data->getPosition() <= o.getMaxUserDataSize());
+
+  getData().writeRaw( o.data->getData(), o.data->getPosition() );
 }
 
 CustomPacket::~CustomPacket() {
@@ -46,15 +54,6 @@ RawPacket& CustomPacket::getData() {
 
 void CustomPacket::reset() {
   destroyData();
-}
-
-Packet* CustomPacket::makeClone() const {
-  assert(data != NULL);
-  assert(data->getPosition() > 0 && data->getPosition() <= getMaxUserDataSize());
-
-  CustomPacket* ret = new CustomPacket;
-  ret->getData().writeRaw(data->getData(), data->getPosition());
-  return ret;
 }
 
 int CustomPacket::getSize() const {
@@ -89,10 +88,6 @@ void CustomPacket::readPacket(RawPacket& raw) {
   ourBuf = new gbyte[contentLen];
   raw.readRaw(ourBuf, contentLen);
   data = new RawPacket(ourBuf);
-}
-
-Packet* CustomPacket::create() {
-  return new CustomPacket;
 }
 
 void CustomPacket::destroyData() {

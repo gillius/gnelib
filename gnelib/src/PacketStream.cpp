@@ -160,6 +160,10 @@ Packet* PacketStream::getNextPacket() {
   return ret;
 }
 
+Packet::sptr PacketStream::getNextPacketSp() {
+  return Packet::sptr( getNextPacket(), PacketParser::destroyPacket );
+}
+
 void PacketStream::writePacket(const Packet& packet, bool reliable) {
   //Perform operations on the outgoing queue
   outQCtrl.acquire();
@@ -176,6 +180,10 @@ void PacketStream::writePacket(const Packet& packet, bool reliable) {
   //If we need to, wake up the writer thread.
   if (notify)
     outQCtrl.broadcast();
+}
+
+void PacketStream::writePacket(const Packet::sptr& packet, bool reliable) {
+  writePacket( *packet, reliable );
 }
 
 int PacketStream::getCurrOutRate() const {

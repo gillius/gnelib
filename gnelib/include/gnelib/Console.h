@@ -159,7 +159,8 @@ class moveTo;
    * Initalizes the console part of GNE.  This may be called multiple times.
    *
    * @return true if the console could not be initialized.
-   * @deprecated the atexit pointer is no longer needed or used.
+   * @deprecated the atexit pointer is no longer needed or used.  This method
+   *             has the same effect as initConsole( true )
    */
   bool initConsole(int (*atexit_ptr)(void (*func)(void)) );
 

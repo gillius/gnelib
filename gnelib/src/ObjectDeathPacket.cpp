@@ -34,13 +34,5 @@ ObjectDeathPacket::ObjectDeathPacket( int objectId, const Packet* data )
 
 ObjectDeathPacket::~ObjectDeathPacket() {
 }
-  
-Packet* ObjectDeathPacket::makeClone() const {
-  return new ObjectDeathPacket( *this );
-}
-
-Packet* ObjectDeathPacket::create() {
-  return new ObjectDeathPacket();
-}
 
 } //namespace GNE

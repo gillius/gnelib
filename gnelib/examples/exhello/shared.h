@@ -32,15 +32,17 @@ class OurServer;
 
 class HelloPacket : public Packet {
 public:
+  typedef SmartPtr<HelloPacket> sptr;
+  typedef WeakPtr<HelloPacket> wptr;
+
+public:
   HelloPacket() : Packet(ID) {}
+  //copy ctor not needed
   HelloPacket(string message2) : Packet(MIN_USER_ID), message(message2) {}
+
   virtual ~HelloPacket() {}
 
   static const int ID;
-
-  Packet* makeClone() const {
-    return new HelloPacket(*this);
-  }
 
   int getSize() const {
     return Packet::getSize() + RawPacket::getSizeOf(message);
@@ -54,10 +56,6 @@ public:
   void readPacket(RawPacket& raw) {
     Packet::readPacket(raw);
     raw >> message;
-  }
-
-  static Packet* create() {
-    return new HelloPacket();
   }
 
   string getMessage() {
@@ -130,7 +128,9 @@ void doMain(const char* connType) {
 
   initConsole(atexit);
   setTitle("GNE Basic Connections Example");
-  registerPacket(MIN_USER_ID, HelloPacket::create);
+
+  //register HelloPacket using default behavior and allocators.
+  defaultRegisterPacket<HelloPacket>();
 
   gout << "GNE " << connType << " Basic Connections Example for " << GNE::VER_STR << endl;
   gout << "Local address: " << getLocalAddress() << endl;

@@ -93,6 +93,10 @@ struct PingInformation {
  * to use PingPacket.
  */
 class PingPacket : public Packet {
+public: //typedefs
+  typedef SmartPtr<PingPacket> sptr;
+  typedef WeakPtr<PingPacket> wptr;
+
 public:
   /**
    * Creates a PingPacket with a preassigned request ID which is pulled from
@@ -161,11 +165,6 @@ public:
   static int reqsPending();
 
   /**
-   * Returns a newly allocated exact copy of this packet.
-   */
-  virtual Packet* makeClone() const;
-
-  /**
    * Returns the current size of this packet in bytes.
    */
   virtual int getSize() const;
@@ -206,7 +205,6 @@ private:
   static guint32 nextReqId;
 
   static std::map<guint32, Time> requests;
-
 };
 
 }

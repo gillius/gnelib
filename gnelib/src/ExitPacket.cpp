@@ -32,10 +32,6 @@ ExitPacket::ExitPacket() : Packet(ID) {
 ExitPacket::~ExitPacket() {
 }
 
-Packet* ExitPacket::makeClone() const {
-  return new ExitPacket(*this);
-}
-
 int ExitPacket::getSize() const {
   return Packet::getSize();
 }
@@ -46,10 +42,6 @@ void ExitPacket::writePacket(RawPacket& raw) const {
 
 void ExitPacket::readPacket(RawPacket& raw) {
   Packet::readPacket(raw);
-}
-
-Packet* ExitPacket::create() {
-  return new ExitPacket;
 }
 
 }

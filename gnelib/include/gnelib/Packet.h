@@ -20,6 +20,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "SmartPtr.h"
+#include "WeakPtr.h"
+
 namespace GNE {
 class RawPacket;
 
@@ -37,6 +40,10 @@ class RawPacket;
  * look at the code for the other GNE packets.
  */
 class Packet {
+public: //typedefs
+  typedef SmartPtr<Packet> sptr;
+  typedef WeakPtr<Packet> wptr;
+
 public:
   /**
    * Constructs a packet with the given ID.  If you pass no ID, the ID for an
@@ -50,6 +57,11 @@ public:
    */
   explicit Packet(int id = 0);
 
+  /**
+   * Copy constructor.  If your Packet is using the default packet clone
+   * function in registration, remember that it uses the copy constructor so
+   * if you need to override the default implementation, you must do it.
+   */
   Packet( const Packet& o );
 
   virtual ~Packet();
@@ -60,9 +72,10 @@ public:
   static const int ID;
 
   /**
-   * Returns a newly allocated exact copy of this packet.
+   * Returns a newly allocated exact copy of this packet, using the
+   * PacketParser::clonePacket function.
    */
-  virtual Packet* makeClone() const;
+  Packet* makeClone() const;
 
   /**
    * Returns the type of this instance.  This allows you to identify the type
@@ -99,18 +112,9 @@ public:
    * Note that the parser has already read the packet type from raw so it can
    * create this packet, so it should not be re-read.  This object already
    * knows its type from creation.  This is only relevant to the implemenation
-   * of the actual Packet class, and has no signifiance to derived classes,
-   * or to the end user.
+   * of the actual Packet class, and has no signifiance to derived classes.
    */
   virtual void readPacket(RawPacket& raw);
-
-  /**
-   * Returns a new instance of this class.  This is used by the
-   * PacketParser::registerPacket function as a callback to make new packets
-   * to parse the data into.  If you derive a new packet type, you'll probably
-   * want to register it, so you should create a create function of your own.
-   */
-  static Packet* create();
 
   /**
    * Copy operator you can use to help you in creating your own.
@@ -118,7 +122,8 @@ public:
    * types match.  Call this operator first from your copy operator.  Many
    * GNE packets may not support this operation, so check the documentation
    * first -- if no operator = exists, then assume you cannot copy packets
-   * this way, unless the documentation says otherwise.<br>
+   * this way, unless the documentation says otherwise.
+   *
    * If you can't use operator= on a packet, you can use makeClone to
    * achieve a nearly equivalent result.
    */

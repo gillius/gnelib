@@ -35,12 +35,4 @@ ObjectCreationPacket::ObjectCreationPacket( int objectId, const Packet& data )
 ObjectCreationPacket::~ObjectCreationPacket() {
 }
   
-Packet* ObjectCreationPacket::makeClone() const {
-  return new ObjectCreationPacket( *this );
-}
-
-Packet* ObjectCreationPacket::create() {
-  return new ObjectCreationPacket();
-}
-
 } //namespace GNE

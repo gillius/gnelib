@@ -102,10 +102,6 @@ int PingPacket::reqsPending() {
   return ret;
 }
 
-Packet* PingPacket::makeClone() const {
-  return new PingPacket(*this);
-}
-
 int PingPacket::getSize() const {
   return Packet::getSize() + RawPacket::getSizeOf(reqId) +
     RawPacket::getSizeOf(T2) + RawPacket::getSizeOf(T3);

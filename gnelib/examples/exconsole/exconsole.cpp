@@ -23,7 +23,7 @@
  * partial test.
  */
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 #include <iostream>
 #include <iomanip>
 
@@ -33,7 +33,16 @@ using namespace GNE::Console;
 
 class ConsoleTest : public Thread {
 public:
+  typedef SmartPtr<ConsoleTest> sptr;
+  typedef WeakPtr<ConsoleTest> wptr;
+
+protected:
   ConsoleTest( ConsoleBuffer& cb ) : cb(cb) {
+  }
+
+public:
+  static sptr create( ConsoleBuffer& cb ) {
+    return sptr( new ConsoleTest( cb ) );
   }
 
   void run() {
@@ -50,7 +59,7 @@ int main(int argc, char* argv[]) {
   if (initGNE(NO_NET, atexit)) {
     exit(1);
   }
-  initConsole(atexit);
+  initConsole();
   setTitle("GNE Console Test/Example");
 
   TextConsole console( 5, 5, 40, 10 );
@@ -77,12 +86,12 @@ int main(int argc, char* argv[]) {
   console.clear();
 
   console << "Now testing multithreaded locking:" << endl;
-  ConsoleTest tester( console );
-  tester.start();
+  ConsoleTest::sptr tester = ConsoleTest::create( console );
+  tester->start();
   Thread::sleep( 250 );
   console << acquire << "This line should also be together."
     << endl << release;
-  tester.join();
+  tester->join();
   getch();
   console.clear();
 

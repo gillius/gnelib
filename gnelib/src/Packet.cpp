@@ -19,6 +19,7 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/Packet.h"
+#include "../include/gnelib/PacketParser.h"
 #include "../include/gnelib/RawPacket.h"
 
 namespace GNE {
@@ -35,12 +36,7 @@ Packet::~Packet() {
 }
 
 Packet* Packet::makeClone() const {
-  Packet* ret = new Packet(*this);
-  //We do this, in case they forgot to derive a makeClone method, then we will
-  //have a Packet object of type Packet but with an INCORRECT ID which will
-  //eventually lead to a miscast!
-  ret->type = ID;
-  return ret;
+  return PacketParser::clonePacket( this );
 }
 
 int Packet::getType() const {
@@ -56,10 +52,6 @@ void Packet::writePacket(RawPacket& raw) const {
 }
 
 void Packet::readPacket(RawPacket& raw) {
-}
-
-Packet* Packet::create() {
-  return new Packet();
 }
 
 Packet& Packet::operator = (const Packet& rhs) {

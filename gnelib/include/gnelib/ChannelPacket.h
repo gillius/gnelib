@@ -35,6 +35,13 @@ namespace GNE {
 class ChannelPacket : public WrapperPacket {
 public:
   /**
+   * Default constructor for the create function.  The constructed
+   * ChannelPacket is valid only for a readPacket call.  You must use the
+   * constructor with parameters to create a ChannelPacket for sending.
+   */
+  ChannelPacket();
+
+  /**
    * Inits a new ChannelPacket for the given channel, and from the given
    * source ID.  A copy of the passed packet is made and stored inside the
    * ChannelPacket.  This copy is made using the Packet::makeClone method.
@@ -101,8 +108,6 @@ public:
   static Packet* create();
 
 private:
-  ChannelPacket();
-
   guint8 channel;
   guint8 from;
 };

@@ -21,7 +21,6 @@
  */
 
 #include "WrapperPacket.h"
-#include <boost/shared_ptr.hpp>
 
 namespace GNE {
   
@@ -33,19 +32,8 @@ namespace GNE {
  */
 class ObjectBrokerPacket : public WrapperPacket {
 public: //typedefs
-  /**
-   * Smart, reference counted pointer to an ObjectBrokerPacket.
-   * The object pointed to is destroyed when no more reference counted
-   * pointers point to the object anymore.
-   */
-  typedef boost::shared_ptr<ObjectBrokerPacket> pointer;
-
-  /**
-   * Smart, weak reference to an ObjectBrokerPacket.
-   * Weak references become null when all reference counted pointers to the
-   * object dissapear, and the object has been destroyed.
-   */
-  typedef boost::weak_ptr<ObjectBrokerPacket> weak_pointer;
+  typedef SmartPtr<ObjectBrokerPacket> sptr;
+  typedef WeakPtr<ObjectBrokerPacket> wptr;
 
 public:
   /**

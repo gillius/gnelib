@@ -1,4 +1,6 @@
 GNE 0.55 to current
+  LockObject nad LockObjectEx added.  These work on SynchronizedObjects like
+    gout.
   onTimeout events were being generated even when the timeout value was set to
     0.
   Like Connections and Timers, ServerConnectionListeners can live after
@@ -9,6 +11,8 @@ GNE 0.55 to current
   optional clearOnExit param to Console::initConsole
   Thread::waitForAllThreads didn't work right at all.  How did I miss that?!
   Major API changes, see http://www.rit.edu/~jpw9607/gne/apichanges.htm
+    There were a LOT of changes not listed here.  That document covers most of
+    what is not listed here.
   Added Console::mclearConsole method.
   Added ObjectBroker, ObjectBrokerClient, ObjectBrokerServer.
   Added ChannelProvider and ChannelPacket to add in channel functionality into

@@ -94,14 +94,14 @@ public:
   void onReceive() {
     Packet* message = NULL;
     while ( (message = conn->stream().getNextPacket()) != NULL ) {
-      if (message->getType() == MIN_USER_ID) {
+      if ( message->getType() == HelloPacket::ID ) {
         HelloPacket* helloMessage = (HelloPacket*)message;
         LockObject lock( gout );
         gout << "got message: \"" << helloMessage->getMessage() << '\"'
              << endl;
       } else
         mprintf("got bad packet.\n");
-      delete message;
+      destroyPacket( message );
     }
   }
 
@@ -196,10 +196,12 @@ public:
   //it just won't ever be sent ;), but there is no reason to pass in a param
   //and check for disconnection just so we don't send the data.
   void receivePackets() {
-    Packet* message = NULL;
-    while ( (message = conn->stream().getNextPacket() ) != NULL) {
-      if (message->getType() == MIN_USER_ID) {
-        HelloPacket* helloMessage = (HelloPacket*)message;
+    //This time we use the SmartPtr version of getNextPacket, to show both
+    //ways.  Using the SP version we don't need to call destroyPacket.
+    Packet::sptr message;
+    while ( (message = conn->stream().getNextPacketSp() ) ) {
+      if ( message->getType() == HelloPacket::ID ) {
+        HelloPacket::sptr helloMessage = static_pointer_cast<HelloPacket>( message );
         mprintf("got message: \"%s\"\n", helloMessage->getMessage().c_str());
         received = true;
         
@@ -209,7 +211,6 @@ public:
         conn->stream().writePacket(response, true);
       } else
         mprintf("got bad packet.\n");
-      delete message;
     }
   }
 

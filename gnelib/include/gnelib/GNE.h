@@ -83,17 +83,6 @@ namespace GNE {
   Address getLocalAddress();
 
   /**
-   * Exits from your main() function.  This should be used if you want any
-   * detached threads to continue running.  All threads must either be
-   * detached or joined.
-   * @see Thread::detach()
-   * @see Thread::join()
-   * @param status the return code
-   */
-  //static void exit(int status);
-
-
-  /**
    * Gets the global stats.  Very similar to Connection::getStats, but this
    * gets cumulative stats for all sockets, user-created ones and GNE ones
    * too you may not know about.

@@ -38,9 +38,15 @@ namespace PacketParser {
 
 static Mutex mapSync;
 
-//Originally this was a map, but this array is only 2k, and its faster and
+struct PacketFuncs {
+  PacketCreateFunc  createFunc;
+  PacketCloneFunc   cloneFunc;
+  PacketDestroyFunc destroyFunc;
+};
+
+//Originally this was a map, but this array is only 3k, and its faster and
 // easier to use a static array in this case.
-static Packet* (*packets[256])();
+static PacketFuncs packets[256];
 
 /**
  * \todo GNE authors -- don't forget to add additional packets to this
@@ -52,8 +58,21 @@ static Packet* (*packets[256])();
 // properly init the parser.
 void registerGNEPackets() {
   for (int c=0; c<256; c++) {
-    packets[c] = NULL;
+    packets[c].createFunc = NULL;
+    packets[c].cloneFunc = NULL;
+    packets[c].destroyFunc = NULL;
   }
+
+  defaultRegisterPacket<Packet>();
+  defaultRegisterPacket<CustomPacket>();
+  defaultRegisterPacket<ExitPacket>();
+  defaultRegisterPacket<RateAdjustPacket>();
+  registerPacket( PingPacket::ID, PingPacket::create, defaultPacketCloneFunc<PingPacket>, defaultPacketDestroyFunc<PingPacket> );
+  defaultRegisterPacket<ChannelPacket>();
+  defaultRegisterPacket<ObjectCreationPacket>();
+  defaultRegisterPacket<ObjectUpdatePacket>();
+  defaultRegisterPacket<ObjectDeathPacket>();
+  /*
   packets[0] = Packet::create;
   packets[1] = CustomPacket::create;
   packets[2] = ExitPacket::create;
@@ -63,16 +82,67 @@ void registerGNEPackets() {
   packets[6] = ObjectCreationPacket::create;
   packets[7] = ObjectUpdatePacket::create;
   packets[8] = ObjectDeathPacket::create;
+  */
 }
 
-void registerPacket(guint8 id, Packet* (*createFunc)()) {
-  assert(id >= MIN_USER_ID && id <= MAX_USER_ID);
-  assert( createFunc != Packet::create );
+void registerPacket( guint8 id,
+                     PacketCreateFunc createFunc,
+                     PacketCloneFunc cloneFunc,
+                     PacketDestroyFunc destroyFunc ) {
+  LockMutex lock( mapSync );
+
+  assert(packets[id].createFunc  == NULL);
+  assert(packets[id].cloneFunc   == NULL);
+  assert(packets[id].destroyFunc == NULL);
+
+  packets[id].createFunc  = createFunc;
+  packets[id].cloneFunc   = cloneFunc;
+  packets[id].destroyFunc = destroyFunc;
+
+  assert(packets[id].createFunc  != NULL);
+  assert(packets[id].cloneFunc   != NULL);
+  assert(packets[id].destroyFunc != NULL);
+}
+
+Packet* createPacket( guint8 id ) {
+  mapSync.acquire();
+  PacketCreateFunc func = packets[id].createFunc;
+  mapSync.release();
+
+  assert( func );
+  if ( func )
+    return func();
+  else
+    return NULL;
+}
+
+Packet* clonePacket( const Packet* p ) {
+  guint8 id = (guint8)p->getType();
 
   mapSync.acquire();
-  assert(packets[id] == NULL);
-  packets[id] = createFunc;
+  PacketCloneFunc func = packets[id].cloneFunc;
   mapSync.release();
+
+  assert( func );
+  if ( func )
+    return func( p );
+  else
+    return NULL;
+}
+
+void destroyPacket( Packet* p ) {
+  //if statement, because destroyPacket( NULL ) is OK.
+  if ( p ) {
+    guint8 id = (guint8)p->getType();
+
+    mapSync.acquire();
+    PacketDestroyFunc func = packets[id].destroyFunc;
+    mapSync.release();
+
+    assert( func );
+    if ( func )
+      func( p );
+  }
 }
 
 Packet* parseNextPacket(bool& endOfPackets, RawPacket& raw) {
@@ -89,10 +159,8 @@ Packet* parseNextPacket(bool& endOfPackets, RawPacket& raw) {
   }
 
   //Check for packet registration, parsing if it is registered.
-  Packet* (*func)() = NULL;
-
   mapSync.acquire();
-  func = packets[nextId];
+  PacketCreateFunc func = packets[nextId].createFunc;
   mapSync.release();
 
   //This section is split off to keep the above critial section small as
@@ -107,8 +175,8 @@ Packet* parseNextPacket(bool& endOfPackets, RawPacket& raw) {
   return NULL;
 }
 
-}
-}
+} //namespace PacketParser
+} //namespace GNE
 
 
 

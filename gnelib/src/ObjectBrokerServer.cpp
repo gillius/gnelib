@@ -35,13 +35,13 @@ ObjectBrokerServer::ObjectBrokerServer()
 ObjectBrokerServer::~ObjectBrokerServer() {
 }
 
-ObjectCreationPacket::pointer
+ObjectCreationPacket::sptr
 ObjectBrokerServer::getCreationPacket( NetworkObject& obj ) {
   LockMutex lock(sync);
   
   if ( !obj.hasValidId() )
     if ( !assignNextId( obj ) )
-      return ObjectCreationPacket::pointer( (ObjectCreationPacket*)NULL );
+      return ObjectCreationPacket::sptr( (ObjectCreationPacket*)NULL );
   assert( exists( obj.getObjectId() ) );
   
   Packet* packet = obj.createCreationPacket();
@@ -49,10 +49,10 @@ ObjectBrokerServer::getCreationPacket( NetworkObject& obj ) {
   ObjectCreationPacket* ret = new ObjectCreationPacket( obj.getObjectId(), *packet );
   delete packet;
 
-  return ObjectCreationPacket::pointer( ret );
+  return ObjectCreationPacket::sptr( ret );
 }
 
-ObjectUpdatePacket::pointer
+ObjectUpdatePacket::sptr
 ObjectBrokerServer::getUpdatePacket( NetworkObject& obj, const void* param ) {
   LockMutex lock(sync);
   
@@ -63,18 +63,18 @@ ObjectBrokerServer::getUpdatePacket( NetworkObject& obj, const void* param ) {
     ObjectUpdatePacket* ret = new ObjectUpdatePacket( obj.getObjectId(), *packet );
     delete packet;
 
-    return ObjectUpdatePacket::pointer( ret );
+    return ObjectUpdatePacket::sptr( ret );
     
   } else
-    return ObjectUpdatePacket::pointer( (ObjectUpdatePacket*)NULL );  
+    return ObjectUpdatePacket::sptr( (ObjectUpdatePacket*)NULL );  
 }
 
-ObjectUpdatePacket::pointer
+ObjectUpdatePacket::sptr
 ObjectBrokerServer::getUpdatePacket( NetworkObject& obj ) {
   return getUpdatePacket( obj, NULL );
 }
 
-ObjectDeathPacket::pointer
+ObjectDeathPacket::sptr
 ObjectBrokerServer::getDeathPacket( NetworkObject& obj ) {
   LockMutex lock(sync);
   
@@ -83,10 +83,10 @@ ObjectBrokerServer::getDeathPacket( NetworkObject& obj ) {
     ObjectDeathPacket* ret = new ObjectDeathPacket( obj.getObjectId(), packet );
     delete packet;
 
-    return ObjectDeathPacket::pointer( ret );
+    return ObjectDeathPacket::sptr( ret );
 
   } else
-    return ObjectDeathPacket::pointer( (ObjectDeathPacket*)NULL );
+    return ObjectDeathPacket::sptr( (ObjectDeathPacket*)NULL );
 }
 
 /**

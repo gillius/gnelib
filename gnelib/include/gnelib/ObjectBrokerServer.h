@@ -77,15 +77,16 @@ public:
    * If no IDs remain because there are too many objects, then a NULL pointer
    * is returned.
    */
-  ObjectCreationPacket::pointer getCreationPacket( NetworkObject& obj );
+  ObjectCreationPacket::sptr getCreationPacket( NetworkObject& obj );
 
   /**
    * Returns an ObjectUpdatePacket for the given object.  The passed
    * parameter, param, is passed directly into the NetworkObject's
    * createUpdatePacket method.
+   *
    * @see NetworkObject::createUpdatePacket
    */
-  ObjectUpdatePacket::pointer getUpdatePacket(
+  ObjectUpdatePacket::sptr getUpdatePacket(
       NetworkObject& obj, const void* param );
 
   /**
@@ -95,7 +96,7 @@ public:
    * @param obj a valid NetworkObject (one that has been assigned a valid ID
    * through getCreationPacket).
    */
-  ObjectUpdatePacket::pointer getUpdatePacket( NetworkObject& obj );
+  ObjectUpdatePacket::sptr getUpdatePacket( NetworkObject& obj );
 
   /**
    * Creates an ObjectDeathPacket for the given object, but does NOT
@@ -105,7 +106,7 @@ public:
    * @param obj a valid NetworkObject (one that has been assigned a valid ID
    * through getCreationPacket).
    */
-  ObjectDeathPacket::pointer getDeathPacket( NetworkObject& obj );
+  ObjectDeathPacket::sptr getDeathPacket( NetworkObject& obj );
 
 private:
   /**

@@ -32,21 +32,15 @@ namespace GNE {
  */
 class ObjectDeathPacket : public ObjectBrokerPacket {
 public: //typedefs
-  /**
-   * Smart, reference counted pointer to an ObjectDeathPacket.
-   * The object pointed to is destroyed when no more reference counted
-   * pointers point to the object anymore.
-   */
-  typedef boost::shared_ptr<ObjectDeathPacket> pointer;
-
-  /**
-   * Smart, weak reference to an ObjectDeathPacket.
-   * Weak references become null when all reference counted pointers to the
-   * object dissapear, and the object has been destroyed.
-   */
-  typedef boost::weak_ptr<ObjectDeathPacket> weak_pointer;
+  typedef SmartPtr<ObjectDeathPacket> sptr;
+  typedef WeakPtr<ObjectDeathPacket> wptr;
 
 public:
+  /**
+   * Creates a new instance of this packet suitable only to call readPacket on.
+   */
+  ObjectDeathPacket();
+
   /**
    * Initializes a new ObjectDeathPacket.  The given Packet is copied.
    */
@@ -58,19 +52,6 @@ public:
    * The ID for this type of packet.
    */
   static const int ID;
-  
-  /**
-   * Returns a newly allocated exact copy of this packet.
-   */
-  virtual Packet* makeClone() const;
-
-  /**
-   * Returns a new instance of this class suitable only to call readPacket on.
-   */
-  static Packet* create();
-
-protected:
-  ObjectDeathPacket();
 };
 
 } //namespace GNE 

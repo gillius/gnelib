@@ -22,7 +22,7 @@
  * Small test/example using the Address class.
  */
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 #include <iostream>
 
 using namespace std;
@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
   if (initGNE(NL_IP, atexit)) {
     exit(1);
   }
-  initConsole(atexit);
+  initConsole();
   setTitle("GNE Address Class Test/Example");
 
   string url = "www.microsoft.com:80";

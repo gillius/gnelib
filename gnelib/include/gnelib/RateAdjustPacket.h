@@ -32,6 +32,10 @@ namespace GNE {
  * see -- it is used only internally by GNE.
  */
 class RateAdjustPacket : public Packet {
+public: //typedefs
+  typedef SmartPtr<RateAdjustPacket> sptr;
+  typedef WeakPtr<RateAdjustPacket> wptr;
+
 public:
   RateAdjustPacket();
 
@@ -41,11 +45,6 @@ public:
    * The ID for this type of packet.
    */
   static const int ID;
-
-  /**
-   * Returns a newly allocated exact copy of this packet.
-   */
-  virtual Packet* makeClone() const;
 
   /**
    * Returns the current size of this packet in bytes.
@@ -61,11 +60,6 @@ public:
    * Reads this packet from the given RawPacket.
    */
   virtual void readPacket(RawPacket& raw);
-
-  /**
-   * Returns a new instance of this class using the default constructor.
-   */
-  static Packet* create();
 
   /**
    * The requested rate.

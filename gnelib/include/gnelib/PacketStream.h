@@ -157,11 +157,22 @@ public:
    * Returns the next packet from the queue, removing it from that queue.
    * It is your responsibility to deallocate the memory for this packet as
    * the calling code becomes the owner of the memory the returned packet
-   * occupies.
+   * occupies.  You deallocate the Packet by using the
+   * PacketStream::destroyPacket function.
+   *
    * @return A pointer to the next packet, which you are responsible for
    *         deleting, or NULL if there is no next packet.
    */
   Packet* getNextPacket();
+
+  /**
+   * Returns the next packet from the queue, removing it from that queue.
+   * The Sp stands for "SmartPtr" and returns a SmartPtr that will handle the
+   * PacketStream::destroyPacket call for you.
+   *
+   * @return A pointer to the next packet, or NULL if there is no next packet.
+   */
+  SmartPtr<Packet> getNextPacketSp();
 
   /**
    * Adds a packet to the outgoing queue.  The packet given will be copied.
@@ -169,6 +180,16 @@ public:
    * @param should this packet be sent reliably if the connection supports it?
    */
   void writePacket(const Packet& packet, bool reliable);
+
+  /**
+   * Adds a packet to the outgoing queue.  The packet given will be copied.
+   * This works identical to the other writePacket but takes a SmartPtr to a
+   * Packet.
+   *
+   * @param packet the packet to send.
+   * @param should this packet be sent reliably if the connection supports it?
+   */
+  void writePacket(const SmartPtr<Packet>& packet, bool reliable);
 
   /**
    * Returns the actual outgoing data rate, which may be the same or less

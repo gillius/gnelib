@@ -32,10 +32,6 @@ RateAdjustPacket::RateAdjustPacket() : Packet(ID), rate(0) {
 RateAdjustPacket::~RateAdjustPacket() {
 }
 
-Packet* RateAdjustPacket::makeClone() const {
-  return new RateAdjustPacket(*this);
-}
-
 int RateAdjustPacket::getSize() const {
   return Packet::getSize() + RawPacket::getSizeOf(rate);
 }
@@ -48,10 +44,6 @@ void RateAdjustPacket::writePacket(RawPacket& raw) const {
 void RateAdjustPacket::readPacket(RawPacket& raw) {
   Packet::readPacket(raw);
   raw >> rate;
-}
-
-Packet* RateAdjustPacket::create() {
-  return new RateAdjustPacket;
 }
 
 }
