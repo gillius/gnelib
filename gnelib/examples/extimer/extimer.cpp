@@ -114,6 +114,28 @@ int main() {
   mprintf("%is, %ius\n", t.getSec(), t.getuSec());
   mprintf("Timer class tests, press a key to quit:\n");
 
+  //try for some overflow tests.
+  t.setSec( 0 );
+  t.setuSec( 0 );
+  t += INT_MAX;
+  assert( t.getTotaluSec() == INT_MAX );
+  assert( t.getuSec() == 483647 );
+  assert( t.getSec() == 2147 );
+  t += INT_MAX;
+  assert( t.getuSec() == 967294 );
+  assert( t.getSec() == 4294 );
+  t = t + INT_MAX;
+  assert( t.getuSec() == 450941 );
+  assert( t.getSec() == 6442 );
+
+  //check handling of negative numbers.
+  t = Time( 0, -1 );
+  assert( t.getTotaluSec() == -1 );
+  assert( t.getSec() == -1 );
+  assert( t.getuSec() == 999999 );
+
+  assert( t == Time( 1, -1000001 ) );
+
   //Create the timers, which will destroy their callbacks when they die, since
   //we aren't keeping a SmartPtr to them.
   Timer::sptr t1 = Timer::create( TimeClass::create(3, 8, "Bob"), 1000 );

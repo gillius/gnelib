@@ -26,6 +26,8 @@
 #include "../include/gnelib/GNE.h"
 #include "../include/gnelib/Lock.h"
 
+#include <boost/detail/atomic_count.hpp>
+
 namespace GNE {
 
 #ifdef WIN32
@@ -39,6 +41,34 @@ typedef ThreadMap::iterator ThreadMapIter;
 
 static ThreadMap threads;
 static Mutex mapSync;
+
+class SafeCount {
+public:
+  SafeCount() : count( 0 ) {};
+
+  void operator ++ () {
+    LockMutex lock( mtx );
+    ++count;
+  }
+
+  void operator -- () {
+    LockMutex lock( mtx );
+    --count;
+  }
+
+  bool operator <= ( const int& rhs ) {
+    LockMutex lock( mtx );
+    return count <= rhs;
+  }
+
+private:
+  Mutex mtx;
+  int count;
+};
+
+//We can't rely on the threads map to tell if threads are alive, because remove
+//has to run the destructor after mapSync is released.
+static SafeCount liveThreads;
 
 const int Thread::DEF_PRI = 0;
 const int Thread::LOW_PRI = -1;
@@ -83,12 +113,9 @@ void* Thread::threadStart(void* thread) {
 
   gnedbg2( 5, "%x: Thread %s Ending", thr.get(), thr->getName().c_str() );
   ThreadIDData idData = *(thr->id);
-  thr.reset();
-  //We don't want to keep a reference to the Thread, so we can be certain that
-  //remove will kill if it the program is shutting down, because otherwise
-  //after a waitForAllThreads the program can quit before thr has a chance to
-  //die.
   Thread::remove( idData );
+  thr.reset();
+  --liveThreads;
 
   return 0;
 }
@@ -155,7 +182,10 @@ void Thread::yield() {
 #endif
 }
 
-bool Thread::waitForAllThreads(int ms) {
+bool Thread::waitForAllThreads( int ms ) {
+  //we can only call this from the main thread.
+  assert( !Thread::currentThread() );
+
   if (ms > INT_MAX / 1000)
     ms = INT_MAX / 1000;
 
@@ -167,10 +197,8 @@ bool Thread::waitForAllThreads(int ms) {
   while (!ret) {
     ret = timeout = (Timer::getCurrentTime() >= t);
     if (!timeout) {
-      mapSync.acquire();
       //Take into accout the CEG thread.
-      ret = (threads.size() <= (unsigned int)((GNE::eGen) ? 1 : 0) );
-      mapSync.release();
+      ret = (liveThreads <= ((GNE::eGen) ? 1 : 0) );
     }
     if (!ret)
       sleep(20);
@@ -285,6 +313,7 @@ void Thread::start() {
   //reference at any time, the sptr we store here may be the only sptr ref to
   //this object.
   threads[ id->thread_id ] = this_;
+  ++liveThreads;
 
   gnedbgo1( 5, "Starting Thread %s", name.c_str() );
 }
@@ -312,14 +341,16 @@ void Thread::remove( const ThreadIDData& d ) {
   //statement, and Bad Things happen since currentThread finds an element that
   //doesn't really exist.
   sptr temp;
-  {
-    ThreadMapIter iter = threads.find( d.thread_id);
-    assert( iter != threads.end() );
-    temp = iter->second;
-  }
+  ThreadMapIter iter = threads.find( d.thread_id);
+  assert( iter != threads.end() );
+  temp = iter->second;
   threads.erase(d.thread_id);
-  temp.reset();
+
   mapSync.vanillaRelease();
+
+  //we let temp die after the mutex release, to prevent deadlocks from anything
+  //strange that might go on in that dtor.  We REALLY want to execute that dtor
+  //while in mapSync but we can get unexpected deadlocks.
 }
 
 }
