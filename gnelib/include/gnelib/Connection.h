@@ -24,6 +24,7 @@
 #include "Thread.h"
 #include "PacketStream.h"
 #include "ConnectionEventListener.h"
+#include "ErrorGne.h"
 
 namespace GNE {
 
@@ -56,33 +57,6 @@ public:
     //##ModelId=3B075381003C
     int avgRecv;
   };
-
-  /**
-   * An enum describing connection failure type.
-   */
-  //##ModelId=3B075381003D
-  enum FailureType {
-    NoError = 0,
-    GNEHostVersionLow = 1,
-    GNEHostVersionHigh = 2,
-    UserHostVersionLow = 3,
-    UserHostVersionHigh = 4,
-    CouldNotOpenSocket = 5,
-    ConnectionTimeOut = 6,
-		ConnectionDropped = 7,
-		Read = 8,
-		Write = 9,
-		UnknownPacket = 10,
-		OtherGNELevelError = 11,
-    OtherLowLevelError = 12
-  };
-
-  /**
-   * An array of strings matching FailureType to a string.  Example:
-   * FailureStrings[GNEHostVersionLow];
-   */
-  //##ModelId=3AE5BA8F038E
-  static const std::string FailureStrings[];
 
   /**
    * Intializes this class, given the flow control parameters.
@@ -148,7 +122,8 @@ public:
   /**
    * A blocking call that disconnects nicely.  This has the same effect as
    * disconnect, except that all data waiting to be sent will be sent if
-   * possible.
+   * possible.  If the connection is already disconnected, this function does
+	 * nothing.
    * @see #disconnect()
    */
   //##ModelId=3B0753810084
@@ -160,7 +135,7 @@ public:
    * function FIRST so the underlying functions recieve this event.
    */
   //##ModelId=3B0753810085
-  virtual void onFailure(FailureType errorType);
+  virtual void onFailure(Error error);
 
   /**
    * Event triggered when one or more packets have been recieved.  Note that

@@ -109,7 +109,7 @@ public:
    * until this function returns.
    */
   //##ModelId=3B07538003C4
-  virtual void onConnectFailure(FailureType errorType) = 0;
+  virtual void onConnectFailure(Error error) = 0;
 
 private:
   /**

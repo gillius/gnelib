@@ -68,7 +68,7 @@ bool ServerConnectionListener::isListening() const {
 }
 
 //##ModelId=3B075381030A
-void ServerConnectionListener::onListenFailure(Connection::FailureType errorType) {
+void ServerConnectionListener::onListenFailure(Error error) {
 }
 
 //##ModelId=3B075381030F

@@ -75,7 +75,7 @@ public:
    * @see onNewConn
    */
   //##ModelId=3B0753810283
-  virtual void onConnFailure(FailureType errorType) = 0;
+  virtual void onConnFailure(Error error) = 0;
 
 };
 

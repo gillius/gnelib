@@ -98,12 +98,12 @@ public:
     mprintf("Connection to server successful.\n");
   }
 
-	void onFailure(Connection::FailureType errorType) {
-		Connection::onFailure(errorType);
-		mprintf("Socket failure: %s\n", Connection::FailureStrings[errorType].c_str());
+	void onFailure(Error error) {
+		Connection::onFailure(error);
+		mprintf("Socket failure: %s\n", error.getDesc().c_str());
 	}
 
-  void onConnectFailure(FailureType errorType) {
+  void onConnectFailure(Error error) {
     mprintf("Connection to server failed.\n");
   }
 private:
@@ -143,12 +143,12 @@ public:
 		delete message;
 	}
 
-	void onFailure(Connection::FailureType errorType) {
-		Connection::onFailure(errorType);
-		mprintf("Socket failure: %s\n", Connection::FailureStrings[errorType].c_str());
+	void onFailure(Error error) {
+		Connection::onFailure(error);
+		mprintf("Socket failure: %s\n", error.getDesc().c_str());
 	}
 
-  void onConnFailure(FailureType errorType) {
+  void onConnFailure(Error error) {
     mprintf("Connection failure while connecting.\n");
     detach(true);
   }

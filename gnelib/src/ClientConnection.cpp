@@ -19,6 +19,7 @@
 
 #include "gneintern.h"
 #include "ClientConnection.h"
+#include "ErrorGne.h"
 
 namespace GNE {
 
@@ -46,7 +47,7 @@ void ClientConnection::run() {
 		gnedbgo2(2, "connection r: %i, u: %i", rsocket, usocket);
     onConnect();
   } else {
-    onConnectFailure(ConnectionTimeOut);
+    onConnectFailure(Error::ConnectionTimeOut);
   }
 }
 

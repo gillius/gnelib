@@ -49,7 +49,7 @@ void ServerConnection::run() {
 }
 
 //##ModelId=3B0753810283
-void ServerConnection::onConnFailure(Connection::FailureType errorType) {
+void ServerConnection::onConnFailure(Error error) {
 }
 
 }

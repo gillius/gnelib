@@ -88,7 +88,7 @@ public:
    * @param errorType the type of error
    */
   //##ModelId=3B075381030A
-  virtual void onListenFailure(Connection::FailureType errorType);
+  virtual void onListenFailure(Error error);
 
   /**
    * Returns the address of the listening socket.
