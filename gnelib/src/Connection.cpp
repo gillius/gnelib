@@ -108,6 +108,10 @@ void Connection::disconnect() {
     gnedbgo2(2, "disconnecting r: %i, u: %i", sockets.r, sockets.u);
     ps->shutDown(); //PacketStream will try to send the required ExitPacket.
     ps->join();
+    //Once we call onDisconnect we can be deleted at anytime.  But it is OK
+    //to call this here because sync must be acquired and released until the
+    //destructor completes therefore this function will complete before we
+    //can be possibly deleted.
     eventListener->onDisconnect();
     //This will also shutdown the EventThread, and we will join on it in the
     //destructor (because this could be our EventThread, and you can't join
