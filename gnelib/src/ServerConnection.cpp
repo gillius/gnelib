@@ -117,7 +117,7 @@ void ServerConnection::run() {
     ps->start();
     connecting = true;
     startEventThread();
-    reg(true, (sockets.u != NL_INVALID));
+    reg(true, true);
 
     //Setup the packet feeder
     ps->setFeederTimeout( params->cp.getFeederTimeout() );
