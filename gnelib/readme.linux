@@ -6,6 +6,11 @@ libstdc++ is not ISO C++ 98 compliant, but is installed on many systems, so by
 default GNE supports the 2.9.x libstdc++ version. If you want to use the new
 libstdc++ code, set the environment variable NO_OLD_CPP.
 
+OLD_CPP works also on GCC 3.x and the new libstdc++ in addition to
+NO_OLD_CPP and seems to work just as well.  But it is suggested that you use
+the NO_OLD_CPP version, espically if you encounter any errors related to
+console I/O.
+
 1. HawkNL
 
 You will need HawkNL 1.4 final or a later version to use GNE.
