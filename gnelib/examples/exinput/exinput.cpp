@@ -90,11 +90,28 @@ int main(int argc, char* argv[]) {
   for (c = 0; c < NUM_STARS; c++)
     stars[c]->start();
 
-  Console::mlprintf(0, 23, "Press a key to exit.");
+  Console::mlprintf(0, 23, "Please press a key.");
 
   while (!Console::kbhit()) {}
+  int ch = Console::getch();
+  
+  //Process the key, treating enter and BS specially
+  char buf[10];
+  if (ch == Console::ENTER)
+    sprintf(buf, "ENTER");
+  else if (ch == Console::BACKSPACE)
+    sprintf(buf, "BACKSPACE");
+  else
+    sprintf(buf, "%c(%i)", (char)ch, ch);
 
-  Console::mlprintf(0, 23, "Goodnight stars!    ");
+  Console::mlprintf(0, 23, "You pressed: %s, now please type up to 30 chars below and hit enter:", buf);
+  char str[31];
+  int size = Console::lgetString(0, 24, str, 30);
+  //since we don't know the size of the string we clear everything first.
+  //We could do it better perhaps using strlen but who cares?
+  //We just don't want the screen to scroll though by putting too many spaces.
+  Console::mlprintf(0, 23, "                                                                           ");
+  Console::mlprintf(0, 23, "You typed: \"%s\"(%i == %i). Goodnight stars!", str, size, strlen(str));
 
   for (c = 0; c < NUM_STARS; c++)
     stars[c]->stop();
