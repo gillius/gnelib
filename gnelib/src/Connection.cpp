@@ -165,9 +165,18 @@ void Connection::onReceive(bool reliable) {
 	NLbyte* buf = new NLbyte[RawPacket::RAW_PACKET_LEN];
 	int temp = rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
 	if (temp == NL_INVALID) {
-		reportHawkNLErroro();
-		onFailure(Read);
+		if (nlGetError() == NL_MESSAGE_END) {
+			//in HawkNL 1.4b4 and later, this means that the connection was
+			//closed on the network-level because the client disconnected or
+			//has dropped.  Since we didn't get an "exit" packet, it's an error.
+			onFailure(ConnectionDropped);
+		} else {
+			//This is some other bad error that we need to report
+			reportHawkNLErroro();
+			onFailure(Read);
+		}
 	} else if (temp == 0) {
+		//In HawkNL 1.4b3 and earlier, this _USED_ to mean that...
 		//This means the connection was closed on the network-level because
 		//remote computer has purposely closed or has dropped.
 		onFailure(ConnectionDropped);
