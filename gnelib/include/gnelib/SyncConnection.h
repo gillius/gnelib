@@ -118,9 +118,11 @@ public:
 	 * Releases this SyncConnection, returning the underlying Connection to its
 	 * previous event handler.  Once a SyncConnection has been released, then
 	 * it is essentially in an invalid state and should not be used anymore
-	 * (with the exception of the dtor, getConnection(), and isReleased()).  This 
-	 * function throws an Error if some underlying pending operations failed
-	 * since the last call on this SyncConnection.
+	 * (with the exception of the dtor, getConnection(), isReleased(), and
+   * this function).  This function throws an Error if some underlying
+   * pending operations failed since the last call on this SyncConnection.\n
+   * If release is called when the SyncConnection is already released, no
+   * errors will be thrown.
 	 */
   //##ModelId=3BDB10A50316
 	void release() throw (Error);
