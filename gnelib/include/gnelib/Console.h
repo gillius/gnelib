@@ -117,6 +117,14 @@ namespace Console {
   int lgetString(int x, int y, char* str, int maxlen);
 
   /**
+   * Same as lgetString(int, int, char*, int), but uses the current curson
+   * position as obtained from mgetpos for the positions.
+   * @see lgetString
+   * @see mgetpos
+   */
+  int getString(char* str, int maxlen);
+
+  /**
    * Sets the title of the console window to the given parameter, where GNE
    * can, and where it makes sense (like Windows).  If the title cannot be
    * set, this function does nothing.
@@ -127,10 +135,21 @@ namespace Console {
   /**
    * Gets the size of the console, in character columns and character rows.
    * If x or y are -1, then the width and height are unable to be determined.
-   * @param x integer where the number of columns is stored.
-   * @param y integer where the number of rows is stored.
+   * The return values for this function may or may not change if the console
+   * window is resized.
+   * @param width integer where the number of columns is stored.
+   * @param height integer where the number of rows is stored.
    */
-  void getConsoleSize(int* x, int* y);
+  void mgetConsoleSize(int* width, int* height);
+
+  /**
+   * Returns the current position of the cursor.  As an "m" prefixed function,
+   * this is safe to call from multiple threads, but note that if you are
+   * using functions that relocate the cursor at the same time this function is
+   * called, the "current position" probably will not be very helpful.  It is
+   * best used when a single thread is doing console I/O.
+   */
+  void mgetPos(int* x, int* y);
 
   /**
    * The keycode the enter key gives from getch().

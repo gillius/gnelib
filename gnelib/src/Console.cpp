@@ -126,8 +126,16 @@ void setTitle(const char* title) {
   conio_settitle(title);
 }
 
-void getConsoleSize(int* x, int* y) {
-  conio_getsize(x, y);
+void mgetConsoleSize(int* width, int* height) {
+  outSync.acquire();
+  conio_getsize(width, height);
+  outSync.release();
+}
+
+void mgetPos(int* x, int* y) {
+  outSync.acquire();
+  conio_getxy(x, y);
+  outSync.release();
 }
 
 }

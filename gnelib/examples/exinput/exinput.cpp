@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
   setTitle("GNE Console Input Test");
 
   int width, height;
-  getConsoleSize(&width, &height);
+  mgetConsoleSize(&width, &height);
   if (width == 0)
     width = 80; //our best guess
   if (height == 0)
@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
   for (c = 0; c < NUM_STARS; c++)
     stars[c]->start();
 
-  mlprintf(0, height-2, "Please press a key.");
+  mlprintf(0, height-2, "Presumed width: %i and height %i.  Please press a key.", width, height);
 
   while (!kbhit()) {}
   int ch = getch();

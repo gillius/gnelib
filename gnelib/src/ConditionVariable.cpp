@@ -68,9 +68,7 @@ void ConditionVariable::timedWait(int ms) {
   timespec tv;
   tv.tv_sec = t.getSec();
   tv.tv_nsec = t.getuSec() * 1000;
-  mutex->acquire();
   pthread_cond_timedwait(&cond, &(mutex->mutex), &tv);
-  mutex->release();
 }
 
 //##ModelId=3B0753810005
