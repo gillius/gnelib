@@ -36,10 +36,27 @@ using namespace GNE;
 using namespace GNE::PacketParser;
 using namespace GNE::Console;
 
+void errorExit(const char* error);
+int getPort(const char* prompt);
+void doServer(int outRate, int inRate, int port);
+void doClient(int outRate, int inRate, int port);
+
+//This keeps track of some screen positions when can write to.
+//Essentially makes tiles out of the screen.
+struct Pos {
+  int x, y;
+  bool taken;
+};
+static Pos positions[] = {{0, 8, false}};
+
+const Pos& getNextPos() {
+  return positions[0];
+}
+
 //The PerfTester class works on both the client and the server side.
 class PerfTester : public ConnectionListener {
 public:
-	PerfTester() : conn(NULL) {}
+	PerfTester(const Pos& ourPos2) : ourPos(ourPos2), conn(NULL) {}
   ~PerfTester() {}
 
 	void onDisconnect() { 
@@ -47,11 +64,13 @@ public:
 	}
 
   void onConnect(SyncConnection& conn2) {
+    mlprintf(ourPos.x, ourPos.y, "Connection accepted");
 		conn = conn2.getConnection();
     writePackets(); //Send an initial batch of data.
   }
 
   void onNewConn(SyncConnection& conn2) {
+    mlprintf(ourPos.x, ourPos.y, "Connection accepted");
 		conn = conn2.getConnection();
     writePackets();
   }
@@ -63,18 +82,18 @@ public:
 	}
 
 	void onFailure(const Error& error) {
-		mprintf("Socket failure: %s\n", error.toString().c_str());
+		mlprintf(0, 0, "Socket failure: %s   ", error.toString().c_str());
     //No need to disconnect, this has already happened on a failure.
 	}
 
 	void onError(const Error& error) {
-		mprintf("Socket error: %s\n", error.toString().c_str());
+		mlprintf(0, 0, "Socket error: %s   ", error.toString().c_str());
 		conn->disconnect();//For simplicity we treat even normal errors as fatal.
 	}
 
   void onConnectFailure(const Error& error) {
-    mprintf("Connection to server failed.\n");
-		mprintf("  GNE reported error: %s\n", error.toString().c_str());
+    mprintf(0, 0, "Connection to server failed.   ");
+		mprintf(0, 1, "  GNE reported error: %s   ", error.toString().c_str());
   }
 
   void onDoneWriting() {
@@ -85,6 +104,7 @@ public:
   void writePackets() {
   }
 private:
+  Pos ourPos;
 	Connection* conn;
 };
 
@@ -104,7 +124,7 @@ public:
 
   void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
     inRate = outRate = 0; //0 meaning no limits on rates.
-    listener = new PerfTester();
+    listener = new PerfTester(getNextPos());
   }
 
 private:
@@ -139,5 +159,67 @@ int main() {
   }
   setTitle("GNE Net Performance Tester");
 
+  gout << "GNE Net Performance Tester for " << GNE::VER_STR << endl;
+  gout << "Local address: " << getLocalAddress() << endl;
+  gout << "Should we act as the server, or the client?" << endl;
+  gout << "Type 1 for client, 2 for server: ";
+  int type;
+  gin >> type;
+
+  int port;
+  if (type != 1) {
+    setTitle("GNE Net Performance Tester -- Server");
+    gout << "Reminder: ports <= 1024 on UNIX can only be used by the superuser." << endl;
+    port = getPort("listen on");
+    doServer(0, 0, port);
+  } else {
+    setTitle("GNE Net Performance Tester -- Client");
+    port = getPort("connect to");
+    doClient(0, 0, port);
+  }
+
   return 0;
+}
+
+void doServer(int outRate, int inRate, int port) {
+#ifdef _DEBUG
+  //Generate debugging logs to server.log if in debug mode.
+  initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "server.log");
+#endif
+  OurListener server;
+  if (server.open(port))
+    errorExit("Cannot open server socket.");
+  if (server.listen())
+    errorExit("Cannot listen on server socket.");
+
+  gout << "Server is listening on: " << server.getLocalAddress() << endl;
+  gout << "Press a key to shutdown server." << endl;
+  getch();
+  //When the server class is destructed, it will stop listening and shutdown.
+}
+
+void doClient(int outRate, int inRate, int port) {
+#ifdef _DEBUG
+	initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "client.log");
+#endif
+  string host;
+  gout << "Enter hostname or IP address: ";
+  gin >> host;
+
+	Address address(host);
+	address.setPort(port);
+	if (!address)
+		errorExit("Invalid address.");
+  gout << "Connecting to: " << address << endl;
+  gout << "Press a key to stop the testing. " << endl;
+
+	ClientConnection client(outRate, inRate, new PerfTester(getNextPos()));
+  if (client.open(address, 0)) //localPort = 0, for any local port.
+    errorExit("Cannot open client socket.");
+
+  client.connect();
+  client.join();
+
+  getch(); //Wait for user keypress
+  client.disconnectSendAll();
 }
