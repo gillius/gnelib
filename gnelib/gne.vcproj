@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding = "Windows-1252"?>
+<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.00"
+	Version="7.10"
 	Name="gne"
 	SccProjectName=""
 	SccLocalPath="">
@@ -54,6 +54,12 @@
 				Culture="1033"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
@@ -102,8 +108,16 @@
 				Culture="1033"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
+	<References>
+	</References>
 	<Files>
 		<Filter
 			Name="Source Files"
@@ -125,6 +139,21 @@
 			</File>
 			<File
 				RelativePath=".\src\ConditionVariable.cpp">
+			</File>
+			<File
+				RelativePath=".\src\conioport.c">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\src\Connection.cpp">
@@ -185,6 +214,21 @@
 			</File>
 			<File
 				RelativePath=".\src\GNEDebug.cpp">
+			</File>
+			<File
+				RelativePath="src\gneintern.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\src\ListServerConnection.cpp">
@@ -264,36 +308,6 @@
 			<File
 				RelativePath="src\WrapperPacket.cpp">
 			</File>
-			<File
-				RelativePath=".\src\conioport.c">
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="src\gneintern.cpp">
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
-				</FileConfiguration>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -315,6 +329,9 @@
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ConditionVariable.h">
+			</File>
+			<File
+				RelativePath=".\include\gnelib\conioport.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\Connection.h">
@@ -366,6 +383,12 @@
 			</File>
 			<File
 				RelativePath=".\include\gnelib\GNEDebug.h">
+			</File>
+			<File
+				RelativePath=".\include\gnelib\gneintern.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\gnetypes.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ListServerConnection.h">
@@ -469,24 +492,12 @@
 			<File
 				RelativePath="include\gnelib\WrapperPacket.h">
 			</File>
-			<File
-				RelativePath=".\include\gnelib\conioport.h">
-			</File>
-			<File
-				RelativePath=".\include\gnelib\gneintern.h">
-			</File>
-			<File
-				RelativePath="include\gnelib\gnetypes.h">
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\Authors">
 		</File>
 		<File
 			RelativePath=".\Changes">
-		</File>
-		<File
-			RelativePath=".\Readme">
 		</File>
 		<File
 			RelativePath=".\doxygen.cfg">
@@ -502,6 +513,9 @@
 		</File>
 		<File
 			RelativePath=".\src\mainpage">
+		</File>
+		<File
+			RelativePath=".\Readme">
 		</File>
 		<File
 			RelativePath=".\readme.vc">

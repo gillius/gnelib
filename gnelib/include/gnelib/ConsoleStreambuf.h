@@ -74,7 +74,13 @@ public:
 protected:
   int sync();
   void flush_output();
+
+#if (_MSC_VER == 1310 )
+  int_type overflow(int_type meta = std::char_traits<char>::eof());
+#else
   int_type overflow(int_type meta = traits_type::eof());
+#endif
+
   std::streamsize xsputn(const char_type *ptr, std::streamsize count);
 
 private:
