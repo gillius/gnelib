@@ -48,11 +48,15 @@ void SocketPair::disconnect() {
 Address SocketPair::getLocalAddress(bool reliable) const {
   NLaddress ret;
   if (reliable) {
-    assert(r != NL_INVALID);
-    nlGetLocalAddr(r, &ret);
+		if (r != NL_INVALID)
+			nlGetLocalAddr(r, &ret);
+		else
+			ret.valid = NL_FALSE;
   } else {
-    assert(u != NL_INVALID);
-    nlGetLocalAddr(u, &ret);
+		if (u != NL_INVALID)
+			nlGetLocalAddr(u, &ret);
+		else
+			ret.valid = NL_FALSE;
   }
   return Address(ret);
 }
@@ -61,11 +65,15 @@ Address SocketPair::getLocalAddress(bool reliable) const {
 Address SocketPair::getRemoteAddress(bool reliable) const {
   NLaddress ret;
   if (reliable) {
-    assert(r != NL_INVALID);
-    nlGetRemoteAddr(r, &ret);
+		if (r != NL_INVALID)
+			nlGetRemoteAddr(r, &ret);
+		else
+			ret.valid = NL_FALSE;
   } else {
-    assert(u != NL_INVALID);
-    nlGetRemoteAddr(u, &ret);
+		if (u != NL_INVALID)
+			nlGetRemoteAddr(u, &ret);
+		else
+			ret.valid = NL_FALSE;
   }
   return Address(ret);
 }
