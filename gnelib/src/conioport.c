@@ -9,6 +9,8 @@
 
 #include <conio.h>
 #include <windows.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 void conio_init (int* enterKey, int* backspaceKey) {
   *enterKey = 13;
@@ -30,7 +32,7 @@ void conio_getxy(int* x, int* y) {
     *x = info.dwCursorPosition.X;
     *y = info.dwCursorPosition.Y;
   } else {
-    x = y = -1;
+    *x = *y = -1;
   }
 }
 
@@ -41,7 +43,7 @@ void conio_getsize(int* x, int* y) {
     *x = info.dwSize.X;
     *y = info.dwSize.Y;
   } else {
-    x = y = -1;
+    *x = *y = -1;
   }
 }
 //conio_settitle sets a title for the console window, whereever possible,

@@ -101,7 +101,7 @@ void goutbuf::flush_output() {
   }
 }
 
-goutbuf::int_type goutbuf::overflow(int_type meta = traits_type::eof()) {
+goutbuf::int_type goutbuf::overflow(int_type meta) {
   if (meta != traits_type::eof()) {
     flush_output();
     Console::mputchar(traits_type::to_char_type(meta));
