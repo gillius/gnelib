@@ -23,6 +23,7 @@
 #include "gneintern.h"
 
 namespace GNE {
+class Packet;
 
 /**
  * A utility class for creating a raw block of data that is used to directly
@@ -119,6 +120,14 @@ public:
   RawPacket& operator << (const std::string& x);
 
   /**
+   * Writes a packet to the RawPacket.  This function will simply call the
+   * packet's writePacket function.
+   * @see Packet::writePacket
+   */
+  //##ModelId=3B0C2CE50226
+  RawPacket& operator << (const Packet& packet);
+
+  /**
    * Stream operators for reading from this RawPacket.  All data is converted
    * when appropriate from big endian format.
    */
@@ -140,6 +149,16 @@ public:
   RawPacket& operator >> (NLdouble& x);
   //##ModelId=3B0753810276
   RawPacket& operator >> (std::string& x);
+
+  /**
+   * This function calls the packet's readPacket function.  You will already
+   * need to know what kind of packet is next.  If you don't, use
+   * PacketPaser::parseNextPacket.
+   * @see PacketParser::parseNextPacket
+   * @see Packet::readPacket
+   */
+  //##ModelId=3B0C2CE503A2
+  RawPacket& operator >> (Packet& packet);
 
   /**
    * The length of a RawPacket.  The internal buffer for a RawPacket used for

@@ -19,6 +19,7 @@
 
 #include "gneintern.h"
 #include "RawPacket.h"
+#include "Packet.h"
 
 namespace GNE {
 
@@ -31,7 +32,7 @@ RawPacket::RawPacket(NLbyte* buffer) : currLoc(0) {
     data = buffer;
     ourBuffer = false;
   } else {
-    data = new NLbyte[RAW_PACKET_LEN];
+    data = new NLbyte[RAW_PACKET_LEN + 1]; //last byte for END_OF_PACKET
     ourBuffer = true;
   }
 }
@@ -134,6 +135,12 @@ RawPacket& RawPacket::operator << (const std::string& x) {
   return *this;
 }
 
+//##ModelId=3B0C2CE50226
+RawPacket& RawPacket::operator << (const Packet& x) {
+  x.writePacket(*this);
+  return *this;
+}
+
 //START OF READING OPERATORS
 
 RawPacket& RawPacket::operator >> (signed char& x) {
@@ -188,6 +195,11 @@ RawPacket& RawPacket::operator >> (std::string& x) {
   x = (char*)&data[currLoc];
   currLoc += x.length() + 1;
   assert(currLoc <= RAW_PACKET_LEN);
+  return *this;
+}
+
+RawPacket& RawPacket::operator >> (Packet& x) {
+  x.readPacket(*this);
   return *this;
 }
 
