@@ -26,11 +26,36 @@ The following things are needed for GNE:
       - Solaris: gcc 2.9x, 3.x using the GNU tools.
     + MSVC 4 or 5 might also work, and other *NIX as well, but testers are
       needed for this!
-  * The HawkNL networking library from HawkSoft, version 1.42 or higher.
+  * The HawkNL networking library from HawkSoft, version 1.5b2 or higher.
     The download link is on the left sidebar when you are in the HawkNL
-    section.  Versions 1.4 and 1.41 may be used but are less stable and
-    have a problem with stats reporting.
+    section.  Version 1.5b1 may be used but has a bug which will cause GNE
+    protocol violations due to it misreporting reliable packet sizes.
   * pthreads implementation (pthreads-win32 for Windows used for Windows),
     UNIX already has pthreads support.
   * A curses implementation such as ncurses will be needed to use GNE under
     a UNIX platform
+
+Comming Features
+
+This version of GNE was supposed to be 0.5, the completed "mid-level" portion
+of GNE which is GNE without the high-level game engine classes.  There are a
+couple of simple missing features which will be implemented in 0.5:
+
+* Timeouts are not yet detected automatically, but doing so yourself now
+  will not be overly difficult.  Even the final version of timeout detection
+  will be somewhat limited as GNE cannot force the other end to respond to
+  anything, including PingPackets -- only you can send packets, but GNE will
+  trigger an event (onTimeout) after a connection has been idle for a
+  user-specified amount of time.
+
+* Thread priorities have not been implemented because I haven't been able to
+  figure how how to do this portably with pthreads yet -- if you know how,
+  feel free to speak up ;).
+
+* Throwing exceptions in the readPacket and maybe the writePacket methods
+  will be allowed and caught to signal the caller that parsing of the packet
+  cannot be completed.  Not having this functionality is not very bad right
+  now as TCP and UDP protocols guarantee that data inside of packets is
+  always sent correctly if it arrives, therefore readPacket should only fail
+  due to a programming error.  For now it is advised that you use asserts to
+  check for this problem.
