@@ -22,7 +22,6 @@
 
 namespace GNE {
 
-//##ModelId=3B07538100E0
 ReceiveEventListener::~ReceiveEventListener() {
 }
 

@@ -40,7 +40,6 @@ class PacketFeeder;
  *       its own mutexes internally.  Note that data in the class may change
  *       between calls, if another thread changes its state.
  */
-//##ModelId=3B075380030D
 class PacketStream : public Thread {
 public:
   /**
@@ -53,20 +52,17 @@ public:
    *                    send.  The actual outgoing rate, therefore, is the
    *                    minimum of the two outgoing rate values.
    */
-  //##ModelId=3B07538101BD
   PacketStream(int reqOutRate2, int maxOutRate2, Connection& ourOwner);
 
   /**
    * Destroys this object.  Any data left remaining in the in or out queues
    * is destroyed as well.
    */
-  //##ModelId=3B07538101C0
   virtual ~PacketStream();
 
   /**
    * Returns the current incoming queue length in packets.
    */
-  //##ModelId=3B07538101C2
   int getInLength() const;
 
   /**
@@ -77,7 +73,6 @@ public:
    * @param reliable true for the outgoing reliable packet queue.<br>
    *                 false for the incoming reliable packet queue.
    */
-  //##ModelId=3B07538101C4
   int getOutLength(bool reliable) const;
 
   /**
@@ -95,7 +90,6 @@ public:
    * The passed newFeeder may be NULL in which case onLowPackets events will
    * not be generated.
    */
-  //##ModelId=3CE60C490079
   void setFeeder(PacketFeeder* newFeeder);
 
   /**
@@ -107,13 +101,11 @@ public:
    * regard to the timeout, and an onLowPacket event will be generated if the
    * conditions are proper.
    */
-  //##ModelId=3CE60C490092
   void setLowPacketThreshold(int limit);
 
   /**
    * Returns the current low packet threshold.
    */
-  //##ModelId=3CE60C4900A6
   int getLowPacketThreshold() const;
 
   /**
@@ -128,13 +120,11 @@ public:
    * except that one will eventually happen with a non-zero timeout and that
    * it will likely be called too soon rather than too late.
    */
-  //##ModelId=3CE60C4900B0
   void setFeederTimeout(int ms);
 
   /**
    * Returns the set feeder timeout.
    */
-  //##ModelId=3CE60C4900C4
   int getFeederTimeout() const;
 
   /**
@@ -146,7 +136,6 @@ public:
    * is suggested that you use getNextPacket and if it is non-NULL then
    * process the data.  That method is thread safe.
    */
-  //##ModelId=3B07538101C6
   bool isNextPacket() const;
 
   /**
@@ -157,7 +146,6 @@ public:
    * @return A pointer to the next packet, which you are responsible for
    *         deleting, or NULL if there is no next packet.
    */
-  //##ModelId=3B07538101C8
   Packet* getNextPacket();
 
   /**
@@ -165,7 +153,6 @@ public:
    * @param packet the packet to send.
    * @param should this packet be sent reliably if the connection supports it?
    */
-  //##ModelId=3B07538101C9
   void writePacket(const Packet& packet, bool reliable);
 
   /**
@@ -179,7 +166,6 @@ public:
    * max allowed limit, this number will change to the new minimum between
    * these rates.
    */
-  //##ModelId=3B07538101F7
   int getCurrOutRate() const;
 
   /**
@@ -188,7 +174,6 @@ public:
    * @see getCurrOutRate
    * @see setRates
    */
-  //##ModelId=3C7AB4C501C1
   int getReqOutRate() const;
 
   /**
@@ -199,7 +184,6 @@ public:
    * @see getCurrOutRate
    * @see setRates
    */
-  //##ModelId=3C7AB4C501CB
   int getRemoteOutLimit() const;
 
   /**
@@ -211,7 +195,6 @@ public:
    *
    * @see PacketStream::PacketStream
    */
-  //##ModelId=3C783ACF0264
   void setRates(int reqOutRate2, int maxInRate2);
 
   /**
@@ -224,14 +207,12 @@ public:
    * @param waitTime the max amount of time in ms to wait for the outgoing
    *        packet queue to clear.
    */
-  //##ModelId=3B07538101F9
   void waitToSendAll(int waitTime = 10000) const;
 
   /**
    * Overrides Thread::shutDown so that the PacketStream daemon thread will
    * be woken up since it might be waiting on a ConditionVariable.
    */
-  //##ModelId=3B8DC5D10096
   void shutDown();
 
   /**
@@ -245,40 +226,31 @@ public:
    * eventually get it back from getNextPacket(), so you will want to handle
    * deallocation at that point.
    */
-  //##ModelId=3B07538101FB
   void addIncomingPacket(Packet* packet);
 
 protected:
   /**
    * This thread handles throttled writes to the socket.
    */
-  //##ModelId=3B07538101FA
   void run();
 
 private:
 
-  //##ModelId=3C7867230185
   void prepareSend(std::queue<Packet*>& q, RawPacket& raw);
 
-  //##ModelId=3B6B30250015
   Connection& owner;
 
-  //##ModelId=3AE45A8302E4
   std::queue<Packet*> in;
 
-  //##ModelId=3AE45B56017C
   std::queue<Packet*> outUnrel;
 
   std::queue<Packet*> outRel;
 
-  //##ModelId=3B075381018F
   int maxOutRate;
 
-  //##ModelId=3C783ACF021E
   int reqOutRate;
 
   //This is the precalculated min of maxOutRate and reqOutRate.
-  //##ModelId=3C783ACF0232
   int currOutRate;
 
   /**
@@ -286,27 +258,23 @@ private:
    * waiting.  This value should increase per the outRateStep until it
    * reaches a maximum value of currOutRate.
    */
-  //##ModelId=3C783ACF023C
   int outRemain;
 
   /**
    * This is the "step" that the out value increases for every step in
    * time.  The size of the step is defined by the code.
    */
-  //##ModelId=3C783ACF0246
   int outRateStep;
 
   /**
    * The last time the rate was calculated.
    */
-  //##ModelId=3C783ACF025B
   Time lastTime;
 
   /**
    * Calculates the current rate and step based on the current values for
    * maxOutRate and reqOutRate.
    */
-  //##ModelId=3C7960970177
   void setupCurrRate();
 
   /**
@@ -315,25 +283,19 @@ private:
    * before we use currOutRemain.  outQCtrl MUST be acquired when you call
    * this function.
    */
-  //##ModelId=3C783ACF028C
   void updateRates();
 
   //These 3 variables syncronized by outQCtrl, and must be since the writer
   //thread has to wait on conditions of the feeder.
-  //##ModelId=3CE60C490039
   PacketFeeder* feeder;
-  //##ModelId=3CE60C490044
   bool onLowPacketsEvent;
-  //##ModelId=3CE60C490056
   int feederTimeout;
-  //##ModelId=3CE60C490060
   int lowPacketsThreshold;
 
   /**
    * Generates and processes the onLowPackets event immedately if conditions
    * are appropriate, returning when the event has completed.
    */
-  //##ModelId=3CE60C4900CF
   void onLowPackets( int numPackets );
 
   /**
@@ -341,12 +303,9 @@ private:
    * non-const access to these objects, but they can still be called const
    * because the object's state is the same before and after the method.
    */
-  //##ModelId=3CE60C490075
   mutable Mutex feederLock;
-  //##ModelId=3B0753810196
   mutable Mutex inQCtrl;
 
-  //##ModelId=3B07538101B9
   mutable ConditionVariable outQCtrl;
 
 };

@@ -40,10 +40,8 @@ namespace GNE {
  * writing therefor you can send out a batch of packets with a better
  * assurance they will be combined and optimized.
  */
-//##ModelId=3CE60C4802DF
 class PacketFeeder {
 public:
-  //##ModelId=3CE60C49002E
   virtual ~PacketFeeder() {}
 
   /**
@@ -59,7 +57,6 @@ public:
    * You can use the informational methods of ps to get information about
    * how many packets are left and such to better optimize your sending.
    */
-  //##ModelId=3CE60C490030
   virtual void onLowPackets(PacketStream& ps) = 0;
 };
 

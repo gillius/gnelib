@@ -32,47 +32,34 @@ namespace GNE {
  * \todo The List server code will be completed only after the rest of GNE
  *       works and has been tested and finalized.
  */
-//##ModelId=3B07538002DC
 class ListServerConnection : public ClientConnection {
 public:
   /**
    * Data about each game.
    */
-  //##ModelId=3B07538002DD
   struct GameListData {
-    //##ModelId=3AE4B1420046
     std::string gameName;
 
-    //##ModelId=3AE4B25E008C
     std::string modName;
 
-    //##ModelId=3AE4B2150136
     std::string serverName;
 
-    //##ModelId=3AE4B21D0032
     std::string address;
 
-    //##ModelId=3B075381011C
     int numPlayers;
 
-    //##ModelId=3B075381011D
     int latency;
 
-    //##ModelId=3B075381011E
     void* gameSpecificData;
 
   };
 
-  //##ModelId=3B0753810120
   ListServerConnection(std::string address);
 
-  //##ModelId=3B0753810122
   virtual ~ListServerConnection();
 
-  //##ModelId=3B0753810124
   void setGame(std::string gameName);
 
-  //##ModelId=3B0753810126
   void getGameList();
 
 };

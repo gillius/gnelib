@@ -35,7 +35,6 @@ class ConnectionParams;
  * its base class -- a Connection.  This class is created by
  * ServerConnectionListener when incoming connections are comming in.
  */
-//##ModelId=3B0753800310
 class ServerConnection : public Connection, public Thread {
 public:
   /**
@@ -46,7 +45,6 @@ public:
    * @param creator the ServerConnectionListener that created us, so that we
    *                may call its onListenFailure event.
    */
-  //##ModelId=3B075381027A
   ServerConnection(const ConnectionParams& p, NLsocket rsocket2,
                    ServerConnectionListener* creator);
 
@@ -55,7 +53,6 @@ public:
    * the fact that ServerConnection is a thread (in the sense that the user
    * never need to call detach or join), to do a proper cleanup.
    */
-  //##ModelId=3B075381027E
   virtual ~ServerConnection();
 
 protected:
@@ -74,42 +71,35 @@ protected:
    * After onNewConn is called successfully, then
    * ServerConnectionListener::onListenSuccess is called.
    */
-  //##ModelId=3B0753810280
   void run();
 
 private:
   /**
    * @throw Error if an error occurs.
    */
-  //##ModelId=3C783ACF02BE
   void doHandshake();
 
   /**
    * @throw Error if an error occurs.
    */
-  //##ModelId=3C5CED0502CD
   void getCRP();
 
   /**
    * @throw Error if an error occurs.
    */
-  //##ModelId=3C5CED0502CE
   void sendRefusal();
 
   /**
    * @throw Error if an error occurs.
    */
-  //##ModelId=3C5CED0502D7
   void sendCAP();
 
   /**
    * @throw Error if an error occurs.
    */
-  //##ModelId=3C5CED0502D8
   void getUnreliableInfo();
 
   //Temporary storage to hold variables before and during connecting.
-  //##ModelId=3C5CED0502C4
   ServerConnectionParams* params;
 };
 

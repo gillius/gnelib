@@ -24,38 +24,30 @@
 
 namespace GNE {
 
-//##ModelId=3C7071E0016F
 const int ExitPacket::ID = 2;
 
-//##ModelId=3C7071E00170
 ExitPacket::ExitPacket() : Packet(ID) {
 }
 
-//##ModelId=3C7071E00171
 ExitPacket::~ExitPacket() {
 }
 
-//##ModelId=3C7071E00173
 Packet* ExitPacket::makeClone() const {
   return new ExitPacket(*this);
 }
 
-//##ModelId=3C7071E00178
 int ExitPacket::getSize() const {
   return Packet::getSize();
 }
 
-//##ModelId=3C7071E0017A
 void ExitPacket::writePacket(RawPacket& raw) const {
   Packet::writePacket(raw);
 }
 
-//##ModelId=3C7071E0017D
 void ExitPacket::readPacket(RawPacket& raw) {
   Packet::readPacket(raw);
 }
 
-//##ModelId=3C7071E00180
 Packet* ExitPacket::create() {
   return new ExitPacket;
 }

@@ -29,55 +29,45 @@ namespace GNE {
  * the PacketStream.  It is not a packet that you send, or that you will
  * see -- it is used only internally by GNE.
  */
-//##ModelId=3C783ACF00AE
 class RateAdjustPacket : public Packet {
 public:
-  //##ModelId=3C783ACF02AA
   RateAdjustPacket();
 
-  //##ModelId=3C783ACF02AB
   virtual ~RateAdjustPacket();
 
   /**
    * The ID for this type of packet.
    */
-  //##ModelId=3C783ACF02A1
   static const int ID;
 
   /**
    * Returns a newly allocated exact copy of this packet.
    */
-  //##ModelId=3C783ACF02AD
   virtual Packet* makeClone() const;
 
   /**
    * Returns the current size of this packet in bytes.
    */
-  //##ModelId=3C783ACF02AF
   virtual int getSize() const;
 
   /**
    * Writes the packet to the given RawPacket. 
    */
-  //##ModelId=3C783ACF02B1
   virtual void writePacket(RawPacket& raw) const;
 
   /**
    * Reads this packet from the given RawPacket.
    */
-  //##ModelId=3C783ACF02B4
   virtual void readPacket(RawPacket& raw);
 
   /**
    * Returns a new instance of this class using the default constructor.
    */
-  //##ModelId=3C783ACF02B7
   static Packet* create();
 
   /**
    * The requested rate.
    */
-  //##ModelId=3C783ADD03D8
   guint32 rate;
 
 private:

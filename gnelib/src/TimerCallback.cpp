@@ -22,11 +22,9 @@
 
 namespace GNE {
 
-//##ModelId=3B075382006B
 TimerCallback::TimerCallback() {
 }
 
-//##ModelId=3B075382006C
 TimerCallback::~TimerCallback() {
 }
 

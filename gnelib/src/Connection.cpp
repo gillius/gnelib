@@ -35,14 +35,12 @@
 
 namespace GNE {
 
-//##ModelId=3B0753810073
 Connection::Connection(ConnectionListener* listener)
 : ps(NULL), connecting(false), connected(false), rlistener(NULL),
 ulistener(NULL), exiting(false) {
   eventListener = new EventThread(listener, this);
 }
 
-//##ModelId=3B0753810076
 Connection::~Connection() {
   disconnect();
   if (eventListener->hasStarted()) {
@@ -63,53 +61,43 @@ Connection::~Connection() {
   delete ps;
 }
 
-//##ModelId=3BCE75A80280
 ConnectionListener* Connection::getListener() const {
   return eventListener->getListener();
 }
 
-//##ModelId=3BCE75A80282
 void Connection::setListener(ConnectionListener* listener) {
   eventListener->setListener(listener);
 }
 
-//##ModelId=3CC4E33800A1
 int Connection::getTimeout() {
   return eventListener->getTimeout();
 }
 
-//##ModelId=3CC4E33800A2
 void Connection::setTimeout(int ms) {
   eventListener->setTimeout(ms);
 }
 
-//##ModelId=3B0753810078
 PacketStream& Connection::stream() {
   assert(ps != NULL);
   return *ps;
 }
 
-//##ModelId=3B0753810079
 ConnectionStats Connection::getStats(int reliable) const {
   return sockets.getStats(reliable);
 }
 
-//##ModelId=3B075381007B
 Address Connection::getLocalAddress(bool reliable) const {
   return Address(sockets.getLocalAddress(reliable));
 }
 
-//##ModelId=3B075381007E
 Address Connection::getRemoteAddress(bool reliable) const {
   return Address(sockets.getRemoteAddress(reliable));
 }
 
-//##ModelId=3B0753810081
 bool Connection::isConnected() const {
   return connected;
 }
 
-//##ModelId=3B0753810083
 void Connection::disconnect() {
   sync.acquire();
   if (connecting || connected) {
@@ -136,19 +124,16 @@ void Connection::disconnect() {
   sync.release();
 }
 
-//##ModelId=3B0753810084
 void Connection::disconnectSendAll(int waitTime) {
   if (isConnected())
     ps->waitToSendAll(waitTime);
   disconnect();
 }
 
-//##ModelId=3C82ADDA0093
 void Connection::addHeader(RawPacket& raw) {
   raw << (gbyte)'G' << (gbyte)'N' << (gbyte)'E';
 }
 
-//##ModelId=3C82ADDA00A7
 void Connection::addVersions(RawPacket& raw) {
   GNEProtocolVersionNumber us = GNE::getGNEProtocolVersion();
   //Write the GNE version numbers.
@@ -161,7 +146,6 @@ void Connection::addVersions(RawPacket& raw) {
   raw << GNE::getUserVersion();
 }
 
-//##ModelId=3C82ABA50326
 void Connection::checkHeader(RawPacket& raw,
                              ProtocolViolation::ViolationType t) {
   gbyte headerG, headerN, headerE;
@@ -171,7 +155,6 @@ void Connection::checkHeader(RawPacket& raw,
     throw ProtocolViolation(t);
 }
 
-//##ModelId=3C82ABA5036C
 void Connection::checkVersions(RawPacket& raw) {
   //Get the version numbers
   GNEProtocolVersionNumber them;
@@ -193,12 +176,10 @@ void Connection::checkVersions(RawPacket& raw) {
   GNE::checkVersions(them, gameName, themUser);
 }
 
-//##ModelId=3B07538100AC
 void Connection::onReceive() {
   eventListener->onReceive();
 }
 
-//##ModelId=3C30E3FF01DE
 void Connection::finishedConnecting() {
   sync.acquire();
   if (connecting && !connected) {
@@ -210,7 +191,6 @@ void Connection::finishedConnecting() {
   sync.release();
 }
 
-//##ModelId=3B07538100B0
 void Connection::onReceive(bool reliable) {
   //Create buffer into a RawPacket
   gbyte* buf = new gbyte[RawPacket::RAW_PACKET_LEN];
@@ -266,7 +246,6 @@ void Connection::onReceive(bool reliable) {
  *      trigger onFailure then PacketStream fails because then the eGen won't
  *      block.
  */
-//##ModelId=3BB4208C0280
 void Connection::processError(const Error& error) {
   //If we got an ExitPacket, then any errors that we get should be ignored
   //because the socket will fail when we disconnect.
@@ -290,21 +269,17 @@ void Connection::processError(const Error& error) {
   }
 }
 
-//##ModelId=3B075381004E
 Connection::Listener::Listener(Connection& listener, bool isReliable) 
 : conn(listener), reliable(isReliable) {
 }
 
-//##ModelId=3B0753810051
 Connection::Listener::~Listener() {
 }
 
-//##ModelId=3B0753810053
 void Connection::Listener::onReceive() {
   conn.onReceive(reliable);
 }
 
-//##ModelId=3B6E14AC0104
 void Connection::reg(bool reliable, bool unreliable) {
   regSync.acquire();
   if (reliable && rlistener == NULL) {
@@ -322,7 +297,6 @@ void Connection::reg(bool reliable, bool unreliable) {
   regSync.release();
 }
 
-//##ModelId=3B6E14AC01D6
 void Connection::unreg(bool reliable, bool unreliable) {
   regSync.acquire();
   if (reliable && rlistener != NULL) {

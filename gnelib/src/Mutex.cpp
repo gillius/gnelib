@@ -30,7 +30,6 @@ struct Mutex::MutexData {
 #endif
 };
 
-//##ModelId=3B075381014B
 Mutex::Mutex() {
   data = new MutexData();
 #ifdef WIN32
@@ -44,7 +43,6 @@ Mutex::Mutex() {
 #endif
 }
 
-//##ModelId=3B075381014C
 Mutex::~Mutex() {
 #ifdef WIN32
   DeleteCriticalSection(&data->mutex);
@@ -53,7 +51,6 @@ Mutex::~Mutex() {
 #endif
 }
 
-//##ModelId=3B075381014E
 void Mutex::acquire() {
 #ifdef WIN32
   EnterCriticalSection(&data->mutex);
@@ -62,7 +59,6 @@ void Mutex::acquire() {
 #endif
 }
 
-//##ModelId=3B075381014F
 void Mutex::release() {
 #ifdef WIN32
   LeaveCriticalSection(&data->mutex);

@@ -22,19 +22,15 @@
 
 namespace GNE {
 
-//##ModelId=3B0753810120
 ListServerConnection::ListServerConnection(std::string address) {
 }
 
-//##ModelId=3B0753810122
 ListServerConnection::~ListServerConnection() {
 }
 
-//##ModelId=3B0753810124
 void ListServerConnection::setGame(std::string gameName) {
 }
 
-//##ModelId=3B0753810126
 void ListServerConnection::getGameList() {
 }
 

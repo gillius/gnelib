@@ -41,7 +41,6 @@ class SyncConnection;
  * When you create a new Connection, you will want to register a
  * ConnectionListener for it so you can receive its events.
  */
-//##ModelId=3B075380029E
 class Connection {
 public:
   /**
@@ -51,7 +50,6 @@ public:
    *        with but must be set before performing any other operations on
    *        this Connection instance.
    */
-  //##ModelId=3B0753810073
   Connection(ConnectionListener* listener = NULL);
 
   /**
@@ -59,7 +57,6 @@ public:
    * is destructed.  Connections won't allocate or deallocate their listeners,
    * so you may want to delete your listener that was registered
    */
-  //##ModelId=3B0753810076
   virtual ~Connection();
 
   /**
@@ -67,7 +64,6 @@ public:
    * delete your registered user right after disconnection, so you won't have
    * to keep track of the pointer after you allocate it.
    */
-  //##ModelId=3BCE75A80280
   ConnectionListener* getListener() const;
 
   /**
@@ -90,14 +86,12 @@ public:
    * listener to discard all events before you wrap this Connection with a
    * SyncConnection.
    */
-  //##ModelId=3BCE75A80282
   void setListener(ConnectionListener* listener);
 
   /**
    * Returns the timeout for this connection.
    * @see setTimeout
    */
-  //##ModelId=3CC4E33800A1
   int getTimeout();
 
   /**
@@ -109,14 +103,12 @@ public:
    * events sets the "timeout counter" back to zero to say it another way.
    * @see GNE::ConnectionListener::onTimeout
    */
-  //##ModelId=3CC4E33800A2
   void setTimeout(int ms);
 
   /**
    * Returns the PacketStream associated with this class.  Writing and
    * reading through this Connection is done through this PacketStream.
    */
-  //##ModelId=3B0753810078
   PacketStream& stream();
 
   /**
@@ -130,7 +122,6 @@ public:
    * @see ConnectionStats
    * @see GNE::enableStats
    */
-  //##ModelId=3B0753810079
   ConnectionStats getStats(int reliable) const;
 
   /**
@@ -141,7 +132,6 @@ public:
    *                 want the address of.
    * @see GNE::Address
    */
-  //##ModelId=3B075381007B
   Address getLocalAddress(bool reliable) const;
 
   /**
@@ -152,13 +142,11 @@ public:
    *                 want the address of.
    * @see GNE::Address
    */
-  //##ModelId=3B075381007E
   Address getRemoteAddress(bool reliable) const;
 
   /**
    * Returns true if this Connection is active and ready to send/recieve.
    */
-  //##ModelId=3B0753810081
   bool isConnected() const;
 
   /**
@@ -170,7 +158,6 @@ public:
    * disconnect.
    * @see #disconnectSendAll()
    */
-  //##ModelId=3B0753810083
   void disconnect();
 
   /**
@@ -182,7 +169,6 @@ public:
    *        packet queue to clear.
    * @see #disconnect()
    */
-  //##ModelId=3B0753810084
   void disconnectSendAll(int waitTime = 10000);
 
 protected:
@@ -192,14 +178,12 @@ protected:
    * A utility function for ServerConnection and ClientConnection to add the
    * standard header onto the connection packets.
    */
-  //##ModelId=3C82ADDA0093
   void addHeader(RawPacket& raw);
 
   /**
    * A utility function for ServerConnection and ClientConnection to add the
    * version information to a packet.
    */
-  //##ModelId=3C82ADDA00A7
   void addVersions(RawPacket& raw);
 
   /**
@@ -213,7 +197,6 @@ protected:
    * @throw ProtocolViolation if the next bytes of the RawPacket is not the
    *                          proper %GNE header.
    */
-  //##ModelId=3C82ABA50326
   void checkHeader(RawPacket& raw,
     ProtocolViolation::ViolationType t = ProtocolViolation::OtherViolation);
 
@@ -227,31 +210,26 @@ protected:
    * @throw WrongGame if the game names don't match.
    * @throw UserVersionMismatch if the user version numbers don't match.
    */
-  //##ModelId=3C82ABA5036C
   void checkVersions(RawPacket& raw);
 
   //For information about events, see the ConnectionListener class.
-  //##ModelId=3B07538100AC
   void onReceive();
 
   /**
    * The pair of sockets.
    */
-  //##ModelId=3BB2CB410263
   SocketPair sockets;
 
   /**
    * The PacketStream associated with this Connection.  This object also
    * contains information about the in and out connection rates.
    */
-  //##ModelId=3B075381006E
   PacketStream* ps;
 
   /**
    * The connecting has just finished and the flags need to be changed.
    * Since this needs a mutex, we make a function to handle this.
    */
-  //##ModelId=3C30E3FF01DE
   void finishedConnecting();
 
   /**
@@ -259,13 +237,11 @@ protected:
    * for communications, but still want to disconnect.  This will be set
    * after the sockets are registered and the PacketStream is active.
    */
-  //##ModelId=3BDB10A302F8
   bool connecting;
 
   /**
    * Is this Connection active and ready for communications?
    */
-  //##ModelId=3B0753810072
   bool connected;
 
   /**
@@ -282,7 +258,6 @@ protected:
    * @see #onReceive(bool)
    * @see #unreg(bool, bool)
    */
-  //##ModelId=3B6E14AC0104
   void reg(bool reliable, bool unreliable);
 
   /**
@@ -292,27 +267,20 @@ protected:
    * registered.  Trying to unregister sockets that are already unregistered
    * will result in no effect.
    */
-  //##ModelId=3B6E14AC01D6
   void unreg(bool reliable, bool unreliable);
 
 private:
-  //##ModelId=3B07538002A0
   class Listener : public ReceiveEventListener {
   public:
-    //##ModelId=3B075381004E
     Listener(Connection& listener, bool isReliable);
 
-    //##ModelId=3B0753810051
     virtual ~Listener();
 
-    //##ModelId=3B0753810053
     void onReceive();
 
   private:
-    //##ModelId=3B0753810049
     Connection& conn;
 
-    //##ModelId=3B075381004D
     bool reliable;
 
   };
@@ -326,17 +294,13 @@ private:
   /**
    * Used to keep some functions thread-safe.
    */
-  //##ModelId=3BC3B98001C3
   Mutex sync;
   //Used for reg and unreg functions.
-  //##ModelId=3C46133F02D5
   Mutex regSync;
 
   //Possible ReceiveEventListeners that may or may not exist, but if they do
   //we need to kill them on exit.
-  //##ModelId=3B6E14AC00FB
   Listener* rlistener;
-  //##ModelId=3B6E14AC0100
   Listener* ulistener;
 
   //PacketStream might call our processError function.
@@ -348,21 +312,18 @@ private:
   /**
    * Parses the packets recieved, then calls onReceive.
    */
-  //##ModelId=3B07538100B0
   void onReceive(bool reliable);
 
   /**
    * When we get an ExitPacket we want to ignore any further errors,
    * espically NL_MESSAGE_END.
    */
-  //##ModelId=3C73170D0055
   bool exiting;
 
   /**
    * Determines whether the error given is fatal or non-fatal, and calls the
    * appropriate event, and handles disconnects if necessary.
    */
-  //##ModelId=3BB4208C0280
   void processError(const Error& error);
 };
 

@@ -29,7 +29,6 @@
  * a few global functions, some constants, classes, and the GNE::Console
  * namespace, which holds the console IO functions.
  */
-//##ModelId=3AE26ED703DE
 namespace GNE {
   class Address;
   class ConnectionEventGenerator;
@@ -102,13 +101,9 @@ namespace GNE {
    */
   int getOpenConnections();
 
-//##ModelId=3C5CED0500EC
   struct GNEProtocolVersionNumber {
-  //##ModelId=3C65C7A20213
     guint8 version;
-  //##ModelId=3C65C7A20218
     guint8 subVersion;
-  //##ModelId=3C65C7A20220
     guint16 build;
   };
 

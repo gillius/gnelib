@@ -26,7 +26,6 @@
 
 namespace GNE {
 
-//##ModelId=3B07538100B9
 ConnectionEventGenerator::ConnectionEventGenerator() 
 : Thread("EventGen", Thread::HIGH_PRI), group(NL_INVALID) {
   group = nlGroupCreate();
@@ -35,7 +34,6 @@ ConnectionEventGenerator::ConnectionEventGenerator()
   gnedbgo(5, "created");
 }
 
-//##ModelId=3B07538100BA
 ConnectionEventGenerator::~ConnectionEventGenerator() {
   nlGroupDestroy(group);
   delete[] sockBuf;
@@ -50,7 +48,6 @@ ConnectionEventGenerator::~ConnectionEventGenerator() {
  *      are ignored, and the call is made again (or in debug mode, the
  *      assert fails).
  */
-//##ModelId=3B07538100BC
 void ConnectionEventGenerator::run() {
   while (!shutdown) {
     mapCtrl.acquire();
@@ -86,7 +83,6 @@ void ConnectionEventGenerator::run() {
   }
 }
 
-//##ModelId=3B07538100BD
 void ConnectionEventGenerator::reg(NLsocket socket, ReceiveEventListener* conn) {
   assert(socket != NL_INVALID);
   mapCtrl.acquire();
@@ -97,7 +93,6 @@ void ConnectionEventGenerator::reg(NLsocket socket, ReceiveEventListener* conn) 
                     // registered, and it is sleeping.
 }
 
-//##ModelId=3B07538100DD
 void ConnectionEventGenerator::unreg(NLsocket socket) {
   assert(socket != NL_INVALID);
   mapCtrl.acquire();
@@ -107,7 +102,6 @@ void ConnectionEventGenerator::unreg(NLsocket socket) {
   mapCtrl.release();
 }
 
-//##ModelId=3B07538100DF
 void ConnectionEventGenerator::shutDown() {
   Thread::shutDown();
   mapCtrl.signal();

@@ -44,13 +44,11 @@ class Time;
  * object.  When this thread reawakens, it waits to lock the associated mutex
  * then exits the wait call.
  */
-//##ModelId=3B0753800271
 class ConditionVariable {
 public:
   /**
    * Initalizes this class creating a new mutex.
    */
-  //##ModelId=3B07538003CD
   ConditionVariable();
 
   /**
@@ -59,24 +57,20 @@ public:
    * @param m the mutex to be associated with this conditional variable.
    *          this mutex will not be deallocated.
    */
-  //##ModelId=3B07538003CE
   ConditionVariable(Mutex* m);
 
-  //##ModelId=3B07538003D0
   virtual ~ConditionVariable();
 
   /**
    * Locks the associated mutex for this condition variable.
    * @see Mutex#acquire()
    */
-  //##ModelId=3B0753810000
   void acquire();
 
   /**
    * Releases the associated mutex.
    * @see Mutex#release()
    */
-  //##ModelId=3B0753810001
   void release();
 
   /**
@@ -85,7 +79,6 @@ public:
    * is called.  wait() will unlock the mutex and block until woken up at
    * which point it will re-acquire the mutex.
    */
-  //##ModelId=3B0753810002
   void wait();
 
   /**
@@ -94,26 +87,22 @@ public:
    * reacquired.
    * @param timeout the time to wait in milliseconds
    */
-  //##ModelId=3B0753810003
   void timedWait(int ms);
 
   /**
    * Waits until the given time, specified in absolute time.
    */
-  //##ModelId=3CC4E338006F
   void timedWait(const Time& until);
 
   /**
    * Wakes up at least one thread waiting on this CV.  Which thread wakes up
    * is implementation dependant.
    */
-  //##ModelId=3B0753810005
   void signal();
 
   /**
    * Wakes up all threads waiting on this CV.
    */
-  //##ModelId=3B0753810006
   void broadcast();
 
 private:
@@ -123,22 +112,18 @@ private:
 #ifdef WIN32
   //The Windows implementation of condition variables comes from the Boost
   //C++ library.
-  //##ModelId=3CBD09C7036F
   void initBoostCode();
-  //##ModelId=3CBD09C70379
   void enter_wait();
 #endif
 
   /**
    * is the mutex pointer we have our mutex we should delete?
    */
-  //##ModelId=3B07538003C7
   bool ourMutex;
 
   /**
    * The mutex associated with this Conditional Variable
    */
-  //##ModelId=3B07538003C9
   Mutex* mutex;
 };
 

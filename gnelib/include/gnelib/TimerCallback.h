@@ -27,19 +27,15 @@ namespace GNE {
  * A pure interface class for usage in the Timer class.  Inherit from this
  * class and define timerCallback.
  */
-//##ModelId=3B075380037C
 class TimerCallback {
 public:
-  //##ModelId=3B075382006B
   TimerCallback();
 
-  //##ModelId=3B075382006C
   virtual ~TimerCallback();
 
   /**
    * The function that the Timer calls at its firing rate.
    */
-  //##ModelId=3B075382006E
   virtual void timerCallback() = 0;
 
 };

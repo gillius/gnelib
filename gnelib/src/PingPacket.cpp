@@ -27,15 +27,11 @@
 
 namespace GNE {
 
-//##ModelId=3C65C6D000C7
 const int PingPacket::ID = 4;
-//##ModelId=3C65C7A20259
 Mutex PingPacket::sync;
-//##ModelId=3C65C7A20263
 guint32 PingPacket::nextReqId = 0;
 std::map<guint32, Time> PingPacket::requests;
 
-//##ModelId=3C65C6D000CD
 PingPacket::PingPacket(bool makeReq) : Packet(ID), isReq(gTrue) {
   //makeReq is false when creating a packet just for reading.
   if (makeReq) {
@@ -52,21 +48,17 @@ PingPacket::PingPacket(bool makeReq) : Packet(ID), isReq(gTrue) {
   }
 }
 
-//##ModelId=3C65C6D000CF
 PingPacket::~PingPacket() {
 }
 
-//##ModelId=3C65C6D000D1
 bool PingPacket::isRequest() {
   return (isReq != gFalse);
 }
 
-//##ModelId=3C65C6D000D2
 void PingPacket::makeReply() {
   isReq = gFalse;
 }
 
-//##ModelId=3C65C6D000D3
 Time PingPacket::getPing() {
   assert(!isRequest());
   Time ret(0, 0);
@@ -82,7 +74,6 @@ Time PingPacket::getPing() {
   return ret;
 }
 
-//##ModelId=3C65C6D000D4
 int PingPacket::recoverLostRequests(Time limit) {
   int ret = 0;
   Time late = Timer::getCurrentTime() - limit;
@@ -101,7 +92,6 @@ int PingPacket::recoverLostRequests(Time limit) {
   return ret;
 }
 
-//##ModelId=3C67292703D9
 int PingPacket::reqsPending() {
   sync.acquire();
   int ret = requests.size();
@@ -109,29 +99,24 @@ int PingPacket::reqsPending() {
   return ret;
 }
 
-//##ModelId=3C65C6D000D7
 Packet* PingPacket::makeClone() const {
   return new PingPacket(*this);
 }
 
-//##ModelId=3C65C6D000D9
 int PingPacket::getSize() const {
   return Packet::getSize() + sizeof(isReq) + sizeof(reqId);
 }
 
-//##ModelId=3C65C6D000DB
 void PingPacket::writePacket(RawPacket& raw) const {
   Packet::writePacket(raw);
   raw << isReq << reqId;
 }
 
-//##ModelId=3C65C6D000DE
 void PingPacket::readPacket(RawPacket& raw) {
   Packet::readPacket(raw);
   raw >> isReq >> reqId;
 }
 
-//##ModelId=3C65C6D000E1
 Packet* PingPacket::create() {
   return new PingPacket(false);
 }

@@ -41,16 +41,13 @@ namespace Console {
 //  ConsoleMutex implementation
 //
 //--------------------------------
-//##ModelId=3BF88CAB02E7
 ConsoleMutex::ConsoleMutex(bool isAcquiring, Mutex& syncMutex) 
 : acq(isAcquiring), sync(syncMutex) {
 }
 
-//##ModelId=3BF88CAB02EA
 ConsoleMutex::~ConsoleMutex() {
 }
 
-//##ModelId=3BF88CAB02EB
 void ConsoleMutex::action(std::ostream& o) const {
   if (acq)
     sync.acquire();
@@ -63,15 +60,12 @@ void ConsoleMutex::action(std::ostream& o) const {
 //     moveTo implementation
 //
 //--------------------------------
-//##ModelId=3BF8BBF9034D
 moveTo::moveTo(int xLoc, int yLoc) : x(xLoc), y(yLoc) {
 }
 
-//##ModelId=3BF8BBF90350
 moveTo::~moveTo() {
 }
 
-//##ModelId=3BF8BBF90352
 void moveTo::action(std::ostream& o) const {
   ((goutbuf*)(o.rdbuf()))->setNextWriteLoc(x, y);
 }

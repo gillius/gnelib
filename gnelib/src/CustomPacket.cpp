@@ -24,20 +24,16 @@
 
 namespace GNE {
 
-//##ModelId=3C65C6D00076
 const int CustomPacket::ID = 1;
 
-//##ModelId=3C0B257E03C4
 CustomPacket::CustomPacket()
   : Packet(ID), data(NULL), ourBuf(NULL), contentLen(-1) {
 }
 
-//##ModelId=3C0B257E03C5
 CustomPacket::~CustomPacket() {
   destroyData();
 }
 
-//##ModelId=3C0B257E03C7
 RawPacket& CustomPacket::getData() {
   if (data == NULL) {
     //create a new RawPacket for writing
@@ -48,12 +44,10 @@ RawPacket& CustomPacket::getData() {
   return *data;
 }
 
-//##ModelId=3C7E97B80267
 void CustomPacket::reset() {
   destroyData();
 }
 
-//##ModelId=3C0B257E03C8
 Packet* CustomPacket::makeClone() const {
   assert(data != NULL);
   assert(data->getPosition() > 0 && data->getPosition() <= getMaxUserDataSize());
@@ -63,18 +57,15 @@ Packet* CustomPacket::makeClone() const {
   return ret;
 }
 
-//##ModelId=3C0B257E03CA
 int CustomPacket::getSize() const {
   return Packet::getSize() + sizeof(guint16) + data->getPosition();
 }
 
-//##ModelId=3C30EFBD0226
 int CustomPacket::getMaxUserDataSize() {
   Packet packet;
   return RawPacket::RAW_PACKET_LEN - packet.getSize() - sizeof(guint16);
 }
 
-//##ModelId=3C0B257E03CC
 void CustomPacket::writePacket(RawPacket& raw) const {
   assert(data != NULL);
   //We might have a cached contentLen which we kept only to be 
@@ -86,7 +77,6 @@ void CustomPacket::writePacket(RawPacket& raw) const {
   raw.writeRaw(data->getData(), pos);
 }
 
-//##ModelId=3C0B257E03CF
 void CustomPacket::readPacket(RawPacket& raw) {
   Packet::readPacket(raw);
   destroyData();
@@ -100,12 +90,10 @@ void CustomPacket::readPacket(RawPacket& raw) {
   data = new RawPacket(ourBuf);
 }
 
-//##ModelId=3C0B257E03D2
 Packet* CustomPacket::create() {
   return new CustomPacket;
 }
 
-//##ModelId=3C0B257E03D4
 void CustomPacket::destroyData() {
   delete[] ourBuf;
   delete data;

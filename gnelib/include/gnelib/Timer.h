@@ -39,7 +39,6 @@ class TimerCallback;
  * A Timer thread runs with a higher priority than the main thread, therefore
  * its callbacks are suitable for short, quick tasks.
  */
-//##ModelId=3B075380037B
 class Timer : public Thread {
 public:
   /**
@@ -53,7 +52,6 @@ public:
    * @param destroy should the callback be destroyed when this object is
    *        destroyed (this is done with the delete operator)?
    */
-  //##ModelId=3B0753820030
   Timer(TimerCallback* callback, int rate, bool destroy);
 
   /**
@@ -69,7 +67,6 @@ public:
    * object could delete a Timer, but not from the same thread the callback
    * function is called in (see exnetperf's StatsDisplay for an example).
    */
-  //##ModelId=3B0753820034
   virtual ~Timer();
 
   /**
@@ -77,7 +74,6 @@ public:
    * usually a very high precision timer that likely provides microsecond
    * or better resolution.
    */
-  //##ModelId=3B0753820036
   static Time getCurrentTime();
 
   /**
@@ -86,14 +82,12 @@ public:
    * The time returned is an absolute time, usually relative to midnight,
    * Jan 1, 1970.
    */
-  //##ModelId=3B0753820065
   static Time getAbsoluteTime();
 
   /**
    * Starts the timer running and calling the callback.  If the timer has
    * already started, this call will have no effect.
    */
-  //##ModelId=3B0753820067
   void startTimer();
 
   /**
@@ -109,43 +103,36 @@ public:
    *
    * If a Timer is already stopped, this function will have no effect.
    */
-  //##ModelId=3B0753820068
   void stopTimer(bool waitForEnd);
 
 protected:
   /**
    * This is the thread that will perform the callbacks.
    */
-  //##ModelId=3B0753820069
   void run();
 
 private:
   /**
    * Next time the callbacks will be activated.
    */
-  //##ModelId=3B07538103FB
   Time nextTime;
 
   /**
    * The callback rate in microseconds.  This is different from the accepted
    * parameter in the constructor of milliseconds.
    */
-  //##ModelId=3B0753820029
   int callbackRate;
 
-  //##ModelId=3B075382002B
   TimerCallback* listener;
 
   /**
    * Should listener be destroyed with this object?
    */
-  //##ModelId=3B075382002F
   bool destroyListener;
 
   /**
    * Provides syncronization for some functions to make them thread safe.
    */
-  //##ModelId=3C30E3FF029D
   Mutex sync;
 
 };

@@ -32,13 +32,10 @@ class ReceiveEventListener;
  * of GNE should not need to use or know about this class.  This class uses
  * nlPollGroup to check for events comming in on sockets.
  */
-//##ModelId=3B07538002A1
 class ConnectionEventGenerator : public Thread {
 public:
-  //##ModelId=3B07538100B9
   ConnectionEventGenerator();
 
-  //##ModelId=3B07538100BA
   virtual ~ConnectionEventGenerator();
 
   /**
@@ -46,41 +43,33 @@ public:
    * @param socket the low-level HawkNL socket for this connection.
    * @param conn the Connection class associated with the socket.
    */
-  //##ModelId=3B07538100BD
   void reg(NLsocket socket, ReceiveEventListener* conn);
 
   /**
    * Removes a Connection.
    * @param socket the low-level HawkNL socket for this connection.
    */
-  //##ModelId=3B07538100DD
   void unreg(NLsocket socket);
 
   /**
    * Tells the event generator to shutdown.  This function is called
    * internally on library cleanup, so you should not call it.
    */
-  //##ModelId=3B07538100DF
   void shutDown();
 
 protected:
  /**
    * The thread that listens for events.
    */
-  //##ModelId=3B07538100BC
   void run();
 
 private:
-  //##ModelId=3AE358F701FE
   NLint group;
 
-  //##ModelId=3AE35A87032A
   std::map<NLsocket, ReceiveEventListener*> connections;
 
-  //##ModelId=3B0167440348
   NLsocket* sockBuf;
 
-  //##ModelId=3B07538100B5
   ConditionVariable mapCtrl;
 };
 

@@ -33,7 +33,6 @@ class Address;
  * class, except to possibly pass it to another Connection type class to
  * "evolve" a SyncConnection to an asyncronous type.
  */
-//##ModelId=3BB2341D01FE
 class SocketPair {
 public:
   /**
@@ -41,39 +40,33 @@ public:
    * The value NL_INVALID should always be used for sockets that are not
    * active.
    */
-  //##ModelId=3BB2348D0348
   SocketPair(NLsocket reliable = NL_INVALID, NLsocket unreliable = NL_INVALID);
 
   /**
    * Since this is just a class to contain the sockets, the sockets are not
    * disconnected on exit.
    */
-  //##ModelId=3BB2349B015E
   ~SocketPair();
 
   /**
    * Calls a low-level disconnect (nlClose) on both sockets, if they are not
    * NL_INVALID, and then sets them to NL_INVALID.
    */
-  //##ModelId=3BB2351603A2
   void disconnect();
 
   /**
    * @see GNE::Connection::getLocalAddress
    */
-  //##ModelId=3BB2CB41030C
   Address getLocalAddress(bool reliable) const;
 
   /**
    * @see GNE::Connection::getRemoteAddress
    */
-  //##ModelId=3BB2CB41037A
   Address getRemoteAddress(bool reliable) const;
 
   /**
    * @see GNE::Connection::getStats
    */
-  //##ModelId=3C106F030036
   ConnectionStats getStats(int reliable) const;
 
   /**
@@ -82,7 +75,6 @@ public:
    * @param buf data arrives in this buffer.
    * @param bufSize the size of buf.
    */
-  //##ModelId=3B6B302400CA
   int rawRead(bool reliable, const gbyte* buf, int bufSize) const;
 
   /**
@@ -93,19 +85,16 @@ public:
    * @param buf data to be sent.
    * @param bufSize the size of data to be sent.
    */
-  //##ModelId=3B6B302401D6
   int rawWrite(bool reliable, const gbyte* buf, int bufSize) const;
 
   /**
    * The reliable socket.
    */
-  //##ModelId=3BB2346A0208
   NLsocket r;
 
   /**
    * The unreliable socket.
    */
-  //##ModelId=3BB234640280
   NLsocket u;
 };
 

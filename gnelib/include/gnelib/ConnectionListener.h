@@ -52,10 +52,8 @@ class SyncConnection;
  *
  * @see ServerConnectionListener::onListenFailure
  */
-//##ModelId=3BCA810C0276
 class ConnectionListener {
 public:
-  //##ModelId=3BCA817C0046
   virtual ~ConnectionListener();
 
   /**
@@ -64,7 +62,6 @@ public:
    * is no need to create your own listener.  This listener will ignore all
    * events.
    */
-  //##ModelId=3C09B42D0144
   static ConnectionListener* getNullListener();
 
   /**
@@ -92,7 +89,6 @@ public:
    *
    * @throw Error if an error occurs and the connection was not successful.
    */
-  //##ModelId=3BCA83910078
   virtual void onConnect(SyncConnection& conn);
 
   /**
@@ -120,7 +116,6 @@ public:
    * Note: Only ClientConnection generates this event.
    * @see Connection::disconnect()
    */
-   //##ModelId=3BCA83920262
   virtual void onConnectFailure(const Error& error);
 
   /**
@@ -162,7 +157,6 @@ public:
    *
    * @throw Error if an error occurs and the connection was not successful.
    */
-  //##ModelId=3BCFAE5900AA
   virtual void onNewConn(SyncConnection& newConn);
 
   /**
@@ -191,7 +185,6 @@ public:
    * might a onDisconnect event be generated.
    * @see ~Connection()
    */
-  //##ModelId=3BCA83BA02F8
   virtual void onDisconnect();
 
   /**
@@ -204,7 +197,6 @@ public:
    * is only a single event thread per connection.  Therefore, no other
    * events will be called until this function completes for this connection.
    */
-  //##ModelId=3C70672B0357
   virtual void onExit();
 
   /**
@@ -226,7 +218,6 @@ public:
    * keep onTimeout events from occuring, you have to send them yourself and
    * respond to them yourself as well.
    */
-  //##ModelId=3CC4E33800BF
   virtual void onTimeout();
 
   /**
@@ -245,7 +236,6 @@ public:
    * @see onFailure()
    * @see disconnect()
    */
-  //##ModelId=3BCA83C600B4
   virtual void onError(const Error& error);
 
   /**
@@ -260,7 +250,6 @@ public:
    *
    * @see onError()
    */
-  //##ModelId=3BCA83C803A2
   virtual void onFailure(const Error& error);
 
   /**
@@ -274,7 +263,6 @@ public:
    * is only a single event thread per connection.  Therefore, no other
    * events will be called until this function completes for this connection.
    */
-  //##ModelId=3BCA83CF0208
   virtual void onReceive();
 
 };

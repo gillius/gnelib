@@ -32,46 +32,38 @@ namespace GNE {
  */
 class ExitPacket : public Packet {
 public:
-  //##ModelId=3C7071E00170
   ExitPacket();
 
-  //##ModelId=3C7071E00171
   virtual ~ExitPacket();
 
   /**
    * The ID for this type of packet.
    */
-  //##ModelId=3C7071E0016F
   static const int ID;
 
   /**
    * Returns a newly allocated exact copy of this packet.
    */
-  //##ModelId=3C7071E00173
   virtual Packet* makeClone() const;
 
   /**
    * Returns the current size of this packet in bytes.
    */
-  //##ModelId=3C7071E00178
   virtual int getSize() const;
 
   /**
    * Writes the packet to the given RawPacket. 
    */
-  //##ModelId=3C7071E0017A
   virtual void writePacket(RawPacket& raw) const;
 
   /**
    * Reads this packet from the given RawPacket.
    */
-  //##ModelId=3C7071E0017D
   virtual void readPacket(RawPacket& raw);
 
   /**
    * Returns a new instance of this class using the default constructor.
    */
-  //##ModelId=3C7071E00180
   static Packet* create();
 
 private:

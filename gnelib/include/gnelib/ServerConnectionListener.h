@@ -34,20 +34,17 @@ class ConnectionParams;
  * overriding the functions from Connection and ClientConnection based on the
  * events you wish to respond to.
  */
-//##ModelId=3B0753800349
 class ServerConnectionListener {
 public:
   /**
    * Initalizes this class.
    */
-  //##ModelId=3B07538102E4
   ServerConnectionListener();
 
   /**
    * The destructor will close down a listening object, so when you are done
    * listening, just destroy this object.
    */
-  //##ModelId=3B0753810303
   virtual ~ServerConnectionListener();
 
   /**
@@ -55,7 +52,6 @@ public:
    * @param port the port to listen on.
    * @return true if could not open a socket on the port.
    */
-  //##ModelId=3B0753810305
   bool open(int port);
 
   /**
@@ -65,20 +61,17 @@ public:
    * @see onListenFailure
    * @return true, if there was an error.
    */
-  //##ModelId=3B0753810307
   bool listen();
 
   /**
    * Returns true if this ServerConnectionListener is active.
    */
-  //##ModelId=3B0753810308
   bool isListening() const;
 
   /**
    * Returns the address of the listening socket.  The socket must be opened
    * when this function is called, but does not have to be listening.
    */
-  //##ModelId=3B075381030D
   Address getLocalAddress() const;
 
 protected:
@@ -102,7 +95,6 @@ protected:
    *                 getNewConnectionParams.  If it is NULL, then
    *                 getNewConnectionParams was never called.
    */
-  //##ModelId=3B075381030A
   virtual void onListenFailure(const Error& error, const Address& from,
                                ConnectionListener* listener) = 0;
 
@@ -123,7 +115,6 @@ protected:
    * @param listener The listener than you returned from
    *                 getNewConnectionParams.
    */
-  //##ModelId=3C8435E6012D
   virtual void onListenSuccess(ConnectionListener* listener);
 
   /**
@@ -139,42 +130,32 @@ protected:
    *
    * This function can be called from multiple threads at the same time.
    */
-  //##ModelId=3BCFAE5A0064
   virtual void getNewConnectionParams(ConnectionParams& params) = 0;
 
 private:
   //This is simply so that ServerConnection can call onListenFailure when it fails.
   friend class ServerConnection;
 
-  //##ModelId=3B075380034A
   class ServerListener : public ReceiveEventListener {
   public:
-    //##ModelId=3B07538102D0
     ServerListener(ServerConnectionListener& listener);
 
-    //##ModelId=3B07538102D2
     virtual ~ServerListener();
 
-    //##ModelId=3B07538102D4
     void onReceive();
 
   private:
-    //##ModelId=3B075381029E
     ServerConnectionListener& conn;
 
   };
   friend class ServerListener;
 
-  //##ModelId=3B075381030F
   void onReceive();
 
-  //##ModelId=3B07538102D7
   bool listening;
 
-  //##ModelId=3B07538102D9
   ServerListener* listener;
 
-  //##ModelId=3B01D48100DC
   NLsocket socket;
 };
 

@@ -42,7 +42,6 @@ class Packet;
  *
  * See the example "expacket" for an example of the usage of this class.
  */
-//##ModelId=3B075380030F
 class RawPacket {
 public:
   /**
@@ -55,7 +54,6 @@ public:
    *               readable object, which you will destroy after this object
    *               has been destroyed.
    */
-  //##ModelId=3B075381022A
   RawPacket(gbyte* buffer = NULL);
 
   /**
@@ -63,14 +61,12 @@ public:
    * so you cannot use any pointers you got back from getData() after this
    * point.
    */
-  //##ModelId=3B075381022C
   virtual ~RawPacket();
 
   /**
    * Gets the raw block of data.  This will be used by the library to get the
    * data that will actually be sent out to the socket.
    */
-  //##ModelId=3B075381022E
   const gbyte* getData() const;
 
   /**
@@ -81,7 +77,6 @@ public:
    * read thus far.  This way you can tell how much was written or how much
    * was read back in bytes.
    */
-  //##ModelId=3B0753810230
   int getPosition() const;
 
   /**
@@ -89,7 +84,6 @@ public:
    * essentially "erases" all data, and when reading this starts reading
    * from the beginning again.
    */
-  //##ModelId=3B0753810232
   void reset();
 
   /**
@@ -97,54 +91,41 @@ public:
    * in your overridden Packet::getSize method to find the size of strings.
    * For all other primitives, use sizeof(variable).
    */
-  //##ModelId=3CE60C49010A
   static int getStringSize(std::string x) { return (int)(x.size() + 1); }
 
   /**
    * Returns the maximum possible serialized size of a string of the given
    * length in ASCII characters.
    */
-  //##ModelId=3CE60C49011E
   static int getStringSize(int x) { return x + 1; }
 
   /**
    * Writes raw data starting at the current position.  This acts similar to
    * the memcpy function.
    */
-  //##ModelId=3B0753810233
   void writeRaw(const gbyte* block, int length);
 
   /**
    * Like writeRaw, but just the other way around now :).
    * @see writeRaw
    */
-  //##ModelId=3B0753810236
   void readRaw(gbyte* block, int length);
 
   /**
    * Stream operators for writing to this RawPacket.  All data is converted
    * when appropriate into little endian format.
    */
-  //##ModelId=3B0753810239
   RawPacket& operator << (gint8 x);
   /**
    * This operator also works for gbool and gbyte.
    */
-  //##ModelId=3B075381023B
   RawPacket& operator << (guint8 x);
-  //##ModelId=3B075381023D
   RawPacket& operator << (gint16 x);
-  //##ModelId=3B075381023F
   RawPacket& operator << (guint16 x);
-  //##ModelId=3B0753810241
   RawPacket& operator << (gint32 x);
-  //##ModelId=3B0753810243
   RawPacket& operator << (guint32 x);
-  //##ModelId=3B0753810245
   RawPacket& operator << (gsingle x);
-  //##ModelId=3B0753810262
   RawPacket& operator << (gdouble x);
-  //##ModelId=3B0753810264
   RawPacket& operator << (const std::string& x);
 
   /**
@@ -152,33 +133,23 @@ public:
    * packet's writePacket function.
    * @see Packet::writePacket
    */
-  //##ModelId=3B0C2CE50226
   RawPacket& operator << (const Packet& packet);
 
   /**
    * Stream operators for reading from this RawPacket.  All data is converted
    * when appropriate from big endian format.
    */
-  //##ModelId=3B0753810266
   RawPacket& operator >> (gint8& x);
   /**
    * This operator also works for gbool and gbyte.
    */
-  //##ModelId=3B0753810268
   RawPacket& operator >> (guint8& x);
-  //##ModelId=3B075381026A
   RawPacket& operator >> (gint16& x);
-  //##ModelId=3B075381026C
   RawPacket& operator >> (guint16& x);
-  //##ModelId=3B075381026E
   RawPacket& operator >> (gint32& x);
-  //##ModelId=3B0753810270
   RawPacket& operator >> (guint32& x);
-  //##ModelId=3B0753810272
   RawPacket& operator >> (gsingle& x);
-  //##ModelId=3B0753810274
   RawPacket& operator >> (gdouble& x);
-  //##ModelId=3B0753810276
   RawPacket& operator >> (std::string& x);
 
   /**
@@ -188,27 +159,22 @@ public:
    * @see PacketParser::parseNextPacket
    * @see Packet::readPacket
    */
-  //##ModelId=3B0C2CE503A2
   RawPacket& operator >> (Packet& packet);
 
   /**
    * The max length of a RawPacket.  The internal buffer for a RawPacket
    * used for writing will always have a buffer of this size.
    */
-  //##ModelId=3B0753810226
   static const int RAW_PACKET_LEN;
 
 private:
-  //##ModelId=3B0753810227
   bool ourBuffer;
 
-  //##ModelId=3C65C7A2028B
   gbyte* data;
 
   /**
    * The current location of the next data read/write.
    */
-  //##ModelId=3B0753810229
   int currLoc;
 
 };

@@ -31,16 +31,13 @@ namespace GNE {
  * owns the mutex, then a second lock will not deadlock.  You need to unlock
  * the mutex the same number of times it was locked to unlock it.
  */
-//##ModelId=3B07538002DE
 class Mutex {
 public:
   /**
    * Initalizes this mutex.
    */
-  //##ModelId=3B075381014B
   Mutex();
 
-  //##ModelId=3B075381014C
   virtual ~Mutex();
 
   /**
@@ -49,13 +46,11 @@ public:
    *     <li>If the mutex is locked, wait for it to become unlocked, then go
    *         to step 1.</li></ol>
    */
-  //##ModelId=3B075381014E
   void acquire();
 
   /**
    * Releases a locked mutex.
    */
-  //##ModelId=3B075381014F
   void release();
 
 private:
@@ -79,28 +74,21 @@ private:
  * early, and provide additional features, but its core functionality will
  * remain the same.
  */
-//##ModelId=3C5CED0500F6
 class LockMutex {
 public:
-  //##ModelId=3C5CED050263
   LockMutex(Mutex& mutexToLock) : mutex(mutexToLock) {
     mutex.acquire();
   }
 
-  //##ModelId=3C5CED050265
   ~LockMutex() {
     mutex.release();
   }
 private:
   //LockMutex cannot be copied or constructed defaultly.
-  //##ModelId=3C5CED050266
   LockMutex();
-  //##ModelId=3C5CED050267
   LockMutex(LockMutex&);
-  //##ModelId=3C5CED050269
   LockMutex& operator= (LockMutex& rhs);
 
-  //##ModelId=3C65C6D00095
   Mutex& mutex;
 };
 

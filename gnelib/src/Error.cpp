@@ -76,35 +76,28 @@ const std::string ErrorStrings[] = {
   "Low-level HawkNL error:"
 };
 
-//##ModelId=3BAEC1A30050
 Error::Error(ErrorCode ec) : code(ec) {
 }
 
-//##ModelId=3BAEC1A30051
 Error::~Error() {
 }
 
-//##ModelId=3BAEC1A30053
 Error::ErrorCode Error::getCode() const {
   return code;
 }
 
-//##ModelId=3BBA9D6E01E1
 const void Error::setCode(Error::ErrorCode newCode) {
   code = newCode;
 }
 
-//##ModelId=3BAEC1DF014A
 std::string Error::toString() const {
   return ErrorStrings[code];
 }
 
-//##ModelId=3BAEC39201C2
 Error::operator bool() const {
   return (code == NoError);
 }
 
-//##ModelId=3BAEC74F0168
 bool Error::operator == (const ErrorCode& rhs) const {
   return (code == rhs);
 }

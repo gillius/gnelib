@@ -33,20 +33,16 @@ namespace GNE {
  * Adds low level HawkNL and possibly system error information to any other
  * error.
  */
-//##ModelId=3C86E08F0344
 class LowLevelError : public Error {
 public:
   /**
    * Creates a normal error, but picks up any error information reported
    * currently by the underlying network library implementation.
    */
-  //##ModelId=3C86E09000C4
   LowLevelError(ErrorCode newCode = OtherLowLevelError);
 
-  //##ModelId=3C887CEF0284
   virtual ~LowLevelError();
 
-  //##ModelId=3C86E09000C6
   virtual std::string toString() const;
 
 private:
@@ -58,7 +54,6 @@ private:
   /**
    * A possible error code for the system given by HawkNL.
    */
-  //##ModelId=3C86E09000C3
   int sysError;
 };
 
@@ -67,22 +62,17 @@ private:
  * process.  If two GNE programs try to connect that are different games,
  * this is the error you will get.
  */
-//##ModelId=3C86E090000E
 class WrongGame : public Error {
 public:
-  //##ModelId=3C86E0900163
   WrongGame(std::string GameName);
 
-  //##ModelId=3C887CEF0309
   virtual ~WrongGame();
 
   /**
    * Returns the mismatched game name.
    */
-  //##ModelId=3C86E0900165
   std::string getWrongGame() const;
 
-  //##ModelId=3C86E0900167
   virtual std::string toString() const;
 
 private:
@@ -93,24 +83,19 @@ private:
  * An error thrown by SyncConnection when you get a packet other than the one
  * you are trying to receive.
  */
-//##ModelId=3C86E08F0369
 class PacketTypeMismatch : public Error {
 public:
-  //##ModelId=3C86E09000E2
   PacketTypeMismatch(int OtherID)
     : Error(Error::PacketTypeMismatch), otherID(OtherID) {}
 
-  //##ModelId=3C887CEF0298
   virtual ~PacketTypeMismatch() {}
 
   /**
    * Returns the offending packet's ID.
    */
-  //##ModelId=3C86E09000E4
   int getWrongID() const { return otherID; }
 
 private:
-  //##ModelId=3C86E09000E1
   int otherID;
 };
 
@@ -119,24 +104,19 @@ private:
  * are different.  The version is passed to you because GNE does not know
  * what format your version is -- only that is is not equal.
  */
-//##ModelId=3C86E0900004
 class UserVersionMismatch : public Error {
 public:
-  //##ModelId=3C86E090015E
   UserVersionMismatch(guint32 OtherVer)
     : Error(Error::UserVersionMismatch), otherVer(OtherVer) {}
 
-  //##ModelId=3C887CEF0307
   virtual ~UserVersionMismatch() {}
 
   /**
    * Returns the offending user version.
    */
-  //##ModelId=3C86E0900160
   guint32 getWrongVer() const { return otherVer; }
 
 private:
-  //##ModelId=3C86E0AA0138
   guint32 otherVer;
 };
 
@@ -146,10 +126,8 @@ private:
  * they were using a pre-alpha version of GNE, or if the connection came from
  * a non-GNE program.
  */
-//##ModelId=3C86E08F037D
 class ProtocolViolation : public Error {
 public:
-  //##ModelId=3C86E09000F4
   enum ViolationType {
     OtherViolation = 0,
     InvalidCRP,
@@ -157,22 +135,16 @@ public:
     InvalidUnreliableInfo
   };
 
-  //##ModelId=3C86E09000FB
   ProtocolViolation(ViolationType T = OtherViolation);
 
-  //##ModelId=3C887CEF02AC
   virtual ~ProtocolViolation();
 
-  //##ModelId=3C86E09000FD
   ViolationType getViolationType() const;
-  //##ModelId=3C86E09000FF
   void setViolationType(ViolationType T);
 
-  //##ModelId=3C86E0900101
   virtual std::string toString() const;
 
 private:
-  //##ModelId=3C86E0AA00D4
   ViolationType t;
 };
 

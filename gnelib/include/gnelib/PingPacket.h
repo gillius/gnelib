@@ -63,7 +63,6 @@ namespace GNE {
  * Check out the exping example for an example and more explaination on how
  * to use PingPacket.
  */
-//##ModelId=3C65C6CF0370
 class PingPacket : public Packet {
 public:
   /**
@@ -76,29 +75,24 @@ public:
    * form of the constructor.  If you pass false, the state of this object is
    * undefined after creation and is suitable only to use readPacket on.
    */
-  //##ModelId=3C65C6D000CD
   PingPacket(bool makeReq = true);
 
-  //##ModelId=3C65C6D000CF
   virtual ~PingPacket();
 
   /**
    * The ID for this type of packet.
    */
-  //##ModelId=3C65C6D000C7
   static const int ID;
 
   /**
    * Is this PingPacket a ping request?
    */
-  //##ModelId=3C65C6D000D1
   bool isRequest();
 
   /**
    * Changes this PingPacket from a ping request to a ping reply.  If the
    * PingPacket is already a reply, this function has no net effect.
    */
-  //##ModelId=3C65C6D000D2
   void makeReply();
 
   /**
@@ -108,7 +102,6 @@ public:
    * work once for each reply.  If the request ID was not found, then an
    * elapsed time of 0 will be returned.
    */
-  //##ModelId=3C65C6D000D3
   Time getPing();
 
   /**
@@ -127,7 +120,6 @@ public:
    * have to ever call this function unless you want to find out how many
    * more packets have been lost, or if you want to free some memory.
    */
-  //##ModelId=3C65C6D000D4
   static int recoverLostRequests(Time limit);
 
   /**
@@ -136,31 +128,26 @@ public:
    * call to getPing.  The number will also decrease if recoverLostReqests
    * is called and finds late requests.
    */
-  //##ModelId=3C67292703D9
   static int reqsPending();
 
   /**
    * Returns a newly allocated exact copy of this packet.
    */
-  //##ModelId=3C65C6D000D7
   virtual Packet* makeClone() const;
 
   /**
    * Returns the current size of this packet in bytes.
    */
-  //##ModelId=3C65C6D000D9
   virtual int getSize() const;
 
   /**
    * Writes the packet to the given RawPacket. 
    */
-  //##ModelId=3C65C6D000DB
   virtual void writePacket(RawPacket& raw) const;
 
   /**
    * Reads this packet from the given RawPacket.
    */
-  //##ModelId=3C65C6D000DE
   virtual void readPacket(RawPacket& raw);
 
   /**
@@ -168,21 +155,16 @@ public:
    * false, so this returns an object in an uninitialized state and suitable
    * only to call readPacket on.
    */
-  //##ModelId=3C65C6D000E1
   static Packet* create();
 
 private:
-  //##ModelId=3C65C7A20245
   gbool isReq;
 
-  //##ModelId=3C65C7A2024F
   guint32 reqId;
 
   //Provides syncronization for nextReqId and requests
-  //##ModelId=3C65C7A20259
   static Mutex sync;
 
-  //##ModelId=3C65C7A20263
   static guint32 nextReqId;
 
   static std::map<guint32, Time> requests;

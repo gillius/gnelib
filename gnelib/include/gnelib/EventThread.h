@@ -56,7 +56,6 @@ class Connection;
  *   machines.</li>
  * </ul>
  */
-//##ModelId=3C106F0202CD
 class EventThread : public Thread {
 public:
   /**
@@ -65,34 +64,28 @@ public:
    * event is finally processed.  This is to assure that disconnect is called
    * from a safe thread that won't lead to deadlock when a failure occurs.
    */
-  //##ModelId=3C106F0203D4
   EventThread(ConnectionListener* listener, Connection* conn);
 
-  //##ModelId=3C106F0203D6
   virtual ~EventThread();
 
   /**
    * Use GNE::Connection::getListener.
    */
-  //##ModelId=3C106F0203D8
   ConnectionListener* getListener() const;
   
   /**
    * Use GNE::Connection::setListener.
    */
-  //##ModelId=3C106F0203DA
   void setListener(ConnectionListener* listener);
 
   /**
    * Use GNE::Connection::getTimeout.
    */
-  //##ModelId=3CC4E3380110
   int getTimeout();
 
   /**
    * Use GNE::Connection::setTimeout.
    */
-  //##ModelId=3CC4E338011A
   void setTimeout(int ms);
 
   /**
@@ -100,31 +93,26 @@ public:
    * processing of an onDisconnect event will be the last, and the thread
    * will essentially stop when onDisconnect completes.
    */
-  //##ModelId=3C106F0203DC
   void onDisconnect();
 
   /**
    * For more information about these events, see ConnectionListener.
    */
-  //##ModelId=3C70672C0037
   void onExit();
 
   /**
    * For more information about these events, see ConnectionListener.
    */
-  //##ModelId=3C106F0203DD
   void onFailure(const Error& error);
 
   /**
    * For more information about these events, see ConnectionListener.
    */
-  //##ModelId=3C106F0203DF
   void onError(const Error& error);
 
   /**
    * For more information about these events, see ConnectionListener.
    */
-  //##ModelId=3C106F0203E1
   void onReceive();
 
   /**
@@ -132,26 +120,22 @@ public:
    * be woken up since it might be waiting on a ConditionVariable.  Once it
    * shuts down it should not be activated again.
    */
-  //##ModelId=3C106F0203E3
   void shutDown();
 
   /**
    * Returns true if this EventThread was ever started at least once.
    */
-  //##ModelId=3C106F0203E4
   bool hasStarted();
 
   /**
    * Starts this EventThread.
    */
-  //##ModelId=3C106F0203E5
   void start();
 
 protected:
   /**
    * This thread serializes events for a Connection.
    */
-  //##ModelId=3C106F0203E6
   void run();
 
 private:
@@ -159,59 +143,44 @@ private:
    * Checks for timeout, triggering an onTimeout event and handling the time
    * variables, if needed.
    */
-  //##ModelId=3CC4E3380124
   void checkForTimeout();
 
   /**
    * Resets the timeout counter by making nextTimeout be the current absolute
    * time + the timeout interval.
    */
-  //##ModelId=3CC4E338012E
   void resetTimeout();
 
-  //##ModelId=3CC4E3380138
   void onTimeout();
 
   //See the ctor for more information about ourConn.
-  //##ModelId=3C6729270312
   Connection* ourConn;
 
   //The listener for our events.  All on* events go here.  This is protected
   //so ClientConnection can send events as well.
-  //##ModelId=3C106F1903BE
   ConnectionListener* eventListener;
 
-  //##ModelId=3C106F1903C3
   ConditionVariable eventSync;
 
-  //##ModelId=3C4116C301A9
   ConditionVariable listenSync;
 
   //Variables for handling onTimeout events.
-  //##ModelId=3CC4E33800F2
   Mutex timeSync;
-  //##ModelId=3CC4E33800FD
   Time timeout;
-  //##ModelId=3CC4E3380107
   Time nextTimeout;
 
   //True if this EventThread was ever started at least one time.
-  //##ModelId=3C106F0203CB
   bool started;
 
-  //##ModelId=3C106F0203CC
   bool onReceiveEvent;
-  //##ModelId=3CC4E338010B
   bool onTimeoutEvent;
 
   //If this is true, we should not receive any more events.  It should be the
   //next event called, and everything else should stop.
-  //##ModelId=3C106F0203CE
   bool onDisconnectEvent;
 
   //If this is true, an graceful exit notice was received, and the next event
   //is an onDisconnectEvent.
-  //##ModelId=3C70672C002D
   bool onExitEvent;
 
   //Wish we could combine error events and report the last error, but this
@@ -221,7 +190,6 @@ private:
 
   //If this is true, we have a onFailure event which takes precedence over
   //everything.
-  //##ModelId=3C106F1903CA
   Error* failure;
 };
 

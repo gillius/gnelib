@@ -38,18 +38,13 @@ namespace GNE {
  * Simply just a class to temporarily hold connection parameters until the
  * ClientConnection is connected, then it is useless.
  */
-//##ModelId=3C5CED05010A
 class ServerConnectionParams {
 public:
-  //##ModelId=3CBE05D50012
   ConnectionParams cp;
-  //##ModelId=3C65C6D000F9
   ServerConnectionListener* creator;
-  //##ModelId=3C7059BF0112
   bool doJoin;
 };
 
-//##ModelId=3B075381027A
 ServerConnection::ServerConnection(const ConnectionParams& p,
                                    NLsocket rsocket2,
                                    ServerConnectionListener* creator)
@@ -65,7 +60,6 @@ ServerConnection::ServerConnection(const ConnectionParams& p,
   params->doJoin = true;
 }
 
-//##ModelId=3B075381027E
 ServerConnection::~ServerConnection() {
   //If this is the current thread, we did a detach(true) because we failed 
   //before onNewConn.  Else this is another thread (likely our event thread)
@@ -87,7 +81,6 @@ ServerConnection::~ServerConnection() {
  *      the user sets a different PacketFeeder right after connecting, it
  *      might "get lost" and if set during onNewConn, is definitely lost.
  */
-//##ModelId=3B0753810280
 void ServerConnection::run() {
   assert(sockets.r != NL_INVALID);
   assert(getListener() != NULL);
@@ -158,7 +151,6 @@ void ServerConnection::run() {
   params = NULL;
 }
 
-//##ModelId=3C783ACF02BE
 void ServerConnection::doHandshake() {
   //Receive the client's CRP.
   gnedbgo(2, "Waiting for the client's CRP.");
@@ -190,7 +182,6 @@ void ServerConnection::doHandshake() {
 
 const int CRPLEN = 48;
 
-//##ModelId=3C5CED0502CD
 void ServerConnection::getCRP() {
   gbyte crpBuf[64];
   int check = sockets.rawRead(true, crpBuf, 64);
@@ -225,7 +216,6 @@ void ServerConnection::getCRP() {
   ps = new PacketStream(params->cp.getOutRate(), maxOutRate, *this);
 }
 
-//##ModelId=3C5CED0502CE
 void ServerConnection::sendRefusal() {
   RawPacket ref;
   addHeader(ref);
@@ -242,7 +232,6 @@ void ServerConnection::sendRefusal() {
   }
 }
 
-//##ModelId=3C5CED0502D7
 void ServerConnection::sendCAP() {
   RawPacket cap;
   addHeader(cap);
@@ -265,7 +254,6 @@ void ServerConnection::sendCAP() {
     throw LowLevelError(Error::Write);
 }
 
-//##ModelId=3C5CED0502D8
 void ServerConnection::getUnreliableInfo() {
   gbyte* buf = new gbyte[64];
   int check = sockets.rawRead(true, buf, 64);

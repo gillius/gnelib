@@ -38,7 +38,6 @@ namespace GNE {
  *
  * \todo Priorities are not yet implemented.
  */
-//##ModelId=3B075380034B
 class Thread {
 public:
   /**
@@ -46,10 +45,8 @@ public:
    * @param name2 the name of this thread
    * @param priority2 the priority this thread has
    */
-  //##ModelId=3B0753810376
   Thread(std::string name2 = DEF_NAME, int priority2 = DEF_PRI);
 
-  //##ModelId=3B0753810379
   virtual ~Thread();
 
   /**
@@ -57,13 +54,11 @@ public:
    * @return the currently running thread, or NULL if no Thread object
    *         resembles this thread.
    */
-  //##ModelId=3B075381037B
   static Thread* currentThread();
 
   /**
    * The currently running thread sleeps for the time given in milliseconds.
    */
-  //##ModelId=3B075381037D
   static void sleep(int ms);
 
   /**
@@ -80,7 +75,6 @@ public:
    * CPU and essentially you will perform a busy-wait and just lower the
    * scheduling priority of your thread/process.
    */
-  //##ModelId=3D1F80610065
   static void yield();
 
   /**
@@ -107,13 +101,11 @@ public:
    * @return true if all threads have completed, or false if there are still
    *              some threads running and the method timed out.
    */
-  //##ModelId=3C885B3800E8
   static bool waitForAllThreads(int ms);
 
   /**
    * Returns the name of this thread.
    */
-  //##ModelId=3B0753810380
   std::string getName() const;
 
   /**
@@ -132,7 +124,6 @@ public:
    * This function is safe to call multiple times, but you cannot undo a
    * shutdown once it has been called.
    */
-  //##ModelId=3B0C5919012C
   virtual void shutDown();
 
   /**
@@ -142,7 +133,6 @@ public:
    * thread may not be joined after being detached.
    * @see detach
    */
-  //##ModelId=3B0753810382
   void join();
 
   /**
@@ -169,38 +159,32 @@ public:
    *                finishes executing.
    * @see join
    */
-  //##ModelId=3B0753810383
   void detach(bool delThis);
 
   /**
    * Determine the running state of the thread.
    */
-  //##ModelId=3B0753810388
   bool isRunning() const;
 
   /**
    * Starts this thread running.  The thread will be marked as running before
    * this function completes.
    */
-  //##ModelId=3B07538103A5
   virtual void start();
   
   /**
    * Returns the priority of this class.
    */
-  //##ModelId=3B07538103A6
   int getPriority() const;
 
   /**
    * The default priority of a thread.
    */
-  //##ModelId=3B0753810334
   static const int DEF_PRI;
 
   /**
    * The default name for a thread.
    */
-  //##ModelId=3AE1F1CA00DC
   static const std::string DEF_NAME;
 
   /**
@@ -208,13 +192,11 @@ public:
    * operations like loading and saving files or something so it does not
    * interfer with the user interface (be it a GUI or a game or whatever).
    */
-  //##ModelId=3CBD09C8004F
   static const int LOW_PRI;
 
   /**
    * A lower priority for a thread than LOW_PRI.
    */
-  //##ModelId=3CBD09C8006D
   static const int LOWER_PRI;
 
   /**
@@ -222,14 +204,12 @@ public:
    * priority for the network threads to reduce network latency in favor of a
    * little in-game fps.
    */
-  //##ModelId=3B0753810335
   static const int HIGH_PRI;
 
   /**
    * Even higher priority thread than HIGH_PRI.  Used typically for the timer
    * threads.
    */
-  //##ModelId=3CBD09C80081
   static const int HIGHER_PRI;
 
 protected:
@@ -241,7 +221,6 @@ protected:
    * all threads may take awhile.  Responding to this flag usually takes
    * nothing more than a while (!shutdown) {} loop.
    */
-  //##ModelId=3B0C591802EE
   volatile bool shutdown;
 
   /**
@@ -249,7 +228,6 @@ protected:
    * Derive your own class from Thread, and implement this function.
    * When this function returns, the thread ends.
    */
-  //##ModelId=3B0753810385
   virtual void run() = 0;
 
 private:
@@ -266,25 +244,18 @@ private:
    * This function is called internally and automatically after run ends and
    * is used for internal library cleanup.
    */
-  //##ModelId=3B0753810387
   void end();
 
-  //##ModelId=3B07538103AA
   static void remove(Thread*);
 
-  //##ModelId=3AE11D30014A
   std::string name;
 
-  //##ModelId=3B0753810336
   bool running;
 
-  //##ModelId=3B0753810338
   bool deleteThis;
 
-  //##ModelId=3B0753810339
   int priority;
 
-  //##ModelId=3B075381033B
   Mutex sync;
 };
 

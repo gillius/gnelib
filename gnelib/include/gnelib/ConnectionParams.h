@@ -32,7 +32,6 @@ class PacketFeeder;
  * class when constructed sets everything to defaults, so change only the
  * parameters that you care about.
  */
-//##ModelId=3CBE05D40261
 class ConnectionParams {
 public:
   /**
@@ -40,29 +39,24 @@ public:
    * optionally setting the listener property.  A non-NULL listener is always
    * needed by the time it comes active, so it is almost always specified.
    */
-  //##ModelId=3CBE05D4035C
   ConnectionParams(ConnectionListener* Listener = NULL);
 
   /**
    * Returns true if any of the parameters are invalid or out of range.
    */
-  //##ModelId=3CBE05D4035E
   bool checkParams() const;
 
   /**
    * Returns the result of checkParams.
    */
-  //##ModelId=3CBE05D40360
   operator bool() const { return checkParams(); }
 
   /**
    * The ConnectionListener that will receive events from the Connection.
    * Valid value is any non-NULL pointer.
    */
-  //##ModelId=3CBE05D40362
   void setListener(ConnectionListener* Listener);
 
-  //##ModelId=3CBE05D40364
   ConnectionListener* getListener() const;
 
   /**
@@ -71,10 +65,8 @@ public:
    * ConnectionListener.  The default is NULL, and any point is valid.
    * @see PacketStream::setFeeder
    */
-  //##ModelId=3CE60C4803CD
   void setFeeder(PacketFeeder* Feeder);
 
-  //##ModelId=3CE60C4803CF
   PacketFeeder* getFeeder() const;
 
   /**
@@ -83,10 +75,8 @@ public:
    * given in milliseconds.
    * @see PacketStream::setFeederTimeout
    */
-  //##ModelId=3CE60C4803D1
   void setFeederTimeout(int FeederTimeout);
 
-  //##ModelId=3CE60C4803D3
   int getFeederTimeout() const;
 
   /**
@@ -94,10 +84,8 @@ public:
    * any positive integer is valid.
    * @see PacketStream::setLowPacketThreshold
    */
-  //##ModelId=3CE60C4803D5
   void setLowPacketThreshold(int limit);
 
-  //##ModelId=3CE60C4803D7
   int getLowPacketThreshold() const;
 
   /**
@@ -105,13 +93,11 @@ public:
    * signifies that no timeouts should occur.  Values less than 0 are invalid.
    * @see Connection::setTimeout
    */
-  //##ModelId=3CC4E33800D3
   void setTimeout(int ms);
 
   /**
    * Gets the timeout.
    */
-  //##ModelId=3CC4E33800D5
   int getTimeout() const;
 
   /**
@@ -120,10 +106,8 @@ public:
    *
    * The default out rate is 0 (unlimited).
    */
-  //##ModelId=3CBE05D40366
   void setOutRate(int OutRate);
 
-  //##ModelId=3CBE05D40368
   int getOutRate() const;
 
   /**
@@ -133,16 +117,13 @@ public:
    *
    * The default in rate is 0 (unlimited).
    */
-  //##ModelId=3CBE05D4036A
   void setInRate(int InRate);
 
-  //##ModelId=3CBE05D4036C
   int getInRate() const;
 
   /**
    * A shortcut to set both rates at the same time.
    */
-  //##ModelId=3CBE05D4036E
   void setRates(int OutRate, int InRate);
 
   /**
@@ -153,10 +134,8 @@ public:
    *
    * This option is ignored for ServerConnection.
    */
-  //##ModelId=3CBE05D40371
   void setLocalPort(int LocalPort);
 
-  //##ModelId=3CBE05D40373
   int getLocalPort() const;
 
   /**
@@ -170,38 +149,27 @@ public:
    *
    * The default for unreliable is false.
    */
-  //##ModelId=3CBE05D40375
   void setUnrel(bool set);
 
-  //##ModelId=3CBE05D40377
   bool getUnrel() const;
 
 private:
-  //##ModelId=3CBE05D4034F
   ConnectionListener* listener;
 
-  //##ModelId=3CE60C4803C7
   PacketFeeder* feeder;
 
-  //##ModelId=3CE60C4803CB
   int feederTimeout;
 
-  //##ModelId=3CE60C4803CC
   int feederThresh;
 
-  //##ModelId=3CC4E33800C9
   int timeout;
 
-  //##ModelId=3CBE05D40358
   int outRate;
 
-  //##ModelId=3CBE05D40359
   int inRate;
 
-  //##ModelId=3CBE05D4035A
   int localPort;
 
-  //##ModelId=3CBE05D4035B
   bool unrel;
 };
 

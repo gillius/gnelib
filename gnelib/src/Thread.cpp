@@ -80,13 +80,11 @@ void* Thread::threadStart(void* thread) {
   return 0;
 }
 
-//##ModelId=3B0753810376
 Thread::Thread(std::string name2, int priority2) : shutdown(false), name(name2),
 running(false), deleteThis(false), priority(priority2) {
   id = new ThreadIDData();
 }
 
-//##ModelId=3B0753810379
 Thread::~Thread() {
   assert(!isRunning());
 #ifdef WIN32
@@ -95,7 +93,6 @@ Thread::~Thread() {
   delete id;
 }
 
-//##ModelId=3B075381037B
 Thread* Thread::currentThread() {
   mapSync.acquire();
 #ifdef WIN32
@@ -115,7 +112,6 @@ Thread* Thread::currentThread() {
   }
 }
 
-//##ModelId=3B075381037D
 void Thread::sleep(int ms) {
   assert(ms > 0);
   if (ms > 0) {
@@ -130,7 +126,6 @@ void Thread::sleep(int ms) {
   }
 }
 
-//##ModelId=3D1F80610065
 void Thread::yield() {
 #ifdef WIN32
   Sleep(0);
@@ -139,7 +134,6 @@ void Thread::yield() {
 #endif
 }
 
-//##ModelId=3C885B3800E8
 bool Thread::waitForAllThreads(int ms) {
   if (ms > INT_MAX / 1000)
     ms = INT_MAX / 1000;
@@ -164,17 +158,14 @@ bool Thread::waitForAllThreads(int ms) {
   return timeout;
 }
 
-//##ModelId=3B0753810380
 std::string Thread::getName() const {
   return name;
 }
 
-//##ModelId=3B0C5919012C
 void Thread::shutDown() {
   shutdown = true;
 }
 
-//##ModelId=3B0753810382
 void Thread::join() {
   assert( !deleteThis );
 #ifdef WIN32
@@ -184,7 +175,6 @@ void Thread::join() {
 #endif
 }
 
-//##ModelId=3B0753810383
 void Thread::detach(bool delThis) {
   assert( !deleteThis );
 #ifndef WIN32
@@ -203,7 +193,6 @@ void Thread::detach(bool delThis) {
   }
 }
 
-//##ModelId=3B0753810387
 void Thread::end() {
   sync.acquire();
   running = false;
@@ -216,12 +205,10 @@ void Thread::end() {
     sync.release();
 }
 
-//##ModelId=3B0753810388
 bool Thread::isRunning() const {
   return running;
 }
 
-//##ModelId=3B07538103A5
 void Thread::start() {
   shutdown = false;
   running = true;
@@ -255,12 +242,10 @@ void Thread::start() {
   mapSync.release();
 }
 
-//##ModelId=3B07538103A6
 int Thread::getPriority() const {
   return priority;
 }
 
-//##ModelId=3B07538103AA
 void Thread::remove(Thread* thr) {
   assert(!thr->isRunning());
   mapSync.acquire();

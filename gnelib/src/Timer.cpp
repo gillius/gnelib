@@ -25,13 +25,11 @@
 
 namespace GNE {
 
-//##ModelId=3B0753820030
 Timer::Timer(TimerCallback* callback, int rate, bool destroy)
 : Thread("Timer", Thread::HIGHER_PRI), callbackRate(rate*1000),
   listener(callback), destroyListener(destroy) {
 }
 
-//##ModelId=3B0753820034
 Timer::~Timer() {
   stopTimer(true);
   if (destroyListener)
@@ -43,7 +41,6 @@ Timer::~Timer() {
 #include <sys/time.h>
 #endif
 
-//##ModelId=3B0753820036
 Time Timer::getCurrentTime() {
   Time ret;
 #ifdef WIN32
@@ -61,7 +58,6 @@ Time Timer::getCurrentTime() {
   return ret;
 }
 
-//##ModelId=3B0753820065
 Time Timer::getAbsoluteTime() {
 #ifdef WIN32
   Time ret;
@@ -75,7 +71,6 @@ Time Timer::getAbsoluteTime() {
 #endif
 }
 
-//##ModelId=3B0753820067
 void Timer::startTimer() {
   sync.acquire();
   if (!isRunning()) {
@@ -86,7 +81,6 @@ void Timer::startTimer() {
   sync.release();
 }
 
-//##ModelId=3B0753820068
 void Timer::stopTimer(bool waitForEnd) {
   sync.acquire();
   if (isRunning()) {
@@ -99,7 +93,6 @@ void Timer::stopTimer(bool waitForEnd) {
   sync.release();
 }
 
-//##ModelId=3B0753820069
 void Timer::run() {
   while (!shutdown) {
     Time currTime, sleepTime;

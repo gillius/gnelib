@@ -23,7 +23,6 @@
 
 namespace GNE {
 
-//##ModelId=3BCA817C0046
 ConnectionListener::~ConnectionListener() {
 }
 
@@ -32,39 +31,30 @@ ConnectionListener* ConnectionListener::getNullListener() {
   return &nullListener;
 }
 
-//##ModelId=3BCA83910078
 void ConnectionListener::onConnect(SyncConnection& conn) {
 }
 
-//##ModelId=3BCA83920262
 void ConnectionListener::onConnectFailure(const Error& error) {
 }
 
-//##ModelId=3BCFAE5900AA
 void ConnectionListener::onNewConn(SyncConnection& newConn) {
 }
 
-//##ModelId=3BCA83BA02F8
 void ConnectionListener::onDisconnect() {
 }
 
-//##ModelId=3C70672B0357
 void ConnectionListener::onExit() {
 }
 
-//##ModelId=3CC4E33800BF
 void ConnectionListener::onTimeout() {
 }
 
-//##ModelId=3BCA83C600B4
 void ConnectionListener::onError(const Error& error) {
 }
 
-//##ModelId=3BCA83C803A2
 void ConnectionListener::onFailure(const Error& error) {
 }
 
-//##ModelId=3BCA83CF0208
 void ConnectionListener::onReceive() {
 }
 

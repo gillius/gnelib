@@ -23,16 +23,13 @@
 
 namespace GNE {
 
-//##ModelId=3BB2348D0348
 SocketPair::SocketPair(NLsocket reliable, NLsocket unreliable)
 : r(reliable), u(unreliable) {
 }
 
-//##ModelId=3BB2349B015E
 SocketPair::~SocketPair() {
 }
 
-//##ModelId=3BB2351603A2
 void SocketPair::disconnect() {
   if (r != NL_INVALID) {
     nlClose(r);
@@ -44,7 +41,6 @@ void SocketPair::disconnect() {
   }
 }
 
-//##ModelId=3BB2CB41030C
 Address SocketPair::getLocalAddress(bool reliable) const {
   NLaddress ret;
   if (reliable) {
@@ -61,7 +57,6 @@ Address SocketPair::getLocalAddress(bool reliable) const {
   return Address(ret);
 }
 
-//##ModelId=3BB2CB41037A
 Address SocketPair::getRemoteAddress(bool reliable) const {
   NLaddress ret;
   if (reliable) {
@@ -90,7 +85,6 @@ static void addStats(NLsocket s, ConnectionStats& st) {
   st.openSockets++;
 }
 
-//##ModelId=3C106F030036
 ConnectionStats SocketPair::getStats(int reliable) const {
   ConnectionStats ret;
   memset((void*)&ret, 0, sizeof(ret));
@@ -101,7 +95,6 @@ ConnectionStats SocketPair::getStats(int reliable) const {
   return ret;
 }
 
-//##ModelId=3B6B302400CA
 int SocketPair::rawRead(bool reliable, const gbyte* buf, int bufSize) const {
   NLsocket act;
   if (reliable)
@@ -117,7 +110,6 @@ int SocketPair::rawRead(bool reliable, const gbyte* buf, int bufSize) const {
   return chk;*/
 }
 
-//##ModelId=3B6B302401D6
 int SocketPair::rawWrite(bool reliable, const gbyte* buf, int bufSize) const {
   NLsocket act;
   if (reliable)

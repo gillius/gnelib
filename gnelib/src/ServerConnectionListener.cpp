@@ -30,14 +30,12 @@
 
 namespace GNE {
 
-//##ModelId=3B07538102E4
 ServerConnectionListener::ServerConnectionListener()
 : listening(false), listener(NULL) {
   listener = new ServerListener(*this);
   gnedbgo(5, "created");
 }
 
-//##ModelId=3B0753810303
 ServerConnectionListener::~ServerConnectionListener() {
   if (listening) {
     gnedbgo1(3, "Unregistering listen socket %i", socket);
@@ -48,13 +46,11 @@ ServerConnectionListener::~ServerConnectionListener() {
   gnedbgo(5, "destroyed");
 }
 
-//##ModelId=3B0753810305
 bool ServerConnectionListener::open(int port) {
   socket = nlOpen(port, NL_RELIABLE_PACKETS);
   return (socket == NL_INVALID);
 }
 
-//##ModelId=3B0753810307
 bool ServerConnectionListener::listen() {
   NLboolean ret = nlListen(socket);
   if (ret == NL_TRUE) {
@@ -66,12 +62,10 @@ bool ServerConnectionListener::listen() {
   return true;
 }
 
-//##ModelId=3B0753810308
 bool ServerConnectionListener::isListening() const {
   return listening;
 }
 
-//##ModelId=3B075381030F
 void ServerConnectionListener::onReceive() {
   NLsocket sock = nlAcceptConnection(socket);
   if (sock != NL_INVALID) {
@@ -97,7 +91,6 @@ void ServerConnectionListener::onReceive() {
   }
 }
 
-//##ModelId=3B075381030D
 Address ServerConnectionListener::getLocalAddress() const {
   assert(socket != NL_INVALID);
   NLaddress ret;
@@ -105,21 +98,17 @@ Address ServerConnectionListener::getLocalAddress() const {
   return Address(ret);
 }
 
-//##ModelId=3C8435E6012D
 void ServerConnectionListener::onListenSuccess(ConnectionListener* listener) {
   //The default behavior for this event is to do nothing.
 }
 
-//##ModelId=3B07538102D0
 ServerConnectionListener::ServerListener::ServerListener(ServerConnectionListener& listener)
 : conn(listener) {
 }
 
-//##ModelId=3B07538102D2
 ServerConnectionListener::ServerListener::~ServerListener() {
 }
 
-//##ModelId=3B07538102D4
 void ServerConnectionListener::ServerListener::onReceive() {
   conn.onReceive();
 }

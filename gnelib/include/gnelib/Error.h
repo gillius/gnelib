@@ -29,13 +29,11 @@ namespace GNE {
  * safe.  This is usually OK since Error objects are not typically shared by
  * threads.
  */
-//##ModelId=3BAEC0E901EA
 class Error {
 public:
   /**
    * An enum describing connection failure type.
    */
-  //##ModelId=3BAEC99B01FE
   enum ErrorCode {
     NoError = 0,
     ProtocolViolation,
@@ -61,16 +59,13 @@ public:
    * Create a new object representing a certain error, given by the passed
    * ErrorCode.  If no error code is passed, NoError is assumed.
    */
-  //##ModelId=3BAEC1A30050
   Error(ErrorCode ec = NoError);
 
-  //##ModelId=3BAEC1A30051
   virtual ~Error();
 
   /**
    * Returns the error code for this error.
    */
-  //##ModelId=3BAEC1A30053
   ErrorCode getCode() const;
 
   /**
@@ -79,7 +74,6 @@ public:
    * code.  The Error object still retains the low-level specific error
    * information.
    */
-  //##ModelId=3BBA9D6E01E1
   const void setCode(ErrorCode newCode);
 
   /**
@@ -88,25 +82,21 @@ public:
    * write a debug message or out to a log, and tell the user more about the
    * error.
    */
-  //##ModelId=3BAEC1DF014A
   virtual std::string toString() const;
 
   /**
    * Returns error.getCode() != NoError, a handy shortcut so you can test for
    * error by if (error).
    */
-  //##ModelId=3BAEC39201C2
   operator bool() const;
 
   /**
    * A handy shortcut for (error.getCode() == rhs).
    * @param rhs an errorCode to test with.
    */
-  //##ModelId=3BAEC74F0168
   bool operator == (const ErrorCode& rhs) const;
 
 private:
-  //##ModelId=3BAEC9C101CD
   ErrorCode code;
 };
 

@@ -34,7 +34,6 @@ struct ConditionVariable::ConditionVariableData {
   pthread_cond_t cond;
 };
 
-//##ModelId=3B07538003CD
 ConditionVariable::ConditionVariable() {
   data = new ConditionVariableData();
   valassert(pthread_cond_init( &data->cond, NULL ), 0);
@@ -42,7 +41,6 @@ ConditionVariable::ConditionVariable() {
   mutex = new Mutex();
 }
 
-//##ModelId=3B07538003CE
 ConditionVariable::ConditionVariable(Mutex* m) {
   data = new ConditionVariableData();
   valassert(pthread_cond_init( &data->cond, NULL ), 0);
@@ -50,7 +48,6 @@ ConditionVariable::ConditionVariable(Mutex* m) {
   ourMutex = false;
 }
 
-//##ModelId=3B07538003D0
 ConditionVariable::~ConditionVariable() {
   valassert(pthread_cond_destroy( &data->cond ), 0);
   if (ourMutex)
@@ -58,22 +55,18 @@ ConditionVariable::~ConditionVariable() {
   delete data;
 }
 
-//##ModelId=3B0753810000
 void ConditionVariable::acquire() {
   mutex->acquire();
 }
 
-//##ModelId=3B0753810001
 void ConditionVariable::release() {
   mutex->release();
 }
 
-//##ModelId=3B0753810002
 void ConditionVariable::wait() {
   valassert(pthread_cond_wait(&data->cond, &mutex->data->mutex), 0);
 }
 
-//##ModelId=3B0753810003
 void ConditionVariable::timedWait(int ms) {
   Time t = Timer::getAbsoluteTime();
   t += ms*1000;
@@ -87,12 +80,10 @@ void ConditionVariable::timedWait(const Time& until) {
   pthread_cond_timedwait(&data->cond, &(mutex->data->mutex), &tv);
 }
 
-//##ModelId=3B0753810005
 void ConditionVariable::signal() {
   valassert(pthread_cond_signal( &data->cond ), 0);
 }
 
-//##ModelId=3B0753810006
 void ConditionVariable::broadcast() {
   valassert(pthread_cond_broadcast( &data->cond ), 0);
 }

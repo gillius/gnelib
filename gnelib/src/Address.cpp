@@ -27,12 +27,10 @@ std::ostream& operator << (std::ostream& o, const GNE::Address& addr) {
 
 namespace GNE {
 
-//##ModelId=3BB974B402E4
 Address::Address(std::string address) {
   setAddressByName(address);
 }
 
-//##ModelId=3BB94B190168
 Address::Address(const char* address) {
   setAddressByName(address);
 }
@@ -40,16 +38,13 @@ Address::Address(const char* address) {
 Address::Address(NLaddress address) : addr(address) {
 }
 
-//##ModelId=3BB9282B0334
 Address::~Address() {
 }
 
-//##ModelId=3BB974B40384
 void Address::setAddressByName(const std::string& address) {
   nlGetAddrFromName((const NLchar*)address.c_str(), &addr);
 }
 
-//##ModelId=3BBA41220208
 std::string Address::getNameByAddress() const {
   if (isValid()) {
     char buf[NL_MAX_STRING_LENGTH];
@@ -61,18 +56,15 @@ std::string Address::getNameByAddress() const {
   }
 }
 
-//##ModelId=3BB9282B0336
 NLaddress Address::getAddress() const {
   return addr;
 }
 
-//##ModelId=3BB9282B0371
 void Address::setAddress(NLaddress address) {
   addr = address;
 }
 
 //The totally lame const_casts are due to HawkNL's lack of const-correctness.
-//##ModelId=3BB92893038E
 std::string Address::toString() const {
   if (isValid()) {
     char buf[NL_MAX_STRING_LENGTH];
@@ -82,12 +74,10 @@ std::string Address::toString() const {
     return "invalid address";
 }
 
-//##ModelId=3BB94B1901D6
 int Address::getPort() const {
   return (int)nlGetPortFromAddr(&const_cast<Address*>(this)->addr);
 }
 
-//##ModelId=3BB932340050
 void Address::setPort(int port) {
   if (port < 0 || port > 65535)
     addr.valid = NL_FALSE;
@@ -95,17 +85,14 @@ void Address::setPort(int port) {
     nlSetAddrPort(&const_cast<Address*>(this)->addr, (NLushort)port);
 }
 
-//##ModelId=3BB934B4015E
 bool Address::isValid() const {
   return (addr.valid == NL_TRUE);
 }
 
-//##ModelId=3BB934C5010E
 Address::operator bool() const {
   return isValid();
 }
 
-//##ModelId=3BB934CC00BE
 bool Address::operator ==(const Address& rhs) const {
   return (nlAddrCompare(&const_cast<Address*>(this)->addr, &const_cast<Address&>(rhs).addr) == NL_TRUE);
 }

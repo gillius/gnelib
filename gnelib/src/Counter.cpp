@@ -22,15 +22,12 @@
 
 namespace GNE {
 
-//##ModelId=3B07538100EB
 Counter::Counter() : count(0) {
 }
 
-//##ModelId=3B07538100EC
 Counter::~Counter() {
 }
 
-//##ModelId=3B07538100EE
 void Counter::timerCallback() {
   countSync.acquire();
   ++count;
@@ -38,12 +35,10 @@ void Counter::timerCallback() {
   countSync.release();
 }
 
-//##ModelId=3B0753810118
 int Counter::getCount() {
   return count;
 }
 
-//##ModelId=3B0753810119
 void Counter::setCount(int newCount) {
   countSync.acquire();
   count = newCount;
@@ -51,7 +46,6 @@ void Counter::setCount(int newCount) {
   countSync.release();
 }
 
-//##ModelId=3C5CED0501BE
 void Counter::adjustCount(int val) {
   countSync.acquire();
   count += val;
@@ -59,7 +53,6 @@ void Counter::adjustCount(int val) {
   countSync.release();
 }
 
-//##ModelId=3C7C0AFD0391
 void Counter::waitAndDecrement() {
   countSync.acquire();
   while (count <= 0) {

@@ -26,55 +26,45 @@ namespace GNE {
 /**
  * A struct holding values returned by getStats.
  */
-//##ModelId=3C0D571B02A8
 struct ConnectionStats {
   /**
    * Total bytes sent.
    */
-  //##ModelId=3C0D571B03C7
   int bytesSent;
   /**
    * Total bytes received.
    */
-  //##ModelId=3C0D571B03C8
   int bytesRecv;
   /**
    * Total low-level packets sent (not GNE packets but packets after they
    * were converted and translated to the current network).
    */
-  //##ModelId=3C0D571B03C9
   int packetsSent;
   /**
    * Total low-level packets received.
    */
-  //##ModelId=3C0D571B03CA
   int packetsRecv;
   /**
    * Maximum average bytes per second sent encountered.
    */
-  //##ModelId=3C0D571B03CB
   int maxAvgBytesSent;
   /**
    * Maximum average bytes per second received encountered.
    */
-  //##ModelId=3C0D571B03CC
   int maxAvgBytesRecv;
   /**
    * Average bytes per second sent in the last 8 seconds.
    */
-  //##ModelId=3C0D571B03CD
   int avgBytesSent;
   /**
    * Average bytes per second received in the last 8 seconds.
    */
-  //##ModelId=3C0D571B03CE
   int avgBytesRecv;
   /**
    * The number of open sockets.  This value is 0-2 when getting stats for
    * a single Connection.  When getting global stats this is all open
    * sockets, wether user controlled or maintained privately by GNE.
    */
-  //##ModelId=3C106F02037E
   int openSockets;
 };
 

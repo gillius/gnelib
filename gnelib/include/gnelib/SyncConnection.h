@@ -65,14 +65,12 @@ class ConnectionParams;
  *
  * See the example exsynchello for more help with the usage of this class.
  */
-//##ModelId=3BC3C5B200BE
 class SyncConnection : public ConnectionListener {
 public:
   /**
    * Creates a new SyncConnection.  Pass in the Connection that you want to
    * wrap.  See the details above for more information.
    */
-  //##ModelId=3BC3CB1703B6
   SyncConnection(Connection* target);
 
   /**
@@ -81,13 +79,11 @@ public:
    *
    * @see release()
    */
-  //##ModelId=3BC3CB1703B7
   virtual ~SyncConnection();
 
   /**
    * Returns the underlying Connection.
    */
-  //##ModelId=3BDB10A502A8
   Connection* getConnection() const;
   
   /**
@@ -99,7 +95,6 @@ public:
    *
    * @throw Error if the connection could not be opened.
    */
-  //##ModelId=3BC3CD0902E4
   void open(const Address& dest, const ConnectionParams& params);
   
   /**
@@ -115,7 +110,6 @@ public:
    *
    * @throw Error if the connection failed.
    */
-  //##ModelId=3BC3CD090320
   void connect();
   
   /**
@@ -126,7 +120,6 @@ public:
    * @throw Error if release throws an error, or if the disconnection was
    *              unsuccessful.
    */
-  //##ModelId=3BC3CD6E02BD
   void disconnect();
 
   /**
@@ -147,14 +140,12 @@ public:
    * @throw Error if an error has occured since the last operation on this
    *              SyncConnection instance.
    */
-  //##ModelId=3BDB10A50316
   void release();
   
   /**
    * Returns true if release() has been called on this SyncConnection, and it
    * is not a valid object to use anymore.
    */
-  //##ModelId=3BDB10A50317
   bool isReleased() const;
   
   /**
@@ -170,7 +161,6 @@ public:
    * @throw Error if an error occured while reading, or an error occured
    *              since the last interaction with this object.
    */
-  //##ModelId=3BC3CFE50014
   SyncConnection& operator >> (Packet& packet);
   
   /**
@@ -186,7 +176,6 @@ public:
    * @throw Error if an error occured while writing, or an error occured
    *              since the last interaction with this object.
    */
-  //##ModelId=3BC3DBB000AA
   SyncConnection& operator << (const Packet& packet);
   
 private:
@@ -202,7 +191,6 @@ private:
    * This must be called BEFORE any events can possibly be received (so
    * before registration into ConnectionEventGenerator).
    */
-  //##ModelId=3C4116C3023E
   void startConnect();
 
   /**
@@ -219,7 +207,6 @@ private:
    *
    * @throw Error if release throws.
    */
-  //##ModelId=3C4116C30248
   void endConnect(bool passEvents);
 
   //Make friends so they can use startConnect and endConnect.
@@ -234,30 +221,20 @@ private:
    * @throw Error if an error occured while releasing, or an error occured
    *              since the last interaction with this object.
    */
-  //##ModelId=3C4116C30249
   void doRelease();
 
   /**
    * The event listeners for SyncConnection that will override the current
    * listener our connection has.
    */
-  //##ModelId=3BDB10A50353
   void onNewConn(SyncConnection& newConn);
-  //##ModelId=3BDB10A6000A
   void onConnect(SyncConnection& conn);
-  //##ModelId=3BDB10A60078
   void onConnectFailure(const Error& error);
-  //##ModelId=3BDB10A60122
   void onDisconnect();
-  //##ModelId=3BDB10A60154
   void onError(const Error& error);
-  //##ModelId=3BDB10A601FE
   void onFailure(const Error& error);
-  //##ModelId=3C70672C009C
   void onExit();
-  //##ModelId=3BDB10A6029E
   void onReceive();
-  //##ModelId=3C1081BC015B
   void onDoneWriting();
 
   /**
@@ -266,7 +243,6 @@ private:
    * is also sensitive to if an error happens -- it will stop waiting if the
    * connection failed.
    */
-  //##ModelId=3BDB10A501CE
   ConditionVariable recvNotify;
 
   /**
@@ -274,19 +250,16 @@ private:
    *
    * @throw Error if an error has occured.
    */
-  //##ModelId=3BDB10A6029F
   void checkError();
 
   /**
    * Sets the error.
    */
-  //##ModelId=3BDB10A602DA
   void setError(const Error& error);
 
   /**
    * Syncronization for release and connecting events.
    */
-  //##ModelId=3BDB10A501D3
   Mutex sync;
 
   /**
@@ -294,29 +267,24 @@ private:
    * no error.  recvNotify acts to keep this variable from being accessed by
    * multiple threads.
    */
-  //##ModelId=3BDB10A501D8
   Error currError;
 
   /**
    * The underlying Connection.
    */
-  //##ModelId=3BDB10A50209
   Connection* conn;
 
   /**
    * The old listener for asyncronous communications that the Connection just
    * had.  If this is NULL, then this object has been released.
    */
-  //##ModelId=3BDB10A5020E
   ConnectionListener* oldListener;
 
-  //##ModelId=3C4116C30220
   volatile bool released;
 
   /**
    * @see setConnectMode
    */
-  //##ModelId=3C4116C30234
   volatile bool connectMode;
 };
 

@@ -40,7 +40,6 @@ const int TIME_STEPS_PER_SEC = 1000000 / TIME_STEP;
 
 namespace GNE {
 
-//##ModelId=3B07538101BD
 PacketStream::PacketStream(int reqOutRate2, int maxOutRate2, Connection& ourOwner)
 : Thread("PktStrm", Thread::HIGH_PRI), owner(ourOwner), maxOutRate(maxOutRate2),
 reqOutRate(reqOutRate2), feeder(NULL), feederTimeout(0), lowPacketsThreshold(0) {
@@ -61,7 +60,6 @@ reqOutRate(reqOutRate2), feeder(NULL), feederTimeout(0), lowPacketsThreshold(0) 
   gnedbgo(5, "created");
 }
 
-//##ModelId=3B07538101C0
 PacketStream::~PacketStream() {
   //We can't do assert(shutdown) in case PacketStream was never started.
   assert(!isRunning());
@@ -88,7 +86,6 @@ PacketStream::~PacketStream() {
   gnedbgo(5, "destroyed");
 }
 
-//##ModelId=3B07538101C2
 int PacketStream::getInLength() const {
   int ret;
   inQCtrl.acquire();
@@ -97,7 +94,6 @@ int PacketStream::getInLength() const {
   return ret;
 }
 
-//##ModelId=3B07538101C4
 int PacketStream::getOutLength(bool reliable) const {
   int ret;
   outQCtrl.acquire();
@@ -108,7 +104,6 @@ int PacketStream::getOutLength(bool reliable) const {
   return ret;
 }
 
-//##ModelId=3CE60C490079
 void PacketStream::setFeeder(PacketFeeder* newFeeder) {
   outQCtrl.acquire();
   feeder = newFeeder;
@@ -119,18 +114,15 @@ void PacketStream::setFeeder(PacketFeeder* newFeeder) {
   outQCtrl.release();
 }
 
-//##ModelId=3CE60C490092
 void PacketStream::setLowPacketThreshold(int limit) {
   lowPacketsThreshold = limit;
   outQCtrl.broadcast();
 }
 
-//##ModelId=3CE60C4900A6
 int PacketStream::getLowPacketThreshold() const {
   return lowPacketsThreshold;
 }
 
-//##ModelId=3CE60C4900B0
 void PacketStream::setFeederTimeout(int ms) {
   assert(ms >= 0);
 
@@ -141,17 +133,14 @@ void PacketStream::setFeederTimeout(int ms) {
   }
 }
 
-//##ModelId=3CE60C4900C4
 int PacketStream::getFeederTimeout() const {
   return feederTimeout;
 }
 
-//##ModelId=3B07538101C6
 bool PacketStream::isNextPacket() const {
   return (getInLength() != 0);
 }
 
-//##ModelId=3B07538101C8
 Packet* PacketStream::getNextPacket() {
   Packet* ret = NULL;
   inQCtrl.acquire();
@@ -163,7 +152,6 @@ Packet* PacketStream::getNextPacket() {
   return ret;
 }
 
-//##ModelId=3B07538101C9
 void PacketStream::writePacket(const Packet& packet, bool reliable) {
   //Perform operations on the outgoing queue
   outQCtrl.acquire();
@@ -182,22 +170,18 @@ void PacketStream::writePacket(const Packet& packet, bool reliable) {
     outQCtrl.broadcast();
 }
 
-//##ModelId=3B07538101F7
 int PacketStream::getCurrOutRate() const {
   return currOutRate;
 }
 
-//##ModelId=3C7AB4C501C1
 int PacketStream::getReqOutRate() const {
   return reqOutRate;
 }
 
-//##ModelId=3C7AB4C501CB
 int PacketStream::getRemoteOutLimit() const {
   return maxOutRate;
 }
 
-//##ModelId=3C783ACF0264
 void PacketStream::setRates(int reqOutRate2, int maxInRate2) {
   if (reqOutRate2 >= 0) {
     outQCtrl.acquire();
@@ -214,7 +198,6 @@ void PacketStream::setRates(int reqOutRate2, int maxInRate2) {
   }
 }
 
-//##ModelId=3B07538101F9
 void PacketStream::waitToSendAll(int waitTime) const {
   assert(waitTime <= (INT_MAX / 1000));
   assert(waitTime > 0);
@@ -235,7 +218,6 @@ void PacketStream::waitToSendAll(int waitTime) const {
   outQCtrl.release();
 }
 
-//##ModelId=3B8DC5D10096
 void PacketStream::shutDown() {
   Thread::shutDown();
   //We acquire the mutex to avoid the possiblity of a deadlock between the
@@ -249,7 +231,6 @@ void PacketStream::shutDown() {
  * \bug  we need a way to guarantee that the write won't block when trying
  *       to send the ExitPacket on shutdown.
  */
-//##ModelId=3B07538101FA
 void PacketStream::run() {
   int numPackets = 0;
 
@@ -330,7 +311,6 @@ void PacketStream::run() {
   }
 }
 
-//##ModelId=3B07538101FB
 void PacketStream::addIncomingPacket(Packet* packet) {
   if (packet->getType() != RateAdjustPacket::ID) {
     inQCtrl.acquire();
@@ -346,7 +326,6 @@ void PacketStream::addIncomingPacket(Packet* packet) {
   }
 }
 
-//##ModelId=3C7867230185
 void PacketStream::prepareSend(std::queue<Packet*>& q, RawPacket& raw) {
   //outQCtrl must be acquired for this function.
   //While there are packets left and they won't overflow the RawPacket
@@ -360,7 +339,6 @@ void PacketStream::prepareSend(std::queue<Packet*>& q, RawPacket& raw) {
   }
 }
 
-//##ModelId=3C7960970177
 void PacketStream::setupCurrRate() {
   //Precalculate the current outgoing rate, keeping in mind that the value of
   //is the "largest" and means unlimited rate (or "unchecked").  Unlimited is
@@ -380,7 +358,6 @@ void PacketStream::setupCurrRate() {
     currOutRate, outRateStep);
 }
 
-//##ModelId=3C783ACF028C
 void PacketStream::updateRates() {
   //The out remain is part of the out queue, so outQCtrl must be locked when
   //we call this function.
@@ -404,7 +381,6 @@ void PacketStream::updateRates() {
   }
 }
 
-//##ModelId=3CE60C4900CF
 void PacketStream::onLowPackets( int numPackets ) {
   if (feeder && numPackets <= lowPacketsThreshold) {
     gnedbgo(4, "onLowPackets event generated.");

@@ -33,7 +33,6 @@ class ConnectionParams;
 /**
  * A class that can connect to a remote target.
  */
-//##ModelId=3B0753800270
 class ClientConnection : public Connection, public Thread {
 public:
   /**
@@ -41,10 +40,8 @@ public:
    * method.
    * @see Connection#Connection(ConnectionListener*)
    */
-  //##ModelId=3B075380037F
   ClientConnection();
 
-  //##ModelId=3B07538003B8
   virtual ~ClientConnection();
 
   /**
@@ -53,7 +50,6 @@ public:
    * this function.  If there is already an error, the function returns true.
    * @param dest the destination address.
    */
-  //##ModelId=3B07538003BB
   bool open(const Address& dest, const ConnectionParams& p);
 
   /**
@@ -87,7 +83,6 @@ public:
    * @see ConnectionListener#onConnect()
    * @see ConnectionListener#onConnectFailure()
    */
-  //##ModelId=3B07538003C1
   void connect(SyncConnection* wrapped = NULL);
 
 protected:
@@ -95,20 +90,17 @@ protected:
    * Connection starts a new thread lasting only while it is connecting.
    * @see Thread#run()
    */
-  //##ModelId=3B07538003BA
   void run();
 
 private:
   /**
    * Does the GNE protocol handshake, throwing an Error on error.
    */
-  //##ModelId=3C783ACF0192
   void doHandshake();
 
   /**
    * Sends the CRP, throwing an Error on error.
    */
-  //##ModelId=3C5CED05016E
   void sendCRP();
 
   /**
@@ -118,17 +110,14 @@ private:
    *         no unreliable connection was requested, the value of the
    *         returned address is undefined.
    */
-  //##ModelId=3C5CED05016F
   Address getCAP();
 
   /**
    * Sets up the unreliable connection, throwing an Error on error.
    */
-  //##ModelId=3C5CED050170
   void setupUnreliable(const Address& dest);
 
   //Temp storage of connection params.
-  //##ModelId=3C5CED05013D
   ClientConnectionParams* params;
 };
 

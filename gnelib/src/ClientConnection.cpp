@@ -36,30 +36,23 @@ namespace GNE {
  * Simply just a class to temporarily hold connection parameters until the
  * ClientConnection is connected, then it is useless.
  */
-//##ModelId=3C5CED0500C7
 class ClientConnectionParams {
 public:
-  //##ModelId=3C65C6D0001D
   Address dest;
-  //##ModelId=3CBE05D40327
   ConnectionParams cp;
-  //##ModelId=3C65C6D00029
   SyncConnection* sConnPtr;
 };
 
-//##ModelId=3B075380037F
 ClientConnection::ClientConnection()
 : Thread("CliConn", Thread::HIGH_PRI), params(NULL) {
   gnedbgo(5, "created");
 }
 
-  //##ModelId=3B07538003B8
 ClientConnection::~ClientConnection() {
   delete params;
   gnedbgo(5, "destroyed");
 }
 
-//##ModelId=3B07538003BB
 bool ClientConnection::open(const Address& dest,
                             const ConnectionParams& p) {
   if (!dest || p)
@@ -76,7 +69,6 @@ bool ClientConnection::open(const Address& dest,
   return (sockets.r == NL_INVALID);
 }
 
-//##ModelId=3B07538003C1
 void ClientConnection::connect(SyncConnection* wrapped) {
   assert(sockets.r != NL_INVALID);
   assert(params != NULL);
@@ -92,7 +84,6 @@ void ClientConnection::connect(SyncConnection* wrapped) {
  *      the user sets a different PacketFeeder right after connecting, it
  *      might "get lost" and if set during onNewConn, is definitely lost.
  */
-//##ModelId=3B07538003BA
 void ClientConnection::run() {
   assert(getListener() != NULL);
   gnedbgo1(1, "Trying to connect to %s", params->dest.toString().c_str());
@@ -186,7 +177,6 @@ void ClientConnection::run() {
   }
 }
 
-//##ModelId=3C783ACF0192
 void ClientConnection::doHandshake() {
   //Start the GNE protocol connection process.
   //The first packet is from client to server, and is the connection
@@ -208,7 +198,6 @@ void ClientConnection::doHandshake() {
   }
 }
 
-//##ModelId=3C5CED05016E
 void ClientConnection::sendCRP() {
   RawPacket crp;
   addHeader(crp);
@@ -226,7 +215,6 @@ const int MINLEN = 8;
 const int REFLEN = 44;
 const int CAPLEN = 12;
 
-//##ModelId=3C5CED05016F
 Address ClientConnection::getCAP() {
   gbyte capBuf[64];
   int check = sockets.rawRead(true, capBuf, 64);
@@ -304,7 +292,6 @@ Address ClientConnection::getCAP() {
   return Address();
 }
 
-//##ModelId=3C5CED050170
 void ClientConnection::setupUnreliable(const Address& dest) {
   assert(dest);
   sockets.u = nlOpen(0, NL_UNRELIABLE);

@@ -29,7 +29,6 @@
 
 namespace GNE {
 
-//##ModelId=3C106F0203D4
 EventThread::EventThread(ConnectionListener* listener, Connection* conn)
 : Thread("EventThr", Thread::HIGH_PRI), ourConn(conn), eventListener(listener),
 started(false), onReceiveEvent(false), onTimeoutEvent(false),
@@ -37,7 +36,6 @@ onDisconnectEvent(false), onExitEvent(false), failure(NULL) {
   gnedbgo(5, "created");
 }
 
-//##ModelId=3C106F0203D6
 EventThread::~EventThread() {
   eventSync.acquire();
   while (!eventQueue.empty()) {
@@ -49,12 +47,10 @@ EventThread::~EventThread() {
   gnedbgo(5, "destroyed");
 }
 
-//##ModelId=3C106F0203D8
 ConnectionListener* EventThread::getListener() const {
   return eventListener;
 }
 
-//##ModelId=3C106F0203DA
 void EventThread::setListener(ConnectionListener* listener) {
   //Acquire listenSync to wait for the current event to complete.
   listenSync.acquire();
@@ -70,12 +66,10 @@ void EventThread::setListener(ConnectionListener* listener) {
   listenSync.release();
 }
 
-//##ModelId=3CC4E3380110
 int EventThread::getTimeout() {
   return (timeout.getuSec() / 1000);
 }
 
-//##ModelId=3CC4E338011A
 void EventThread::setTimeout(int ms) {
   timeSync.acquire();
   if (ms != 0) {
@@ -91,7 +85,6 @@ void EventThread::setTimeout(int ms) {
   eventSync.signal();
 }
 
-//##ModelId=3C106F0203DC
 void EventThread::onDisconnect() {
   gnedbgo(1, "onDisconnect Event triggered.");
   //We acquire the mutex to avoid the possiblity of a deadlock between the
@@ -102,7 +95,6 @@ void EventThread::onDisconnect() {
   eventSync.release();
 }
 
-//##ModelId=3C70672C0037
 void EventThread::onExit() {
   assert(failure == NULL); //only onFailure or onExit can happen.
   gnedbgo(1, "onExit Event triggered.");
@@ -113,7 +105,6 @@ void EventThread::onExit() {
   eventSync.release();
 }
 
-//##ModelId=3C106F0203DD
 void EventThread::onFailure(const Error& error) {
   assert(!onExitEvent); //only onFailure or onExit can happen.
   gnedbgo1(1, "onFailure Event: %s", error.toString().c_str());
@@ -124,7 +115,6 @@ void EventThread::onFailure(const Error& error) {
   eventSync.release();
 }
 
-//##ModelId=3C106F0203DF
 void EventThread::onError(const Error& error) {
   gnedbgo1(1, "onError Event: %s", error.toString().c_str());
 
@@ -134,7 +124,6 @@ void EventThread::onError(const Error& error) {
   eventSync.release();
 }
 
-//##ModelId=3C106F0203E1
 void EventThread::onReceive() {
   gnedbgo(4, "onReceive event triggered.");
 
@@ -147,7 +136,6 @@ void EventThread::onReceive() {
   eventSync.release();
 }
 
-//##ModelId=3C106F0203E3
 void EventThread::shutDown() {
   Thread::shutDown();
 
@@ -156,18 +144,15 @@ void EventThread::shutDown() {
   eventSync.release();
 }
 
-//##ModelId=3C106F0203E4
 bool EventThread::hasStarted() {
   return started;
 }
 
-//##ModelId=3C106F0203E5
 void EventThread::start() {
   Thread::start();
   started = true;
 }
 
-//##ModelId=3C106F0203E6
 void EventThread::run() {
   while (!shutdown) {
     eventSync.acquire();
@@ -245,7 +230,6 @@ void EventThread::run() {
   }
 }
 
-//##ModelId=3CC4E3380124
 void EventThread::checkForTimeout() {
   timeSync.acquire();
   Time t = nextTimeout;
@@ -255,7 +239,6 @@ void EventThread::checkForTimeout() {
     onTimeout();
 }
 
-//##ModelId=3CC4E338012E
 void EventThread::resetTimeout() {
   timeSync.acquire();
   if ( timeout != Time() ) {
@@ -264,7 +247,6 @@ void EventThread::resetTimeout() {
   timeSync.release();
 }
 
-//##ModelId=3CC4E3380138
 void EventThread::onTimeout() {
   gnedbgo(4, "onTimeout event triggered.");
 

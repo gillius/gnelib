@@ -28,17 +28,13 @@ namespace GNE {
    * implementations (as defined in the GNE protocol document).
    * "u" type variables denote unsigned versions.
    */
-  //##ModelId=3C65C7A20192
   typedef signed   char  gint8;
-  //##ModelId=3C65C7A201A4
   typedef unsigned char  guint8;
-  //##ModelId=3C65C7A20182
   typedef guint8         gbyte;
 
   /**
    * A gbool is 'false' only when its value is 0, else it is 'true'.
    */
-  //##ModelId=3C65C7A20180
   typedef guint8         gbool;
 
   /**
@@ -50,25 +46,19 @@ namespace GNE {
    */
   const gbool gFalse = 0;
   
-  //##ModelId=3C65C7A20189
   typedef signed   short gint16;
-  //##ModelId=3C65C7A2019B
   typedef unsigned short guint16;
   
-  //##ModelId=3C65C7A20190
   typedef signed   int   gint32;
-  //##ModelId=3C65C7A2019D
   typedef unsigned int   guint32;
   
   /**
    * A single precision 32-bit IEEE 754 floating point variable.
    */
-  //##ModelId=3C65C7A20194
   typedef float          gsingle;
   /**
    * A double precision 64-bit IEEE 754 floating point variable.
    */
-  //##ModelId=3C65C7A20187
   typedef double         gdouble;
 };
 

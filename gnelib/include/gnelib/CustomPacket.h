@@ -35,19 +35,15 @@ class RawPacket;
  * Remember RawPacket does endian and processor-type conversions for you.\n
  * See the documentation for Packet for more info on some of these functions.
  */
-//##ModelId=3C0B257E02C7
 class CustomPacket : public Packet {
 public:
-  //##ModelId=3C0B257E03C4
   CustomPacket();
 
-  //##ModelId=3C0B257E03C5
   virtual ~CustomPacket();
 
   /**
    * The ID for this type of packet.
    */
-  //##ModelId=3C65C6D00076
   static const int ID;
 
   /**
@@ -57,14 +53,12 @@ public:
    * This RawPacket will last until this object is destroyed or readPacket
    * is called.
    */
-  //##ModelId=3C0B257E03C7
   RawPacket& getData();
 
   /**
    * This method resets the underlying data, and prepares it for write
    * access.  Essentially, this method "recreates" the CustomPacket instance.
    */
-  //##ModelId=3C7E97B80267
   void reset();
 
   /**
@@ -77,13 +71,11 @@ public:
    * Since makeClone is used by GNE when sending packets, the RawPackets were
    * just used for writing this function works acceptably.
    */
-  //##ModelId=3C0B257E03C8
   virtual Packet* makeClone() const;
 
   /**
    * @see Packet::getSize()
    */
-  //##ModelId=3C0B257E03CA
   virtual int getSize() const;
 
   /**
@@ -91,7 +83,6 @@ public:
    * this value rather than RawPacket::RAW_PACKET_LEN.  The value returned is
    * the maximum size the hosted RawPacket can be.
    */
-  //##ModelId=3C30EFBD0226
   static int getMaxUserDataSize();
 
   /**
@@ -100,37 +91,31 @@ public:
    * since the length of the RawPacket is needed, and this is only known to
    * RawPackets used for writing only.
    */
-  //##ModelId=3C0B257E03CC
   virtual void writePacket(RawPacket& raw) const;
 
   /**
    * Reads this packet from the given RawPacket.  The data in this packet
    * will be destroyed and replaced by the new data.
    */
-  //##ModelId=3C0B257E03CF
   virtual void readPacket(RawPacket& raw);
 
   /**
    * Returns a new instance of this class.
    */
-  //##ModelId=3C0B257E03D2
   static Packet* create();
 
 private:
   /**
    * Deletes the RawPacket and our buffer, if needed.
    */
-  //##ModelId=3C0B257E03D4
   void destroyData();
 
-  //##ModelId=3C0B25A3037C
   RawPacket* data;
 
   /**
    * If this is non-null, then the current RawPacket is using a buffer that
    * we allocated, and we need to delete it.
    */
-  //##ModelId=3C65C7A201EB
   gbyte* ourBuf;
 
   /**
@@ -138,7 +123,6 @@ private:
    * we know our contentLength at least until getData is called.  When this
    * variable is -1 we do not know the size of the CustomPacket.
    */
-  //##ModelId=3C7E6B2203AF
   int contentLen;
 };
 

@@ -25,7 +25,6 @@ namespace GNE {
 
 const int RawPacket::RAW_PACKET_LEN = 512;
 
-//##ModelId=3B075381022A
 RawPacket::RawPacket(gbyte* buffer) : currLoc(0) {
   if (buffer) {
     data = buffer;
@@ -36,34 +35,28 @@ RawPacket::RawPacket(gbyte* buffer) : currLoc(0) {
   }
 }
 
-//##ModelId=3B075381022C
 RawPacket::~RawPacket() {
   if (ourBuffer)
     delete[] data;
 }
 
-//##ModelId=3B075381022E
 const gbyte* RawPacket::getData() const {
   return data;
 }
 
-//##ModelId=3B0753810230
 int RawPacket::getPosition() const {
   return currLoc;
 }
 
-//##ModelId=3B0753810232
 void RawPacket::reset() {
   currLoc = 0;
 }
 
-//##ModelId=3B0753810233
 void RawPacket::writeRaw(const gbyte* block, int length) {
   writeBlock(data, currLoc, block, length);
   assert(currLoc <= RAW_PACKET_LEN);
 }
 
-//##ModelId=3B0753810236
 void RawPacket::readRaw(gbyte* block, int length) {
   readBlock(data, currLoc, block, length);
   assert(currLoc <= RAW_PACKET_LEN);
@@ -71,63 +64,54 @@ void RawPacket::readRaw(gbyte* block, int length) {
 
 //START OF WRITING OPERATORS
 
-//##ModelId=3B0753810239
 RawPacket& RawPacket::operator << (gint8 x) {
   writeByte(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-//##ModelId=3B075381023B
 RawPacket& RawPacket::operator << (guint8 x) {
   writeByte(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-//##ModelId=3B075381023D
 RawPacket& RawPacket::operator << (gint16 x) {
   writeShort(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-//##ModelId=3B075381023F
 RawPacket& RawPacket::operator << (guint16 x) {
   writeShort(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-//##ModelId=3B0753810241
 RawPacket& RawPacket::operator << (gint32 x) {
   writeLong(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-//##ModelId=3B0753810243
 RawPacket& RawPacket::operator << (guint32 x) {
   writeLong(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-//##ModelId=3B0753810245
 RawPacket& RawPacket::operator << (gsingle x) {
   writeFloat(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-//##ModelId=3B0753810262
 RawPacket& RawPacket::operator << (gdouble x) {
   writeDouble(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-//##ModelId=3B0753810264
 RawPacket& RawPacket::operator << (const std::string& x) {
   assert(x.size() <= 255);
   guint8 length = (guint8)x.size();
@@ -146,7 +130,6 @@ RawPacket& RawPacket::operator << (const std::string& x) {
   return *this;
 }
 
-//##ModelId=3B0C2CE50226
 RawPacket& RawPacket::operator << (const Packet& x) {
   x.writePacket(*this);
   return *this;

@@ -27,16 +27,13 @@ namespace GNE {
  * A class to act as an interface between ConnectionEventGenerator and its
  * listeners.
  */
-//##ModelId=3B07538002DA
 class ReceiveEventListener {
 public:
-  //##ModelId=3B07538100E0
   virtual ~ReceiveEventListener();
 
   /**
    * This function is called when data arrives on the socket.
    */
-  //##ModelId=3B07538100E2
   virtual void onReceive() = 0;
 
 };

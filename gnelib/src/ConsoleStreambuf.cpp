@@ -35,18 +35,15 @@ namespace Console {
 //--------------------------------
 const int IBUF_LEN = 128;
 
-//##ModelId=3BF8444503C9
 ginbuf::ginbuf() {
   buf = new char[IBUF_LEN];
   setg(buf, buf + IBUF_LEN, buf + IBUF_LEN);
 }
 
-//##ModelId=3BF8444503CA
 ginbuf::~ginbuf() {
   delete[] buf;
 }
 
-//##ModelId=3BF8444503CB
 ginbuf::int_type ginbuf::underflow() {
   //If there is data still in the input buffer, return it.
   if (gptr() < egptr())
@@ -77,7 +74,6 @@ ginbuf::int_type ginbuf::underflow() {
 //--------------------------------
 const int OBUF_LEN = 256;
 
-//##ModelId=3BF8444503CD
 goutbuf::goutbuf() : x(-1), y(-1) {
   buf = new char[OBUF_LEN];
   setp(buf, buf + OBUF_LEN - 1);
@@ -85,7 +81,6 @@ goutbuf::goutbuf() : x(-1), y(-1) {
   //terminate the string during a flush to output a whole string at a time.
 }
 
-//##ModelId=3BF8444503CE
 goutbuf::~goutbuf() {
   //Actually we don't want to flush, because when this dtor is called we can't
   //output.
@@ -93,19 +88,16 @@ goutbuf::~goutbuf() {
   delete[] buf;
 }
 
-//##ModelId=3BF8BBF902E6
 void goutbuf::setNextWriteLoc(int xLoc, int yLoc) {
   x = xLoc;
   y = yLoc;
 }
 
-//##ModelId=3BF8444503CF
 int goutbuf::sync() {
   flush_output();
   return 0;
 }
 
-//##ModelId=3BF8444503D0
 /**
  * \bug does not handle nulls in the stream properly in all cases although
  *      most of the time it works.  It seems at least for the case of
@@ -128,7 +120,6 @@ void goutbuf::flush_output() {
   }
 }
 
-//##ModelId=3BF8444503D1
 goutbuf::int_type goutbuf::overflow(int_type meta) {
   if (meta != traits_type::eof()) {
     flush_output();
@@ -137,7 +128,6 @@ goutbuf::int_type goutbuf::overflow(int_type meta) {
   return traits_type::not_eof(meta);
 }
   
-//##ModelId=3BF8444503D3
 std::streamsize goutbuf::xsputn(const char_type *ptr, std::streamsize count) {
   for (int i=0; i<count; i++) {
     sputc(ptr[i]);

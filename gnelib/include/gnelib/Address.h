@@ -30,7 +30,6 @@ namespace GNE {
  * A wrapper class for the HawkNL NLaddress.  This class is used many times
  * around GNE and is made for ease of use and cleaner code.
  */
-//##ModelId=3BB927EB0186
 class Address {
 public:
   /**
@@ -47,28 +46,23 @@ public:
    * resolution failed, then the Address is not valid (!isValid()).
    * @see isValid()
    */
-  //##ModelId=3BB933C4010E
   Address(std::string address);
 
   /**
    * Alternate version for better implicit conversion
    */
-  //##ModelId=3BB94B190168
   Address(const char* address = "0.0.0.0:0");
 
   /**
    * Creates a new Address with the HawkNL NLaddress.
    */
-  //##ModelId=3BB974B402E4
   Address(NLaddress address);
 
-  //##ModelId=3BB9282B0334
   ~Address();
 
   /**
    * Does the same work as the constructor.
    */
-  //##ModelId=3BB974B40384
   void setAddressByName(const std::string& address);
 
   /**
@@ -76,19 +70,16 @@ public:
    * block.  If the name doesn't exist, the IP address will be returned.
    * The port from this address will not be part of the name in either case.
    */
-  //##ModelId=3BBA41220208
   std::string getNameByAddress() const;
 
   /** 
    * Returns a copy of the actual HawkNL address struct.
    */
-  //##ModelId=3BB9282B0336
   NLaddress getAddress() const;
 
   /**
    * Sets the address based on the given HawkNL address.
    */
-  //##ModelId=3BB9282B0371
   void setAddress(NLaddress address);
 
   /**
@@ -96,44 +87,37 @@ public:
    * xxx.xxx.xxx.xxx:ppppp, but if the port is 0, the colon and port number
    * are empty.
    */
-  //##ModelId=3BB92893038E
   std::string toString() const;
 
   /**
    * Returns the port for this address.
    */
-  //##ModelId=3BB94B1901D6
   int getPort() const;
 
   /**
    * Sets the port for this address.  This is a number 0..65535.
    */
-  //##ModelId=3BB932340050
   void setPort(int port);
 
   /**
    * Returns if this address is in a valid state.  And address will become
    * invalid if a name could not be resolved, or a port sent was out of range.
    */
-  //##ModelId=3BB934B4015E
   bool isValid() const;
 
   /**
    * Another method for testing isValid().
    * @see isValid()
    */
-  //##ModelId=3BB934C5010E
   operator bool() const;
 
   /**
    * Tests if two addresses are equal based on the HawkNL function
    * nlCompareAddr.  This does not take validity into consideration.
    */
-  //##ModelId=3BB934CC00BE
   bool operator ==(const Address& rhs) const;
 
 private:
-  //##ModelId=3BB927FF0186
   NLaddress addr;
 
 };

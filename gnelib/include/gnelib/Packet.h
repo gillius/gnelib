@@ -35,7 +35,6 @@ class RawPacket;
  * See the example expacket on how to properly derive from a Packet class, or
  * look at the code for the other GNE packets.
  */
-//##ModelId=3B075380030C
 class Packet {
 public:
   /**
@@ -48,29 +47,24 @@ public:
    * @param id a number from PacketParser::MIN_USER_ID to 255.  GNE packet
    *        id's are from 0 to MIN_USER_ID-1, inclusive.
    */
-  //##ModelId=3B0753810151
   Packet(int id = 0);
 
-  //##ModelId=3B0753810153
   virtual ~Packet();
 
   /**
    * The ID for this type of packet.
    */
-  //##ModelId=3C65C6D000A8
   static const int ID;
 
   /**
    * Returns a newly allocated exact copy of this packet.
    */
-  //##ModelId=3B0753810155
   virtual Packet* makeClone() const;
 
   /**
    * Returns the type of this instance.  This allows you to identify the type
    * of packet you have when you only have a Packet*.
    */
-  //##ModelId=3B0753810157
   int getType() const;
 
   /**
@@ -83,7 +77,6 @@ public:
    * discouraged as much as possible since GNE allocates packets in the data
    * stream based on this value, and large values will hinder performance.
    */
-  //##ModelId=3B0753810159
   virtual int getSize() const;
 
   /**
@@ -93,7 +86,6 @@ public:
    * overloading this function, call writePacket on the parent class then
    * write your own variables.
    */
-  //##ModelId=3B075381015B
   virtual void writePacket(RawPacket& raw) const;
 
   /**
@@ -107,7 +99,6 @@ public:
    * of the actual Packet class, and has no signifiance to derived classes,
    * or to the end user.
    */
-  //##ModelId=3B075381015E
   virtual void readPacket(RawPacket& raw);
 
   /**
@@ -116,7 +107,6 @@ public:
    * to parse the data into.  If you derive a new packet type, you'll probably
    * want to register it, so you should create a create function of your own.
    */
-  //##ModelId=3B089AE802BC
   static Packet* create();
 
   /**
@@ -129,11 +119,9 @@ public:
    * If you can't use operator= on a packet, you can use makeClone to
    * achieve a nearly equivalent result.
    */
-  //##ModelId=3BDB10A500BE
   Packet& operator = (const Packet& rhs);
 
 private:
-  //##ModelId=3B089B520140
   guint8 type;
 
 };

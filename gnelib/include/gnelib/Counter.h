@@ -30,44 +30,37 @@ namespace GNE {
  * of the functions in this class are thread-safe so that multiple threads
  * can be accessing the Counter at the same time.
  */
-//##ModelId=3B07538002DB
 class Counter : public TimerCallback {
 public:
   /**
    * Initalize this Counter.  Pass this Counter into a Timer class to use it.
    * @see TimerCallback
    */
-  //##ModelId=3B07538100EB
   Counter();
 
-  //##ModelId=3B07538100EC
   virtual ~Counter();
 
   /**
    * The callback function that the Timer calls.  You should not call this
    * function directly.
    */
-  //##ModelId=3B07538100EE
   void timerCallback();
 
   /**
    * Returns the current count of this Counter.
    */
-  //##ModelId=3B0753810118
   int getCount();
 
   /**
    * Sets the current count to newCount.
    * @param newCount the new value for the Counter
    */
-  //##ModelId=3B0753810119
   void setCount(int newCount);
 
   /**
    * Adjusts the counter's value by adding val to the current count.  This
    * means that negative numbers will subtract from the current count.
    */
-  //##ModelId=3C5CED0501BE
   void adjustCount(int val);
 
   /**
@@ -75,14 +68,11 @@ public:
    * is already greater than zero it returns immediately.  In either case, the
    * value of the counter is decremented.
    */
-  //##ModelId=3C7C0AFD0391
   void waitAndDecrement();
 
 private:
-  //##ModelId=3B07538100E5
   int count;
 
-  //##ModelId=3B07538100E7
   ConditionVariable countSync;
 
 };
