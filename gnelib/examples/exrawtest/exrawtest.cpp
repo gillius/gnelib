@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
        << e << endl << f << endl;
 
   for (int count=0; count<16; count++) {
-    gout << (const char *)(block[count]) << ' ';
+    gout << block[count] << ' ';
   }
   gout << endl;
   gout << "Data was of length: " << raw2.getPosition() << " (should be as above)" << endl;
