@@ -6,7 +6,7 @@ GCC				= g++
 
 AR				= ar
 
-EXAMPLE_LIBS			= $(LIB_STATIC) -lNL -lcurses -lpthread
+EXAMPLE_LIBS			= $(LIB_STATIC) -lNL -lncurses -lpthread
 
 LINKER_OPTIONS			=
 
