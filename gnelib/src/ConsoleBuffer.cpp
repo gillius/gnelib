@@ -38,11 +38,15 @@ ConsoleBuffer::~ConsoleBuffer() {
 }
 
 void ConsoleBuffer::setContIndent( const string& indent ) {
+  acquire();
   this->indent = indent;
+  release();
 }
 
 void ConsoleBuffer::setAutoRender( bool autoRender ) {
+  acquire();
   this->autoRender = autoRender;
+  release();
 }
 
 int ConsoleBuffer::getXOffset() {
@@ -62,20 +66,30 @@ int ConsoleBuffer::getHeight() const {
 }
 
 void ConsoleBuffer::clear() {
+  acquire();
+
   lastLine = "";
   currRow = currCol = 0;
   lines.clear();
   erase();
+
+  release();
 }
 
 void ConsoleBuffer::redraw() {
+  acquire();
+
   currCol = 0;
   currRow = -(int)lines.size();
   doUpdate( REDRAW_HINT );
+
+  release();
 }
 
 void ConsoleBuffer::update() {
+  acquire();
   doUpdate( 0 );
+  release();
 }
 
 bool ConsoleBuffer::scroll( int height ) {
@@ -87,12 +101,16 @@ int ConsoleBuffer::stringWidth( const string& str ) {
 }
 
 void ConsoleBuffer::setRequiredDelimiters( const string& delims ) {
+  acquire();
   reqdDelims = delims;
   allDelims = reqdDelims + optDelims + '\n';
+  release();
 }
 
 void ConsoleBuffer::addRequiredDelimiters( const string& delims ) {
+  acquire();
   setRequiredDelimiters( reqdDelims + delims );
+  release();
 }
 
 string ConsoleBuffer::getRequiredDelimiters() {
@@ -203,11 +221,17 @@ void ConsoleBuffer::pushLastLine( const string& newLastLine ) {
 }
 
 bool ConsoleBuffer::isReqDelim( char ch ) {
-  return ( reqdDelims.find( ch ) != string::npos );
+  acquire();
+  bool ret = ( reqdDelims.find( ch ) != string::npos );
+  release();
+  return ret;
 }
 
 bool ConsoleBuffer::isOptDelim( char ch ) {
-  return ( optDelims.find( ch ) != string::npos );
+  acquire();
+  bool ret = ( optDelims.find( ch ) != string::npos );
+  release();
+  return ret;
 }
 
 } //namespace GNE

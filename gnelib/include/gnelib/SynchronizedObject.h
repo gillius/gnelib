@@ -1,3 +1,6 @@
+#ifndef _SYNCHRONIZEDOBJECT_H_
+#define _SYNCHRONIZEDOBJECT_H_
+
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
  * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
@@ -17,37 +20,39 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/TextConsole.h"
-#include "../include/gnelib/Console.h"
-#include "../include/gnelib/ConsoleStream.h"
-
-using namespace std;
-using namespace GNE::Console;
+#include "Mutex.h"
 
 namespace GNE {
 
-namespace Console {
+/**
+ * A class meant to act as a base class for objects who might want an acquire/
+ * release pair of functions tied to a mutex for object-level synchronization.
+ *
+ * You can inherit from this class publically to allow for external sources to
+ * do locking.  Protected inheritance is possible to allow for implicit
+ * locking internally, but likely would not be any more useful and declaring a
+ * Mutex object.
+ */
+class SynchronizedObject {
+public:
+  /**
+   * Synchronizes on this object.
+   */
+  void acquire() {
+    lock.acquire();
+  }
 
-TextConsole::TextConsole( int xoffset, int yoffset, int width, int height )
-: ConsoleBuffer( xoffset, yoffset, width, height, 1 ) {
+  /**
+   * Releases the lock on this object.
+   */
+  void release() {
+    lock.release();
+  }
+
+protected:
+  Mutex lock;
 };
 
-void TextConsole::erase() {
-  for ( int i = 0; i < getHeight(); ++i )
-    render( getXOffset(), getYOffset() + i, string( getWidth(), ' ' ), 0 );
-}
-
-void TextConsole::render( int x, int y, string text, int renderHints ) {
-  assert( text.find( '\n' ) == string::npos );
-  if ( renderHints & REDRAW_HINT ) {
-    //We want to fill the rest of the line with spaces to redraw.
-    int numSpaces = getWidth() - x + getXOffset() - stringWidth( text );
-    text.append( string( numSpaces, ' ' ) );
-  }
-  gout << Console::acquire << moveTo( x, y ) << text << flush << Console::release;
-}
-
-} //namespace Console
-
 } //namespace GNE
+
+#endif //_SYNCHRONIZEDOBJECT_H_

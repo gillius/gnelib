@@ -20,6 +20,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "SynchronizedObject.h"
+
 #include <string>
 #include <list>
 #include <sstream>
@@ -54,8 +56,16 @@ namespace GNE {
  *
  * You won't instantiate a ConsoleBuffer directly, but instead will create a
  * instance of a child class of ConsoleBuffer, like TextConsole.
+ *
+ * ConsoleBuffer provides thread-safety in a similar way used for
+ * Console::gout.  You may use the acquirecb and releasecb objects to acquire
+ * or release the buffer when using the insertion operators:
+ * <code>cb << acquirecb << "Testing " << 123 << endl << releasecb;</code>
+ *
+ * Calling the ConsoleBuffer functions implicitly lock it, so you need not
+ * acquire or release the object when calling the functions.
  */
-class ConsoleBuffer {
+class ConsoleBuffer : public SynchronizedObject {
 public:
   virtual ~ConsoleBuffer();
 

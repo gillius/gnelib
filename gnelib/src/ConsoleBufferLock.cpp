@@ -17,37 +17,29 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/TextConsole.h"
-#include "../include/gnelib/Console.h"
-#include "../include/gnelib/ConsoleStream.h"
-
-using namespace std;
-using namespace GNE::Console;
+#include "../include/gnelib/ConsoleBufferLock.h"
+#include "../include/gnelib/ConsoleBuffer.h"
 
 namespace GNE {
 
-namespace Console {
-
-TextConsole::TextConsole( int xoffset, int yoffset, int width, int height )
-: ConsoleBuffer( xoffset, yoffset, width, height, 1 ) {
-};
-
-void TextConsole::erase() {
-  for ( int i = 0; i < getHeight(); ++i )
-    render( getXOffset(), getYOffset() + i, string( getWidth(), ' ' ), 0 );
+ConsoleBufferLock::ConsoleBufferLock( bool acq ) : acq(acq) {
 }
 
-void TextConsole::render( int x, int y, string text, int renderHints ) {
-  assert( text.find( '\n' ) == string::npos );
-  if ( renderHints & REDRAW_HINT ) {
-    //We want to fill the rest of the line with spaces to redraw.
-    int numSpaces = getWidth() - x + getXOffset() - stringWidth( text );
-    text.append( string( numSpaces, ' ' ) );
-  }
-  gout << Console::acquire << moveTo( x, y ) << text << flush << Console::release;
+ConsoleBuffer& ConsoleBufferLock::action( ConsoleBuffer& cb ) {
+  if ( acq )
+    cb.acquire();
+  else
+    cb.release();
+  return cb;
 }
 
-} //namespace Console
+GNE::ConsoleBufferLock acquirecb( true );
+
+GNE::ConsoleBufferLock releasecb( false );
 
 } //namespace GNE
+
+GNE::ConsoleBuffer& operator <<
+( GNE::ConsoleBuffer& cb, GNE::ConsoleBufferLock& l ) {
+  return l.action( cb );
+}

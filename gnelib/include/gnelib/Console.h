@@ -26,13 +26,15 @@ namespace GNE {
  * Functions for providing very basic console support, meant for use in the
  * example and test programs, and in console-only servers using GNE.  These
  * functions's behavior is undefined when running in a Win32 application (not
- * a Win32 console) project, or in any non-console environment.\n
+ * a Win32 console) project, or in any non-console environment.
+ *
  * Functions that have m prefixed on them mean "multithreaded," because they
  * are thread safe.  Functions with l prefixed on them mean "location,"
  * because they perform their operations starting at the given coordinates
  * rather than the current cursor location.  When one of these functions are
  * called, the cursor is not returned to its original location (so you can't
- * mix mprintf and mlprintf calls well).\n
+ * mix mprintf and mlprintf calls well).
+ *
  * The upper-left coordinate of the screen is (0,0).  The lower-right
  * coordinate of the window is (width-1,height-1).  Use the function
  * getConsoleSize(int*, int*) to find the width and height if possible.
