@@ -125,6 +125,7 @@ void PacketStream::run() {
     while (out.empty() && !shutdown) {
       outQCtrl.wait();
     }
+    outQCtrl.release();
     if (!shutdown) {
       //Do throttled writes
 			PacketStreamData* next = getNextPacketToSend();
@@ -133,7 +134,6 @@ void PacketStream::run() {
       owner.rawWrite(next->reliable, raw.getData(), raw.getLength());
 			delete next;
     }
-    outQCtrl.release();
   }
 }
 
