@@ -66,7 +66,13 @@ void ConditionVariable::release() {
 }
 
 void ConditionVariable::wait() {
+#ifdef _DEBUG
+  mutex->markReleased();
+#endif
   valassert(pthread_cond_wait(&data->cond, &mutex->data->mutex), 0);
+#ifdef _DEBUG
+  mutex->markAcquired();
+#endif
 }
 
 void ConditionVariable::timedWait(int ms) {

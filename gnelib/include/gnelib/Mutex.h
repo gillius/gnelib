@@ -55,6 +55,19 @@ public:
   void release();
 
 private:
+#ifdef _DEBUG
+  //In the POSIX threads case, I can't assume a mutex is always released with
+  //its release method, because of wait on ConditionVariable.  So I need to
+  //mark my debugging info as if I released and acquired the mutex without
+  //actually performing the operation
+  friend class ConditionVariable;
+
+  void markAcquired();
+
+  void markReleased();
+#endif
+
+private:
   //These are used by Thread::currentThread to lock and unlock mapsync,
   //because currentThread is used for debugging in the main methods.
   friend class Thread;

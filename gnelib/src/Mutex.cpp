@@ -85,27 +85,37 @@ void Mutex::acquire() {
   lowLevelAcquire( &data->mutex );
 
 #ifdef _DEBUG
-  lowLevelAcquire( &data->dbgMutex );
-  data->lockCount++;
-  //assert( data->lockCount != 1 || data->owner == NULL || data->owner == Thread::currentThread() );
-  data->owner = Thread::currentThread().get();
-  lowLevelRelease( &data->dbgMutex );
+  markAcquired();
 #endif
 }
 
 void Mutex::release() {
 #ifdef _DEBUG
-  lowLevelAcquire( &data->dbgMutex );
-  assert( data->owner == Thread::currentThread().get() );
-  assert( data->lockCount > 0 );
-  data->lockCount--;
-  if ( data->lockCount == 0 )
-    data->owner = NULL;
-  lowLevelRelease( &data->dbgMutex );
+  markReleased();
 #endif
 
   lowLevelRelease( &data->mutex );
 }
+
+#ifdef _DEBUG
+void Mutex::markAcquired() {
+  lowLevelAcquire( &data->dbgMutex );
+  data->lockCount++;
+  //assert( data->lockCount != 1 || data->owner == NULL || data->owner == Thread::currentThread() );
+  data->owner = Thread::currentThread().get();
+  lowLevelRelease( &data->dbgMutex );
+}
+
+void Mutex::markReleased() {
+  lowLevelAcquire( &data->dbgMutex );
+  assert( data->lockCount > 0 );
+  assert( data->owner == Thread::currentThread().get() );
+  data->lockCount--;
+  if ( data->lockCount == 0 )
+    data->owner = NULL;
+  lowLevelRelease( &data->dbgMutex );
+}
+#endif
 
 void Mutex::vanillaAcquire() {
   lowLevelAcquire( &data->mutex );
