@@ -41,7 +41,7 @@ int ChannelPacket::getChannel() const {
 }
 
 void ChannelPacket::setChannel( int chan ) {
-  assert( channel >= 0 && channel <= 255 );
+  assert( chan >= 0 && chan <= 255 );
   channel = (guint8)chan;
 }
 

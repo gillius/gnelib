@@ -82,7 +82,7 @@ protected:
     mprintf("Hello World!  My name is %s.\n", getName().c_str());
     Thread::sleep(50);  //sleep(50) will work too, Thread:: is not needed...
 
-    mprintf(" %s Ref: %x %x\n", getName().c_str(), Thread::currentThread(), this);
+    mprintf(" %s Ref: %x %x\n", getName().c_str(), Thread::currentThread().get(), this);
 
     assert(Thread::currentThread().get() == this);
     assert(Thread::currentThread() == getThisPointer() );
@@ -233,5 +233,3 @@ int main(int argc, char* argv[]) {
   //won't get called!
   return 0;
 }
-
-

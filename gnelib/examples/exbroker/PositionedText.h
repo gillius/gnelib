@@ -148,7 +148,7 @@ public:
   }
 
   PositionedText( string msg, int x, int y )
-    : dead(false), drawn(false), msg(msg), x(x), y(y) {
+    : dead(false), drawn(false), x(x), y(y), msg(msg) {
   }
 
   PositionedText( int objId, string msg, int x, int y )

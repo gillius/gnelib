@@ -23,7 +23,7 @@ CPPFLAGS             = $(OPTIMIZEFLAGS)
 CFLAGS               = $(OPTIMIZEFLAGS)
 endif
 
-ifndef NO_OLD_CPP
+ifdef OLD_CPP
 CPPFLAGS            += -DOLD_CPP
 endif
 

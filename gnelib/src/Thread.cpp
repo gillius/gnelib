@@ -26,8 +26,6 @@
 #include "../include/gnelib/GNE.h"
 #include "../include/gnelib/Lock.h"
 
-#include <boost/detail/atomic_count.hpp>
-
 namespace GNE {
 
 #ifdef WIN32
