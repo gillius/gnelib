@@ -40,12 +40,12 @@ int main(int argc, char* argv[]) {
   raw << (int)56 << "superlala" << (NLubyte)124 << (short)26 << (float)12.5 << (double)123.4;
   raw.writeRaw(block, 16);
   
-  cout << "Raw length: " << raw.getLength() << endl;
+  cout << "Raw length: " << raw.getPosition() << endl;
   cout << " should be: " << (sizeof(int) + 10 + sizeof(NLubyte) + sizeof(short) +
                              sizeof(float) + sizeof(double) + 16) << endl;
 
-  NLbyte* buffer = new NLbyte[raw.getLength()];
-  memcpy(buffer, raw.getData(), raw.getLength());
+  NLbyte* buffer = new NLbyte[raw.getPosition()];
+  memcpy(buffer, raw.getData(), raw.getPosition());
   RawPacket raw2(buffer);
   cout << "Now reading from the same data..." << endl;
 
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
     cout << block[count] << ' ';
   }
   cout << endl;
-  cout << "Data was of length: " << raw2.getLength() << " (should be as above)" << endl;
+  cout << "Data was of length: " << raw2.getPosition() << " (should be as above)" << endl;
   cout << "String length: " << b.length() << " (should be 9)" << endl;
   
   return 0;
