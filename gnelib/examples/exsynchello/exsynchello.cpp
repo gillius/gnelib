@@ -110,7 +110,7 @@ void doClient(int outRate, int inRate, int port) {
   gout << "Connecting to: " << address << endl;
 
   //Uncomment the loop for a stress test.
-  for (int i=0; i<100; ++i) {
+  //for (int i=0; i<100; ++i) {
     //We use pointers and new here only to allow the possibility for a for
     //loop.  Without the loop there is no reason why these cannot be on the
     //stack (auto variables).
@@ -141,7 +141,7 @@ void doClient(int outRate, int inRate, int port) {
     }
     delete &client;
     delete clientConn;
-  }
+  //}
 }
 
 
