@@ -1,4 +1,9 @@
 GNE 0.45 to current
+  GNE now compiles against the C runtime dynamically rather than statically,
+    which is better in many different ways and starts to pave the path
+    towards GNE becoming a DLL itself.  The examples are 1/2 to 1/3 the size!
+  Small updates to the exballs Allegro example, which has been around since
+    the first GNE release ;).  We almost forgot about it.
   New example/game expong.
   Fixes in the connection and handshaking process with error handling
   Slight fix in RawPacket when sending 0 byte strings.

@@ -121,7 +121,7 @@ public:
                               ConnectionListener*& listener) {
     inRate = outRate = 0; //0 meaning no limits on rates.
     //We don't use unreliable transfers in this program.
-    allowUnreliable = false;
+    allowUnreliable = true;
     listener = new PingTest();
   }
 
@@ -223,13 +223,16 @@ void doClient(int outRate, int inRate, int port) {
   client->join();
 
   if (client->isConnected()) {
-    gout << "Press s to send a ping and q to quit." << endl;
+    gout << "Press s to send a ping, u to send a ping over unreliable, and q to quit." << endl;
     int ch = 0;
     while (ch != (int)'q') {
       ch = getch();
       if (ch == (int)'s') {
         PingPacket req;
         client->stream().writePacket(req, true);
+      } else if (ch == (int)'u') {
+        PingPacket req;
+        client->stream().writePacket(req, false);
       }
     }
   }
