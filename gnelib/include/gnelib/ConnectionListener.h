@@ -74,11 +74,10 @@ public:
    * case, onConnectFailure but not onDisconnect will be generated, so
    * any needed cleanup needs to be done in your exception handler.
    *
-   * You can also choose to refuse a connection by calling disconnect on
-   * the given SyncConnection and throwing an Error with an error code of
-   * Error::ConnectionRefused, and will it will make the connection act as if
-   * an error just occured, so onConnectFailure will be called and the above
-   * section of text still applies.
+   * You can also choose to refuse a connection by throwing an Error with an
+   * error code of Error::ConnectionRefused, and will it will make the
+   * connection act as if an error just occured, so onListenFailure will be
+   * called and the above section of text still applies.
    *
    * This event does not have the "non-blocking" requirement that most GNE
    * events have.  Take as long as needed to establish a connection, such as
@@ -137,11 +136,10 @@ public:
    * delete this ConnectionListener as usual if this is needed, and GNE will
    * destroy the ServerConnection if onNewConn did not complete w/o errors.
    *
-   * You can also choose to refuse a connection by calling disconnect on
-   * the given SyncConnection and throwing an Error with an error code of
-   * Error::ConnectionRefused, and will it will make the connection act as if
-   * an error just occured, so onListenFailure will be called and the above
-   * section of text still applies.
+   * You can also choose to refuse a connection by throwing an Error with an
+   * error code of Error::ConnectionRefused, and will it will make the
+   * connection act as if an error just occured, so onListenFailure will be
+   * called and the above section of text still applies.
    *
    * Note: Only ServerConnection generates this function.  The SyncConnection
    * is currently wrapped around a ServerConnection, and you should use
@@ -149,7 +147,9 @@ public:
    *
    * If the connection failed before this event, though, the function
    * ServerConnectionListener::onListenFailure instead of this function is
-   * called.
+   * called.  If onNewConn succeeds, ServerConnectionListener::onListenSucess
+   * is called, and the connection process will be completed after that event
+   * completes.
    *
    * This event does not have the "non-blocking" requirement that most GNE
    * events have.  Take as long as needed to establish a connection, such as

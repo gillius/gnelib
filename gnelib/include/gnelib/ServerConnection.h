@@ -67,14 +67,19 @@ public:
 
 protected:
   /**
-   * This thread performs the connection process.  If an error occurs:\n
-   * Before onNewConn: ServerConnectionListener::onListenFailure() is called.\n
+   * This thread performs the connection process.  If an error occurs:
+   *
+   * Before onNewConn: ServerConnectionListener::onListenFailure() is called.
+   *
    * During onNewConn: Only onNewConn is called and is reponsible for catching
    *                   the exception and cleaning up anything it has done.
    *                   onDisconnect will NOT be called, but onListenFailure
    *                   will be.
-   * After onNewConn:  onDisconnect will be called.  onFailure will likely not
-   *                   be called first.
+   *
+   * After onNewConn:  onFailure then onDisconnect.
+   *
+   * After onNewConn is called successfully, then
+   * ServerConnectionListener::onListenSuccess is called.
    */
   //##ModelId=3B0753810280
   void run();
