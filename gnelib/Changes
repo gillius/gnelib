@@ -1,4 +1,9 @@
 GNE 0.45 to current
+  New example/game expong.
+  Fixes in the connection and handshaking process with error handling
+  Slight fix in RawPacket when sending 0 byte strings.
+  Fixed a bug in CustomPacket that did not allow it to be transfered over a
+    SyncConnection, the very purpose it was most meant to serve.
   Added the ability to wait on a counter and decrement it, so that it is
     suitable to use to control or throttle the timing of another thread.
   Modified the examples a little to use the rate controls more/better.
