@@ -20,6 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/EventThread.h"
 #include "../include/gnelib/ConnectionListener.h"
+#include "../include/gnelib/Connection.h"
 #include "../include/gnelib/Thread.h"
 #include "../include/gnelib/Error.h"
 #include "../include/gnelib/ConditionVariable.h"
@@ -27,10 +28,10 @@
 namespace GNE {
 
 //##ModelId=3C106F0203D4
-EventThread::EventThread(ConnectionListener* listener)
-: Thread("EventThr"), eventListener(listener), started(false),
-onReceiveEvent(false), onDoneWritingEvent(false), onDisconnectEvent(false),
-failure(NULL) {
+EventThread::EventThread(Connection* ourConn2, ConnectionListener* listener)
+: Thread("EventThr"), ourConn(ourConn2), eventListener(listener),
+started(false), onReceiveEvent(false), onDoneWritingEvent(false),
+onDisconnectEvent(false), failure(NULL) {
   gnedbgo(5, "created");
 }
 
@@ -146,6 +147,7 @@ void EventThread::run() {
         eventListener->onFailure(*failure);
         delete failure;
         failure = NULL;
+        ourConn->disconnect();
 
       } else if (onDisconnectEvent) {
         eventListener->onDisconnect();
