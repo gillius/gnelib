@@ -34,7 +34,8 @@ public:
 
 /**
  * A class for syncronizing the gout stream.  You won't create this class
- * directly, but instead will use the acquire and release variables.
+ * directly, but instead will use the GNE::Console::acquire and
+ * GNE::Console::release variables.
  */
 class ConsoleMutex : public ConsoleManipulator {
 public:
@@ -57,11 +58,15 @@ private:
  * version of mlprintf.  Using moveTo in the gout stream (and ONLY gout),
  * will set the stream to display the next line-buffered text using an
  * mlprintf rather than a normal mprintf.  gout needs to be acquired if other
- * threads might write to gout.  The following code:\n
- * gout << acquire << moveTo(10, 15) << "Hello, World!" << flush << release;
- * \nworks like mlprintf(10, 15, "Hello, World!");.  Other stuff may be
- * before if anything is in the stream -- remember gout, like cout, only
- * displays when it encounters a newline or is explicitly flushed.
+ * threads might write to gout.  The following code:
+ *
+ * <code>gout << acquire << moveTo(10, 15) << "Hello, World!" << flush << release;</code>
+ * 
+ * works like <code>mlprintf(10, 15, "Hello, World!");</code>.  Other stuff
+ * may be before if anything is in the stream -- remember gout only displays
+ * when it encounters a newline or is explicitly flushed.
+ *
+ * The position 0,0 is the upper left corner of the console.
  */
 class moveTo : public ConsoleManipulator {
 public:
