@@ -49,8 +49,7 @@ const NLbyte* RawPacket::getData() const {
 }
 
 //##ModelId=3B0753810230
-int RawPacket::getLength() const {
-	assert(ourBuffer == true);
+int RawPacket::getPosition() const {
   return currLoc;
 }
 
