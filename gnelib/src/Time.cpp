@@ -195,7 +195,7 @@ void Time::normalize() {
   if (microsec > 999999) {
     sec += (microsec / 1000000);
     microsec = microsec % 1000000;
-  } else while (microsec < 0) {
+  } else if (microsec < 0) {
     sec += microsec / 1000000 - 1;
     microsec *= -1;
     microsec = 1000000 - (microsec % 1000000);
