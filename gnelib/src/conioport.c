@@ -145,7 +145,8 @@ void conio_getxy(int* x, int* y) {
 //Following functions by Jason Winnebeck
 
 void conio_clear() {
-#error implement this function
+  erase();
+  refresh();
 }
 
 void conio_getsize(int* x, int* y) {
