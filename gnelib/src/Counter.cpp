@@ -49,9 +49,10 @@ void Counter::setCount(int newCount) {
   countSync.release();
 }
 
+void Counter::adjustCount(int val) {
+  countSync.acquire();
+  count += val;
+  countSync.release();
 }
 
-
-
-
-
+}

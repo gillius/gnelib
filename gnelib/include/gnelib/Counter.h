@@ -27,7 +27,9 @@
 namespace GNE {
 
 /**
- * An implementation of a TimerCallback that provides a simple counter.
+ * An implementation of a TimerCallback that provides a simple counter.  All
+ * of the functions in this class are thread-safe so that multiple threads
+ * can be accessing the Counter at the same time.
  */
 //##ModelId=3B07538002DB
 class Counter : public TimerCallback {
@@ -50,20 +52,23 @@ public:
   void timerCallback();
 
   /**
-   * Returns the current count of this Counter.  This function is safe to 
-   * call from multiple threads.
+   * Returns the current count of this Counter.
    */
   //##ModelId=3B0753810118
   int getCount();
 
   /**
-   * Sets the current count to newCount.  This function is syncronized
-   * with its own mutex so it is safe to call from multiple threads.
+   * Sets the current count to newCount.
    * @param newCount the new value for the Counter
    */
   //##ModelId=3B0753810119
   void setCount(int newCount);
 
+  /**
+   * Adjusts the counter's value by adding val to the current count.  This
+   * means that negative numbers will subtract from the current count.
+   */
+  void adjustCount(int val);
 
 private:
   //##ModelId=3B07538100E5
