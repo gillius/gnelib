@@ -36,22 +36,23 @@ using namespace GNE::PacketParser;
 class OurServer : public ConnectionListener {
 public:
   OurServer() : received(false) {
-		gout << "Server instance created" << endl;
+		gout << acquire << "Server instance created" << endl << release;
 	}
 
   virtual ~OurServer() {
-		gout << "ServerConnection instance killed" << endl;
+		gout << "ServerConnection instance killed" << endl << release;
 	}
 
 	void onDisconnect() { 
-		gout << "ServerConnection just disconnected." << endl;
+		gout << acquire << "ServerConnection just disconnected." << endl;
 		if (!received)
-			gout << "No message received." << endl;
+			gout << "  No message received." << endl << release;
 		delete this;
 	}
 
   void onNewConn(SyncConnection& conn) {
-    gout << "Connection received from " << conn.getConnection()->getRemoteAddress(true)
+    gout << acquire << "Connection received from "
+         << conn.getConnection()->getRemoteAddress(true)
          << "; waiting for message..." << endl;
 
     HelloPacket message;
@@ -62,9 +63,10 @@ public:
       
       HelloPacket response("Hello, client!  I'm the syncronous server!");
       conn << response;
+      gout << release;
     } catch (Error e) {
       gout << "An error occured during communications." << endl;
-      gout << "  The error was: " << e << endl;
+      gout << "  The error was: " << e << endl << release;
     }
   }
 
@@ -100,6 +102,8 @@ void doClient(int outRate, int inRate, int port) {
   ClientConnection clientConn(outRate, inRate, ConnectionListener::getNullListener());
   SyncConnection client(&clientConn);
   try {
+    //Since only one client can exist, acquire and release is not needed on
+    //gout.
     gout << "Opening client socket." << endl;
     client.open(address, 0); //localPort = 0, for any local port.
     gout << "Attempting to connect." << endl;
