@@ -128,6 +128,9 @@ void shutdownGNE() {
 
   Console::shutdownConsole();
 
+  gameNameBuf[0] = '\0';
+  userVersion = 0;
+
   gnedbg(1, "GNE Shutdown");
 }
 

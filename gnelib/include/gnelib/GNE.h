@@ -34,7 +34,7 @@ namespace GNE {
   class Address;
 
   /**
-   * Initalizes %GNE and HawkNL.  Call this before using any HawkNL or %GNE
+   * Initializes %GNE and HawkNL.  Call this before using any HawkNL or %GNE
    * functions.  Pass it the atexit function so shutdown will be called on
    * exit.  A call to any other %GNE function before this function succeeds
    * is undefined.
@@ -48,7 +48,7 @@ namespace GNE {
    *   connections to finish closing, timers to shut down, and user threads
    *   to close.
    *
-   * @return true if %GNE or HawkNL could not be initalized.
+   * @return true if %GNE or HawkNL could not be initialized.
    *
    * @see shutdownGNE
    */
@@ -72,13 +72,18 @@ namespace GNE {
    * Neither initGNE nor shutdownGNE calls are thread-safe, so they should
    * only be called by the main thread, and most certainly not from any %GNE
    * Thread (this also means you cannot call "exit" from a %GNE Thread).
+   *
+   * You are able to re-initialize %GNE.  If you do this, you should act as if
+   * %GNE was never initialized.  A few methods claim that they can only be
+   * called once (such as setGameInformation), but ignore this claim when
+   * restarting %GNE.
    */
   void shutdownGNE();
 
   /**
    * Use this function to get the address of the default networking device on
    * this system, if possible.  The port in the resulting address will be
-   * zero.  The returned address is invalid if an error occured.
+   * zero.  The returned address is invalid if an error occurred.
    */
   Address getLocalAddress();
 
@@ -128,12 +133,16 @@ namespace GNE {
   GNEProtocolVersionNumber getGNEProtocolVersion();
 
   /**
+   * @ingroup internal
+   *
    * This function is used internally by GNE to get the name that you set in
    * setGameInformation.
    */
   const char* getGameName();
 
   /**
+   * @ingroup internal
+   *
    * This function is used internally by GNE to get the version that you set
    * in setGameInformation.
    */
@@ -142,7 +151,7 @@ namespace GNE {
   /**
    * The user's game information.  This information is used during the
    * connection process to check if the versions and games match.  This
-   * function should only be called once before making any connections.
+   * function should only be called once, and before making any connections.
    *
    * @param gameName the name of your game, or any other unique string
    *        identifier in ASCII format with a length not exceeding
@@ -185,15 +194,15 @@ namespace GNE {
    * The low-level header size of a UDP header, which is used with the HawkNL
    * internet driver that GNE uses.  A number that I always have trouble
    * finding and might be useful in getting stats or calculating actual
-   * bandwith.
+   * bandwidth.
    */
   const int UDP_HEADER_SIZE = 28;
 
   /**
    * Normally you would pass a network type to GNE::init, but passing this
-   * value means that no network should be initalized.  This is useful only
+   * value means that no network should be initialized.  This is useful only
    * in the example programs that don't use networking and do not need to
-   * initalize everything.
+   * initialize everything.
    * @see initGNE
    */
   const NLenum NO_NET = 128;
