@@ -56,6 +56,10 @@
 #include <map>
 #include <queue>
 
+//Boost includes
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+
 //Other standard includes
 #include <assert.h>
 
