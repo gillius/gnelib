@@ -23,6 +23,9 @@
  * your packet.
  * This example does NOT show how to use the packet over the network.
  * See exhello for that.
+ * Note that like exrawtest, this uses Packets and RawPackets in
+ * non-standard ways, so this is not the normal end-user way to use GNE.
+ * This example is mainly just for testing purposes of GNE.
  */
 
 #include "../../src/gnelib.h"
@@ -41,14 +44,6 @@ int main(int argc, char* argv[]) {
   //we don't register UnknownPacket to try to trigger an error later so we
   //can test error handling of the parser.
   
-  cout << endl;
-  packetTest();
-
-  return 0;
-}
-
-void packetTest() {
-  cout << "Creating two PersonPackets" << endl;
   PersonPacket jason;
   jason.age = 19;
   jason.firstName = "Jason";
@@ -62,9 +57,20 @@ void packetTest() {
   elias.lastName = "Pschernig";
   elias.timestamp = 0;
 
+  packetTest(jason, elias);
+  parseTest(jason, elias);
+
+  return 0;
+}
+
+void packetTest(const PersonPacket& jason, const PersonPacket& elias) {
+  cout << "Creating two PersonPackets" << endl;
+
   RawPacket raw(NULL);
   jason.writePacket(raw);
-  elias.writePacket(raw);
+  Packet* temp = elias.makeClone();
+  temp->writePacket(raw);
+  delete temp;
 
   raw.reset();
 
@@ -81,8 +87,54 @@ void packetTest() {
   raw >> dummy;
   t1.readPacket(raw);
   raw >> dummy;
-  t2.readPacket(raw);
+  raw >> t2;
 
-  cout << t1.firstName << ' ' << t1.lastName << ", " << (int)t1.age << " years." << endl;
-  cout << t2.firstName << ' ' << t2.lastName << ", " << (int)t2.age << " years." << endl;
+  cout << t1.firstName << ' ' << t1.lastName << ", " << (int)t1.age
+    << " years.  (size/type: " << t1.getSize() << '/' << t1.getType() << ')' << endl;
+  cout << t2.firstName << ' ' << t2.lastName << ", " << (int)t2.age
+    << " years.  (size/type: " << t2.getSize() << '/' << t2.getType() << ')' << endl;
+}
+
+void parseTest(const Packet& jason, const Packet& elias) {
+  cout << "Starting packet tests.  If no \"Unexpected values\" are seen, everything worked." << endl;
+  Packet packet1;
+  UnknownPacket packet2;
+
+  RawPacket raw1;
+  
+  //All packets we intend on parsing must end with END_OF_PACKET.  In normal
+  //GNE usage, the library will terminate packets properly on send.
+  raw1 << packet1 << packet2 << jason << packet1 << elias << END_OF_PACKET;
+
+  raw1.reset();
+
+  bool end = false;
+  Packet* next = parseNextPacket(end, raw1);
+  cout << end << ", " << next << ", " << next->getType() << endl;
+  if (end == true || next == NULL || next->getType() != 0)
+    cout << "(1)Unexpected values." << endl;
+  delete next;
+
+  //This one should fail as we did not register UnknownPacket.
+  next = parseNextPacket(end, raw1);
+  cout << end << ", " << next << endl;
+  if (end == true || next != NULL)
+    cout << "(2)Unexpected values." << endl;
+
+  raw1.reset();
+  //After we register, we should be able to completely read the RawPacket.
+  registerPacket(packet2.getType(), UnknownPacket::create);
+
+  while(!end) {
+    next = parseNextPacket(end, raw1);
+    if (end && next != NULL)
+      cout << "(3)Unexpected values." << endl;
+    if (!end && next == NULL)
+      cout << "(4)Unexpected values." << endl;
+    if (!end) {
+      cout << end << ", " << next << ", " << next->getType() << endl;
+      delete next;
+    }
+  }
+  cout << end << ", " << next << endl;
 }

@@ -90,6 +90,7 @@ public:
   }
 };
 
-void packetTest();
+void packetTest(const PersonPacket&, const PersonPacket&);
+void parseTest(const Packet&, const Packet&);
 
 #endif
