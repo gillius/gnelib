@@ -21,6 +21,7 @@
  */
 
 #include "gneintern.h"
+#include "ConnectionStats.h"
 
 /**
  * The namespace in which all of GNE resides in.  The namespace consists of
@@ -69,15 +70,13 @@ class ConnectionEventGenerator;
    */
   //static void exit(int status);
 
-  /**
-   * Returns how many total bytes GNE has read on all sockets.
-   */
-  int getBytesRead();
 
   /**
-   * Returns how many total bytes GNE has written on all sockets.
+   * Gets the global stats.  Very similar to Connection::getStats, but this
+   * gets cumulative stats for all sockets, user-created ones and GNE ones
+   * too you may not know about.
    */
-  int getBytesWritten();
+  ConnectionStats getGlobalStats();
 
   /**
    * Enables stats gathering, which is off by default.  When stats is not

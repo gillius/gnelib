@@ -237,6 +237,10 @@ SOURCE=.\include\gnelib\ConnectionListener.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\gnelib\ConnectionStats.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\gnelib\Console.h
 # End Source File
 # Begin Source File

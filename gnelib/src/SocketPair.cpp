@@ -78,6 +78,30 @@ Address SocketPair::getRemoteAddress(bool reliable) const {
   return Address(ret);
 }
 
+static void addStats(NLsocket s, ConnectionStats& st) {
+  st.packetsSent += nlGetSocketStat(s, NL_PACKETS_SENT);
+  st.bytesSent += nlGetSocketStat(s, NL_BYTES_SENT);
+  st.avgBytesSent += nlGetSocketStat(s, NL_AVE_BYTES_SENT);
+  st.maxAvgBytesSent += nlGetSocketStat(s, NL_HIGH_BYTES_SENT);
+  st.packetsRecv += nlGetSocketStat(s, NL_PACKETS_RECEIVED);
+  st.bytesRecv += nlGetSocketStat(s, NL_BYTES_RECEIVED);
+  st.avgBytesRecv += nlGetSocketStat(s, NL_AVE_BYTES_RECEIVED);
+  st.maxAvgBytesRecv += nlGetSocketStat(s, NL_HIGH_BYTES_RECEIVED);
+  st.openSockets++;
+}
+
+ConnectionStats SocketPair::getStats(int reliable) const {
+  ConnectionStats ret;
+  ret.avgBytesRecv = ret.avgBytesSent = ret.bytesRecv = ret.bytesSent
+    = ret.maxAvgBytesRecv = ret.maxAvgBytesSent = ret.packetsRecv
+    = ret.packetsSent = 0;
+  if (reliable != 0 && r != NL_INVALID) //Add in reliable socket stats
+    addStats(r, ret);
+  if (reliable <= 0 && u != NL_INVALID) //Add in unrel socket stats
+    addStats(u, ret);
+  return ret;
+}
+
 //##ModelId=3B6B302400CA
 int SocketPair::rawRead(bool reliable, const NLbyte* buf, int bufSize) const {
   NLsocket act;

@@ -19,6 +19,7 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ConnectionEventGenerator.h"
+#include "../include/gnelib/ConnectionStats.h"
 #include "../include/gnelib/PacketParser.h"
 #include "../include/gnelib/GNE.h"
 #include "../include/gnelib/Address.h"
@@ -84,14 +85,18 @@ Address getLocalAddress() {
   return ret;
 }
 
-int getBytesRead() {
-  assert(initialized);
-  return nlGetInteger(NL_BYTES_RECEIVED);
-}
-
-int getBytesWritten() {
-  assert(initialized);
-  return nlGetInteger(NL_BYTES_SENT);
+ConnectionStats getGlobalStats() {
+  ConnectionStats ret;
+  ret.packetsSent = nlGetInteger(NL_PACKETS_SENT);
+  ret.bytesSent = nlGetInteger(NL_BYTES_SENT);
+  ret.avgBytesSent = nlGetInteger(NL_AVE_BYTES_SENT);
+  ret.maxAvgBytesSent = nlGetInteger(NL_HIGH_BYTES_SENT);
+  ret.packetsRecv = nlGetInteger(NL_PACKETS_RECEIVED);
+  ret.bytesRecv = nlGetInteger(NL_BYTES_RECEIVED);
+  ret.avgBytesRecv = nlGetInteger(NL_AVE_BYTES_RECEIVED);
+  ret.maxAvgBytesRecv = nlGetInteger(NL_HIGH_BYTES_RECEIVED);
+  ret.openSockets = nlGetInteger(NL_OPEN_SOCKETS);
+  return ret;
 }
 
 void enableStats() {
@@ -120,9 +125,3 @@ void setUserVersion(int version) {
 }
 
 }
-
-
-
-
-
-

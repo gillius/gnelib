@@ -21,6 +21,7 @@
  */
 
 #include "gneintern.h"
+#include "ConnectionStats.h"
 
 namespace GNE {
 class Address;
@@ -71,6 +72,18 @@ public:
    */
   //##ModelId=3BB2CB41037A
   Address getRemoteAddress(bool reliable) const;
+
+  /**
+   * If stats is enabled, returns Connection stats.
+   * @param reliable If greater than 0, returns reliable stats only.\n
+   *                 If 0, returns unreliable transfer stats only.\n
+   *                 If less than 0, returns cumulative stats for both.
+   * @return various connection stats.
+   * @see ConnectionStats
+	 * @see GNE::enableStats
+   */
+  //##ModelId=3B0753810079
+  ConnectionStats getStats(int reliable) const;
 
 	/**
 	 * Performs a low-level read on a socket.

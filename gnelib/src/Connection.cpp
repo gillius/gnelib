@@ -19,6 +19,7 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/Connection.h"
+#include "../include/gnelib/ConnectionStats.h"
 #include "../include/gnelib/ConnectionListener.h"
 #include "../include/gnelib/RawPacket.h"
 #include "../include/gnelib/PacketParser.h"
@@ -59,8 +60,8 @@ PacketStream& Connection::stream() {
 }
 
 //##ModelId=3B0753810079
-Connection::Stats Connection::getStats() const {
-  return Stats();
+ConnectionStats Connection::getStats(int reliable) const {
+  return sockets.getStats(reliable);
 }
 
 //##ModelId=3B075381007B

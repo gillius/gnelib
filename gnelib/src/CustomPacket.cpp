@@ -57,12 +57,14 @@ int CustomPacket::getSize() const {
 //##ModelId=3C0B257E03CC
 void CustomPacket::writePacket(RawPacket& raw) const {
   assert (data != NULL);
+  Packet::writePacket(raw);
   raw << data->getPosition();
   raw.writeRaw(data->getData(), data->getPosition());
 }
 
 //##ModelId=3C0B257E03CF
 void CustomPacket::readPacket(RawPacket& raw) {
+  Packet::readPacket(raw);
   destroyData();
   
   int contentLen;

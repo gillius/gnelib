@@ -26,6 +26,8 @@
 #include "ReceiveEventListener.h"
 #include "Error.h"
 #include "SocketPair.h"
+#include "Address.h"
+#include "ConnectionStats.h"
 
 namespace GNE {
 class ConnectionListener;
@@ -43,25 +45,6 @@ class ConnectionListener;
 //##ModelId=3B075380029E
 class Connection {
 public:
-  /**
-   * A struct holding values returned by getStats.
-   */
-  //##ModelId=3B075380029F
-  struct Stats {
-    //##ModelId=3B0753810008
-    int sent;
-    //##ModelId=3B0753810009
-    int recv;
-    //##ModelId=3B075381000A
-    int maxAvgSent;
-    //##ModelId=3B075381000B
-    int maxAvgRecv;
-    //##ModelId=3B075381000C
-    int avgSent;
-    //##ModelId=3B075381003C
-    int avgRecv;
-  };
-
   /**
    * Intializes this class, given the flow control parameters.
    * @param outRate the maximum rate in bytes per second to send.  If this is
@@ -112,12 +95,15 @@ public:
 
   /**
    * If stats is enabled, returns Connection stats.
+   * @param reliable If greater than 0, returns reliable stats only.\n
+   *                 If 0, returns unreliable transfer stats only.\n
+   *                 If less than 0, returns cumulative stats for both.
    * @return various connection stats.
-   * @see Stats
+   * @see ConnectionStats
 	 * @see GNE::enableStats
    */
   //##ModelId=3B0753810079
-  Stats getStats() const;
+  ConnectionStats getStats(int reliable) const;
 
   /**
    * Returns the local address of this connection.  If the requested socket

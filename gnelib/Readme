@@ -20,12 +20,12 @@ Dependancies
 The following things are needed for GNE:
 
   * ANSI C++ compiler
-    + Out-of-the-Box for MSVC 6, Linux gcc 3.x
+    + Out-of-the-Box for MSVC 6, Linux gcc 3.x, Linux gcc 2.9x, MingW.
     + Planned support for Solaris 8 (this might already work using the Linux
       makefiles with GNU make, need testers!)
     + MSVC 4 or 5 might also work, and other *NIX as well, but testers are
       needed for this!
-  * The HawkNL networking library from HawkSoft , version 1.4 final or higher.
+  * The HawkNL networking library from HawkSoft, version 1.4 final or higher.
     The download link is on the left sidebar when you are in the HawkNL
     section.
   * pthreads implementation (pthreads-win32 for Windows used for Windows),

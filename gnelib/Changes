@@ -1,5 +1,8 @@
 GNE 0.4 to Current
-  New example exnetperf.
+  Implemented and refined the API related to getting Connection stats.
+  Due to some issues, Connection::Stats is now no longer a nested class and
+    is now called ConnectionStats.
+  New example exnetperf made for testing/profiling GNE's network performance.
   Added the CustomPacket class, which allows you to send data without
     creating a packet to encapsulate it.
   GCC 2.9x support!  MingW and GCC 2.9x in Linux should work again with the
