@@ -100,15 +100,20 @@ void doClient(int outRate, int inRate, int port) {
   ClientConnection clientConn(outRate, inRate, ConnectionListener::getNullListener());
   SyncConnection client(&clientConn);
   try {
+    gout << "Opening client socket." << endl;
     client.open(address, 0); //localPort = 0, for any local port.
+    gout << "Attempting to connect." << endl;
     client.connect();
     
+    gout << "Connection completed, sending message to server." << endl;
     HelloPacket message("Hello, server!  I'm the syncronous client!");
     client << message;
 
+    gout << "Waiting for message from server." << endl;
     client >> message;
     gout << "Received \"" << message.getMessage() << "\" from the server." << endl;
     
+    gout << "Disconnecting." << endl;
     client.disconnect();
   } catch (Error e) {
     gout << "An error occured while trying to communicate." << endl;
