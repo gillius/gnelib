@@ -46,6 +46,7 @@ public:
     UserVersionMismatch,
     CouldNotOpenSocket,
     ConnectionTimeOut,
+    ConnectionAborted,
     ConnectionRefused,
     ConnectionDropped,
     SyncConnectionReleased,
