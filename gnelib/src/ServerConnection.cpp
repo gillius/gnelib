@@ -56,7 +56,7 @@ void ServerConnection::run() {
 		//Do connection negotiaion here
 		reg(true, false);
 		ps->start();
-		eventListener->onNewConn(&sync); //SyncConnection will relay this
+		eventListener->onNewConn(sync); //SyncConnection will relay this
 		sync.release();
 		connected = true;
 		connecting = false;

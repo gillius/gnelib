@@ -53,7 +53,7 @@ void ClientConnection::run() {
       reg(true, false);
       ps->start();
       connecting = true;
-      eventListener->onConnect(&sync); //SyncConnection will relay this
+      eventListener->onConnect(sync); //SyncConnection will relay this
       sync.release();
       connected = true;
       connecting = false;

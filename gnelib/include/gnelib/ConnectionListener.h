@@ -52,7 +52,7 @@ public:
    * \nIn the near future the ability to refuse connections will be added.
    */
   //##ModelId=3BCA83910078
-  virtual void onConnect(SyncConnection* conn);
+  virtual void onConnect(SyncConnection& conn);
 
   /**
    * Event triggered when a connection failed.\n
@@ -81,7 +81,7 @@ public:
    * \nIn the near future the ability to refuse connections will be added.
    */
   //##ModelId=3BCFAE5900AA
-  virtual void onNewConn(SyncConnection* newConn);
+  virtual void onNewConn(SyncConnection& newConn);
 
 	/**
 	 * An event triggered when a socket is closing for any reason.  This event

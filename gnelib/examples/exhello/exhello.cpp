@@ -104,8 +104,8 @@ public:
 		delete this;
 	}
 
-  void onConnect(SyncConnection* conn2) {
-		conn = conn2->getConnection();
+  void onConnect(SyncConnection& conn2) {
+		conn = conn2.getConnection();
     mprintf("Connection to server successful.\n");
   }
 
@@ -155,8 +155,8 @@ public:
 		delete this;
 	}
 
-  void onNewConn(SyncConnection* conn2) {
-		conn = conn2->getConnection();
+  void onNewConn(SyncConnection& conn2) {
+		conn = conn2.getConnection();
     mprintf("Connection received from %s; waiting for message...\n", conn->getRemoteAddress(true).toString().c_str());
   }
 
@@ -225,8 +225,6 @@ int main(int argc, char* argv[]) {
   setTitle("GNE Basic Connections Example");
   registerPacket(MIN_USER_ID, HelloPacket::create);
 
-  //It's okay to use iostreams instead of the Console functions when we are
-  //only accessing the console from one thread.
 	gout << "GNE Basic Connections Example for " << GNE::VER_STR << endl;
   gout << "Local address: " << getLocalAddress() << endl;
   gout << "Should we act as the server, or the client?" << endl;

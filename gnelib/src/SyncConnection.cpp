@@ -154,20 +154,20 @@ SyncConnection& SyncConnection::operator << (const Packet& packet) throw (Error)
 }
 
 //##ModelId=3BDB10A50353
-void SyncConnection::onNewConn(SyncConnection* newConn) {
+void SyncConnection::onNewConn(SyncConnection& newConn) {
 	//Only ServerConnection sends this event, so we pass it on.  newConn should
 	//be this, otherwise someone else sent this event, and we would need some
 	//additional syncronization that we don't have.
 	assert(!isReleased());
-	assert(this == newConn);
+	assert(this == &newConn);
 	oldListener->onNewConn(newConn);
 }
 
 //##ModelId=3BDB10A6000A
-void SyncConnection::onConnect(SyncConnection* conn) {
+void SyncConnection::onConnect(SyncConnection& conn) {
 	//Only ClientConnection sends this event.  See comment for onNewConn.
 	assert(!isReleased());
-	assert(this == conn);
+	assert(this == &conn);
 	oldListener->onConnect(conn);
 }
 

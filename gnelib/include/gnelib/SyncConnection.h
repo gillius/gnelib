@@ -164,9 +164,9 @@ private:
 	 * listener our connection has.
 	 */
   //##ModelId=3BDB10A50353
-	void onNewConn(SyncConnection* newConn);
+	void onNewConn(SyncConnection& newConn);
   //##ModelId=3BDB10A6000A
-	void onConnect(SyncConnection* conn);
+	void onConnect(SyncConnection& conn);
   //##ModelId=3BDB10A60078
 	void onConnectFailure(const Error& error);
   //##ModelId=3BDB10A60122
