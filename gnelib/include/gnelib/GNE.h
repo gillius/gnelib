@@ -49,6 +49,7 @@ namespace GNE {
    * library.  However, this function is acceptable enough to be used on an
    * "emergency" shutdown due to some error -- just don't try to call any
    * other GNE or HawkNL function after calling this.
+   *
    * Note that it is possible that this function may block for a short time
    * (500ms or less), while the event generators shut down.
    */
@@ -100,16 +101,41 @@ namespace GNE {
    */
   int getOpenConnections();
 
+  struct GNEProtocolVersionNumber {
+    guint8 version;
+    guint8 subVersion;
+    guint16 build;
+  };
+
   /**
-   * Sets the user application protocol version number.
-   * @see userVersion
+   * Returns the GNE Protocol version number.  This is different from the
+   * library version number.  This number is specified by the GNE protocol
+   * document on the GNE web site.  Versions of this library obtained from
+   * CVS might have the build number non-zero.  Non-beta public releases of
+   * GNE will have a build number of zero and a version and subVersion number
+   * strictly defined by the GNE protocol specification.  Public alpha or
+   * beta releases might have a non-zero build number.
    */
-  void setUserVersion(int version);
+  GNEProtocolVersionNumber getGNEProtocolVersion();
+
+  /**
+   * Returns the user specified protocol number.
+   * @see setUserVersion
+   */
+  guint32 getUserVersion();
+
+  /**
+   * The user's own protocol version number, 0 by default.  If you set this
+   * number, GNE will version check not only its own library version, but
+   * your application version as well on connect, and produce the appropriate
+   * error if there is a mismatch.
+   */
+  void setUserVersion(guint32 version);
 
   /**
    * A numeric representation of the current version of this library.
    */
-  const double VER = 0.45;
+  const double VER = 0.46;
 
   /**
    * A string representation of the name of the library and the current
@@ -133,15 +159,6 @@ namespace GNE {
    * @see initGNE
    */
   const NLenum NO_NET = 128;
-
-  /**
-   * The user's own protocol version number, 0 by default.  If you set this
-   * number, GNE will version check not only its own library version, but
-   * your application version as well on connect, and produce the appropriate
-   * error if there is a mismatch.\n
-   * To set this number, use setUserVersion(int).
-   */
-  extern int userVersion;
 
   /**
    * The global event generator.  The library uses this internally to

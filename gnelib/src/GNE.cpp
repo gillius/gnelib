@@ -31,7 +31,7 @@ namespace GNE {
     void registerGNEPackets();
   }
 
-int userVersion = 0;
+guint32 userVersion = 0;
 ConnectionEventGenerator* eGen = NULL;
 
 static bool initialized = false;
@@ -86,6 +86,7 @@ Address getLocalAddress() {
 }
 
 ConnectionStats getGlobalStats() {
+  assert(initialized);
   ConnectionStats ret;
   ret.packetsSent = nlGetInteger(NL_PACKETS_SENT);
   ret.bytesSent = nlGetInteger(NL_BYTES_SENT);
@@ -119,7 +120,23 @@ int getOpenConnections() {
   return nlGetInteger(NL_OPEN_SOCKETS);
 }
 
-void setUserVersion(int version) {
+GNEProtocolVersionNumber getGNEProtocolVersion() {
+  assert(initialized);
+
+  GNEProtocolVersionNumber ret;
+  ret.version = 0;
+  ret.subVersion = 0;
+  ret.build = 1;
+
+  return ret;
+}
+
+guint32 getUserVersion() {
+  assert(initialized);
+  return userVersion;
+}
+
+void setUserVersion(guint32 version) {
   assert(initialized);
   userVersion = version;
 }
