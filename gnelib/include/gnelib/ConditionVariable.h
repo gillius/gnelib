@@ -26,6 +26,8 @@ class Mutex;
 class Time;
 
 /**
+ * @ingroup threading
+ *
  * A class for a conditional variable.  This is to be used when a thread needs
  * to wait for a condition that another thread will trigger.  The most common
  * usage of ConditionVariables:

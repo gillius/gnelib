@@ -26,11 +26,13 @@ namespace GNE {
   bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)));
 
 /**
+ * @ingroup highlevel
+ *
  * The ObjectBrokerClient takes packets generated from the ObjectBrokerServer
  * and manages the object creations, updates, and deletes specified.  All
  * methods in ObjectBrokerClient are thread safe.
  */
-  class ObjectBrokerClient : public ObjectBroker {
+class ObjectBrokerClient : public ObjectBroker {
 public:
   /**
    * Default ctor.

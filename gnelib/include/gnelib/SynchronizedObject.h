@@ -25,6 +25,8 @@
 namespace GNE {
 
 /**
+ * @ingroup threading
+ *
  * A class meant to act as a base class for objects who might want an acquire/
  * release pair of functions tied to a mutex for object-level synchronization.
  *

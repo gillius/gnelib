@@ -522,6 +522,9 @@
 			RelativePath=".\docs\gnereq.doc">
 		</File>
 		<File
+			RelativePath="src\groups">
+		</File>
+		<File
 			RelativePath=".\src\mainpage">
 		</File>
 		<File

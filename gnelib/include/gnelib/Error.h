@@ -25,6 +25,8 @@
 namespace GNE {
 
 /**
+ * @ingroup midlevel
+ *
  * This class resembles some sort of error in GNE, with the ability to obtain
  * a textual description of the error.  Objects of type Error are not thread
  * safe.  This is usually OK since Error objects are not typically shared by

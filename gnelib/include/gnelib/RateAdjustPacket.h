@@ -25,6 +25,8 @@
 namespace GNE {
 
 /**
+ * @ingroup internal
+ *
  * The RateAdjustPacket is sent automatically by GNE when you change rates in
  * the PacketStream.  It is not a packet that you send, or that you will
  * see -- it is used only internally by GNE.

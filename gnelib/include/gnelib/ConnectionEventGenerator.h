@@ -30,6 +30,8 @@ namespace GNE {
 class ReceiveEventListener;
 
 /**
+ * @ingroup internal
+ *
  * A class used internally by GNE to generate the events in Connection.  Users
  * of GNE should not need to use or know about this class.  This class uses
  * nlPollGroup to check for events comming in on sockets.

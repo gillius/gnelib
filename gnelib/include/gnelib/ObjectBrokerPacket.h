@@ -26,6 +26,8 @@
 namespace GNE {
   
 /**
+ * @ingroup highlevel
+ *
  * The three ObjectBrokerPackets are all identical except for their packet
  * IDs.  This base class abstracts the common functionality.
  */

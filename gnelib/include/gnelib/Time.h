@@ -29,6 +29,8 @@ class ostream;
 namespace GNE {
 
 /**
+ * @ingroup midlevel
+ *
  * A class representing a time relative to a point in the past.  The time
  * is always proper ("normalized"), meaning that 999,999 is the highest value
  * for microseconds.  Setting a value higher than this will increase seconds.

@@ -24,6 +24,8 @@
 namespace GNE {
 
 /**
+ * @ingroup threading
+ *
  * The mutex class models a simple mutex to provide mutual exclusion to a
  * resource shared by threads.
  *

@@ -33,6 +33,8 @@ class ClientConnectionParams;
 class ConnectionParams;
 
 /**
+ * @ingroup midlevel
+ *
  * A class that can connect to a remote target.
  */
 class ClientConnection : public Connection, public Thread {

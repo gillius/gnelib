@@ -25,6 +25,8 @@
 namespace GNE {
   
 /**
+ * @ingroup midlevel
+ *
  * WrapperPacket is a Packet that encapsulates another packet for the purposes
  * of adding information to that packet.  A WrapperPacket on its own has no
  * identity; it is meant only to be used as a base class for the real packet

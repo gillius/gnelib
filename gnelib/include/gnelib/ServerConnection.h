@@ -33,6 +33,8 @@ class Error;
 class ConnectionParams;
 
 /**
+ * @ingroup internal
+ *
  * A GNE "internal" class.  Users will use this class, but probably only as
  * its base class -- a Connection.  This class is created by
  * ServerConnectionListener when incoming connections are comming in.

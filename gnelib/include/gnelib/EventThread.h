@@ -31,6 +31,8 @@ class ConnectionListener;
 class Connection;
 
 /**
+ * @ingroup internal
+ *
  * Internal class used by GNE to manage Connection events.
  *
  * Each Connection has an EventThread.  This is used internally by the

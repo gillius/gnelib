@@ -31,6 +31,8 @@ namespace GNE {
   class NetworkObject;
 
 /**
+ * @ingroup highlevel
+ *
  * The ObjectBrokerServer assigns IDs to NetworkObject objects, and aids in
  * the creation of ObjectBrokerPacket packets.  When a new object is
  * registered with the broker, a new, unique, ID is assigned to that

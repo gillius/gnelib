@@ -34,6 +34,8 @@ class ServerConnection;
 class ConnectionParams;
 
 /**
+ * @ingroup midlevel
+ *
  * A class for performing syncronous connections.  All methods of this class
  * except writing block until completion.  This is useful while
  * connecting or performing trivial connections/communications.  Many times

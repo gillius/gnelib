@@ -25,6 +25,8 @@
 namespace GNE {
 
 /**
+ * @ingroup midlevel internal
+ *
  * The ExitPacket is sent automatically by GNE when you disconnect in a
  * proper manner.  You need not use this class.  When you receive an
  * ExitPacket, though, a graceful disconnect is initiated that generates an

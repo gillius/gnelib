@@ -24,6 +24,8 @@
 namespace GNE {
 
 /**
+ * @ingroup midlevel
+ *
  * A struct holding values returned by getStats.
  */
 struct ConnectionStats {

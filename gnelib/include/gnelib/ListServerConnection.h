@@ -26,9 +26,12 @@
 namespace GNE {
 
 /**
+ * @ingroup highlevel
+ *
  * A Client-side connection to a game list server for retriving a list of
  * games.  This stuff is all very preliminary.  List server code will be
  * completed last so don't pay attention to these classes at all.
+ *
  * \todo The List server code will be completed only after the rest of GNE
  *       works and has been tested and finalized.
  */

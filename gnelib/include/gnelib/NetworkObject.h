@@ -25,6 +25,8 @@ namespace GNE {
   class ObjectBroker;
   
 /**
+ * @ingroup highlevel
+ *
  * Represents an object which can be replicated through the ObjectBroker.  All
  * of these methods should be called through the ObjectBroker, but it is
  * acceptable to call createCreationPacket, createUpdatePacket,

@@ -35,9 +35,12 @@ class RawPacket;
 class PacketFeeder;
 
 /**
+ * @ingroup midlevel
+ *
  * This class resembles a packet stream through a connection.  This class
  * is maintained by the Connection class, and you shouldn't have to create
  * your own PacketStreams.
+ *
  * NOTE: all functions in this class are thread safe, since this class uses
  *       its own mutexes internally.  Note that data in the class may change
  *       between calls, if another thread changes its state.

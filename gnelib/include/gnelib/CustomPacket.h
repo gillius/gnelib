@@ -26,6 +26,8 @@ namespace GNE {
 class RawPacket;
 
 /**
+ * @ingroup midlevel
+ *
  * Many times, espically during connection, you want to send some more
  * "free-form" data that may or may not all be related and will only be sent
  * once.  It may not make sense to create a completely new packet type just

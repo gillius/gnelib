@@ -30,6 +30,8 @@
 namespace GNE {
 
 /**
+ * @ingroup midlevel
+ *
  * Adds low level HawkNL and possibly system error information to any other
  * error.
  */
@@ -58,6 +60,8 @@ private:
 };
 
 /**
+ * @ingroup midlevel
+ *
  * An error that represents a mismatch in the games during the connection
  * process.  If two GNE programs try to connect that are different games,
  * this is the error you will get.
@@ -100,6 +104,8 @@ private:
 };
 
 /**
+ * @ingroup midlevel
+ *
  * An error that occurs during the connecting process if the user versions
  * are different.  The version is passed to you because GNE does not know
  * what format your version is -- only that is is not equal.
@@ -121,6 +127,8 @@ private:
 };
 
 /**
+ * @ingroup midlevel
+ *
  * An error that occurs during the connection process if the remote machine
  * sends incorrect or corrupted packets to us.  This might be possible if
  * they were using a pre-alpha version of GNE, or if the connection came from

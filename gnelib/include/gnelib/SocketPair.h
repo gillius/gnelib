@@ -28,6 +28,8 @@ namespace GNE {
 class Address;
 
 /**
+ * @ingroup internal
+ *
  * A class used to centralize shared elements between Connection and
  * SyncConnection.  The GNE user will not need to use or know about this
  * class, except to possibly pass it to another Connection type class to

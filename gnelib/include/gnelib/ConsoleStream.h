@@ -35,6 +35,8 @@ public:
 };
 
 /**
+ * @ingroup console
+ *
  * A class for syncronizing the gout stream or a ConsoleBuffer.  You won't
  * create this class directly, but instead will use the GNE::Console::acquire
  * and GNE::Console::release variables.
@@ -55,6 +57,8 @@ private:
 };
 
 /**
+ * @ingroup console
+ *
  * A manipulator for gout essentially meant to facilitate a C++ iostream
  * version of mlprintf.  Using moveTo in the gout stream (and ONLY gout),
  * will set the stream to display the next line-buffered text using an

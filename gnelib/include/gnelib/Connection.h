@@ -37,6 +37,8 @@ class EventThread;
 class SyncConnection;
 
 /**
+ * @ingroup midlevel
+ *
  * A class resembling any type of connection to a remote computer.  A
  * connection also manages flow control through its PacketStream.
  *

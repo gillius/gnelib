@@ -26,6 +26,8 @@
 namespace GNE {
 
 /**
+ * @ingroup internal
+ *
  * A class to act as an interface between ConnectionEventGenerator and its
  * listeners.
  */

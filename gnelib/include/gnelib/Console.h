@@ -31,6 +31,8 @@
 
 namespace GNE {
 /**
+ * @ingroup console
+ *
  * Functions for providing very basic console support, meant for use in the
  * example and test programs, and in console-only servers using GNE.  These
  * functions's behavior is undefined when running in a Win32 application (not

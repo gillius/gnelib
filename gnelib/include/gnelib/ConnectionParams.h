@@ -26,6 +26,8 @@ class ConnectionListener;
 class PacketFeeder;
 
 /**
+ * @ingroup midlevel
+ *
  * A class to encapsulate parameters about a connection.  The parameter list
  * was starting to get very complex, and I knew in the future that I wanted
  * to expand the list of parameters, and perhaps change the defaults.  This

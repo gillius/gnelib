@@ -27,6 +27,8 @@ namespace GNE {
 namespace Console {
 
 /**
+ * @ingroup console
+ *
  * Provides a text-based window view of a buffer of text, similar to a textbox
  * object in a GUI.  This allows one to provide a text-based console which
  * would be useful in a dedicated server running in a console, or in a UNIX

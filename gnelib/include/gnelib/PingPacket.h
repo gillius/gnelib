@@ -28,6 +28,8 @@
 namespace GNE {
 
 /**
+ * @ingroup midlevel
+ *
  * Information returned by GNE::PingPacket::getPingInformation.
  */
 struct PingInformation {
@@ -45,6 +47,8 @@ struct PingInformation {
 };
 
 /**
+ * @ingroup midlevel
+ *
  * Using the PingPacket is one way to measure ping and clock offsets from a
  * remote machine.  Measuring ping and clock offset are very similar operations
  * in how they work, and because the extra overhead of measuring clock offset

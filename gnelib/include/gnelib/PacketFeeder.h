@@ -24,6 +24,8 @@
 namespace GNE {
 
 /**
+ * @ingroup midlevel
+ *
  * The PacketFeeder class is a callback for the PacketStream thread when it
  * is running low on packets.  How low before the callback occurs is defined
  * by a parameter set in the PacketStream class during connection creation or

@@ -27,6 +27,8 @@ class ostream;
 namespace GNE {
 
 /**
+ * @ingroup midlevel
+ *
  * A wrapper class for the HawkNL NLaddress.  This class is used many times
  * around GNE and is made for ease of use and cleaner code.
  */

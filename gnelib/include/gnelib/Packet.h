@@ -24,6 +24,8 @@ namespace GNE {
 class RawPacket;
 
 /**
+ * @ingroup midlevel
+ *
  * The base packet class, used for dealing with all types of packets at a
  * fundamental level.  All types of packets must inherit from this class to
  * be recognized by GNE.  GNE already implmenets some types of packets.

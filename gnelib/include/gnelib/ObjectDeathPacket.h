@@ -25,6 +25,8 @@
 namespace GNE {
 
 /**
+ * @ingroup highlevel
+ *
  * ObjectDeathPacket is a class used by the ObjectBroker to signify when an
  * object is being removed from its control (usually because it is "dying").
  */

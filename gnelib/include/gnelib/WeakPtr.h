@@ -26,6 +26,8 @@
 namespace GNE {
 
 /**
+ * @ingroup midlevel
+ *
  * The WeakPtr class is a weak pointer to an object managed by SmartPtr.
  * Weak pointers do not prevent the objects they refer to from being destroyed
  * when all strong pointers dissapear.

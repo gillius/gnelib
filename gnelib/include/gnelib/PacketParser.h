@@ -27,6 +27,8 @@ class Packet;
 class RawPacket;
 
 /**
+ * @ingroup midlevel
+ *
  * A namespace containing functions handling the parsing of packets.  Also
  * contains important constants to be aware of for assigning your packets
  * IDs.

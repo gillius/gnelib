@@ -25,6 +25,8 @@
 namespace GNE {
 
 /**
+ * @ingroup highlevel
+ *
  * ObjectCreationPacket is a class used by the ObjectBroker to update already
  * existing objects.
  */

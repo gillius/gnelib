@@ -28,6 +28,8 @@
 namespace GNE {
 
 /**
+ * @ingroup threading
+ *
  * A class resembling a thread.
  * Derive your own classes from this class that implements the run function.
  * Execution begins in the run method.  All methods of this class are thread-

@@ -27,6 +27,8 @@ class Packet;
 class Time;
 
 /**
+ * @ingroup midlevel
+ *
  * A utility class for creating a raw block of data that is used to directly
  * send data through the socket, and on the other side, parse it into
  * system-dependant data.  Users of GNE can also use this class to serialize

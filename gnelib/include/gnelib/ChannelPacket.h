@@ -25,6 +25,8 @@
 namespace GNE {
 
 /**
+ * @ingroup highlevel
+ *
  * A ChannelPacket wraps around a normal Packet to give that Packet a channel
  * destination and information about its source.  This is a packet type meant
  * to be used with the high-level API, and provides routing information for

@@ -29,6 +29,8 @@ class Packet;
 class ChannelPacket;
 
 /**
+ * @ingroup highlevel
+ *
  * The ChannelProvider provides for a set of sets of Connection objects, which
  * are used as broadcast channels to broadcast packets to. A single Connection
  * can be in zero or more channels.

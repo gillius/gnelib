@@ -26,6 +26,8 @@ class Error;
 class SyncConnection;
 
 /**
+ * @ingroup midlevel
+ *
  * This is an abstract base class representing an interface to the Connection,
  * ClientConnection, and ServerConnection classes.  All of the events that
  * those three classes generate are in this class, and classes listening to

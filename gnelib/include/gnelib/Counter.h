@@ -26,6 +26,8 @@
 namespace GNE {
 
 /**
+ * @ingroup threading
+ *
  * An implementation of a TimerCallback that provides a simple counter.  All
  * of the functions in this class are thread-safe so that multiple threads
  * can be accessing the Counter at the same time.

@@ -33,6 +33,8 @@ class ServerConnection;
 class ConnectionParams;
 
 /**
+ * @ingroup midlevel
+ *
  * A connection that listens for other connections.  Inherit from this class,
  * overriding the functions from Connection and ClientConnection based on the
  * events you wish to respond to.

@@ -28,11 +28,15 @@ namespace GNE {
   class NetworkObject;
 
   /**
+   * @ingroup highlevel
+   *
    * The function type used to create an object from a given packet.
    */
   typedef NetworkObject* (*ObjCreationFunc)( int objectId, const Packet& );
   
 /**
+ * @ingroup highlevel
+ *
  * Serves as a base class for ObjectBrokerServer and ObjectBrokerClient and
  * contains common functionality.  This class is abstract, so you cannot
  * instantiate it.

@@ -32,6 +32,8 @@ namespace GNE {
   }
 
 /**
+ * @ingroup console
+ *
  * An abstracted Console.  A console is defined as a rectangle in units.  What
  * a unit is is entirely arbitrary -- it could be characters or pixels or
  * something else.

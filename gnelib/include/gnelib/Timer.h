@@ -30,7 +30,7 @@ namespace GNE {
 class TimerCallback;
 
 /**
- * \ingroup Threading
+ * @ingroup threading
  *
  * The timer class is used to get the current time and to provide callbacks.
  * A timer object calls its listeners back every so often based on the time

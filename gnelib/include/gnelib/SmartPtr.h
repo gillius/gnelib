@@ -25,6 +25,8 @@
 namespace GNE {
 
 /**
+ * @ingroup midlevel
+ *
  * The SmartPtr class is a reference-counted smart pointer implementation for
  * general use
  *

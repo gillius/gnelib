@@ -26,6 +26,8 @@
 namespace GNE {
 
 /**
+ * @ingroup threading
+ *
  * A pure interface class for usage in the Timer class.  Inherit from this
  * class and define timerCallback.
  */
