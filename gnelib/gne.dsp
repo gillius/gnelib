@@ -113,6 +113,10 @@ SOURCE=.\src\Counter.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\Error.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\GNE.cpp
 # End Source File
 # Begin Source File
@@ -210,6 +214,10 @@ SOURCE=.\include\gnelib\Console.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\Counter.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ErrorGne.h
 # End Source File
 # Begin Source File
 

@@ -23,6 +23,7 @@
 #include "gnelib/ClientConnection.h"
 #include "gnelib/ConditionVariable.h"
 #include "gnelib/Connection.h"
+#include "gnelib/ErrorGne.h"
 #include "gnelib/ConnectionEventGenerator.h"
 #include "gnelib/ConnectionEventListener.h"
 #include "gnelib/Console.h"
