@@ -44,33 +44,9 @@ Address::Address(NLaddress address) : addr(address) {
 Address::~Address() {
 }
 
-/**
- * \todo This code works around a bug in HawkNL that you cannot provide a
- *       port number if you give a hostname.  In the next HawkNL release this
- *       will be fixed (the one after 1.4b4).
- */
 //##ModelId=3BB974B40384
 void Address::setAddressByName(std::string address) {
-	addr.valid = NL_TRUE;
-	int pos = address.find(':', 0);
-	if (pos != std::string::npos) {
-		int port = 0;  //0 if nothing else
-
-		//Parse the port part of the string if included.
-		if (pos+1 <= address.size()) { //else the string ended with a :, so we say port 0.
-			std::string temp = address.substr(pos+1);
-			port = atoi(temp.c_str());
-		}
-
-		address.erase(pos);
-		if (port < 0 || port > 65535)
-			addr.valid = NL_FALSE;
-		else {
-			nlGetAddrFromName((NLbyte*)address.c_str(), &addr);
-			setPort(port);
-		}
-	} else
-		nlGetAddrFromName((NLbyte*)address.c_str(), &addr);
+	nlGetAddrFromName((NLbyte*)address.c_str(), &addr);
 }
 
 //##ModelId=3BBA41220208
