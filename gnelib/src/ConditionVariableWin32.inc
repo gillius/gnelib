@@ -23,6 +23,9 @@
 #include "../include/gnelib/Mutex.h"
 #include "../include/gnelib/Time.h"
 #include "../include/gnelib/Timer.h"
+#ifndef OLD_CPP
+#include <limits>
+#endif
 //There appears to be a max() macro defined that is messing things up in
 //at least MSVC.NET, and we don't use a max() define in this source file.
 #undef max

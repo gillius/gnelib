@@ -19,7 +19,7 @@ echo I have found an installation of HawkNL. The version is:
 find "NL_VERSION_STRING" "%MSVCDIR%\include\nl.h" | find "NL_VERSION_STRING"
 if errorlevel 1 goto othererr
 echo.
-echo HawkNL requires HawkNL version 1.5 or 1.6 beta 4 or later.  A GNE
+echo GNE requires HawkNL version 1.5, 1.6 beta 4, 1.6 or later.  A GNE
 echo distribution comes with a precompiled binary version of HawkNL.  Would you
 echo like to see more info about the precompiled version?
 yesno
@@ -112,8 +112,22 @@ goto end
 REM ----------------------------------------------------------------------------
 REM ----------- PROCEDURES -----------
 :insthawk
-echo I am now going to install HawkNL for you into your MSVC directories,
-echo which consists of nl.h and HawkNL.lib.  I see that your MSVC root is:
+REM --- First decide if we want the MSVC 6 or .NET versions of HawkNL ---
+echo GNE comes with two versions of precompiled HawkNL.  One compiled with MSVC
+echo 6, and one compiled with MSVC.NET.  Read the HawkNL.txt file in hawk_bin
+echo for more details.  If you have MSVC.NET and would like to use the MSVC.NET
+echo compiled version, press y now.
+yesno
+set GNE_HAWK_VERSION=msvc6
+if errorlevel 1 goto conthawkinst
+set GNE_HAWK_VERSION=msvcnet
+
+:conthawkinst
+if "%GNE_HAWK_VERSION%"=="" goto othererr
+echo.
+echo I am now going to install the %GNE_HAWK_VERSION% compiled version of HawkNL for you into
+echo into your MSVC directories, which consists of nl.h and HawkNL.lib.  I see
+echo that your MSVC root is:
 echo %MSVCDIR%
 echo If the root is incorrect, or you do not want to install, press ctrl-c now.
 pause
@@ -123,7 +137,7 @@ copy /-Y hawk_bin\nl.h "%MSVCDIR%\include"
 @echo off
 if errorlevel 1 goto copyerr
 @echo on
-copy /-Y hawk_bin\msvcnet\HawkNL.lib "%MSVCDIR%\lib"
+copy /-Y "hawk_bin\%GNE_HAWK_VERSION%\HawkNL.lib" "%MSVCDIR%\lib"
 @echo off
 if errorlevel 1 goto copyerr
 echo.
@@ -141,7 +155,7 @@ goto hawkcont
 :insthawkdll
 if "%windir%"=="" goto windirerr
 @echo on
-copy /-Y "hawk_bin\msvcnet\HawkNL.dll" "%windir%\system"
+copy /-Y "hawk_bin\%GNE_HAWK_VERSION%\HawkNL.dll" "%windir%\system"
 @echo off
 if errorlevel 1 goto copyerr
 goto dllinstret
@@ -162,7 +176,7 @@ if errorlevel 1 goto compilefail
 
 :contcompile
 echo MSVC should be running.  If you have problems with compiling, abort now
-echo and contact GNE's author for further advice.
+echo and contact GNE's site, mailing lists, or author for more information.
 pause
 goto hawkcont
 

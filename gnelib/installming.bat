@@ -23,7 +23,7 @@ echo I have found an installation of HawkNL. The version is:
 find "NL_VERSION_STRING" "%MINGDIR%\include\nl.h" | find "NL_VERSION_STRING"
 if errorlevel 1 goto othererr
 echo.
-echo HawkNL requires HawkNL version 1.5 or 1.6 beta 4 or later.  A GNE
+echo GNE requires HawkNL version 1.5, 1.6 beta 4, 1.6 or later.  A GNE
 echo distribution comes with a precompiled binary version of HawkNL.  Would you
 echo like to see more info about the precompiled version?
 yesno

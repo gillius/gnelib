@@ -12,61 +12,16 @@ the NO_OLD_CPP version, espically if you encounter any errors related to
 console I/O.
 
 Compiler Requirements:
-This release was tested with GCC 2.95.2 on an UltraSparc.  I see no reason,
-though, that this should not work on an Intel and/or GCC 3.x.
+The last release was tested with GCC 2.95.2 on an UltraSparc.  I see no reason,
+though, that this should not work on an Intel and/or GCC 3.x.  Unfortunately
+due to certain constraints I was unable to try GNE 0.55 on Solaris.  Please
+let me know if it fails there.
 
 I have not attempted to try GNE with the Sun CC compiler, but with a makefile
 in that compiler's format I would not be surprised if GNE will compile (it is
 made for ISO 98 compliance), after you got HawkNL to compile. If you get GNE
 to work with CC, PLEASE send makefiles/scripts.
 
-1. HawkNL
-
-You will need HawkNL 1.4 final or a later version to use GNE.
-(http://www.hawksoft.com/)
-
-There is a small bug in HawkNL where parsing packets will lead to misaligned
-memory access. While this is acceptable on an Intel processor, it causes a bus
-error on an UltraSparc. Therefore when the RawPacket class is used, a bus
-error will occur. This is a bug in HawkNL, and the author says a patch will be
-out soon. For those wanting to fix it earlier, the problem is in the HawkNL
-header file in the endian conversion macros at the end of nl.h. Direct writes
-and reads through pointers are used -- instead memcpy should be used (direct
-copy only works when the addresses are aligned).
-
-2. About pthreads and Linux
-
-Pthreads should be already present as part of the standard libraries on your
-OS.
-
-3. ncurses
-
-GNE uses the ncurses library.  GNE was created with the libncurses5.2 library,
-others may or may not work.  On Solaris, an old curses lib was used, and I made
-a small modification to the code in conioport.c that will let this old lib work
-(as well as any new ones). 
-
-4. Installation
-
-In a shell, execute:
-
-fixsolaris.sh
-
-Which should give you a short description of the makefile options. Now type:
-
-make
-
-To compile the library and examples. Then type:
-
-make install
-
-To install GNE into the following default locations:
-
-/usr/local/lib/libgnelib.a
-/usr/local/include/gnelib.h
-
-Should you ever wish to uninstall these two installed files from your system
-(and it might be a good idea before upgrading to a newer version as well),
-use:
-
-make uninstall
+Other for these issues, the process should be the same as the process as
+described in readme.linux.  If you have root privaleges (to install HawkNL
+and GNE) the install should go smoothly.

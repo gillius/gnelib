@@ -6,35 +6,18 @@ libstdc++ is not ISO C++ 98 compliant, but is used by the current mingw, so by
 default GNE supports the 2.9.x libstdc++ version. If you want to use the new
 libstdc++ code, set the environment variable NO_OLD_CPP.
 
-1. About HawkNL and mingw
+Automatic Installation
 
-You will need HawkNL 1.4 final or a later version to use GNE. It should come
-with a makefile, ready to compile for mingw.
-(http://www.hawksoft.com/)
+At a command prompt, run the installming.bat installation script, which will
+walk you through the install process, step by step, including installation of
+the mingw precompiled version of HawkNL if needed.
 
-2. About pthreads and mingw
+Manual Installation
 
-For me, the following files worked, found at
-http://sources.redhat.com/pthreads-win32/
-in any of the FTP links on that site:
+Install HawkNL if needed, into your include and lib directories.  There is a
+makefile for HawkNL.
 
-pthreads-dll-2001-07-12/include/pthread.h
-pthreads-dll-2001-07-12/include/sched.h
-pthreads-dll-2001-07-12/include/semaphore.h
-
-Put these 3 files in your mingw/include folder.
-
-pthreads-dll-2001-07-12/lib/libpthreadGC.a
-
-Put this in your mingw/lib folder.
-
-pthreads-dll-2001-07-12/lib/pthreadGC.dll
-
-Put this in your windows shared libraries folder. (i.e. SYSTEM or System32)
-
-3. Installation
-
-Inside a DOS-prompt, type:
+Inside a command prompt, type:
 
 fixming
 

@@ -11,24 +11,16 @@ NO_OLD_CPP and seems to work just as well.  But it is suggested that you use
 the NO_OLD_CPP version, espically if you encounter any errors related to
 console I/O.
 
-1. HawkNL
-
-You will need HawkNL 1.42 final or a later version to use GNE.
-(http://www.hawksoft.com/)
-HawkNL 1.4 will work but a bug in that version causes no stats to be reported
-(as in exnetperf), but if you are not using stats gathering then you don't
-have to upgrade.
-
-2. About pthreads and Linux
-
-Pthreads should be already present as part of the standard libraries on your OS.
-
-3. ncurses
+1. ncurses
 
 GNE uses the ncurses library.  GNE was created with the libncurses5.2 library,
-others may or may not work.
+others may or may not work.  In all of the distributions I've used,
+libncurses-devel comes with it which installs everything you need.
 
-4. Installation
+2. Installation
+
+Install HawkNL.  HawkNL has its own installation process, which does involve
+a makefile.
 
 In a shell, execute:
 
