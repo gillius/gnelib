@@ -37,6 +37,7 @@ LowLevelError::LowLevelError(ErrorCode newCode)
     hawkError = error;
 }
 
+//##ModelId=3C887CEF0284
 LowLevelError::~LowLevelError() {
 }
 
@@ -60,6 +61,7 @@ WrongGame::WrongGame(std::string GameName)
 : Error(Error::WrongGame), gameName(GameName) {
 }
 
+//##ModelId=3C887CEF0309
 WrongGame::~WrongGame() {
 }
 
@@ -93,6 +95,7 @@ ProtocolViolation::ProtocolViolation(ViolationType T)
 : Error(Error::ProtocolViolation), t(T) {
 }
 
+//##ModelId=3C887CEF02AC
 ProtocolViolation::~ProtocolViolation() {
 }
 

@@ -41,6 +41,7 @@ public:
   //##ModelId=3C86E09000C4
   LowLevelError(ErrorCode newCode = OtherLowLevelError);
 
+  //##ModelId=3C887CEF0284
   virtual ~LowLevelError();
 
   //##ModelId=3C86E09000C6
@@ -70,6 +71,7 @@ public:
   //##ModelId=3C86E0900163
   WrongGame(std::string GameName);
 
+  //##ModelId=3C887CEF0309
   virtual ~WrongGame();
 
   /**
@@ -96,6 +98,7 @@ public:
   PacketTypeMismatch(int OtherID)
     : Error(Error::PacketTypeMismatch), otherID(OtherID) {}
 
+  //##ModelId=3C887CEF0298
   virtual ~PacketTypeMismatch() {}
 
   /**
@@ -121,6 +124,7 @@ public:
   UserVersionMismatch(guint32 OtherVer)
     : Error(Error::UserVersionMismatch), otherVer(OtherVer) {}
 
+  //##ModelId=3C887CEF0307
   virtual ~UserVersionMismatch() {}
 
   /**
@@ -154,6 +158,7 @@ public:
   //##ModelId=3C86E09000FB
   ProtocolViolation(ViolationType T = OtherViolation);
 
+  //##ModelId=3C887CEF02AC
   virtual ~ProtocolViolation();
 
   //##ModelId=3C86E09000FD
