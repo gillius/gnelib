@@ -35,6 +35,9 @@ namespace GNE {
  * rather than the current cursor location.  When one of these functions are
  * called, the cursor is not returned to its original location (so you can't
  * mix mprintf and mlprintf calls well).\n
+ * The upper-left coordinate of the screen is (0,0).  The lower-right
+ * coordinate of the window is (width-1,height-1).  Use the function
+ * getConsoleSize(int*, int*) to find the width and height if possible.
  * Note that the input functions are not thread-safe since there's only one
  * keyboard to be used ;).  It is okay, however, to be using the console
  * output functions at the same time you are using the input functions.
@@ -56,6 +59,8 @@ namespace Console {
   /**
    * Returns non-zero if a key is waiting in the buffer to be received by
    * getch.  You cannot use this call while an lgetstring is being processed.
+   * This is the same as kbhit(), but since kbhit is a macro in some cases it
+   * messes up this function.
    * @see getch
    * @see lgetString
    */
@@ -121,6 +126,7 @@ namespace Console {
 
   /**
    * Gets the size of the console, in character columns and character rows.
+   * If x or y are -1, then the width and height are unable to be determined.
    * @param x integer where the number of columns is stored.
    * @param y integer where the number of rows is stored.
    */

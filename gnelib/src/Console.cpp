@@ -20,8 +20,6 @@
 #include "gneintern.h"
 #include "Console.h"
 
-//Yes I know you don't include code files.  I'm lazy.  Shoot me, OK?
-// OWE#$!()*%(!#%!5 THAT WAS A RETORICAL QUESTION!  THAT HURT !$#%(*!%
 #include "conioport.h"
 
 namespace GNE {
@@ -29,11 +27,6 @@ namespace Console {
 
 static Mutex outSync;
 static bool initialized = false;
-
-/**
-* Moves the cursor on the screen to (X, Y).
-*/
-static void gotoxy(int x, int y);
 
 bool initConsole(int (*atexit_ptr)(void (*func)(void))) {
   if (!initialized) {
@@ -52,18 +45,9 @@ void shutdownConsole() {
   }
 }
 
-void gotoxy(int x, int y) {
-  //outSync MUST be acquired.
-  conio_gotoxy(x, y);
-}
-
 int kbhit() {
   return conio_kbhit();
 }
-
-//This is an undef because under Linux at least it appears that getch is a
-//macro.
-#undef getch
 
 int getch() {
   return conio_getch();
@@ -74,7 +58,7 @@ int mprintf(const char* format, ...) {
   
   va_start(arg, format);
   outSync.acquire();
-  int ret = vprintf(format, arg);
+  int ret = conio_vprintf(format, arg);
   outSync.release();
   va_end(arg);
 
@@ -87,7 +71,7 @@ int mlprintf(int x, int y, const char* format, ...) {
   va_start(arg, format);
   outSync.acquire();
   conio_gotoxy(x, y);
-  int ret = vprintf(format, arg);
+  int ret = conio_vprintf(format, arg);
   outSync.release();
   va_end(arg);
 
@@ -96,14 +80,14 @@ int mlprintf(int x, int y, const char* format, ...) {
 
 void mputchar(int ch) {
   outSync.acquire();
-  putchar(ch);
+  conio_putchar(ch);
   outSync.release();
 }
 
 void mlputchar(int x, int y, int ch) {
   outSync.acquire();
-  gotoxy(x, y);
-  putchar(ch);
+  conio_gotoxy(x, y);
+  conio_putchar(ch);
   outSync.release();
 }
 
