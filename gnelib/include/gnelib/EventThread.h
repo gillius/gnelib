@@ -20,7 +20,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 #include "Thread.h"
 #include "Error.h"
 #include "Mutex.h"

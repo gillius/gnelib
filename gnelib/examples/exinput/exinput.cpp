@@ -33,9 +33,11 @@
 // star.
 
 #include "../../include/gnelib.h"
-#include <stdlib.h>
-#include <time.h>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
+using namespace std;
 using namespace GNE;
 using namespace GNE::Console;
 

@@ -20,7 +20,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 #include "Connection.h"
 #include "Thread.h"
 
@@ -116,5 +115,3 @@ private:
 
 }
 #endif /* SERVERCONNECTION_H_INCLUDED_C4FE6FF3 */
-
-

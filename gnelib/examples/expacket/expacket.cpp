@@ -34,6 +34,7 @@
 
 #include "../../include/gnelib.h"
 #include <iostream>
+#include <assert.h>
 
 using namespace std;
 using namespace GNE;

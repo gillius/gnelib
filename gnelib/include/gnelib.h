@@ -35,6 +35,7 @@
 #include "gnelib/Error.h"
 #include "gnelib/Errors.h"
 #include "gnelib/GNE.h"
+#include "gnelib/GNEDebug.h"
 #include "gnelib/ListServerConnection.h"
 #include "gnelib/Mutex.h"
 #include "gnelib/Packet.h"
@@ -52,11 +53,4 @@
 #include "gnelib/Timer.h"
 #include "gnelib/TimerCallback.h"
 
-#ifdef _DEBUG
-#include "gnelib/GNEDebug.h"
 #endif
-
-#endif
-
-
-

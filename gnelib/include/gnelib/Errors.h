@@ -22,8 +22,10 @@
 
 //This file contains various errors derived from Error.
 
-#include "gneintern.h"
 #include "Error.h"
+#include <nl.h>
+#include <string>
+#include "gnetypes.h"
 
 namespace GNE {
 
@@ -177,4 +179,3 @@ private:
 }
 
 #endif
-

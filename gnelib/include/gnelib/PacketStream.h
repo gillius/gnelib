@@ -20,11 +20,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 #include "ConditionVariable.h"
 #include "Mutex.h"
 #include "Thread.h"
 #include "Time.h"
+#include <queue>
 
 namespace GNE {
 class Packet;
@@ -353,5 +353,3 @@ private:
 
 }
 #endif /* PACKETSTREAM_H_INCLUDED_C51CCBFF */
-
-

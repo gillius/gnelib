@@ -20,9 +20,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 #include "ConnectionStats.h"
 #include "Error.h"
+#include "gnetypes.h"
 
 /**
  * The namespace in which all of GNE resides in.  The namespace consists of
@@ -203,6 +203,3 @@ namespace GNE {
 }
 
 #endif /* GNE_H_INCLUDED_C51DF1DD */
-
-
-

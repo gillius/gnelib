@@ -76,4 +76,27 @@ void killDebug();
 void doTrace(int level, const char* fn, int lineno, const char* msg, ...);
 }
 
+//Define a custom "assert" macro
+#ifdef _DEBUG
+#define valassert(CALL, VAL)        assert((CALL) == (VAL))
+#else
+#define valassert(CALL, VAL)        CALL
+#endif
+
+#ifdef _DEBUG
+#define gnedbg(LEVEL, MESSAGE)           GNE::doTrace(LEVEL, __FILE__, __LINE__, MESSAGE)
+#define gnedbg1(LEVEL, MESSAGE, P1)      GNE::doTrace(LEVEL, __FILE__, __LINE__, MESSAGE, P1)
+#define gnedbg2(LEVEL, MESSAGE, P1, P2)  GNE::doTrace(LEVEL, __FILE__, __LINE__, MESSAGE, P1, P2)
+#define gnedbgo(LEVEL, MESSAGE)          GNE::doTrace(LEVEL, __FILE__, __LINE__, "%x: "MESSAGE, this)
+#define gnedbgo1(LEVEL, MESSAGE, P1)     GNE::doTrace(LEVEL, __FILE__, __LINE__, "%x: "MESSAGE, this, P1)
+#define gnedbgo2(LEVEL, MESSAGE, P1, P2) GNE::doTrace(LEVEL, __FILE__, __LINE__, "%x: "MESSAGE, this, P1, P2)
+#else
+#define gnedbg(LEVEL, MESSAGE)           (void(0))
+#define gnedbg1(LEVEL, MESSAGE, P1)      (void(0))
+#define gnedbg2(LEVEL, MESSAGE, P1, P2)  (void(0))
+#define gnedbgo(LEVEL, MESSAGE)          (void(0))
+#define gnedbgo1(LEVEL, MESSAGE, P1)     (void(0))
+#define gnedbgo2(LEVEL, MESSAGE, P1, P2) (void(0))
+#endif
+
 #endif

@@ -20,7 +20,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
+#include <nl.h>
+#include <string>
 class ostream;
 
 namespace GNE {
@@ -68,7 +69,7 @@ public:
    * Does the same work as the constructor.
    */
   //##ModelId=3BB974B40384
-  void setAddressByName(std::string address);
+  void setAddressByName(const std::string& address);
 
   /**
    * Returns the reverse DNS lookup based on this address.  This method will

@@ -27,26 +27,41 @@
 
 namespace GNE {
 
-//##ModelId=3AE11D5F023A
-std::map<Thread::ID, Thread*> Thread::threads;
-//##ModelId=3BB805C6014B
-Mutex Thread::mapSync;
-//##ModelId=3B0753810334
+#ifdef WIN32
+  typedef DWORD ID;
+#else
+  typedef pthread_t ID;
+#endif
+
+static std::map<ID, Thread*> threads;
+static Mutex mapSync;
+
 const int Thread::DEF_PRI = 0;
-//##ModelId=3CBD09C8004F
 const int Thread::LOW_PRI = -1;
-//##ModelId=3CBD09C8006D
 const int Thread::LOWER_PRI = -2;
-//##ModelId=3B0753810335
 const int Thread::HIGH_PRI = 1;
-//##ModelId=3CBD09C80081
 const int Thread::HIGHER_PRI = 2;
-//##ModelId=3AE1F1CA00DC
+
 const std::string Thread::DEF_NAME = "Thread";
 
-//##ModelId=3BB805C60186
-Thread::RETCODE THREAD_CALLTYPE Thread::threadStart( void* thread ) {
-  Thread* thr = ( ( Thread* )( thread ) );
+struct Thread::ThreadIDData {
+  ID thread_id;
+#ifdef WIN32
+  HANDLE hThread;
+  ThreadIDData() : thread_id(0), hThread(0) {}
+#else
+  ThreadIDData() : thread_id(0) {}
+#endif
+};
+
+//The thread entry point -- two prototypes, one for Win32, the other for
+//POSIX.
+#ifdef WIN32
+unsigned __stdcall Thread::threadStart(void* thread) {
+#else
+void* Thread::threadStart(void* thread) {
+#endif
+  Thread* thr = ( (Thread*)(thread) );
   //Makes sure the map has been updated before we start.
   mapSync.acquire();
   mapSync.release();
@@ -67,18 +82,17 @@ Thread::RETCODE THREAD_CALLTYPE Thread::threadStart( void* thread ) {
 
 //##ModelId=3B0753810376
 Thread::Thread(std::string name2, int priority2) : shutdown(false), name(name2),
-thread_id(0), running(false), deleteThis(false), priority(priority2) {
-#ifdef WIN32
-  hThread = 0;
-#endif
+running(false), deleteThis(false), priority(priority2) {
+  id = new ThreadIDData();
 }
 
 //##ModelId=3B0753810379
 Thread::~Thread() {
   assert(!isRunning());
 #ifdef WIN32
-  CloseHandle( hThread );
+  CloseHandle( id->hThread );
 #endif
+  delete id;
 }
 
 //##ModelId=3B075381037B
@@ -164,9 +178,9 @@ void Thread::shutDown() {
 void Thread::join() {
   assert( !deleteThis );
 #ifdef WIN32
-  valassert(WaitForSingleObject( hThread, INFINITE ), WAIT_OBJECT_0);
+  valassert(WaitForSingleObject( id->hThread, INFINITE ), WAIT_OBJECT_0);
 #else
-  valassert(pthread_join( thread_id, NULL ), 0);
+  valassert(pthread_join( id->thread_id, NULL ), 0);
 #endif
 }
 
@@ -214,28 +228,30 @@ void Thread::start() {
   mapSync.acquire();
 
 #ifdef WIN32
-  hThread = (HANDLE)_beginthreadex( NULL, 0, &threadStart, (void*)this, 0,
-                                    reinterpret_cast<unsigned*>(&thread_id) );
+  id->hThread = (HANDLE)_beginthreadex(
+    NULL, 0, &threadStart, (void*)this, 0,
+    reinterpret_cast<unsigned*>(&id->thread_id) );
+
   //Set the thread priority
   switch (priority) {
     case LOWER_PRI:
-      SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
+      SetThreadPriority(id->hThread, THREAD_PRIORITY_LOWEST);
       break;
     case LOW_PRI:
-      SetThreadPriority(hThread, THREAD_PRIORITY_BELOW_NORMAL);
+      SetThreadPriority(id->hThread, THREAD_PRIORITY_BELOW_NORMAL);
       break;
     case HIGH_PRI:
-      SetThreadPriority(hThread, THREAD_PRIORITY_ABOVE_NORMAL);
+      SetThreadPriority(id->hThread, THREAD_PRIORITY_ABOVE_NORMAL);
       break;
     case HIGHER_PRI:
-      SetThreadPriority(hThread, THREAD_PRIORITY_HIGHEST);
+      SetThreadPriority(id->hThread, THREAD_PRIORITY_HIGHEST);
       break;
   };
 #else
-  pthread_create( &thread_id, NULL, Thread::threadStart, this );
+  pthread_create( &id->thread_id, NULL, Thread::threadStart, this );
 #endif
 
-  threads[ thread_id ] = this;
+  threads[ id->thread_id ] = this;
   mapSync.release();
 }
 
@@ -248,7 +264,7 @@ int Thread::getPriority() const {
 void Thread::remove(Thread* thr) {
   assert(!thr->isRunning());
   mapSync.acquire();
-  threads.erase(thr->thread_id);
+  threads.erase(thr->id->thread_id);
   mapSync.release();
 }
 

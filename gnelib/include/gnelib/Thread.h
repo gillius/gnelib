@@ -20,8 +20,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 #include "Mutex.h"
+#include <string>
 
 namespace GNE {
 
@@ -253,24 +253,14 @@ protected:
   virtual void run() = 0;
 
 private:
-#ifdef WIN32
-  //##ModelId=3CBD09C702D8
-  typedef DWORD ID;
-  //##ModelId=3CBD09C70301
-  typedef unsigned RETCODE;
-#define THREAD_CALLTYPE __stdcall
-#else
-  typedef pthread_t ID;
-  typedef void* RETCODE;
-#define THREAD_CALLTYPE
-#endif
+  struct ThreadIDData;
+  ThreadIDData* id;
 
-  /**
-   * Internal Thread function for the pthread_start callback to start a new
-   * thread and call run().
-   */
-  //##ModelId=3BB805C60186
-  static RETCODE THREAD_CALLTYPE threadStart(void* thread);
+#ifdef WIN32
+  static unsigned __stdcall threadStart(void* thread);
+#else
+  static void* threadStart(void* thread);
+#endif
 
   /**
    * This function is called internally and automatically after run ends and
@@ -279,37 +269,17 @@ private:
   //##ModelId=3B0753810387
   void end();
 
-  /**
-   * This is an internal-only function called by the underlying pthreads
-   * functions -- do not call.
-   */
   //##ModelId=3B07538103AA
   static void remove(Thread*);
 
   //##ModelId=3AE11D30014A
   std::string name;
 
-  //##ModelId=3CBD09C800A0
-  ID thread_id;
-
-#ifdef WIN32
-  HANDLE hThread;
-#endif
-
   //##ModelId=3B0753810336
   bool running;
 
   //##ModelId=3B0753810338
   bool deleteThis;
-
-  //##ModelId=3AE11D5F023A
-  static std::map<ID, Thread*> threads;
-
-  /**
-   * Mutex for syncronizing threads
-   */
-  //##ModelId=3BB805C6014B
-  static Mutex mapSync;
 
   //##ModelId=3B0753810339
   int priority;
@@ -320,5 +290,3 @@ private:
 
 }
 #endif /* THREAD_H_INCLUDED_C51E3746 */
-
-

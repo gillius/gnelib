@@ -18,6 +18,7 @@
  */
 
 #include "../../include/gnelib.h"
+#include <assert.h>
 
 using namespace GNE;
 using namespace Console;

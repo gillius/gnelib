@@ -32,44 +32,57 @@
 
 namespace GNE {
 
-ConditionVariable::ConditionVariable()
-: m_gone(0), m_blocked(0), m_waiting(0) {
+struct ConditionVariable::ConditionVariableData {
+  HANDLE m_gate;
+  HANDLE m_queue;
+  HANDLE m_mutex;
+  unsigned m_gone; // # threads that timed out and never made it to the m_queue
+  unsigned long m_blocked; // # threads m_blocked m_waiting for the condition
+  unsigned m_waiting; // # threads m_waiting no longer m_waiting for the condition but still
+                      //   m_waiting to be removed from the m_queue
+  
+  ConditionVariableData() : m_gone(0), m_blocked(0), m_waiting(0) {}
+};
 
+ConditionVariable::ConditionVariable() {
+  data = new ConditionVariableData();
   initBoostCode();
   ourMutex = true;
   mutex = new Mutex();
 }
 
 ConditionVariable::ConditionVariable(Mutex* m) {
+  data = new ConditionVariableData();
   initBoostCode();
   ourMutex = false;
   mutex = m;
 }
 
 void ConditionVariable::initBoostCode() {
-  m_gate = CreateSemaphore(0, 1, 1, 0);
+  data->m_gate = CreateSemaphore(0, 1, 1, 0);
 #ifndef OLD_CPP
-  m_queue = CreateSemaphore(0, 0, std::numeric_limits<long>::max(), 0);
+  data->m_queue = CreateSemaphore(0, 0, std::numeric_limits<long>::max(), 0);
 #else
-  m_queue = CreateSemaphore(0, 0, INT_MAX, 0);
+  data->m_queue = CreateSemaphore(0, 0, INT_MAX, 0);
 #endif
-  m_mutex = CreateMutex(0, 0, 0);
-  assert(m_gate && m_queue && m_mutex);
+  data->m_mutex = CreateMutex(0, 0, 0);
+  assert(data->m_gate && data->m_queue && data->m_mutex);
 }
 
 ConditionVariable::~ConditionVariable() {
   //Shutdown for boost code
   int res = 0;
-  res = CloseHandle(m_gate);
+  res = CloseHandle(data->m_gate);
   assert(res);
-  res = CloseHandle(m_queue);
+  res = CloseHandle(data->m_queue);
   assert(res);
-  res = CloseHandle(m_mutex);
+  res = CloseHandle(data->m_mutex);
   assert(res);
 
   //Our shutdown code
   if (ourMutex)
     delete mutex;
+  delete data;
 }
 
 void ConditionVariable::acquire() {
@@ -82,10 +95,10 @@ void ConditionVariable::release() {
 
 void ConditionVariable::enter_wait() {
   int res = 0;
-  res = WaitForSingleObject(m_gate, INFINITE);
+  res = WaitForSingleObject(data->m_gate, INFINITE);
   assert(res == WAIT_OBJECT_0);
-  ++m_blocked;
-  res = ReleaseSemaphore(m_gate, 1, 0);
+  ++data->m_blocked;
+  res = ReleaseSemaphore(data->m_gate, 1, 0);
   assert(res);
 }
 
@@ -94,47 +107,47 @@ void ConditionVariable::wait() {
   release();
 
   int res = 0;
-  res = WaitForSingleObject(m_queue, INFINITE);
+  res = WaitForSingleObject(data->m_queue, INFINITE);
   assert(res == WAIT_OBJECT_0);
 
   unsigned was_waiting=0;
   unsigned was_gone=0;
 
-  res = WaitForSingleObject(m_mutex, INFINITE);
+  res = WaitForSingleObject(data->m_mutex, INFINITE);
   assert(res == WAIT_OBJECT_0);
-  was_waiting = m_waiting;
-  was_gone = m_gone;
+  was_waiting = data->m_waiting;
+  was_gone = data->m_gone;
   if (was_waiting != 0)
   {
-    if (--m_waiting == 0)
+    if (--data->m_waiting == 0)
     {
-      if (m_blocked != 0)
+      if (data->m_blocked != 0)
       {
-        res = ReleaseSemaphore(m_gate, 1, 0); // open m_gate
+        res = ReleaseSemaphore(data->m_gate, 1, 0); // open data->m_gate
         assert(res);
         was_waiting = 0;
       }
-      else if (m_gone != 0)
-        m_gone = 0;
+      else if (data->m_gone != 0)
+        data->m_gone = 0;
     }
   }
 #ifndef OLD_CPP
-  else if (++m_gone == (std::numeric_limits<unsigned>::max() / 2))
+  else if (++data->m_gone == (std::numeric_limits<unsigned>::max() / 2))
 #else
-  else if (++m_gone == (INT_MAX / 2))
+  else if (++data->m_gone == (INT_MAX / 2))
 #endif
   {
-    // timeout occured, normalize the m_gone count
+    // timeout occured, normalize the data->m_gone count
     // this may occur if many calls to wait with a timeout are made and
     // no call to notify_* is made
-    res = WaitForSingleObject(m_gate, INFINITE);
+    res = WaitForSingleObject(data->m_gate, INFINITE);
     assert(res == WAIT_OBJECT_0);
-    m_blocked -= m_gone;
-    res = ReleaseSemaphore(m_gate, 1, 0);
+    data->m_blocked -= data->m_gone;
+    res = ReleaseSemaphore(data->m_gate, 1, 0);
     assert(res);
-    m_gone = 0;
+    data->m_gone = 0;
   }
-  res = ReleaseMutex(m_mutex);
+  res = ReleaseMutex(data->m_mutex);
   assert(res);
 
   if (was_waiting == 1)
@@ -142,10 +155,10 @@ void ConditionVariable::wait() {
     for (/**/ ; was_gone; --was_gone)
     {
       // better now than spurious later
-      res = WaitForSingleObject(m_queue, INFINITE);
+      res = WaitForSingleObject(data->m_queue, INFINITE);
       assert(res == WAIT_OBJECT_0);
     }
-    res = ReleaseSemaphore(m_gate, 1, 0);
+    res = ReleaseSemaphore(data->m_gate, 1, 0);
     assert(res);
   }
 
@@ -157,7 +170,7 @@ void ConditionVariable::timedWait(int ms) {
   release();
 
   unsigned int res = 0;
-  res = WaitForSingleObject(m_queue, ms);
+  res = WaitForSingleObject(data->m_queue, ms);
   assert(res != WAIT_FAILED && res != WAIT_ABANDONED);
 
   bool ret = (res == WAIT_OBJECT_0);
@@ -165,48 +178,48 @@ void ConditionVariable::timedWait(int ms) {
   unsigned was_waiting=0;
   unsigned was_gone=0;
 
-  res = WaitForSingleObject(m_mutex, INFINITE);
+  res = WaitForSingleObject(data->m_mutex, INFINITE);
   assert(res == WAIT_OBJECT_0);
-  was_waiting = m_waiting;
-  was_gone = m_gone;
+  was_waiting = data->m_waiting;
+  was_gone = data->m_gone;
   if (was_waiting != 0)
   {
     if (!ret) // timeout
     {
-      if (m_blocked != 0)
-        --m_blocked;
+      if (data->m_blocked != 0)
+        --data->m_blocked;
       else
-        ++m_gone; // count spurious wakeups
+        ++data->m_gone; // count spurious wakeups
     }
-    if (--m_waiting == 0)
+    if (--data->m_waiting == 0)
     {
-      if (m_blocked != 0)
+      if (data->m_blocked != 0)
       {
-        res = ReleaseSemaphore(m_gate, 1, 0); // open m_gate
+        res = ReleaseSemaphore(data->m_gate, 1, 0); // open data->m_gate
         assert(res);
         was_waiting = 0;
       }
-      else if (m_gone != 0)
-        m_gone = 0;
+      else if (data->m_gone != 0)
+        data->m_gone = 0;
     }
   }
 #ifndef OLD_CPP
-  else if (++m_gone == (std::numeric_limits<unsigned>::max() / 2))
+  else if (++data->m_gone == (std::numeric_limits<unsigned>::max() / 2))
 #else
-  else if (++m_gone == (INT_MAX / 2))
+  else if (++data->m_gone == (INT_MAX / 2))
 #endif
   {
-    // timeout occured, normalize the m_gone count
+    // timeout occured, normalize the data->m_gone count
     // this may occur if many calls to wait with a timeout are made and
     // no call to notify_* is made
-    res = WaitForSingleObject(m_gate, INFINITE);
+    res = WaitForSingleObject(data->m_gate, INFINITE);
     assert(res == WAIT_OBJECT_0);
-    m_blocked -= m_gone;
-    res = ReleaseSemaphore(m_gate, 1, 0);
+    data->m_blocked -= data->m_gone;
+    res = ReleaseSemaphore(data->m_gate, 1, 0);
     assert(res);
-    m_gone = 0;
+    data->m_gone = 0;
   }
-  res = ReleaseMutex(m_mutex);
+  res = ReleaseMutex(data->m_mutex);
   assert(res);
 
   if (was_waiting == 1)
@@ -214,10 +227,10 @@ void ConditionVariable::timedWait(int ms) {
     for (/**/ ; was_gone; --was_gone)
     {
       // better now than spurious later
-      res = WaitForSingleObject(m_queue, INFINITE);
+      res = WaitForSingleObject(data->m_queue, INFINITE);
       assert(res ==  WAIT_OBJECT_0);
     }
-    res = ReleaseSemaphore(m_gate, 1, 0);
+    res = ReleaseSemaphore(data->m_gate, 1, 0);
     assert(res);
   }
 
@@ -239,49 +252,49 @@ void ConditionVariable::signal() {
   unsigned signals = 0;
 
   int res = 0;
-  res = WaitForSingleObject(m_mutex, INFINITE);
+  res = WaitForSingleObject(data->m_mutex, INFINITE);
   assert(res == WAIT_OBJECT_0);
 
-  if (m_waiting != 0) // the m_gate is already closed
+  if (data->m_waiting != 0) // the data->m_gate is already closed
   {
-    if (m_blocked == 0)
+    if (data->m_blocked == 0)
     {
-      res = ReleaseMutex(m_mutex);
+      res = ReleaseMutex(data->m_mutex);
       assert(res);
       return;
     }
 
-    ++m_waiting;
-    --m_blocked;
+    ++data->m_waiting;
+    --data->m_blocked;
     signals = 1;
   }
   else
   {
-    res = WaitForSingleObject(m_gate, INFINITE);
+    res = WaitForSingleObject(data->m_gate, INFINITE);
     assert(res == WAIT_OBJECT_0);
-    if (m_blocked > m_gone)
+    if (data->m_blocked > data->m_gone)
     {
-      if (m_gone != 0)
+      if (data->m_gone != 0)
       {
-        m_blocked -= m_gone;
-        m_gone = 0;
+        data->m_blocked -= data->m_gone;
+        data->m_gone = 0;
       }
-      signals = m_waiting = 1;
-      --m_blocked;
+      signals = data->m_waiting = 1;
+      --data->m_blocked;
     }
     else
     {
-      res = ReleaseSemaphore(m_gate, 1, 0);
+      res = ReleaseSemaphore(data->m_gate, 1, 0);
       assert(res);
     }
   }
 
-  res = ReleaseMutex(m_mutex);
+  res = ReleaseMutex(data->m_mutex);
   assert(res);
 
   if (signals)
   {
-    res = ReleaseSemaphore(m_queue, signals, 0);
+    res = ReleaseSemaphore(data->m_queue, signals, 0);
     assert(res);
   }
 }
@@ -290,47 +303,47 @@ void ConditionVariable::broadcast() {
   unsigned signals = 0;
 
   int res = 0;
-  res = WaitForSingleObject(m_mutex, INFINITE);
+  res = WaitForSingleObject(data->m_mutex, INFINITE);
   assert(res == WAIT_OBJECT_0);
 
-  if (m_waiting != 0) // the m_gate is already closed
+  if (data->m_waiting != 0) // the data->m_gate is already closed
   {
-    if (m_blocked == 0)
+    if (data->m_blocked == 0)
     {
-      res = ReleaseMutex(m_mutex);
+      res = ReleaseMutex(data->m_mutex);
       assert(res);
       return;
     }
 
-    m_waiting += (signals = m_blocked);
-    m_blocked = 0;
+    data->m_waiting += (signals = data->m_blocked);
+    data->m_blocked = 0;
   }
   else
   {
-    res = WaitForSingleObject(m_gate, INFINITE);
+    res = WaitForSingleObject(data->m_gate, INFINITE);
     assert(res == WAIT_OBJECT_0);
-    if (m_blocked > m_gone)
+    if (data->m_blocked > data->m_gone)
     {
-      if (m_gone != 0)
+      if (data->m_gone != 0)
       {
-        m_blocked -= m_gone;
-        m_gone = 0;
+        data->m_blocked -= data->m_gone;
+        data->m_gone = 0;
       }
-      signals = m_waiting = m_blocked;
-      m_blocked = 0;
+      signals = data->m_waiting = data->m_blocked;
+      data->m_blocked = 0;
     }
     else
     {
-      res = ReleaseSemaphore(m_gate, 1, 0);
+      res = ReleaseSemaphore(data->m_gate, 1, 0);
       assert(res);
     }
 
-    res = ReleaseMutex(m_mutex);
+    res = ReleaseMutex(data->m_mutex);
     assert(res);
 
     if (signals)
     {
-      res = ReleaseSemaphore(m_queue, signals, 0);
+      res = ReleaseSemaphore(data->m_queue, signals, 0);
       assert(res);
     }
   }

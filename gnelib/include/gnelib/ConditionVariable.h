@@ -20,7 +20,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 
 namespace GNE {
 class Mutex;
@@ -118,6 +117,9 @@ public:
   void broadcast();
 
 private:
+  struct ConditionVariableData;
+  ConditionVariableData* data;
+
 #ifdef WIN32
   //The Windows implementation of condition variables comes from the Boost
   //C++ library.
@@ -125,21 +127,6 @@ private:
   void initBoostCode();
   //##ModelId=3CBD09C70379
   void enter_wait();
-
-  HANDLE m_gate;
-  HANDLE m_queue;
-  HANDLE m_mutex;
-  //##ModelId=3CBD09C70351
-  unsigned m_gone; // # threads that timed out and never made it to the m_queue
-  //##ModelId=3CBD09C7035B
-  unsigned long m_blocked; // # threads m_blocked m_waiting for the condition
-  //##ModelId=3CBD09C70365
-  unsigned m_waiting; // # threads m_waiting no longer m_waiting for the condition but still
-                      //   m_waiting to be removed from the m_queue
-#else
-  //Try POSIX threading
-  //##ModelId=3AE20D83001E
-  pthread_cond_t cond;
 #endif
 
   /**
@@ -157,6 +144,3 @@ private:
 
 }
 #endif /* CONDITIONVARIABLE_H_INCLUDED_C51DFF03 */
-
-
-

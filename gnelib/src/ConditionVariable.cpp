@@ -30,25 +30,32 @@
 
 namespace GNE {
 
+struct ConditionVariable::ConditionVariableData {
+  pthread_cond_t cond;
+};
+
 //##ModelId=3B07538003CD
 ConditionVariable::ConditionVariable() {
-  valassert(pthread_cond_init( &cond, NULL ), 0);
+  data = new ConditionVariableData();
+  valassert(pthread_cond_init( &data->cond, NULL ), 0);
   ourMutex = true;
   mutex = new Mutex();
 }
 
 //##ModelId=3B07538003CE
 ConditionVariable::ConditionVariable(Mutex* m) {
-  valassert(pthread_cond_init( &cond, NULL ), 0);
+  data = new ConditionVariableData();
+  valassert(pthread_cond_init( &data->cond, NULL ), 0);
   mutex = m;
   ourMutex = false;
 }
 
 //##ModelId=3B07538003D0
 ConditionVariable::~ConditionVariable() {
-  valassert(pthread_cond_destroy( &cond ), 0);
+  valassert(pthread_cond_destroy( &data->cond ), 0);
   if (ourMutex)
     delete mutex;
+  delete data;
 }
 
 //##ModelId=3B0753810000
@@ -63,7 +70,7 @@ void ConditionVariable::release() {
 
 //##ModelId=3B0753810002
 void ConditionVariable::wait() {
-  valassert(pthread_cond_wait(&cond, &mutex->mutex), 0);
+  valassert(pthread_cond_wait(&data->cond, &mutex->data->mutex), 0);
 }
 
 //##ModelId=3B0753810003
@@ -77,17 +84,17 @@ void ConditionVariable::timedWait(const Time& until) {
   timespec tv;
   tv.tv_sec = until.getSec();
   tv.tv_nsec = until.getuSec() * 1000;
-  pthread_cond_timedwait(&cond, &(mutex->mutex), &tv);
+  pthread_cond_timedwait(&data->cond, &(mutex->data->mutex), &tv);
 }
 
 //##ModelId=3B0753810005
 void ConditionVariable::signal() {
-  valassert(pthread_cond_signal( &cond ), 0);
+  valassert(pthread_cond_signal( &data->cond ), 0);
 }
 
 //##ModelId=3B0753810006
 void ConditionVariable::broadcast() {
-  valassert(pthread_cond_broadcast( &cond ), 0);
+  valassert(pthread_cond_broadcast( &data->cond ), 0);
 }
 
 }

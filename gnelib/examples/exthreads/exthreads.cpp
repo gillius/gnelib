@@ -28,6 +28,7 @@
 //   whatever data you want from it then delete it.
 
 #include "../../include/gnelib.h"
+#include <assert.h>
 
 #include <sys/timeb.h>
 

@@ -336,6 +336,9 @@
 			<File
 				RelativePath=".\include\gnelib\gneintern.h">
 			</File>
+			<File
+				RelativePath="include\gnelib\gnetypes.h">
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\Authors">

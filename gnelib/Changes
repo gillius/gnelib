@@ -1,5 +1,7 @@
 GNE 0.55 to current
-  No changes yet...
+  Changed header include scheme to get rid of any extra header files I could,
+    most notably my main goal was to get rid of forcing the user to have
+    windows.h included indirectly through gnelib.h.
 
 GNE 0.49 to 0.55
   Now features an interactive and intelligent batch file installation script.

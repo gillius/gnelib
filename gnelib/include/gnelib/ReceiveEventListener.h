@@ -20,7 +20,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 
 namespace GNE {
 
@@ -44,5 +43,3 @@ public:
 
 }
 #endif /* CONNECTIONEVENTLISTENER_H_INCLUDED_C4FF0565 */
-
-

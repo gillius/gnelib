@@ -20,7 +20,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 #include "TimerCallback.h"
 #include "ConditionVariable.h"
 
@@ -90,5 +89,3 @@ private:
 
 }
 #endif /* COUNTER_H_INCLUDED_C517BD95 */
-
-

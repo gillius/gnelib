@@ -24,7 +24,6 @@
 //standard C include time.h.  Both MSVC and GCC have given us problems with
 //including this file, despite the usage between #include <> and #include ""
 
-#include "gneintern.h"
 class ostream;
 
 namespace GNE {

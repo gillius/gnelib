@@ -20,7 +20,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 
 namespace GNE {
 
@@ -60,12 +59,8 @@ public:
   void release();
 
 private:
-#ifdef WIN32
-  CRITICAL_SECTION mutex;
-#else
-  //##ModelId=3AE2097B03CA
-  pthread_mutex_t mutex;
-#endif
+  struct MutexData;
+  MutexData* data;
 
   friend class ConditionVariable;
 };
@@ -111,5 +106,3 @@ private:
 
 }
 #endif /* MUTEX_H_INCLUDED_C51DB1E6 */
-
-

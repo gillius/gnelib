@@ -1,9 +1,11 @@
 // Allegro example program, using the GNElib Threads/Timers/Networking engine //
 //Written by networm, modified some by Gillius
 #include <allegro.h>
-#include <winalleg.h>
 #include "../AllegroSample.h"
 #include "../../include/gnelib.h"
+#ifdef _GNEINTERN_H_
+#error err
+#endif
 
 using namespace GNE;
 

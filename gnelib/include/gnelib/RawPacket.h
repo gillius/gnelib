@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
+#include "gnetypes.h"
 
 namespace GNE {
 class Packet;
@@ -215,5 +215,3 @@ private:
 
 }
 #endif /* RAWPACKET_H_INCLUDED_C51B6961 */
-
-

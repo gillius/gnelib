@@ -20,9 +20,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 #include "ConditionVariable.h"
 #include "Thread.h"
+#include <map>
 
 namespace GNE {
 class ReceiveEventListener;
@@ -86,6 +86,3 @@ private:
 
 }
 #endif /* CONNECTIONEVENTGENERATOR_H_INCLUDED_C51B7986 */
-
-
-

@@ -45,8 +45,8 @@ Address::~Address() {
 }
 
 //##ModelId=3BB974B40384
-void Address::setAddressByName(std::string address) {
-  nlGetAddrFromName((NLbyte*)address.c_str(), &addr);
+void Address::setAddressByName(const std::string& address) {
+  nlGetAddrFromName((const NLchar*)address.c_str(), &addr);
 }
 
 //##ModelId=3BBA41220208
