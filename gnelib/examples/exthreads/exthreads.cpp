@@ -37,7 +37,7 @@ using namespace GNE::Console;
 
 class HelloWorld : public Thread {
 public:
-  HelloWorld(std::string myName) : Thread(myName, DEF_PRI) {
+  HelloWorld(std::string myName) : Thread(myName) {
     mprintf("%s is born\n", myName.c_str());
   }
   virtual ~HelloWorld() {
