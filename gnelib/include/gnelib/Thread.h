@@ -84,7 +84,7 @@ public:
    * You will want to call this function from the override to make sure that
    * shutdown is set to true.\n
    * This function is safe to call multiple times, but you cannot undo a
-   * shutdown once it call this once.
+   * shutdown once it has been called.
    */
   //##ModelId=3B0C5919012C
   virtual void shutDown();
@@ -130,7 +130,8 @@ public:
   bool isRunning() const;
 
   /**
-   * Starts this thread running.
+   * Starts this thread running.  The thread will be marked as running before
+   * this function completes.
    */
   //##ModelId=3B07538103A5
   virtual void start();
@@ -177,7 +178,7 @@ protected:
    * nothing more than a while (!shutdown) {} loop.
    */
   //##ModelId=3B0C591802EE
-  bool shutdown;
+  volatile bool shutdown;
 
   /**
    * This function is the starting point for this thread.
