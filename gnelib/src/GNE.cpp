@@ -147,7 +147,7 @@ guint32 getUserVersion() {
 
 void setGameInformation(std::string gameName, guint32 version) {
   assert(initialized);
-  assert(gameName.length() <= GNE::MAX_GAME_NAME_LEN);
+  assert(gameName.length() <= (std::string::size_type)GNE::MAX_GAME_NAME_LEN);
   //We do this assert since this function should only be called once.
   assert(gameNameBuf[0] == 0);
 
