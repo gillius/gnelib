@@ -23,8 +23,7 @@
 namespace GNE {
 
 //##ModelId=3B0753810120
-ListServerConnection::ListServerConnection(std::string address) 
-: ClientConnection(0, 0) {
+ListServerConnection::ListServerConnection(std::string address) {
 }
 
 //##ModelId=3B0753810122
