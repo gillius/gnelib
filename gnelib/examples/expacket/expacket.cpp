@@ -26,6 +26,10 @@
  * Note that like exrawtest, this uses Packets and RawPackets in
  * non-standard ways, so this is not the normal end-user way to use GNE.
  * This example is mainly just for testing purposes of GNE.
+ * But if you want to use the PacketParser and RawPacket API to do something
+ * interesting and custom like say "sending" GNE packets to a save file to
+ * save your game state, which is not very far-fetched as when clients
+ * connect in network games they are loading a saved game state.
  */
 
 #include "../../include/gnelib.h"
@@ -50,14 +54,10 @@ int main(int argc, char* argv[]) {
   jason.age = 20;
   jason.firstName = "Jason";
   jason.lastName = "Winnebeck";
-  jason.timestamp = 0;
-    //We should always set the timestamp for a packet when it was created,
-    //but since we aren't sending it over a network it doesn't really matter.
   PersonPacket elias;
   elias.age = 255;
   elias.firstName = "Elias";
   elias.lastName = "Pschernig";
-  elias.timestamp = 0;
 
   packetTest(jason, elias);
   parseTest(jason, elias);

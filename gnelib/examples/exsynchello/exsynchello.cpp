@@ -104,13 +104,13 @@ void doClient(int outRate, int inRate, int port) {
     errorExit("Invalid address.");
   gout << "Connecting to: " << address << endl;
 
-  ClientConnection clientConn(outRate, inRate, ConnectionListener::getNullListener());
+  ClientConnection clientConn(ConnectionListener::getNullListener());
   SyncConnection client(&clientConn);
   try {
     //Since only one client can exist, acquire and release is not needed on
     //gout.
     gout << "Opening client socket." << endl;
-    client.open(address, 0); //localPort = 0, for any local port.
+    client.open(address);
     gout << "Attempting to connect." << endl;
     client.connect();
     

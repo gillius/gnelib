@@ -66,7 +66,7 @@ public:
 
   void onReceive() {
     Packet* message = NULL;
-    while (message = conn->stream().getNextPacket()) {
+    while ( (message = conn->stream().getNextPacket()) != NULL ) {
       if (message->getType() == MIN_USER_ID) {
         HelloPacket* helloMessage = (HelloPacket*)message;
         mprintf("got message: \"");
@@ -128,7 +128,7 @@ public:
 
   void onReceive() {
     Packet* message = NULL;
-    while (message = conn->stream().getNextPacket()) {
+    while ( (message = conn->stream().getNextPacket() ) != NULL) {
       if (message->getType() == MIN_USER_ID) {
         HelloPacket* helloMessage = (HelloPacket*)message;
         mprintf("got message: \"%s\"\n", helloMessage->getMessage().c_str());

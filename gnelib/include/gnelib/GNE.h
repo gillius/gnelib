@@ -22,6 +22,7 @@
 
 #include "gneintern.h"
 #include "ConnectionStats.h"
+#include "Error.h"
 
 /**
  * The namespace in which all of GNE resides in.  The namespace consists of
@@ -32,7 +33,6 @@
 namespace GNE {
   class Address;
   class ConnectionEventGenerator;
-  class Error;
 
   /**
    * Initalizes GNE and HawkNL.  Call this before using any HawkNL or GNE

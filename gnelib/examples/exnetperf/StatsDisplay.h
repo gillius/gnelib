@@ -40,7 +40,7 @@ struct Pos {
   int* packetsOut;
 };
 static Pos gpos = {0, 8, NULL}; //global stats position
-static positionsLength = 3;
+static int positionsLength = 3;
 static Pos positions[] = {
   {0, 13, NULL}, {0, 20, NULL}, {0, 27, NULL}, {0, 34, NULL}
 };
