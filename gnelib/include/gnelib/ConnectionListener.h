@@ -58,6 +58,13 @@ public:
 	 * \nNote: Only ClientConnection generates this event.  The SyncConnection
 	 * is currently wrapped around a ClientConnection, and you should use
 	 * SyncConnection::getConnection to get the ClientConnection.
+   * \nRemember that conn will trap your events like onReceive and
+   * onDoneWriting.  So if you will not be using conn, you should release it
+   * if you are writing and reading using the PacketStream only because you
+   * will want to get onDoneWriting most likely.  onDoneWriting and
+   * onReceive can be called BEFORE onConnect finishes in this case if you
+   * release!  After onConnect finishes, conn will be released regardless of
+   * what you did with it or if you released it.
    * \nIn the near future the ability to refuse connections will be added.
    */
   //##ModelId=3BCA83910078
@@ -87,6 +94,13 @@ public:
    * If the connection failed, though, the function
 	 * ServerConnectionListener::onListenFailure instead of this function is
 	 * called.
+   * \nRemember that newConn will trap your events like onReceive and
+   * onDoneWriting.  So if you will not be using newConn, you should release
+   * it if you are writing and reading using the PacketStream only because
+   * you will want to get onDoneWriting most likely.  onDoneWriting and
+   * onReceive can be called BEFORE onConnect finishes in this case if you
+   * release!  After onConnect finishes, conn will be released regardless of
+   * what you did with it or if you released it.
    * \nIn the near future the ability to refuse connections will be added.
    */
   //##ModelId=3BCFAE5900AA
