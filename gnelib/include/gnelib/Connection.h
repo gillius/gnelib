@@ -294,6 +294,13 @@ private:
   void onReceive(bool reliable);
 
   /**
+   * When we get an ExitPacket we want to ignore any further errors,
+   * espically NL_MESSAGE_END.
+   */
+  //##ModelId=3C73170D0055
+  bool exiting;
+
+  /**
    * Determines whether the error given is fatal or non-fatal, and calls the
    * appropriate event, and handles disconnects if necessary.
    */

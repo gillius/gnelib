@@ -1,4 +1,8 @@
 GNE 0.45 to current
+  Graceful disconnects are now detected and handled through the onExit event.
+  ExitPackets are now sent when a connection closes, as per the GNE protocol
+    specification.
+  Created and implemented the ExitPacket class.
   Fixed an event syncronization bug in SyncConnection that caused an assert
     to fail in onDisconnect.
   Now if a listener for a Connection is NULL the event thread is halted

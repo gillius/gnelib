@@ -22,6 +22,8 @@
 #include "../include/gnelib/ConnectionStats.h"
 #include "../include/gnelib/ConnectionListener.h"
 #include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Packet.h"
+#include "../include/gnelib/ExitPacket.h"
 #include "../include/gnelib/PacketParser.h"
 #include "../include/gnelib/ConnectionEventGenerator.h"
 #include "../include/gnelib/Error.h"
@@ -34,7 +36,8 @@ namespace GNE {
 
 //##ModelId=3B0753810073
 Connection::Connection(ConnectionListener* listener)
-: ps(NULL), connecting(false), connected(false), rlistener(NULL), ulistener(NULL) {
+: ps(NULL), connecting(false), connected(false), rlistener(NULL),
+ulistener(NULL), exiting(false) {
   eventListener = new EventThread(listener, this);
 }
 
@@ -158,7 +161,7 @@ void Connection::onReceive(bool reliable) {
     if (error == NL_MESSAGE_END) {
       //in HawkNL 1.4b4 and later, this means that the connection was
       //closed on the network-level because the client disconnected or
-      //has dropped.  Since we didn't get an "exit" packet, it's an error.
+      //has dropped.  If we got an ExitPacket, this will be ignored.
       processError(Error::ConnectionDropped);
     } else {
       //This is some other bad error that we need to report
@@ -168,6 +171,8 @@ void Connection::onReceive(bool reliable) {
     //In HawkNL 1.4b3 and earlier, this _USED_ to mean that...
     //This means the connection was closed on the network-level because
     //remote computer has purposely closed or has dropped.
+    //We should never get this now, because HawkNL traps this message, but
+    //for completeness we check for it anyways.
     processError(Error::ConnectionDropped);
   } else {
     RawPacket raw(buf);
@@ -176,7 +181,12 @@ void Connection::onReceive(bool reliable) {
     bool errorCheck;
     Packet* next = NULL;
     while ((next = PacketParser::parseNextPacket(errorCheck, raw)) != NULL) {
-      ps->addIncomingPacket(next);
+      //We want to intercept ExitPackets, else we just add it.
+      if (next->getType() == ExitPacket::ID) {
+        exiting = true;
+        eventListener->onExit();
+      } else
+        ps->addIncomingPacket(next);
     }
     delete[] buf;
     
@@ -199,9 +209,12 @@ void Connection::onReceive(bool reliable) {
  */
 //##ModelId=3BB4208C0280
 void Connection::processError(const Error& error) {
+  //If we got an ExitPacket, then any errors that we get should be ignored
+  //because the socket will fail when we disconnect.
   switch(error.getCode()) {
   case Error::UnknownPacket:
-    eventListener->onError(error);
+    if (!exiting)
+      eventListener->onError(error);
     break;
   default:
     //The EventThread will call disconnect.  This will prevent a deadlock
@@ -212,7 +225,8 @@ void Connection::processError(const Error& error) {
     unreg(true, true);
     //We call onFailure after unreg because a deadlock will occur if the
     //EventThread tries to disconnect before we unreg.
-    eventListener->onFailure(error);
+    if (!exiting)
+      eventListener->onFailure(error);
     break;
   }
 }

@@ -59,6 +59,10 @@ public:
     delete this;
   }
 
+  void onExit() {
+    mprintf("Server gracefully disconnected.\n");
+  }
+
   void onConnect(SyncConnection& conn2) throw (Error) {
     conn = conn2.getConnection();
     mprintf("Connection to server successful.\n");
@@ -123,6 +127,10 @@ public:
       mprintf("No message received.\n");
     delete conn;
     delete this;
+  }
+
+  void onExit() {
+    mprintf("Client gracefully disconnected.\n");
   }
 
   void onNewConn(SyncConnection& conn2) throw (Error) {
@@ -197,7 +205,7 @@ void doClient(int outRate, int inRate, int port) {
   gout << "Connecting to: " << address << endl;
 
   //uncomment the loop to perform a stress test.
-  //for (int i=0; i <500; i++) {
+  //for (int i=0; i <100; i++) {
     ClientConnection* client = new ClientConnection(new OurClient());
     if (client->open(address)) {
       delete client;

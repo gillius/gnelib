@@ -22,6 +22,7 @@
 #include "../include/gnelib/Packet.h"
 #include "../include/gnelib/Connection.h"
 #include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/ExitPacket.h"
 #include "../include/gnelib/PacketParser.h"
 #include "../include/gnelib/Time.h"
 #include "../include/gnelib/Timer.h"
@@ -178,7 +179,7 @@ void PacketStream::run() {
       next->packet->writePacket(raw);
       raw << PacketParser::END_OF_PACKET;
       if (owner.sockets.rawWrite(next->reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
-        owner.processError(Error::Write);
+        owner.processError( Error::createLowLevelError(Error::Write) );
       }
       delete next->packet;
       delete next;
@@ -197,9 +198,17 @@ void PacketStream::run() {
   //We want to try to send the required ExitPacket, if possible, over the
   //reliable connection.
   //We need a good way to make sure this doesn't block though, but the
-  //current solution here will have to do for now.
+  //current solution here of assuming rawWrite won't block will have to do
+  //for now.
   RawPacket raw;
-
+  ExitPacket temp;
+  raw << temp << PacketParser::END_OF_PACKET;
+  int ret = owner.sockets.rawWrite(true, raw.getData(), raw.getPosition());
+  if (ret > 0) {
+    gnedbgo1(4, "ExitPacket sent (%d).", ret);
+  } else {
+    gnedbgo1(4, "ExitPacket not sent (%d).", ret);
+  }
 }
 
 //##ModelId=3B07538101FB

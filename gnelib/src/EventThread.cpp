@@ -172,6 +172,7 @@ void EventThread::run() {
         failure = NULL;
 
       } else if (onExitEvent) {
+        onExitEvent = false;
         listenSync.acquire();
         eventListener->onExit();
         listenSync.release();
