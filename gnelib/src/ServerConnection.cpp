@@ -47,6 +47,7 @@ public:
   ServerConnectionListener* creator;
   //##ModelId=3C5CED0502F2
   bool unrel;
+  bool doJoin;
 };
 
 //##ModelId=3B075381027A
@@ -61,6 +62,7 @@ ServerConnection::ServerConnection(int outRate, int inRate,
   params->outRate = outRate;
   params->inRate = inRate;
   params->creator = creator;
+  params->doJoin = true;
 }
 
 //##ModelId=3B075381027E
@@ -70,8 +72,13 @@ ServerConnection::~ServerConnection() {
   //and therefore we call join to wait for run to complete if it is still
   //running (as it would be if an error occured after onNewConn but before
   //run finished), and join will also release thread resources.
-  if (Thread::currentThread() != this)
+  //We have to rely on params because Thread::currentThread is not valid in
+  //the dtor when we do detach(true).  When an error occurs, params was not
+  //deleted, so if it was deleted we know we did not call detach(true) because
+  //we did not catch an error.
+  if (params == NULL)
     join();
+  delete params;
   gnedbgo(5, "destroyed");
 }
 
@@ -84,21 +91,27 @@ void ServerConnection::run() {
   //Do the GNE protocol handshake.
   try {
     //Receive the client's CRP.
+    gnedbgo(4, "Waiting for the client's CRP.");
     Error err = getCRP();
 
     if (err.getCode() == Error::GNETheirVersionHigh ||
         err.getCode() == Error::GNETheirVersionLow ||
         err.getCode() == Error::UserVersionMismatch) {
+      gnedbgo(4, "Versions don't match, sending refusal.");
       sendRefusal();
       throw err;
     }
     
     //Else, we send the CAP
+    gnedbgo(4, "Got CRP, now sending CAP.");
     sendCAP();
 
     //Then we handle anything related to the unreliable connection if needed.
-    if (params->unrel)
+    if (params->unrel) {
+      gnedbgo(4, "Unreliable requested.  Getting unrel info.");
       getUnreliableInfo();
+    } else
+      gnedbgo(4, "Unreliable connection not requested.");
 
   } catch (Error e) {
     params->creator->onListenFailure(e, getRemoteAddress(true), getListener());
@@ -107,6 +120,7 @@ void ServerConnection::run() {
     detach(true);
     return;
   }
+  gnedbgo(4, "GNE Protocol Handshake Successful.");
 
   bool onNewConnFinished = false;
   SyncConnection sConn(this);
@@ -135,8 +149,13 @@ void ServerConnection::run() {
       //We delete ourselves when we terminate since we were never seen by the
       //user and no one has seen us yet.
       detach(true);
+      return;
     }
   }
+
+  //If there were no errors, we delete our connection params:
+  delete params;
+  params = NULL;
 }
 
 const int CRPLEN = sizeof(guint8) + sizeof(guint8) + sizeof(guint16) +
@@ -145,13 +164,17 @@ const int CRPLEN = sizeof(guint8) + sizeof(guint8) + sizeof(guint16) +
 //##ModelId=3C5CED0502CD
 Error ServerConnection::getCRP() {
   gbyte* crpBuf = new gbyte[RawPacket::RAW_PACKET_LEN];
-  int check = nlRead(sockets.r, (NLvoid*)crpBuf, RawPacket::RAW_PACKET_LEN);
+  int check = sockets.rawRead(true, crpBuf, RawPacket::RAW_PACKET_LEN);
   if (check != CRPLEN) {
     delete[] crpBuf;
-    if (check == NL_INVALID)
-      return Error::createLowLevelError(Error::Read);
-    else
-      return Error::createLowLevelError(Error::ProtocolViolation);
+    if (check == NL_INVALID) {
+      gnedbgo(1, "nlRead error when trying to get CRP.");
+      throw Error::createLowLevelError(Error::Read);
+    } else {
+      gnedbgo2(1, "Protocol violation trying to get CRP.  Got %d bytes expected %d",
+        check, CRPLEN);
+      throw Error::createLowLevelError(Error::ProtocolViolation);
+    }
   }
 
   //Now parse the CRP
@@ -197,7 +220,7 @@ void ServerConnection::sendRefusal() {
   ref << us.version << us.subVersion << us.build;
   ref << GNE::getUserVersion();
 
-  nlWrite(sockets.r, (NLvoid*)ref.getData(), (NLint)ref.getPosition());
+  sockets.rawWrite(true, ref.getData(), (NLint)ref.getPosition());
   //We don't check for error because if there we don't really care since we
   //are refusing the connection and there is nothing else we can do.
 }
@@ -214,7 +237,7 @@ void ServerConnection::sendCAP() throw (Error) {
     cap << (guint16)(sockets.getLocalAddress(false).getPort());
   }
 
-  int check = nlWrite(sockets.r, (NLvoid*)cap.getData(), (NLint)cap.getPosition());
+  int check = sockets.rawWrite(true, cap.getData(), (NLint)cap.getPosition());
   //The write should succeed and have sent all of our data.
   if (check != cap.getPosition())
     throw Error::createLowLevelError(Error::Write);
@@ -223,13 +246,17 @@ void ServerConnection::sendCAP() throw (Error) {
 //##ModelId=3C5CED0502D8
 void ServerConnection::getUnreliableInfo() throw (Error) {
   gbyte* buf = new gbyte[RawPacket::RAW_PACKET_LEN];
-  int check = nlRead(sockets.r, (NLvoid*)buf, RawPacket::RAW_PACKET_LEN);
+  int check = sockets.rawRead(true, buf, RawPacket::RAW_PACKET_LEN);
   if (check != sizeof(guint16)) {
     delete[] buf;
-    if (check == NL_INVALID)
+    if (check == NL_INVALID) {
+      gnedbgo(1, "nlRead error when trying to get unreliable info.");
       throw Error::createLowLevelError(Error::Read);
-    else
+    } else {
+      gnedbgo2(1, "Protocol violation trying to get unrel info.  Got %d bytes expected %d",
+        check, sizeof(guint16));
       throw Error::createLowLevelError(Error::ProtocolViolation);
+    }
   }
 
   RawPacket raw(buf);

@@ -123,6 +123,7 @@ void ClientConnection::run() {
       getListener()->onConnectFailure(e);
       return;
     }
+    gnedbgo(4, "GNE Protocol Handshake Successful.");
 
     //We don't want to doubly-wrap SyncConnections, so we check for a wrapped
     //one here and else make our own.
@@ -194,7 +195,7 @@ void ClientConnection::sendCRP() throw (Error) {
   crp << (guint32)params->inRate;
   crp << ((params->unrel) ? gTrue : gFalse);
 
-  int check = nlWrite(sockets.r, (NLvoid*)crp.getData(), (NLint)crp.getPosition());
+  int check = sockets.rawWrite(true, crp.getData(), crp.getPosition());
   //The write should succeed and have sent all of our data.
   if (check != crp.getPosition())
     throw Error::createLowLevelError(Error::Write);
@@ -208,7 +209,7 @@ const int CAPLEN = sizeof(gbool) + sizeof(guint32);
 //##ModelId=3C5CED05016F
 Address ClientConnection::getCAP() throw (Error) {
   gbyte* capBuf = new gbyte[RawPacket::RAW_PACKET_LEN];
-  int check = nlRead(sockets.r, (NLvoid*)capBuf, RawPacket::RAW_PACKET_LEN);
+  int check = sockets.rawRead(true, capBuf, RawPacket::RAW_PACKET_LEN);
   if (check == NL_INVALID) {
     delete[] capBuf;
     throw Error::createLowLevelError(Error::Read);
@@ -301,13 +302,13 @@ void ClientConnection::setupUnreliable(const Address& dest) throw (Error) {
   guint16 ourPort = (guint16)sockets.getLocalAddress(false).getPort();
   RawPacket resp;
   resp << ourPort;
-  check = nlWrite(sockets.r, (NLvoid*)resp.getData(), (NLint)resp.getPosition());
+  check = sockets.rawWrite(true, resp.getData(), resp.getPosition());
   if (check != resp.getPosition())
     throw Error::createLowLevelError(Error::Write);
 
   resp.reset();
   resp << PacketParser::END_OF_PACKET;
-  check = nlWrite(sockets.u, (NLvoid*)resp.getData(), (NLint)resp.getPosition());
+  check = sockets.rawWrite(false, resp.getData(), resp.getPosition());
   if (check != resp.getPosition())
     throw Error::createLowLevelError(Error::Write);
 }
