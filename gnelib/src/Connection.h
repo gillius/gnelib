@@ -198,6 +198,33 @@ protected:
   //##ModelId=3B0753810072
   bool connected;
 
+	/**
+	 * Register this Connection object's sockets with the
+	 * ConnectionEventGenerator.  Pass true to register each socket type.
+	 * Usually both will be registered, but in the future there may exist a
+	 * new connection type that only uses one of the sockets.\n
+	 * The internal class ConnectionListener will be used to trigger the proper
+	 * onReceive(bool) event.\n
+	 * The sockets will be unregistered automatically when the object is
+	 * destroyed, but they may be unregistered explicitly at an earlier time
+	 * through unreg(bool, bool).\n
+	 * Registering a socket already registered will have no effect.
+	 * @see #onReceive(bool)
+	 * @see #unreg(bool, bool)
+	 */
+  //##ModelId=3B6E14AC0104
+	void reg(bool reliable, bool unreliable);
+
+	/**
+	 * Unregistered the sockets which are specified by passing true to the
+	 * appropriate parameter.  This function call is optional -- when the
+	 * object is destroyed, unregistering is automatic if socket was
+	 * registered.  Trying to unregister sockets that are already unregistered
+	 * will result in no effect.
+	 */
+  //##ModelId=3B6E14AC01D6
+	void unreg(bool reliable, bool unreliable);
+
 private:
   //##ModelId=3B07538002A0
   class ConnectionListener : public ConnectionEventListener {
@@ -219,7 +246,18 @@ private:
     bool reliable;
 
   };
+	/**
+	 * Make ConnectionListener a friend so it can call our onRecieve(bool)
+	 * event, which will properly parse the packets.
+	 */
   friend class ConnectionListener;
+
+	//Possible ConnectionListeners that may or may not exist, but if they do we
+	//need to kill them on exit.
+  //##ModelId=3B6E14AC00FB
+	ConnectionListener* rlistener;
+  //##ModelId=3B6E14AC0100
+	ConnectionListener* ulistener;
 
   //Functions for PacketStream and parsing packets
   //##ModelId=3B6B302400CA
@@ -228,6 +266,9 @@ private:
   int rawWrite(bool reliable, const NLbyte* buf, int bufSize);
   friend class PacketStream;
 
+	/**
+	 * Parses the packets recieved, then calls onReceive.
+	 */
   //##ModelId=3B07538100B0
   void onReceive(bool reliable);
 

@@ -21,6 +21,8 @@
 #include "Connection.h"
 #include "RawPacket.h"
 #include "PacketParser.h"
+#include "ConnectionEventGenerator.h"
+#include "GNE.h"
 
 namespace GNE {
 
@@ -38,11 +40,14 @@ static const std::string FailureStrings[] = {
 
 //##ModelId=3B0753810073
 Connection::Connection(int outRate, int inRate)
-: ps(NULL), connected(false), rsocket(NL_INVALID), usocket(NL_INVALID) {
+: connected(false), rsocket(NL_INVALID), usocket(NL_INVALID),
+rlistener(NULL), ulistener(NULL) {
+	ps = new PacketStream(outRate, inRate, *this);
 }
 
 //##ModelId=3B0753810076
 Connection::~Connection() {
+	unreg(true, true);
   if (rsocket != NL_INVALID)
     nlClose(rsocket);
   if (usocket != NL_INVALID)
@@ -150,6 +155,32 @@ void Connection::ConnectionListener::onReceive() {
   conn.onReceive(reliable);
 }
 
+//##ModelId=3B6E14AC0104
+void Connection::reg(bool reliable, bool unreliable) {
+	if (rlistener == NULL) {
+		rlistener = new ConnectionListener(*this, true);
+		eGen->reg(rsocket, rlistener);
+	}
+	if (ulistener == NULL) {
+		ulistener = new ConnectionListener(*this, false);
+		eGen->reg(usocket, ulistener);
+	}
+}
+
+//##ModelId=3B6E14AC01D6
+void Connection::unreg(bool reliable, bool unreliable) {
+	if (rlistener != NULL) {
+		eGen->unreg(rsocket);
+		delete rlistener;
+		rlistener = NULL;
+	}
+	if (ulistener != NULL) {
+		eGen->unreg(usocket);
+		delete ulistener;
+		ulistener = NULL;
+	}
+}
+
 //##ModelId=3B6B302400CA
 int Connection::rawRead(bool reliable, const NLbyte* buf, int bufSize) {
   NLsocket act;
@@ -160,6 +191,9 @@ int Connection::rawRead(bool reliable, const NLbyte* buf, int bufSize) {
   return int(nlRead(act, (NLvoid*)buf, (NLint)bufSize));
 }
 
+/**
+ * \todo if an error occurs in the rawWrite/Read functions, call onFailure.
+ */
 //##ModelId=3B6B302401D6
 int Connection::rawWrite(bool reliable, const NLbyte* buf, int bufSize) {
   NLsocket act;
