@@ -34,7 +34,7 @@ void GNE::SocketPair::disconnect() {
 	if (r != NL_INVALID) {
 		nlClose(r);
 		r = NL_INVALID;
-		}
+	}
 	if (u != NL_INVALID) {
 		nlClose(u);
 		u = NL_INVALID;
