@@ -70,6 +70,10 @@ void ConditionVariable::wait() {
 void ConditionVariable::timedWait(int ms) {
   Time t = Timer::getAbsoluteTime();
   t += ms*1000;
+  timedWait(t);
+}
+
+void ConditionVariable::timedWait(const Time& until) {
   timespec tv;
   tv.tv_sec = t.getSec();
   tv.tv_nsec = t.getuSec() * 1000;

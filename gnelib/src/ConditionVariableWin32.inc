@@ -210,6 +210,17 @@ void ConditionVariable::timedWait(int ms) {
   acquire();
 }
 
+void ConditionVariable::timedWait(const Time& until) {
+  Time t = until - Timer::getAbsoluteTime();
+  int microSec = t.getTotaluSec();
+  if (microSec <= 0) {
+    //Return immediately because the time has already passed.
+    return;
+  } else {
+    timedWait(microSec / 1000);
+  }
+}
+
 void ConditionVariable::signal() {
   unsigned signals = 0;
 

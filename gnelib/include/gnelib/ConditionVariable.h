@@ -24,6 +24,7 @@
 
 namespace GNE {
 class Mutex;
+class Time;
 
 /**
  * A class for a conditional variable.  This is to be used when a thread needs
@@ -96,6 +97,12 @@ public:
    */
   //##ModelId=3B0753810003
   void timedWait(int ms);
+
+  /**
+   * Waits until the given time, specified in absolute time.
+   */
+  //##ModelId=3CC4E338006F
+  void timedWait(const Time& until);
 
   /**
    * Wakes up at least one thread waiting on this CV.  Which thread wakes up
