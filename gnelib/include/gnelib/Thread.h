@@ -43,20 +43,12 @@ namespace GNE {
 class Thread {
 public:
   /**
-   * Default ctor.
-   * Creates the thread ready to be run, but is not yet started.
-   * Same as calling Thread(Thread::DEF_NAME, Thread::DEF_PRI)
-   */
-  //##ModelId=3B0753810375
-  Thread();
-
-  /**
    * Creates a new thread, ready to run but not yet running.
    * @param name2 the name of this thread
    * @param priority2 the priority this thread has
    */
   //##ModelId=3B0753810376
-  Thread(std::string name2, int priority2);
+  Thread(std::string name2 = DEF_NAME, int priority2 = DEF_PRI);
 
   //##ModelId=3B0753810379
   virtual ~Thread();
@@ -139,7 +131,7 @@ public:
    * Starts this thread running.
    */
   //##ModelId=3B07538103A5
-  void start();
+  virtual void start();
   
   /**
    * Returns the priority of this class.
