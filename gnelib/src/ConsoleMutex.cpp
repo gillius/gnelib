@@ -17,36 +17,34 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _GNELIB_H_
-#define _GNELIB_H_
+#include "gneintern.h"
+#include "ConsoleMutex.h"
+#include "Mutex.h"
 
-#include "gnelib/Address.h"
-#include "gnelib/ClientConnection.h"
-#include "gnelib/ConnectionListener.h"
-#include "gnelib/ConditionVariable.h"
-#include "gnelib/Connection.h"
-#include "gnelib/ErrorGne.h"
-#include "gnelib/ConnectionEventGenerator.h"
-#include "gnelib/ReceiveEventListener.h"
-#include "gnelib/Console.h"
-#include "gnelib/Counter.h"
-#include "gnelib/GNE.h"
-#include "gnelib/ConsoleMutex.h"
-#include "gnelib/ListServerConnection.h"
-#include "gnelib/Mutex.h"
-#include "gnelib/Packet.h"
-#include "gnelib/PacketStream.h"
-#include "gnelib/PacketParser.h"
-#include "gnelib/RawPacket.h"
-#include "gnelib/ServerConnectionListener.h"
-#include "gnelib/SyncConnection.h"
-#include "gnelib/ServerConnection.h"
-#include "gnelib/Thread.h"
-#include "gnelib/TimeGne.h"
-#include "gnelib/Timer.h"
-#include "gnelib/TimerCallback.h"
-#include "gnelib/GNEDebug.h"
+std::ostream& operator << (std::ostream& o, GNE::Console::ConsoleMutex& cm) {
+  cm.action();
+  return o;
+}
 
-#endif
+namespace GNE {
+namespace Console {
 
+//##ModelId=3BF88CAB02E7
+ConsoleMutex::ConsoleMutex(bool isAcquiring, Mutex& syncMutex) 
+: acq(isAcquiring), sync(syncMutex) {
+}
 
+//##ModelId=3BF88CAB02EA
+ConsoleMutex::~ConsoleMutex() {
+}
+
+//##ModelId=3BF88CAB02EB
+void ConsoleMutex::action() {
+  if (acq)
+    sync.acquire();
+  else
+    sync.release();
+}
+
+}
+}

@@ -1,3 +1,6 @@
+#ifndef _CONSOLEMUTEX_H_
+#define _CONSOLEMUTEX_H_
+
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
  * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
@@ -17,36 +20,41 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _GNELIB_H_
-#define _GNELIB_H_
+#include "gneintern.h"
+namespace GNE {
+class Mutex;
 
-#include "gnelib/Address.h"
-#include "gnelib/ClientConnection.h"
-#include "gnelib/ConnectionListener.h"
-#include "gnelib/ConditionVariable.h"
-#include "gnelib/Connection.h"
-#include "gnelib/ErrorGne.h"
-#include "gnelib/ConnectionEventGenerator.h"
-#include "gnelib/ReceiveEventListener.h"
-#include "gnelib/Console.h"
-#include "gnelib/Counter.h"
-#include "gnelib/GNE.h"
-#include "gnelib/ConsoleMutex.h"
-#include "gnelib/ListServerConnection.h"
-#include "gnelib/Mutex.h"
-#include "gnelib/Packet.h"
-#include "gnelib/PacketStream.h"
-#include "gnelib/PacketParser.h"
-#include "gnelib/RawPacket.h"
-#include "gnelib/ServerConnectionListener.h"
-#include "gnelib/SyncConnection.h"
-#include "gnelib/ServerConnection.h"
-#include "gnelib/Thread.h"
-#include "gnelib/TimeGne.h"
-#include "gnelib/Timer.h"
-#include "gnelib/TimerCallback.h"
-#include "gnelib/GNEDebug.h"
+namespace Console {
+
+/**
+ * A class for syncronizing the gout stream.  You won't create this class
+ * directly, but instead will use the acquire and release variables.
+ */
+//##ModelId=3BF88CAB021F
+class ConsoleMutex {
+public:
+  //##ModelId=3BF88CAB02E7
+  ConsoleMutex(bool isAcquiring, Mutex& syncMutex);
+  //##ModelId=3BF88CAB02EA
+  ~ConsoleMutex();
+
+  //Perform a release or an acquire, based on acq.
+  //##ModelId=3BF88CAB02EB
+  void action();
+
+private:
+  //acq is true if we are trying to acquire, false if release.
+  //##ModelId=3BF88CAB02D8
+  bool acq;
+
+  //sync is the mutex we are wrapping
+  //##ModelId=3BF88CC1010E
+  Mutex& sync;
+};
+
+}
+}
+
+std::ostream& operator << (std::ostream& o, GNE::Console::ConsoleMutex& cm);
 
 #endif
-
-

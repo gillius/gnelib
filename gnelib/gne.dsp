@@ -117,6 +117,10 @@ SOURCE=.\src\Console.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\ConsoleMutex.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Counter.cpp
 # End Source File
 # Begin Source File
@@ -230,6 +234,10 @@ SOURCE=.\include\gnelib\ConnectionListener.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\Console.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ConsoleMutex.h
 # End Source File
 # Begin Source File
 

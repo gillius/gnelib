@@ -24,35 +24,7 @@
 #include <streambuf>
 
 namespace GNE {
-class Mutex;
-
 namespace Console {
-
-/**
- * A class for syncronizing the gout stream.  You won't create this class
- * directly, but instead will use the acquire and release variables.
- */
-//##ModelId=3BF88CAB021F
-class ConsoleMutex {
-public:
-  //##ModelId=3BF88CAB02E7
-  ConsoleMutex(bool isAcquiring, Mutex& syncMutex);
-  //##ModelId=3BF88CAB02EA
-  ~ConsoleMutex();
-
-  //Perform a release or an acquire, based on acq.
-  //##ModelId=3BF88CAB02EB
-  void action();
-
-private:
-  //acq is true if we are trying to acquire, false if release.
-  //##ModelId=3BF88CAB02D8
-  bool acq;
-
-  //sync is the mutex we are wrapping
-  //##ModelId=3BF88CC1010E
-  Mutex& sync;
-};
 
 /**
  * A class derived from streambuf that uses the functions in the Console class.
@@ -108,7 +80,5 @@ private:
 
 }
 }
-
-std::ostream& operator << (std::ostream& o, GNE::Console::ConsoleMutex& cm);
 
 #endif //#ifndef _GSTREAMBUFS_H_

@@ -20,6 +20,7 @@
 #include "gneintern.h"
 #include "Console.h"
 #include "gstreambufs.h"
+#include "ConsoleMutex.h"
 #include "Mutex.h"
 #include <ostream>
 #include <istream>
