@@ -44,11 +44,6 @@ void* Thread::threadStart( void* thread ) {
 	return NULL;
 }
 
-//##ModelId=3B0753810375
-Thread::Thread() :  shutdown(false), name(DEF_NAME), thread_id(0),
-running(false), deleteThis(false), priority(DEF_PRI) {
-}
-
 //##ModelId=3B0753810376
 Thread::Thread(std::string name2, int priority2) : shutdown(false), name(name2),
 thread_id(0), running(false), deleteThis(false), priority(priority2) {
@@ -140,6 +135,7 @@ bool Thread::isRunning() const {
 
 //##ModelId=3B07538103A5
 void Thread::start() {
+  shutdown = false;
   running = true;
   mapSync.acquire();
   pthread_create( &thread_id, NULL, Thread::threadStart, this );
