@@ -74,13 +74,12 @@ void ConnectionEventGenerator::run() {
           mapCtrl.release();
         }
       } else {
-        if (!(nlGetError() == NL_SOCKET_ERROR && nlGetSystemError() == 10004)) {
+        //The only valid error is NL_INVALID_SOCKET which happens if we close
+        //a socket while nlPollGroup is using it.
+        if (nlGetError() != NL_INVALID_SOCKET) {
           gnedbgo1(1, "%s", Error::createLowLevelError().toString().c_str());
           assert(false);
-        } else
-          gnedbgo(1, "nlPollGroup call canceled (perhaps to do low-level socket close).  Trying again.");
-          //Else the call was canceled.  This is a bug in HawkNL I think, since cancellation
-          //is different from an error.
+        }
       }
     }
   }
