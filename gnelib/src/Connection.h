@@ -171,15 +171,27 @@ public:
   virtual void onDoneWriting();
 
 protected:
+  /**
+   * The reliable socket.
+   */
   //##ModelId=3AE4E2340334
   NLsocket rsocket;
 
+  /**
+   * The unreliable socket.
+   */
   //##ModelId=3B00ABDD0078
   NLsocket usocket;
 
+  /**
+   * The PacketStream associated with this Connection.
+   */
   //##ModelId=3AE44E3302DA
   PacketStream* ps;
 
+  /**
+   * Is this Connection active and ready for communications?
+   */
   //##ModelId=3AE4A97A038E
   bool connected;
 
@@ -212,5 +224,3 @@ private:
 };
 
 #endif /* CONNECTION_H_INCLUDED_C51DC478 */
-
-
