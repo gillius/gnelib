@@ -26,6 +26,7 @@
 #include "gnelib/ConditionVariable.h"
 #include "gnelib/Connection.h"
 #include "gnelib/ConnectionEventGenerator.h"
+#include "gnelib/ConnectionParams.h"
 #include "gnelib/ConnectionStats.h"
 #include "gnelib/Console.h"
 #include "gnelib/ConsoleStream.h"

@@ -29,6 +29,7 @@ namespace GNE {
 class ConnectionListener;
 class Error;
 class ClientConnectionParams;
+class ConnectionParams;
 
 /**
  * A class that can connect to a remote target.
@@ -37,11 +38,12 @@ class ClientConnectionParams;
 class ClientConnection : public Connection, public Thread {
 public:
   /**
-   * Initializes this ClientConnection.
+   * Initializes this ClientConnection.  The listener is passed in the open
+   * method.
    * @see Connection#Connection(ConnectionListener*)
    */
   //##ModelId=3B075380037F
-  ClientConnection(ConnectionListener* listener = NULL);
+  ClientConnection();
 
   //##ModelId=3B07538003B8
   virtual ~ClientConnection();
@@ -51,23 +53,9 @@ public:
    * the relvant parameters for establishing the connection are passed into
    * this function.  If there is already an error, the function returns true.
    * @param dest the destination address.
-   * @param outRate the maximum rate in bytes per second to send.  If this is
-   *        0, then the rate is unlimited.
-   * @param inRate the maximum rate we allow the sender to send to us in
-   *        bytes per second.  If this is 0, then the requested
-   *        incoming rate has no bounds.
-   * @param localPort local port to open on, default 0 for don't care.
-   * @param wantUnreliable true if we want to use a lower-overhead connection
-   *        for sending unreliable packets.
-   * @return true if the socket could not be opened, if dest, outRate,
-   *              inRate, or localPort have invalid values.
    */
   //##ModelId=3B07538003BB
-  bool open(const Address& dest,
-            int outRate = 0,
-            int inRate = 0,
-            int localPort = 0,
-            bool wantUnreliable = true);
+  bool open(const Address& dest, const ConnectionParams& p);
 
   /**
    * Starts connection to the specified target.  This method does not block,

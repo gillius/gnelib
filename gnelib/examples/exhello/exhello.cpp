@@ -203,16 +203,14 @@ private:
   bool received;
 };
 
-void OurListener::getNewConnectionParams(int& inRate, int& outRate,
-                                         bool& allowUnreliable,
-                                         ConnectionListener*& listener) {
-  inRate = iRate;
-  outRate = oRate;
+void OurListener::getNewConnectionParams(ConnectionParams& params) {
+  params.setInRate(iRate);
+  params.setOutRate(oRate);
   //We want to also listen for hellos from unreliable channels.  Note that
   //exsynchello will NOT request unreliable, but that's OK -- if no
   //unreliable socket exists, unreliable data will be sent reliable.
-  allowUnreliable = true;
-  listener = new OurServer();
+  params.setUnrel(true);
+  params.setListener(new OurServer());
 }
 
 int main(int argc, char* argv[]) {
@@ -236,8 +234,9 @@ void doClient(int outRate, int inRate, int port) {
 
   //uncomment the loop to perform a stress test.
   //for (int i=0; i <100; i++) {
-    ClientConnection* client = new ClientConnection(new OurClient());
-    if (client->open(address)) {
+    ConnectionParams params(new OurClient());
+    ClientConnection* client = new ClientConnection();
+    if (client->open(address, params)) {
       delete client;
       errorExit("Cannot open client socket.");
     }

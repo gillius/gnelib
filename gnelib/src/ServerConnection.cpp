@@ -21,6 +21,7 @@
 #include "../include/gnelib/ServerConnection.h"
 #include "../include/gnelib/ConnectionListener.h"
 #include "../include/gnelib/Connection.h"
+#include "../include/gnelib/ConnectionParams.h"
 #include "../include/gnelib/SyncConnection.h"
 #include "../include/gnelib/ServerConnectionListener.h"
 #include "../include/gnelib/Address.h"
@@ -40,31 +41,25 @@ namespace GNE {
 //##ModelId=3C5CED05010A
 class ServerConnectionParams {
 public:
-  //##ModelId=3C5CED0502EB
-  int outRate;
-  //##ModelId=3C5CED0502EC
-  int inRate;
+  //##ModelId=3CBE05D50012
+  ConnectionParams cp;
   //##ModelId=3C65C6D000F9
   ServerConnectionListener* creator;
-  //##ModelId=3C5CED0502F2
-  bool unrel;
   //##ModelId=3C7059BF0112
   bool doJoin;
 };
 
 //##ModelId=3B075381027A
-ServerConnection::ServerConnection(int outRate, int inRate, 
-                                   bool allowUnreliable,
-                                   ConnectionListener* listener, 
-                                   NLsocket rsocket2, 
+ServerConnection::ServerConnection(const ConnectionParams& p,
+                                   NLsocket rsocket2,
                                    ServerConnectionListener* creator)
-: Connection(listener), Thread("SrvrConn", Thread::HIGH_PRI) {
+: Thread("SrvrConn", Thread::HIGH_PRI) {
   gnedbgo(5, "created");
+  assert(!p);
   sockets.r = rsocket2;
+  setListener(p.getListener());
   params = new ServerConnectionParams;
-  params->outRate = outRate;
-  params->inRate = inRate;
-  params->unrel = allowUnreliable;
+  params->cp = p;
   params->creator = creator;
   params->doJoin = true;
 }
@@ -171,7 +166,7 @@ void ServerConnection::doHandshake() {
   sendCAP();
   
   //Then we handle anything related to the unreliable connection if needed.
-  if (params->unrel) {
+  if (params->cp.getUnrel()) {
     gnedbgo(2, "Unreliable requested.  Getting unrel info.");
     getUnreliableInfo();
   } else {
@@ -210,10 +205,10 @@ void ServerConnection::getCRP() {
   gbool unreliable;
   crp >> unreliable;
   //We use the unreliable connection only if both sides allow it.
-  params->unrel = (unreliable && params->unrel);
+  params->cp.setUnrel(unreliable && params->cp.getUnrel());
 
   //Now that we know the versions are OK, make the PacketStream
-  ps = new PacketStream(params->outRate, maxOutRate, *this);
+  ps = new PacketStream(params->cp.getOutRate(), maxOutRate, *this);
 }
 
 //##ModelId=3C5CED0502CE
@@ -238,8 +233,8 @@ void ServerConnection::sendCAP() {
   RawPacket cap;
   addHeader(cap);
   cap << gTrue;
-  cap << params->inRate;
-  if (params->unrel) {
+  cap << params->cp.getInRate();
+  if (params->cp.getUnrel()) {
     //If the client requested it and we allowed it, open an unreliable port
     //and send the port number to the client.
     sockets.u = nlOpen(0, NL_UNRELIABLE);

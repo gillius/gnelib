@@ -20,7 +20,7 @@
 /**
  * exrawtest -- Basically a test of the RawPacket class.  Does show usage of the
  * RawPacket class, but the usage in this case because this is a test uses the
- * class is "hackish" ways.  The standard use of RawPackets is pretty trivial.
+ * class in "hackish" ways.  The standard use of RawPackets is pretty trivial.
  */
 
 #include "../../include/gnelib.h"
@@ -31,7 +31,7 @@ using namespace GNE;
 using namespace GNE::Console;
 
 int main(int argc, char* argv[]) {
-  initGNE(NO_NET, atexit);
+  initGNE(NL_IP, atexit);
   initConsole(atexit);
   Console::setTitle("GNE RawPacket Test");
 
@@ -52,6 +52,7 @@ int main(int argc, char* argv[]) {
   gout << "RawPacket must be in little-endian format." << endl;
   gout << "RawPacket is in little-endian format: " << (t[0] == 15) << endl;
   gout << "RawPacket is in big-endian format: " << (t[3] == 15) << endl;
+  assert(t[0] == 15);
   gout << endl;
 
   gout << " * Now writing a RawPacket..." << endl;

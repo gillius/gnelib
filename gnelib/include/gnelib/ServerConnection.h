@@ -29,6 +29,7 @@ class ConnectionListener;
 class ServerConnectionListener;
 class ServerConnectionParams;
 class Error;
+class ConnectionParams;
 
 /**
  * A GNE "internal" class.  Users will use this class, but probably only as
@@ -42,19 +43,12 @@ public:
    * Intializes this class.  Note that you won't create a ServerConnection
    * directly.  The ServerConnectionListener does that for you.
    * @see ServerConnectionListener
-   * @param outRate the maximum rate in bytes per second to send.  If this is
-   *        0, then the rate is unlimited.
-   * @param inRate the maximum rate we allow the sender to send to us in
-   *        bytes per second.  If this is 0, then the requested
-   *        incoming rate has no bounds.
-   * @param allowUnreliable if true, allows unreliable sockets.
    * @param rsocket2 the reliable socket received from the accept command.
    * @param creator the ServerConnectionListener that created us, so that we
    *                may call its onListenFailure event.
    */
   //##ModelId=3B075381027A
-  ServerConnection(int outRate, int inRate, bool allowUnreliable,
-                   ConnectionListener* listener, NLsocket rsocket2,
+  ServerConnection(const ConnectionParams& p, NLsocket rsocket2,
                    ServerConnectionListener* creator);
 
   /**

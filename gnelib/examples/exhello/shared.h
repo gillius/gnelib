@@ -82,9 +82,7 @@ public:
     delete listener;
   }
 
-  void getNewConnectionParams(int& inRate, int& outRate,
-                              bool& allowUnreliable,
-                              ConnectionListener*& listener);
+  void getNewConnectionParams(ConnectionParams& params);
 
 private:
   int iRate;

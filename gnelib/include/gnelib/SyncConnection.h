@@ -32,6 +32,7 @@ class Connection;
 class Packet;
 class ClientConnection;
 class ServerConnection;
+class ConnectionParams;
 
 /**
  * A class for performing syncronous connections.  All methods of this class
@@ -100,9 +101,7 @@ public:
    * @throw Error if the connection could not be opened.
    */
   //##ModelId=3BC3CD0902E4
-  void open(const Address& dest, int outRate = 0,
-            int inRate = 0, int localPort = 0,
-            bool wantUnreliable = true);
+  void open(const Address& dest, const ConnectionParams& params);
   
   /**
    * Attempts to connect to the remote side, and waits for the connection to

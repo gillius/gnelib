@@ -237,18 +237,16 @@ public:
     sync.release();
   }
 
-  void getNewConnectionParams(int& inRate, int& outRate,
-                              bool& allowUnreliable,
-                              ConnectionListener*& listener) {
+  void getNewConnectionParams(ConnectionParams& params) {
     sync.acquire();
 
-    inRate = outRate = 0;
-    allowUnreliable = false;
+    params.setUnrel(false);
     if (accept && !connecting) {
       //If no one is connecting and we are accepting connections
-      listener = connecting = new PongClient(remotePlayer, localPlayer);
+      connecting = new PongClient(remotePlayer, localPlayer);
+      params.setListener(connecting);
     } else {
-      listener = new RefuseClient();
+      params.setListener(new RefuseClient());
     }
 
     sync.release();

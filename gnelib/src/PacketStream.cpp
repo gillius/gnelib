@@ -41,7 +41,7 @@ namespace GNE {
 
 //##ModelId=3B07538101BD
 PacketStream::PacketStream(int reqOutRate2, int maxOutRate2, Connection& ourOwner)
-: Thread("PktStrm"), owner(ourOwner), maxOutRate(maxOutRate2),
+: Thread("PktStrm", Thread::HIGH_PRI), owner(ourOwner), maxOutRate(maxOutRate2),
 reqOutRate(reqOutRate2) {
   assert(reqOutRate2 >= 0);
   assert(maxOutRate2 >= 0);

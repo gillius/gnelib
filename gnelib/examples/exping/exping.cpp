@@ -116,13 +116,8 @@ public:
     delete listener;
   }
 
-  void getNewConnectionParams(int& inRate, int& outRate,
-                              bool& allowUnreliable,
-                              ConnectionListener*& listener) {
-    inRate = outRate = 0; //0 meaning no limits on rates.
-    //We don't use unreliable transfers in this program.
-    allowUnreliable = true;
-    listener = new PingTest();
+  void getNewConnectionParams(ConnectionParams& params) {
+    params.setListener(new PingTest());
   }
 
 private:
@@ -156,7 +151,7 @@ int main() {
     cout << "Unable to initialize GNE Console" << endl;
     exit(3);
   }
-  setTitle("GNE PingPacket Example");
+  setTitle("GNE PingPacket Example"); 
 
   gout << "GNE PingPacket Example for " << GNE::VER_STR << endl;
   gout << "Local address: " << getLocalAddress() << endl;
@@ -215,8 +210,11 @@ void doClient(int outRate, int inRate, int port) {
   gout << "Press a key to stop the testing. " << endl;
 
   //We allocate it on the heap because PingTest deletes this connection.
-  ClientConnection* client = new ClientConnection(new PingTest());
-  if (client->open(address, outRate, inRate, 0, false))
+  ConnectionParams params(new PingTest());
+  params.setOutRate(outRate);
+  params.setInRate(inRate);
+  ClientConnection* client = new ClientConnection();
+  if (client->open(address, params))
     errorExit("Cannot open client socket.");
 
   client->connect();

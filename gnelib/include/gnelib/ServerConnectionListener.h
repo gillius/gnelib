@@ -28,6 +28,7 @@ namespace GNE {
 class Address;
 class ConnectionListener;
 class ServerConnection;
+class ConnectionParams;
 
 /**
  * A connection that listens for other connections.  Inherit from this class,
@@ -128,36 +129,19 @@ protected:
 
   /**
    * A new connection is starting, and now we want the parameters for this
-   * new connection.  The three parameters passed should be modified to give
+   * new connection.  The parameters passed should be modified to give
    * the new connection's flow control parameters and listener.
    *
-   * The last parameter should be set to the initial event listener for the
-   * ServerConnection that is being created.  This could be an entirely new
-   * ConnectionListener or an already existing one, it doesn't matter.  The
-   * returned listener cannot be NULL, since onNewConn must be called or a
-   * memory leak will occur.
-   *
-   * This pointer will be returned to you through the socket failure event
-   * (in this case it was never used, but it is returned in case you need to
-   * delete it).  If the connection is successful you can get your pointer
-   * back through the resulting ServerConnection class by using
-   * Connection::getListener.
+   * The listener pointer will be returned to you through the socket failure
+   * event (in this case it was never used, but it is returned in case you
+   * need to delete it).  If the connection is successful you can get your
+   * pointer back through the resulting ServerConnection class by using
+   * Connection::getListener, or through the onListenSuccess event.
    *
    * This function can be called from multiple threads at the same time.
-   *
-   * See PacketStream::PacketStream for more info about inRate and outRate.
-   * @param inRate the maximum rate we will accept.
-   * @param outRate the maximum rate of data we are able/willing to send.
-   * @param wantUnreliable set to true if you want to have an unreliable data
-   *   socket.  If either this function or the client refuses the unreliable
-   *   socket, then it will not be created, and any data marked to be sent
-   *   unreliably will instead be sent reliably.  You want want to disallow
-   *   this if you are not using unreliable data, or your firewall/gateway
-   *   makes UDP or IPX communication difficult or impossible.
    */
   //##ModelId=3BCFAE5A0064
-  virtual void getNewConnectionParams(int& inRate, int& outRate,
-    bool& allowUnreliable, ConnectionListener*& listener) = 0;
+  virtual void getNewConnectionParams(ConnectionParams& params) = 0;
 
 private:
   //This is simply so that ServerConnection can call onListenFailure when it fails.

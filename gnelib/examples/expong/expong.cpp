@@ -172,11 +172,14 @@ void doClient(int port) {
 
   //We create a new network player tied to the remote paddle.
   PongClient peer(&remote, &local);
-  ClientConnection client(&peer);
+
+  ClientConnection client;
 
   //Open a new connection to the selected address, with no bandwidth limit
   //controls, any local bounded port, and unreliable connection is not needed.
-  if (client.open(address, 0, 0, 0, false))
+  ConnectionParams p(&peer);
+  p.setUnrel(false);
+  if (client.open(address, p))
     errorExit("Unable to open ClientConnection.");
 
   client.connect();

@@ -23,6 +23,7 @@
 #include "../include/gnelib/ServerConnection.h"
 #include "../include/gnelib/ConnectionListener.h"
 #include "../include/gnelib/Connection.h"
+#include "../include/gnelib/ConnectionParams.h"
 #include "../include/gnelib/GNE.h"
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/Errors.h"
@@ -74,21 +75,25 @@ bool ServerConnectionListener::isListening() const {
 void ServerConnectionListener::onReceive() {
   NLsocket sock = nlAcceptConnection(socket);
   if (sock != NL_INVALID) {
-    int inRate, outRate;
-    bool allowUnreliable;
-    ConnectionListener* listener;
-    getNewConnectionParams(inRate, outRate, allowUnreliable, listener);
+    ConnectionParams params;
+    getNewConnectionParams(params);
 
-    ServerConnection* newConn = new ServerConnection(outRate, inRate,
-      allowUnreliable, listener, sock, this);
-    gnedbgo2(4, "Spawning a new ServerConnection %x on socket %i",
-      newConn, sock);
-    newConn->start();
+    if (!params) {
+      //If the params were valid
+      ServerConnection* newConn = new ServerConnection(params, sock, this);
+      gnedbgo2(4, "Spawning a new ServerConnection %x on socket %i",
+        newConn, sock);
+      newConn->start();
+    } else {
+      //If the params are not valid, report the error
+      onListenFailure(Error(Error::OtherGNELevelError), Address(),
+        params.getListener());
+    }
   } else {
     LowLevelError err = LowLevelError();
     gnedbgo1(1, "Listening failure (accept failed): %s",
       err.toString().c_str());
-    onListenFailure(err, NULL, NULL);
+    onListenFailure(err, Address(), NULL);
   }
 }
 

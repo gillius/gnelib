@@ -20,6 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/GNE.h"
 #include "../include/gnelib/ClientConnection.h"
+#include "../include/gnelib/ConnectionParams.h"
 #include "../include/gnelib/ConnectionListener.h"
 #include "../include/gnelib/Error.h"
 #include "../include/gnelib/Errors.h"
@@ -40,19 +41,15 @@ class ClientConnectionParams {
 public:
   //##ModelId=3C65C6D0001D
   Address dest;
-  //##ModelId=3C5CED050187
-  int outRate;
-  //##ModelId=3C5CED050188
-  int inRate;
-  //##ModelId=3C5CED050189
-  bool unrel;
+  //##ModelId=3CBE05D40327
+  ConnectionParams cp;
   //##ModelId=3C65C6D00029
   SyncConnection* sConnPtr;
 };
 
 //##ModelId=3B075380037F
-ClientConnection::ClientConnection(ConnectionListener* listener)
-: Connection(listener), Thread("CliConn", Thread::HIGH_PRI), params(NULL) {
+ClientConnection::ClientConnection()
+: Thread("CliConn", Thread::HIGH_PRI), params(NULL) {
   gnedbgo(5, "created");
 }
 
@@ -63,19 +60,17 @@ ClientConnection::~ClientConnection() {
 }
 
 //##ModelId=3B07538003BB
-bool ClientConnection::open(const Address& dest, int outRate, int inRate,
-                            int localPort, bool wantUnreliable) {
-  if (!dest || outRate < 0 || inRate < 0 || localPort < 0 ||
-      localPort > 65535)
+bool ClientConnection::open(const Address& dest,
+                            const ConnectionParams& p) {
+  if (!dest || p)
     return true;
   else {
     params = new ClientConnectionParams;
     params->dest = dest;
-    params->inRate = inRate;
-    params->outRate = outRate;
-    params->unrel = wantUnreliable;
+    params->cp = p;
+    setListener(p.getListener());
 
-    sockets.r = nlOpen(localPort, NL_RELIABLE_PACKETS);
+    sockets.r = nlOpen(p.getLocalPort(), NL_RELIABLE_PACKETS);
   }
   return (sockets.r == NL_INVALID);
 }
@@ -83,8 +78,10 @@ bool ClientConnection::open(const Address& dest, int outRate, int inRate,
 //##ModelId=3B07538003C1
 void ClientConnection::connect(SyncConnection* wrapped) {
   assert(sockets.r != NL_INVALID);
-  assert(params);
+  assert(params != NULL);
   assert(params->dest);
+  assert(!params->cp);
+
   params->sConnPtr = wrapped;
   start();
 }
@@ -190,7 +187,7 @@ void ClientConnection::doHandshake() {
   gnedbgo(2, "Waiting for the CAP.");
   Address temp = getCAP();
   
-  if (params->unrel) {
+  if (params->cp.getUnrel()) {
     gnedbgo(2, "Setting up the unreliable connection");
     setupUnreliable(temp);
   } else {
@@ -203,8 +200,8 @@ void ClientConnection::sendCRP() {
   RawPacket crp;
   addHeader(crp);
   addVersions(crp);
-  crp << (guint32)params->inRate;
-  crp << ((params->unrel) ? gTrue : gFalse);
+  crp << (guint32)params->cp.getInRate();
+  crp << ((params->cp.getUnrel()) ? gTrue : gFalse);
 
   int check = sockets.rawWrite(true, crp.getData(), crp.getPosition());
   //The write should succeed and have sent all of our data.
@@ -250,7 +247,7 @@ Address ClientConnection::getCAP() {
     cap >> maxOutRate;
 
     //Now we have enough info to create our PacketStream.
-    ps = new PacketStream(params->outRate, maxOutRate, *this);
+    ps = new PacketStream(params->cp.getOutRate(), maxOutRate, *this);
 
     //Get the unreliable connection information.  A port of less than 0 means
     //we didn't request an unreliable conn, or it we refused to us.
@@ -266,9 +263,9 @@ Address ClientConnection::getCAP() {
       ret.setPort((int)portNum);
 
     } else {
-      if (params->unrel) {
+      if (params->cp.getUnrel()) {
         gnedbgo(2, "The server refused our request for an unreliable connection.");
-        params->unrel = false;
+        params->cp.setUnrel(false);
       }
     }
 

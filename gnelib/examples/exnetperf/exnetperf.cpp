@@ -186,13 +186,9 @@ public:
     delete listener;
   }
 
-  void getNewConnectionParams(int& inRate, int& outRate,
-                              bool& allowUnreliable,
-                              ConnectionListener*& listener) {
-    inRate = iRate;
-    outRate = oRate;
-    allowUnreliable = true;
-    listener = new PerfTester();
+  void getNewConnectionParams(ConnectionParams& params) {
+    params.setRates(oRate, iRate);
+    params.setListener(new PerfTester());
   }
 
 private:
@@ -306,8 +302,10 @@ void doClient(int outRate, int inRate, int port) {
   gout << "Connecting to: " << address << endl;
   gout << "Press a key except r to stop the testing.  Press r to change rates." << endl;
 
-  ClientConnection client(new PerfTester());
-  if (client.open(address, outRate, inRate))
+  ConnectionParams params(new PerfTester());
+  params.setRates(outRate, inRate);
+  ClientConnection client;
+  if (client.open(address, params))
     errorExit("Cannot open client socket.");
 
   client.connect();

@@ -90,17 +90,15 @@ private:
   bool received;
 };
 
-void OurListener::getNewConnectionParams(int& inRate, int& outRate,
-                                         bool& allowUnreliable,
-                                         ConnectionListener*& listener) {
-  inRate = iRate;
-  outRate = oRate;
+void OurListener::getNewConnectionParams(ConnectionParams& params) {
+  params.setInRate(iRate);
+  params.setOutRate(oRate);
   //We are only using sync connections, so we don't need the unreliable
   //socket.  If anyone wants to send unreliable data to us, it will come
   //through the reliable channel instead, so this is OK even though
   //exhello will try to request an unreliable connection.
-  allowUnreliable = false;
-  listener = new OurServer();
+  params.setUnrel(false);
+  params.setListener(new OurServer());
 }
 
 int main(int argc, char* argv[]) {
@@ -128,13 +126,15 @@ void doClient(int outRate, int inRate, int port) {
     //loop.  Without the loop there is no reason why these cannot be on the
     //stack (auto variables).
     ClientConnection* clientConn
-      = new ClientConnection(ConnectionListener::getNullListener());
+      = new ClientConnection();
     SyncConnection& client = *(new SyncConnection(clientConn));
     try {
       //Since only one client can exist, acquire and release is not needed on
       //gout.
       gout << "Opening client socket." << endl;
-      client.open(address, 0, 0, 0, false);
+      ConnectionParams p(ConnectionListener::getNullListener());
+      p.setUnrel(false);
+      client.open(address, p);
       gout << "Attempting to connect." << endl;
       client.connect();
       

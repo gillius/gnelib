@@ -126,6 +126,9 @@
 				RelativePath=".\src\ConnectionListener.cpp">
 			</File>
 			<File
+				RelativePath="src\ConnectionParams.cpp">
+			</File>
+			<File
 				RelativePath=".\src\Console.cpp">
 			</File>
 			<File
@@ -233,6 +236,9 @@
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ConnectionListener.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ConnectionParams.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ConnectionStats.h">

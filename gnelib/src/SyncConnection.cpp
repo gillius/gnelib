@@ -23,6 +23,7 @@
 #include "../include/gnelib/Mutex.h"
 #include "../include/gnelib/ConditionVariable.h"
 #include "../include/gnelib/Connection.h"
+#include "../include/gnelib/ConnectionParams.h"
 #include "../include/gnelib/ClientConnection.h"
 #include "../include/gnelib/PacketStream.h"
 #include "../include/gnelib/ConnectionListener.h"
@@ -56,11 +57,9 @@ Connection* SyncConnection::getConnection() const {
  * \todo Check out possibility of a dynamic cast.
  */
 //##ModelId=3BC3CD0902E4
-void SyncConnection::open(const Address& dest,
-                          int outRate, int inRate, 
-                          int localPort, bool wantUnreliable) {
+void SyncConnection::open(const Address& dest, const ConnectionParams& params) {
   assert(!isReleased());
-  if (((ClientConnection*)conn)->open(dest, outRate, inRate, localPort, wantUnreliable))
+  if (((ClientConnection*)conn)->open(dest, params))
     throw Error(Error::CouldNotOpenSocket);
 }
 
