@@ -19,7 +19,7 @@
 
 #include "gneintern.h"
 #include "Address.h"
-#include <ostream>
+#include <iostream>
 
 std::ostream& operator << (std::ostream& o, const GNE::Address& addr) {
 	return o << addr.toString();
