@@ -62,16 +62,22 @@ public:
     packetsOut(0), conn(NULL) {}
   ~PerfTester() {}
 
-  void onDisconnect() { 
+  void onDisconnect() {
+    if (serverSide) {
+      //see serverSide declaration for more info
+      delete conn;
+    }
     delete this;
   }
 
   void onConnect(SyncConnection& conn2) {
+    serverSide = false;
     conn = conn2.getConnection();
     writePackets(); //Send an initial batch of data.
   }
 
   void onNewConn(SyncConnection& conn2) {
+    serverSide = true;
     conn = conn2.getConnection();
     conn2.release();
     writePackets();
@@ -149,6 +155,18 @@ private:
   int packetsOut;
   Pos ourPos;
   Connection* conn;
+
+  //We use this because this class can be client or server.  In the client
+  //side, the ClientConnection is on the stack and is automatically
+  //destroyed but on the server side the ServerConnection is on the heap and
+  //needs to be deleted.
+  //Normially the recommended way is to have in onDisconnect report to the
+  //main thread or some other responsible thread to control the creation or
+  //deletion of the listener and connection, and have that thread check and
+  //do the deletes, rather than use "delete conn; delete this;."  But in a
+  //small program such as this, it is probably acceptable (at least much
+  //easier to program!).
+  bool serverSide;
 };
 
 class OurListener : public ServerConnectionListener {
