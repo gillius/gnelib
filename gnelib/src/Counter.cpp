@@ -21,7 +21,7 @@
 #include "Counter.h"
 
 //##ModelId=3AE8693F0104
-Counter::Counter() {
+Counter::Counter() : count(0) {
 }
 
 //##ModelId=3AE8693F0140
@@ -30,14 +30,23 @@ Counter::~Counter() {
 
 //##ModelId=3AE8694203AC
 void Counter::timerCallback() {
+  countSync.acquire();
+  count++;
+  countSync.release();
 }
 
 //##ModelId=3AED05900154
 int Counter::getCount() {
-  return 0;
+  countSync.acquire();
+  int ret = count;
+  countSync.release();
+  return ret;
 }
 
 //##ModelId=3AED05960226
 void Counter::setCount(int newCount) {
+  countSync.acquire();
+  count = newCount;
+  countSync.release();
 }
 
