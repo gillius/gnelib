@@ -44,9 +44,9 @@ void ClientConnection::run() {
   NLboolean check = nlConnect(sockets.r, &address.getAddress());
   if (check == NL_TRUE) {
 		reg(true, false);
-    connected = true;
 		ps->start();
 		gnedbgo2(2, "connection r: %i, u: %i", sockets.r, sockets.u);
+    connected = true;
     onConnect();
   } else {
     onConnectFailure(Error::createLowLevelError().setCode(Error::ConnectionTimeOut));
