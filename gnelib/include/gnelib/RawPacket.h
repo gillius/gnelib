@@ -24,6 +24,7 @@
 
 namespace GNE {
 class Packet;
+class Time;
 
 /**
  * A utility class for creating a raw block of data that is used to directly
@@ -89,15 +90,29 @@ public:
   /**
    * Returns the serialized size of the given string.  This is meant for use
    * in your overridden Packet::getSize method to find the size of strings.
-   * For all other primitives, use sizeof(variable).
+   * For all other primitives, use getSizeOf(variable).
    */
-  static int getStringSize(std::string x) { return (int)(x.size() + 1); }
+  static int getStringSize(const std::string& x) { return (int)(x.size() + 1); }
 
   /**
    * Returns the maximum possible serialized size of a string of the given
    * length in ASCII characters.
    */
   static int getStringSize(int x) { return x + 1; }
+
+  /**
+   * Returns the serialized size in bytes of the given variable, to be used
+   * in your overridden Packet::getSize method.
+   */
+  static int getSizeOf(const std::string& x) { return getStringSize( x ); }
+  static int getSizeOf(guint8 x) { return sizeof(x); }
+  static int getSizeOf(gint16 x) { return sizeof(x); }
+  static int getSizeOf(guint16 x) { return sizeof(x); }
+  static int getSizeOf(gint32 x) { return sizeof(x); }
+  static int getSizeOf(guint32 x) { return sizeof(x); }
+  static int getSizeOf(gsingle x) { return sizeof(x); }
+  static int getSizeOf(gdouble x) { return sizeof(x); }
+  static int getSizeOf(const Time& x) { return sizeof(gint32)*2; }
 
   /**
    * Writes raw data starting at the current position.  This acts similar to
@@ -127,6 +142,7 @@ public:
   RawPacket& operator << (gsingle x);
   RawPacket& operator << (gdouble x);
   RawPacket& operator << (const std::string& x);
+  RawPacket& operator << (const Time& x);
 
   /**
    * Writes a packet to the RawPacket.  This function will simply call the
@@ -151,6 +167,7 @@ public:
   RawPacket& operator >> (gsingle& x);
   RawPacket& operator >> (gdouble& x);
   RawPacket& operator >> (std::string& x);
+  RawPacket& operator >> (Time& x);
 
   /**
    * This function calls the packet's readPacket function.  You will already

@@ -40,7 +40,7 @@ int Packet::getType() const {
 }
 
 int Packet::getSize() const {
-  return sizeof(type);
+  return RawPacket::getSizeOf(type);
 }
 
 void Packet::writePacket(RawPacket& raw) const {

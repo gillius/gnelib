@@ -45,7 +45,7 @@ public:
   }
 
   int getSize() const {
-    return Packet::getSize() + RawPacket::getStringSize(message);
+    return Packet::getSize() + RawPacket::getSizeOf(message);
   }
 
   void writePacket(RawPacket& raw) const {

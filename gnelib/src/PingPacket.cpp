@@ -32,7 +32,7 @@ Mutex PingPacket::sync;
 guint32 PingPacket::nextReqId = 0;
 std::map<guint32, Time> PingPacket::requests;
 
-PingPacket::PingPacket(bool makeReq) : Packet(ID), isReq(gTrue) {
+PingPacket::PingPacket(bool makeReq) : Packet(ID) {
   //makeReq is false when creating a packet just for reading.
   if (makeReq) {
     sync.acquire();
@@ -52,21 +52,24 @@ PingPacket::~PingPacket() {
 }
 
 bool PingPacket::isRequest() {
-  return (isReq != gFalse);
+  return (T2 == Time());
 }
 
 void PingPacket::makeReply() {
-  isReq = gFalse;
+  T2 = T3 = Timer::getCurrentTime();
 }
 
-Time PingPacket::getPing() {
+PingInformation PingPacket::getPingInformation() {
   assert(!isRequest());
-  Time ret(0, 0);
+  PingInformation ret;
   sync.acquire();
 
   std::map<guint32, Time>::iterator iter = requests.find(reqId);
   if (iter != requests.end()) {
-    ret = Timer::getCurrentTime() - iter->second;
+    Time T4 = Timer::getCurrentTime();
+    const Time& T1(iter->second);
+    ret.pingTime = (T4 - T1) - (T3 - T2);
+    ret.clockOffset = ( (T2 - T1) + (T3 - T4) ) / 2;
     requests.erase(iter);
   }
 
@@ -104,17 +107,18 @@ Packet* PingPacket::makeClone() const {
 }
 
 int PingPacket::getSize() const {
-  return Packet::getSize() + sizeof(isReq) + sizeof(reqId);
+  return Packet::getSize() + RawPacket::getSizeOf(reqId) +
+    RawPacket::getSizeOf(T2) + RawPacket::getSizeOf(T3);
 }
 
 void PingPacket::writePacket(RawPacket& raw) const {
   Packet::writePacket(raw);
-  raw << isReq << reqId;
+  raw << reqId << T2 << T3;
 }
 
 void PingPacket::readPacket(RawPacket& raw) {
   Packet::readPacket(raw);
-  raw >> isReq >> reqId;
+  raw >> reqId >> T2 >> T3;
 }
 
 Packet* PingPacket::create() {

@@ -28,18 +28,43 @@
 namespace GNE {
 
 /**
- * Using the PingPacket is one way to measure ping.  Other methods exist to
- * find ping and latency (latency is one-way time, whereas ping is two-way).
- * You could use other methods depending on if data sent in the game is an
- * implied response (and therefore a "built-in" ping), or if the peers are
- * time-syncronized and timestamps are sent on game packets this can be used
- * to measure latency with every incoming packet.
+ * Information returned by GNE::PingPacket::getPingInformation.
+ */
+struct PingInformation {
+  PingInformation() : pingTime(0, 0), clockOffset(0, 0) {}
+  
+  /**
+   * Round-trip ping time.
+   */
+  Time pingTime;
+
+  /**
+   * Clock offset.
+   */
+  Time clockOffset;
+};
+
+/**
+ * Using the PingPacket is one way to measure ping and clock offsets from a
+ * remote machine.  Measuring ping and clock offset are very similar operations
+ * in how they work, and because the extra overhead of measuring clock offset
+ * is small, that functionality was added into PingPacket.  The effectiveness
+ * of the clock synchronization is discussed in the GNE Protocol specification,
+ * available on the GNE web site. Ping capability was not integrated into the
+ * Connection class to give you the largest flexibility on how to measure
+ * latency and ping in your games.
  *
- * So PingPacket is just a very simple system of measuring ping and is handy
- * for measuring ping while connecting, or when making a simple "query"
- * connection like when a client is just trying to get game info.  Ping
- * capability was not integrated into the Connection class to give you the
- * largest flexibility on how to measure latency and ping in your games.
+ * A choice had to be made between synchronizing actual real clock times, or
+ * synchronizing on an arbitrary server clock. Due to the fact that absolute
+ * time clocks have less resolution in some platforms (ie Windows), and
+ * because of possible difficulties surrounding differing timezones and
+ * GMT-UTC differences, the clock synchronization will be based on an
+ * arbitrary clock on the server. This allows the server to use the clock with
+ * the highest resolution, and perhaps more importantly, the server can use
+ * the same clock for synchronizing and for timing the game logic. The
+ * important part to know from this is that the clock offsets may be extreme
+ * (as GMT is used in Linux, and seconds since CPU powerup in Windows), and
+ * thus may not fit into a 32-bit integer with microsecond accuracy.
  *
  * Since the PingPackets will be placed into the queue and received as
  * normal, this will be measuring effective ping rather than the actual time
@@ -70,6 +95,7 @@ public:
    * an internal source.  Only ping requests are made using the constructor --
    * you should use getReply when you get a ping request to make the ping
    * response packet.
+   *
    * The PingPacket::create function passes in false to get an uninitalized
    * PingPacket for reading.  You will probably only ever use the default
    * form of the constructor.  If you pass false, the state of this object is
@@ -97,12 +123,12 @@ public:
 
   /**
    * If this packet is a ping reply that is from one of our requests, this
-   * finds the time elapsed since its creation.  Calling this function will
+   * finds the round-trip time and clock offset.  Calling this function will
    * remove the request ID from the request table, so this function will only
-   * work once for each reply.  If the request ID was not found, then an
-   * elapsed time of 0 will be returned.
+   * work once for each reply.  If the request ID was not found, then times
+   * of 0 will be returned.
    */
-  Time getPing();
+  PingInformation getPingInformation();
 
   /**
    * Every time you create a packet, the request ID is placed into a request
@@ -158,9 +184,17 @@ public:
   static Packet* create();
 
 private:
-  gbool isReq;
-
   guint32 reqId;
+
+  /**
+   * This is the time the remote end received the packet.
+   */
+  Time T2;
+
+  /**
+   * This is the time the remote end sent the reply.
+   */
+  Time T3;
 
   //Provides syncronization for nextReqId and requests
   static Mutex sync;

@@ -43,6 +43,8 @@ public:
    */
   Time();
 
+  Time( const Time& t );
+
   /**
    * Initalizes this class with the time specified.  The given time need not
    * be normalized as this will be done automatically.  For example it is
@@ -67,10 +69,21 @@ public:
    * Returns the total time in microseconds.  This function can be useful
    * for displaying the time represented by this object in a custom format
    * (such as xxxxx ms or xxxxx us, rather than xxx.xxx seconds).  Since an
-   * int is returned, 2147.483648 seconds is the maximum amount of time that
-   * can be represented in a 32-bit integer in microseconds.
+   * int is returned, +/- 2147.483648 seconds is the maximum amount of time
+   * that can be represented in a 32-bit integer in microseconds.
+   *
+   * Because of this time limitation, only small time differences can be
+   * represented.  If a larger time difference is expected, getTotalmSec may
+   * be a better choice.
    */
   int getTotaluSec() const;
+
+  /**
+   * Returns the total time in milliseconds.  Useful in the same situtations
+   * as getTotaluSec, but can represent larger time differences.  A 32-bit
+   * integer millisecond value can represent a time of about +/- 24.855 days.
+   */
+  int getTotalmSec() const;
 
   /**
    * Sets seconds.
@@ -95,6 +108,8 @@ public:
    * this might return 5.002052 if there was 5 seconds and 2052 microseconds.
    */
   std::string toString() const;
+
+  Time& operator = (const Time& rhs);
 
   /**
    * Equality operator that works as expected.
@@ -143,11 +158,39 @@ public:
    */
   Time operator-(const Time& rhs) const;
 
+  /**
+   * Scalar multiplication operator.
+   */
+  Time& operator*=(int rhs);
+
+  /**
+   * Scalar multiplication operator.
+   */
+  Time operator*(int rhs) const;
+
+  /**
+   * Scalar division operator.
+   */
+  Time& operator/=(int rhs);
+
+  /**
+   * Scalar division operator.
+   */
+  Time operator/(int rhs) const;
+
 protected:
   /**
    * make sure that microsec stays under a second, adding to sec if needed.
    */
   void normalize();
+
+  /**
+   * Temporarily converts the time values into a different format -- don't
+   * know what to call it.  Just look at the formula.  It's needed for things
+   * like division of negative numbers.  The method normalize MUST be called
+   * before the method completes.
+   */
+  void convert();
 
 private:
   int sec;

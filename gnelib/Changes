@@ -1,4 +1,12 @@
 GNE 0.55 to current
+  Added clock synchronization capability into the PingPacket class.
+  Added copy constructor and operator= to Time class.
+  Modified exisiting packet classes and examples to use RawPacket::getSizeOf.
+  Added RawPacket::getSizeOf functions.  You should now use these rather than
+    the sizeof operator when determining the serialized size of the packet.
+  Added RawPacket opeartors to read and write GNE::Time objects.
+  Added operators *, /, *=, /= for integers in the Time class.
+  Added Time::getTotalmSec, to return total milliseconds time.
   Added a debugging system for mutexes which is active when compiling GNE in
     debugging mode.  It detects the following cases:
     * If you try to release a mutex you have not acquired, or if you try to

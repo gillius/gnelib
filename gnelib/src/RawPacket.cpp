@@ -20,6 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/RawPacket.h"
 #include "../include/gnelib/Packet.h"
+#include "../include/gnelib/Time.h"
 
 namespace GNE {
 
@@ -135,6 +136,12 @@ RawPacket& RawPacket::operator << (const Packet& x) {
   return *this;
 }
 
+RawPacket& RawPacket::operator << (const Time& x) {
+  *this << x.getSec() << x.getuSec();
+  assert(currLoc <= RAW_PACKET_LEN);
+  return *this;
+}
+
 //START OF READING OPERATORS
 
 RawPacket& RawPacket::operator >> (gint8& x) {
@@ -205,6 +212,24 @@ RawPacket& RawPacket::operator >> (std::string& x) {
 
 RawPacket& RawPacket::operator >> (Packet& x) {
   x.readPacket(*this);
+  return *this;
+}
+
+/**
+ * \todo throw exceptions later if usec value is out of range.
+ */
+RawPacket& RawPacket::operator >> (Time& x) {
+  gint32 val;
+
+  *this >> val;
+  assert(currLoc <= RAW_PACKET_LEN);
+  x.setSec( val );
+
+  *this >> val;
+  assert(currLoc <= RAW_PACKET_LEN);
+  assert ( val >= 0 && val <= 999999 );
+  x.setuSec( val );
+
   return *this;
 }
 

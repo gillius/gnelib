@@ -35,8 +35,8 @@ public:
   }
 
   int getSize() const {
-    return Packet::getSize() + sizeof(age) + firstName.size() + 1 +
-      lastName.size() + 1;
+    return Packet::getSize() + RawPacket::getSizeOf(age) +
+      RawPacket::getSizeOf(firstName) + RawPacket::getSizeOf(lastName);
   }
 
   void writePacket(RawPacket& raw) const {

@@ -32,6 +32,9 @@ namespace GNE {
 Time::Time() : sec(0), microsec(0) {
 }
 
+Time::Time( const Time& t ) : sec(t.sec), microsec(t.microsec) {
+}
+
 Time::Time(int seconds, int microseconds) 
 : sec(seconds), microsec(microseconds) {
   normalize();
@@ -52,6 +55,10 @@ int Time::getTotaluSec() const {
   return (sec * 1000000 + microsec);
 }
 
+int Time::getTotalmSec() const {
+  return ( (sec * 1000) + (microsec / 1000) );
+}
+
 void Time::setSec(int seconds) {
   sec = seconds;
 }
@@ -69,8 +76,19 @@ Time Time::diff(const Time& rhs) const {
 
 std::string Time::toString() const {
   std::stringstream ret;
-  ret << sec << '.' << std::setfill('0') << std::setw(6) << microsec;
+  if ( sec >= 0 )
+    ret << sec << '.' << std::setfill('0') << std::setw(6) << microsec;
+  else {
+    ret << '-' << abs(sec+1) << '.' << std::setfill('0') << std::setw(6)
+      << 1000000 - microsec;
+  }
   return ret.str();
+}
+
+Time& Time::operator = (const Time& rhs) {
+  sec = rhs.sec;
+  microsec = rhs.microsec;
+  return *this;
 }
 
 bool Time::operator ==(const Time& rhs) const {
@@ -90,10 +108,7 @@ bool Time::operator>(const Time& rhs) const {
 }
 
 Time Time::operator+(int rhs) const {
-  Time ret(*this);
-  ret.microsec += rhs;
-  ret.normalize();
-  return ret;
+  return Time(sec, microsec + rhs);
 }
 
 Time& Time::operator+=(int rhs) {
@@ -110,15 +125,39 @@ Time& Time::operator+=(const Time& rhs) {
 }
 
 Time Time::operator+(const Time& rhs) const {
-  Time t(sec + rhs.sec, microsec + rhs.microsec);
-  t.normalize();
-  return t;
+  return Time(sec + rhs.sec, microsec + rhs.microsec);
 }
 
-Time Time::operator -(const Time& rhs) const {
-  Time t(sec - rhs.sec, microsec - rhs.microsec);
-  t.normalize();
-  return t;
+Time Time::operator-(const Time& rhs) const {
+  return Time(sec - rhs.sec, microsec - rhs.microsec);
+}
+
+Time& Time::operator*=(int rhs) {
+  convert();
+  microsec *= rhs;
+  sec *= rhs;
+  normalize();
+  return *this;
+}
+
+Time Time::operator*(int rhs) const {
+  Time ret( sec, microsec );
+  ret *= rhs;
+  return ret;
+}
+
+Time& Time::operator/=(int rhs) {
+  convert();
+  sec /= rhs;
+  microsec /= rhs;
+  normalize();
+  return *this;
+}
+
+Time Time::operator/(int rhs) const {
+  Time ret( sec, microsec );
+  ret /= rhs;
+  return ret;
 }
 
 void Time::normalize() {
@@ -131,10 +170,11 @@ void Time::normalize() {
   }
 }
 
+void Time::convert() {
+  if ( sec < 0 ) {
+    ++sec;
+    microsec -= 1000000;
+  }
 }
 
-
-
-
-
-
+}

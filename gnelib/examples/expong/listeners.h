@@ -133,7 +133,8 @@ public:
           ping.makeReply();
           conn->stream().writePacket(ping, true);
         } else {
-          mlprintf(63, 24, "Ping: %ss", ping.getPing().toString().c_str());
+          mlprintf(63, 24, "Ping: %ss",
+            ping.getPingInformation().pingTime.toString().c_str());
         }
 
       } else {

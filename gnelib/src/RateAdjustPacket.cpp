@@ -37,7 +37,7 @@ Packet* RateAdjustPacket::makeClone() const {
 }
 
 int RateAdjustPacket::getSize() const {
-  return Packet::getSize() + sizeof(rate);
+  return Packet::getSize() + RawPacket::getSizeOf(rate);
 }
 
 void RateAdjustPacket::writePacket(RawPacket& raw) const {

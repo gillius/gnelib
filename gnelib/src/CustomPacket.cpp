@@ -58,7 +58,8 @@ Packet* CustomPacket::makeClone() const {
 }
 
 int CustomPacket::getSize() const {
-  return Packet::getSize() + sizeof(guint16) + data->getPosition();
+  return Packet::getSize() + RawPacket::getSizeOf(guint16(0)) +
+    data->getPosition();
 }
 
 int CustomPacket::getMaxUserDataSize() {

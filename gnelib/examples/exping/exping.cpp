@@ -97,7 +97,9 @@ public:
           ping->makeReply();
           conn->stream().writePacket(*ping, true);
         } else {
-          gout << "Ping response: " << ((PingPacket*)next)->getPing() << endl;
+          PingInformation info = ((PingPacket*)next)->getPingInformation();
+          gout << "Ping response: round-trip: " << info.pingTime
+            << ", clock offset: " << info.clockOffset << endl;
         }
       } else {
         gout << "We got a packet type (" << next->getType() <<
@@ -269,11 +271,11 @@ void doLocalTest() {
   //REMOVED FROM THE TABLE.  This means getPing will only work once for each
   //ping!  If you try to call it again or on an invalid reply, it will return
   //a 0 ping time.
-  gout << "The ping time is: " << test.getPing()
+  gout << "The ping time is: " << test.getPingInformation().pingTime
     << " seconds. (should be VERY small)" << endl;
   assert(PingPacket::reqsPending() == 0);
   gout << "An invalid ping packet ping time (should be 0): "
-    << test.getPing() << endl;
+    << test.getPingInformation().pingTime << endl;
 
   gout << "Creating 3 PingPackets which we will let be 'late'" << endl;
   PingPacket l1, l2, l3;
@@ -286,7 +288,7 @@ void doLocalTest() {
   gout << "Waiting 350 ms." << endl;
   Thread::sleep(350);
   longTest.makeReply(); //It really doesn't matter when we call makeReply.
-  gout << "Ping time: " << longTest.getPing() << endl;
+  gout << "Ping time: " << longTest.getPingInformation().pingTime << endl;
   assert(PingPacket::reqsPending() == 3);
 
   gout << "Waiting another 200ms." << endl;
@@ -295,7 +297,7 @@ void doLocalTest() {
     << PingPacket::recoverLostRequests(Time(0, 500000)) << '.' << endl;
   assert(PingPacket::reqsPending() == 0);
   gout << "Ping for one of those late, removed, requests (should be 0): "
-    << l1.getPing() << endl;
+    << l1.getPingInformation().pingTime << endl;
 
   gout << "Press a key to continue." << endl;
   getch();
