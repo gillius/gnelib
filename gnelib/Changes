@@ -1,6 +1,5 @@
 GNE 0.001 to 0.002
   Added a new example, exinput.
-  Added character plotting functions to the Console class.
   Added an Allegro example, exballs.
   More functions in the Time class for working with Time objects.
   Basic MingW support.
