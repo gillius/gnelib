@@ -39,10 +39,10 @@ struct Pos {
   int* packetsIn;
   int* packetsOut;
 };
-static Pos gpos = {0, 8, NULL}; //global stats position
+static Pos gpos = {0, 10, NULL}; //global stats position
 static int positionsLength = 3;
 static Pos positions[] = {
-  {0, 13, NULL}, {0, 20, NULL}, {0, 27, NULL}, {0, 34, NULL}
+  {0, 15, NULL}, {0, 22, NULL}, {0, 29, NULL}, {0, 36, NULL}
 };
 
 class StatsDisplay : public TimerCallback {
@@ -144,18 +144,20 @@ public:
       "out:tot =", "rel +", "unrel");
     mlprintf(ourPos.x, ourPos.y+1, "%-18s%10d%31d",
       "HiLvlPkts", *ourPos.packetsIn, *ourPos.packetsOut);
-    mlprintf(ourPos.x, ourPos.y+2, "%-18s%10d%10d%10d",
-      "sockets", all.openSockets, rel.openSockets, unrel.openSockets);
 
-    mlprintf(ourPos.x, ourPos.y+3, "%-18s%10d%10d%10d%11d%10d%10d",
+    mlprintf(ourPos.x, ourPos.y+2, "%-18s%10d%10d%10d%11d%10d%10d",
       "bytes", all.bytesRecv, rel.bytesRecv, unrel.bytesRecv,
       all.bytesSent, rel.bytesSent, unrel.bytesSent);
-    mlprintf(ourPos.x, ourPos.y+4, "%-18s%10d%10d%10d%11d%10d%10d",
+    mlprintf(ourPos.x, ourPos.y+3, "%-18s%10d%10d%10d%11d%10d%10d",
       "bytes/sec", all.avgBytesRecv, rel.avgBytesRecv, unrel.avgBytesRecv,
       all.avgBytesSent, rel.avgBytesSent, unrel.avgBytesSent);
-    mlprintf(ourPos.x, ourPos.y+5, "%-18s%10d%10d%10d%11d%10d%10d",
-      "max b/s", all.maxAvgBytesRecv, rel.maxAvgBytesRecv, unrel.maxAvgBytesRecv,
+    mlprintf(ourPos.x, ourPos.y+4, "%-18s%10d%10d%10d%11d%10d%10d",
+      "max burst b/s", all.maxAvgBytesRecv, rel.maxAvgBytesRecv, unrel.maxAvgBytesRecv,
       all.maxAvgBytesSent, rel.maxAvgBytesSent, unrel.maxAvgBytesSent);
+
+    mlprintf(ourPos.x, ourPos.y+5,
+      "Current outgoing rate limit is %d  (remote limit %d)     ",
+      conn->stream().getCurrOutRate(), conn->stream().getRemoteOutLimit());
   }
 
   /**
@@ -164,11 +166,11 @@ public:
   void updateGlobalStats() {
     ConnectionStats all = GNE::getGlobalStats();
     mlprintf(gpos.x, gpos.y, "%-18s%15s%15s", "global", "in:tot", "out:tot");
-    mlprintf(gpos.x, gpos.y+1, "%-18s%15d%15d", "bytes",
+    mlprintf(gpos.x, gpos.y+1, "%-18s%15d%15d", "tot xfer",
       all.bytesRecv, all.bytesSent);
-    mlprintf(gpos.x, gpos.y+2, "%-18s%15d%15d", "Rate",
+    mlprintf(gpos.x, gpos.y+2, "%-18s%15d%15d", "curr rate",
       all.avgBytesRecv, all.avgBytesSent);
-    mlprintf(gpos.x, gpos.y+3, "%-18s%15d%15d", "maxRate",
+    mlprintf(gpos.x, gpos.y+3, "%-18s%15d%15d", "max burst",
       all.maxAvgBytesRecv, all.maxAvgBytesSent);
   }
 

@@ -32,6 +32,7 @@
 #include "../../include/gnelib.h"
 #include "rndalgor.h"
 #include <iostream>
+#include <cstdio>
 #include "StatsDisplay.h" //Our helper class for displaying the stats.
 
 using namespace std;
@@ -41,6 +42,7 @@ using namespace GNE::Console;
 
 void errorExit(const char* error);
 int getPort(const char* prompt);
+void getRates(int& iRate, int& oRate);
 void doServer(int outRate, int inRate, int port);
 void doClient(int outRate, int inRate, int port);
 
@@ -171,8 +173,8 @@ private:
 
 class OurListener : public ServerConnectionListener {
 public:
-  OurListener() 
-    : ServerConnectionListener() {
+  OurListener(int iRate2, int oRate2)
+    : ServerConnectionListener(), iRate(iRate2), oRate(oRate2) {
   }
 
   virtual ~OurListener() {}
@@ -184,11 +186,14 @@ public:
   }
 
   void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
-    inRate = outRate = 3200;
+    inRate = iRate;
+    outRate = oRate;
     listener = new PerfTester();
   }
 
 private:
+  int iRate;
+  int oRate;
 };
 
 void errorExit(const char* error) {
@@ -206,6 +211,17 @@ int getPort(const char* prompt) {
     gin >> port;
   }
   return port;
+}
+
+void getRates(int& iRate, int& oRate) {
+  gout << "GNE provides bandwith limits.  Enter 0 for no limit, or a value in bytes/sec"
+    << endl;
+  int dummy, oldy;
+  mgetPos(&dummy, &oldy);
+  gout << "Enter max out rate: ";
+  gin >> oRate;
+  gout << moveTo(40, oldy) << "max in rate: ";
+  gin >> iRate;
 }
 
 int main() {
@@ -232,15 +248,18 @@ int main() {
   gin >> type;
 
   int port;
+  int iRate, oRate;
   if (type != 1) {
     setTitle("GNE Net Performance Tester -- Server");
     gout << "Reminder: ports <= 1024 on UNIX can only be used by the superuser." << endl;
     port = getPort("listen on");
-    doServer(3200, 3200, port);
+    getRates(iRate, oRate);
+    doServer(oRate, iRate, port);
   } else {
     setTitle("GNE Net Performance Tester -- Client");
     port = getPort("connect to");
-    doClient(3200, 3200, port);
+    getRates(iRate, oRate);
+    doClient(oRate, iRate, port);
   }
 
   delete sDisplay;
@@ -252,7 +271,7 @@ void doServer(int outRate, int inRate, int port) {
   //Generate debugging logs to server.log if in debug mode.
   initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL5, "server.log");
 #endif
-  OurListener server;
+  OurListener server(inRate, outRate);
   if (server.open(port))
     errorExit("Cannot open server socket.");
   if (server.listen())
@@ -278,7 +297,7 @@ void doClient(int outRate, int inRate, int port) {
   if (!address)
     errorExit("Invalid address.");
   gout << "Connecting to: " << address << endl;
-  gout << "Press a key to stop the testing. " << endl;
+  gout << "Press a key except r to stop the testing.  Press r to change rates." << endl;
 
   ClientConnection client(new PerfTester());
   if (client.open(address, outRate, inRate))
@@ -288,7 +307,36 @@ void doClient(int outRate, int inRate, int port) {
   client.join();
 
   sDisplay->startDisplay();
-  getch(); //Wait for user keypress
+  //We allow the client to change the incoming and outgoing datarate on the
+  //fly by pressing r.
+  while (getch() == (int)'r') {
+    char newRateStr[16] = "";
+    int newRate = 3200;
+    char clr[] = 
+      "                                                                    ";
+    //We can't use gin here because gin is not thread safe like gout is, this
+    //is because the cursor moving around constantly.
+    mlprintf(0, 21,
+      "Pick a new requested outgoing rate (0 == no limit, -1 == no change):",
+      client.stream().getRemoteOutLimit());
+    lgetString(0, 22, newRateStr, 10);
+    sscanf(newRateStr, "%d", &newRate);
+    client.stream().setRates(newRate, -1);
+
+    mlprintf(0, 23,
+      "Pick a new maximum incoming rate (0 == no limit, -1 == no change):",
+      client.stream().getRemoteOutLimit());
+    lgetString(0, 24, newRateStr, 10);
+    sscanf(newRateStr, "%d", &newRate);
+    client.stream().setRates(-1, newRate);
+
+    //Now we clear these lines so the user doesn't think they are still
+    //inputting data.
+    mlprintf(0, 21, clr);
+    mlprintf(0, 22, clr);
+    mlprintf(0, 23, clr);
+    mlprintf(0, 24, clr);
+  }
 
   client.disconnectSendAll();
 }
