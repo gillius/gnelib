@@ -127,7 +127,13 @@ public:
    * Time addition, adding microseconds of time to this object.
    */
   //##ModelId=3B07538103F0
-  void operator+=(int rhs);
+  Time& operator+=(int rhs);
+
+  /**
+   * Time addition that works as expected to add two times.
+   */
+  //##ModelId=3C885B380142
+  Time& operator+=(const Time& rhs);
 
   /**
    * Time addition that works as expected.

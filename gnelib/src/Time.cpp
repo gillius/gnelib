@@ -102,9 +102,18 @@ Time Time::operator+(int rhs) const {
 }
 
 //##ModelId=3B07538103F0
-void Time::operator+=(int rhs) {
+Time& Time::operator+=(int rhs) {
   microsec += rhs;
   normalize();
+  return *this;
+}
+
+//##ModelId=3C885B380142
+Time& Time::operator+=(const Time& rhs) {
+  microsec += rhs.microsec;
+  sec += rhs.sec;
+  normalize();
+  return *this;
 }
 
 //##ModelId=3B07538103F2
