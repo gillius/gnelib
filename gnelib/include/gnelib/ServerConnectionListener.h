@@ -218,22 +218,6 @@ private:
   void processOnListenSuccess( const SmartPtr<ConnectionListener>& listener );
 
 private:
-  class ServerListener : public ReceiveEventListener {
-  public:
-    typedef SmartPtr<ServerListener> sptr;
-    typedef WeakPtr<ServerListener> wptr;
-
-  public:
-    ServerListener(const ServerConnectionListener::sptr& listener);
-
-    virtual ~ServerListener();
-
-    void onReceive();
-
-  private:
-    ServerConnectionListener::sptr conn;
-
-  };
   friend class ServerListener;
 
   void onReceive();
