@@ -1585,7 +1585,7 @@
 			parameters 	(list Parameters
 			    (object Parameter "rhs"
 				quid       	"3AEBA54C02EE"
-				type       	"const Time&"))
+				type       	"int"))
 			result     	"Time"
 			concurrency 	"Sequential"
 			opExportControl 	"Public"
@@ -1608,7 +1608,45 @@
 				type       	"int"))
 			concurrency 	"Sequential"
 			opExportControl 	"Public"
-			uid        	0))
+			uid        	0)
+		    (object Operation "getTotaluSec"
+			quid       	"3AF9D5750082"
+			result     	"int"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "operator+="
+			quid       	"3AF9D5750122"
+			parameters 	(list Parameters
+			    (object Parameter "rhs"
+				quid       	"3AF9D57501CC"
+				type       	"int"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "operator+"
+			quid       	"3AF9D57503B6"
+			parameters 	(list Parameters
+			    (object Parameter "rhs"
+				quid       	"3AF9D5760078"
+				type       	"const Time&"))
+			result     	"Time"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0
+			quidu      	"3AEB9AD500A0")
+		    (object Operation "operator-"
+			quid       	"3AF9D57601F4"
+			parameters 	(list Parameters
+			    (object Parameter "rhs"
+				quid       	"3AF9D5760262"
+				type       	"const Time&"))
+			result     	"Time"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0
+			quidu      	"3AEB9AD500A0"))
 		class_attributes 	(list class_attribute_list
 		    (object ClassAttribute "sec"
 			quid       	"3AEBA0200262"
@@ -1983,7 +2021,7 @@
 		max_height 	28350
 		max_width  	21600
 		origin_x   	5892
-		origin_y   	0
+		origin_y   	1575
 		items      	(list diagram_item_list
 		    (object ClassView "Class" "Logical View::Thread" @1
 			ShowCompartmentStereotypes 	TRUE
@@ -2791,7 +2829,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@26
-			    location   	(4848, 2044)
+			    location   	(4848, 1944)
 			    fill_color 	13434879
 			    nlines     	1
 			    max_width  	404
@@ -2803,7 +2841,7 @@
 			quidu      	"3AEB9AD500A0"
 			compartment 	(object Compartment
 			    Parent_View 	@26
-			    location   	(4848, 2105)
+			    location   	(4848, 2005)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -2816,10 +2854,10 @@
 			    icon_style 	"Icon"
 			    fill_color 	16777215
 			    anchor     	2
-			    nlines     	15
+			    nlines     	19
 			    max_width  	412)
 			width      	422
-			height     	836
+			height     	1036
 			annotation 	8
 			autoResize 	TRUE)
 		    (object AssociationViewNew "$UNNAMED$25" @27
@@ -3094,7 +3132,7 @@
 			    fill_color 	13434879
 			    anchor     	2
 			    nlines     	12
-			    max_width  	980)
+			    max_width  	1006)
 			width      	1002
 			height     	686
 			annotation 	8
@@ -5467,7 +5505,7 @@
 |SClientConnection.h,3af2275a
 |HCon.cpp,0
 |FCon.h,0
-|VConditionVariable.cpp,3af79320
+|VConditionVariable.cpp,3af9c85e
 |TConditionVariable.h,3af2275a
 |OConnection.cpp,3af2275a
 |MConnection.h,3af2275a
@@ -5475,7 +5513,7 @@
 |aConnectionEventGenerator.h,3af2275a
 |UConnectionWriter.cpp,3af2275a
 |SConnectionWriter.h,3af2275a
-|LConsole.cpp,3af8cfa0
+|LConsole.cpp,3af9b6a0
 |JConsole.h,3af8b318
 |LCounter.cpp,3af2275a
 |JCounter.h,3af2275a
@@ -5495,9 +5533,9 @@
 |SServerConnection.h,3af2275a
 |KThread.cpp,3af2275a
 |IThread.h,3af2275a
-|ITime.cpp,3af79b60
-|GTime.h,3af2275a
-|JTimer.cpp,3af82ff2
+|ITime.cpp,3af9d576
+|GTime.h,3af9d576
+|JTimer.cpp,3af9caa8
 |HTimer.h,3af82ffe
 |RTimerCallback.cpp,3af78bc0
 |PTimerCallback.h,3af78bba
@@ -5588,10 +5626,10 @@
 |ConditionVariable::ConditionVariable,f,F,3AE20E490140,A,412,4b1
 |ConditionVariable::ConditionVariable,f,F,3AE50F1A0398,HMutex*,,4b3,551
 |ConditionVariable::acquire,f,F,3AE50F1B00FA,A,5ea,63c
-|ConditionVariable::broadcast,f,F,3AE20E7A00FA,A,8b2,923
+|ConditionVariable::broadcast,f,F,3AE20E7A00FA,A,89d,90e
 |ConditionVariable::release,f,F,3AE50F1B0168,A,63e,690
-|ConditionVariable::signal,f,F,3AE20E7200B4,A,845,8b0
-|ConditionVariable::timedWait,f,F,3AEEF7660032,Eint,,708,843
+|ConditionVariable::signal,f,F,3AE20E7200B4,A,830,89b
+|ConditionVariable::timedWait,f,F,3AEEF7660032,Eint,,708,82e
 |ConditionVariable::wait,f,F,3AE20E5F02DA,A,692,706
 |ConditionVariable::~ConditionVariable,f,F,3AE20E880104,A,553,5e8
 |Connection,t,I,3AE2167E01EA,A,5d0,14aa
@@ -5621,8 +5659,8 @@
 |Console::init,f,N,3AF8A1E2038E,aint(*)(void(*func)(void)),,4e2,5be
 |Console::initialized,f,N,3AF8ADDB0280,A,4a5,4e0
 |Console::kbhit,f,N,3AF8AADE038E,A,6b0,6f9
-|Console::mlprintf,f,N,3AF8A7ED00AA,Sint,int,char*,...,,82a,931
-|Console::mprintf,f,N,3AF8A7EC026C,Kchar*,...,,746,828
+|Console::mlprintf,f,N,3AF8A7ED00AA,Sint,int,char*,...,,821,91f
+|Console::mprintf,f,N,3AF8A7EC026C,Kchar*,...,,746,81f
 |Console::outSync,f,N,3AF8A1F80226,A,474,4a4
 |Console::shutdown,f,N,3AF8A1ED037A,A,5c0,639
 |Counter,t,Q,3AE8691D0032,A,482,871
@@ -5704,26 +5742,30 @@
 |Thread::start,f,f,3AE1DFC70230,A,d98,e5d
 |Thread::threads,f,f,3AE11D5F023A,A,3ee,434
 |Thread::~Thread,f,f,3AE120140046,A,735,763
-|Time,t,i,3AEB9AD500A0,A,4ec,b47
+|Time,t,i,3AEB9AD500A0,A,4ec,ed7
 |Time::Time,f,h,3AEBA04C03A2,A,3cd,40c
 |Time::Time,f,h,3AEEF7680320,Iint,int,,40e,48b
-|Time::diff,f,h,3AEBA53B00AA,Mconst Time&,,5f8,646
+|Time::diff,f,h,3AEBA53B00AA,Mconst Time&,,654,6d7
 |Time::getSec,f,h,3AEBA4AC0096,A,4b9,4f6
+|Time::getTotaluSec,f,h,3AF9D5750082,A,53d,597
 |Time::getuSec,f,h,3AEBA4B100C8,A,4f8,53b
-|Time::normalize,f,h,3AECF2860320,A,7fd,8d7
-|Time::operator+,f,h,3AEBA4F9021C,Mconst Time&,,76a,7fb
-|Time::operator<,f,h,3AEBA4D200A0,Mconst Time&,,648,6d7
-|Time::setSec,f,h,3AEBA4BE0226,Eint,,53d,589
-|Time::setuSec,f,h,3AEBA4C80032,Eint,,58b,5f6
+|Time::normalize,f,h,3AECF2860320,A,9ef,ac9
+|Time::operator -,f,h,,Mconst Time&,,974,9ed
+|Time::operator+,f,h,3AEBA4F9021C,Eint,,7fb,880
+|Time::operator+,f,h,3AF9D57503B6,Mconst Time&,,8e1,972
+|Time::operator+=,f,h,3AF9D5750122,Eint,,882,8df
+|Time::operator<,f,h,3AEBA4D200A0,Mconst Time&,,6d9,768
+|Time::setSec,f,h,3AEBA4BE0226,Eint,,599,5e5
+|Time::setuSec,f,h,3AEBA4C80032,Eint,,5e7,652
 |Time::~Time,f,h,3AEBA04C03DE,A,48d,4b7
 |Timer,t,k,3AE8680C029E,A,4e6,c64
 |Timer::Timer,f,j,3AE868370122,TTimerCallback*,int,,3fb,480
 |Timer::getAbsoluteTime,f,j,3AF4797001CC,A,68d,779
 |Timer::getCurrentTime,f,j,3AE86872030C,A,4f7,667
-|Timer::isRunning,f,j,3AED05E7029E,A,9a8,9ee
-|Timer::run,f,j,3AE868A30294,A,8d6,9a6
-|Timer::startTimer,f,j,3AEB9AB50050,A,77b,846
-|Timer::stopTimer,f,j,3AEB9AB500BE,A,848,8b2
+|Timer::isRunning,f,j,3AED05E7029E,A,a2e,a74
+|Timer::run,f,j,3AE868A30294,A,8bb,a2c
+|Timer::startTimer,f,j,3AEB9AB50050,A,77b,82b
+|Timer::stopTimer,f,j,3AEB9AB500BE,A,82d,897
 |Timer::~Timer,f,j,3AE8686C00BE,A,482,4d1
 |TimerCallback,t,m,3AE868D6019A,A,486,5ad
 |TimerCallback::TimerCallback,f,l,3AF78B950190,A,3d6,411
