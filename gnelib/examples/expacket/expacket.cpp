@@ -21,6 +21,8 @@
  * expacket -- Shows how to derive a new type of packet, and create the
  * proper parsing functions interacting with RawPacket to allow GNE to use
  * your packet.
+ * This example does NOT show how to use the packet over the network or how
+ * to register the packet for parsing.  See exhello for that.
  */
 
 #include "../../src/gnelib.h"
@@ -28,13 +30,46 @@
 
 using namespace std;
 
+class PersonPacket : public Packet {
+public:
+  PersonPacket() : Packet(5) {}
+  virtual ~PersonPacket() {}
+
+  Packet* makeClone() const {
+    return new PersonPacket(*this);
+  }
+
+  int getSize() const {
+    return Packet::getSize() + sizeof(age) + 10 + 20;
+  }
+
+  void writePacket(RawPacket& raw) const {
+    assert(firstName.length() + 1 <= 10);
+    assert(lastName.length() + 1 <= 20);
+    Packet::writePacket(raw);
+    raw << age << firstName << lastName;
+  }
+
+  void readPacket(RawPacket& raw) {
+    Packet::readPacket(raw);
+    raw >> age >> firstName >> lastName;
+  }
+
+  NLubyte age;
+  string firstName; //max size 10
+  string lastName;  //max size 20
+};
+
 void rawPacketTest();
+void packetTest();
 
 int main(int argc, char* argv[]) {
   GNE::init(GNE::NO_NET, atexit);
   Console::setTitle("GNE Packet Example");
   
   rawPacketTest();
+  cout << endl;
+  packetTest();
 
   return 0;
 }
@@ -44,11 +79,11 @@ void rawPacketTest() {
   char block[16] = {'a', 'b', 'a', 'a', 'c', 'a', 'd', 'a', 'e', '1', 'a',
     'a', 'a', '4', 'a', 'a'};
   RawPacket raw(NULL); //same as RawPacket raw().
-  raw << (int)56 << "superlala" << (char)124 << (short)26 << (float)12.5 << (double)123.4;
+  raw << (int)56 << "superlala" << (NLubyte)124 << (short)26 << (float)12.5 << (double)123.4;
   raw.writeRaw(block, 16);
   
   cout << "Raw length: " << raw.getLength() << endl;
-  cout << " should be: " << (sizeof(int) + 10 + sizeof(char) + sizeof(short) +
+  cout << " should be: " << (sizeof(int) + 10 + sizeof(NLubyte) + sizeof(short) +
                              sizeof(float) + sizeof(double) + 16) << endl;
 
   NLbyte* buffer = new NLbyte[raw.getLength()];
@@ -58,7 +93,7 @@ void rawPacketTest() {
 
   int a;
   string b;
-  char c;
+  NLubyte c;
   short d;
   float e;
   double f;
@@ -74,4 +109,44 @@ void rawPacketTest() {
   cout << endl;
   cout << "Data was of length: " << raw2.getLength() << " (should be as above)" << endl;
   cout << "String length: " << b.length() << " (should be 9)" << endl;
+}
+
+void packetTest() {
+  cout << "Creating two PersonPackets" << endl;
+  PersonPacket jason;
+  jason.age = 19;
+  jason.firstName = "Jason";
+  jason.lastName = "Winnebeck";
+  jason.timestamp = 0;
+    //We should always set the timestamp for a packet when it was created,
+    //but since we aren't sending it over a network it doesn't really matter.
+  PersonPacket elias;
+  elias.age = 255;
+  elias.firstName = "Elias";
+  elias.lastName = "Pschernig";
+  elias.timestamp = 0;
+
+  RawPacket raw(NULL);
+  jason.writePacket(raw);
+  elias.writePacket(raw);
+
+  raw.reset();
+
+  PersonPacket t1;
+  PersonPacket t2;
+
+  /**
+   * Read back the packets.  Note that we have to read in the ids, because
+   * normally packets aren't used this way.  Normally the packet parser in GNE
+   * will real the ID, then create the packet.  The packet needs not to read
+   * its own ID.
+   */
+  NLubyte dummy;
+  raw >> dummy;
+  t1.readPacket(raw);
+  raw >> dummy;
+  t2.readPacket(raw);
+
+  cout << t1.firstName << ' ' << t1.lastName << ", " << (int)t1.age << " years." << endl;
+  cout << t2.firstName << ' ' << t2.lastName << ", " << (int)t2.age << " years." << endl;
 }
