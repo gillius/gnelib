@@ -2,8 +2,8 @@
 #define _CUSTOMPACKET_H_
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
- * Project website: http://www.rit.edu/~jpw9607/
+ * Copyright (C) 2001-2005 Jason Winnebeck 
+ * Project website: http://www.gillius.org/gne/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@ namespace GNE {
 /**
  * @ingroup midlevel
  *
- * Many times, espically during connection, you want to send some more
+ * Many times, especially during connection, you want to send some more
  * "free-form" data that may or may not all be related and will only be sent
  * once.  It may not make sense to create a completely new packet type just
  * to send a few things one time.  This packet type will allow you to send
