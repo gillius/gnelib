@@ -35,7 +35,26 @@ int main(int argc, char* argv[]) {
   initConsole(atexit);
   Console::setTitle("GNE RawPacket Test");
 
-  gout << "Now writing a RawPacket..." << endl;
+  gout << " * Now doing endian tests." << endl;
+  //Note: This code has nothing to do with the proper usage of RawPacket.
+  //It is meant ONLY as a test to make sure RawPacket is properly converting
+  //the the right endian format, and to discover this system's endian format.
+  int x = 15;
+  gout << "This system is little-endian: " << (((char*)&x)[0] == 15) << endl;
+  gout << "This system is big-endian: " << (((char*)&x)[3] == 15) << endl;
+  //Now test to make sure RawPacket converts from the system to little.
+  RawPacket endianTest;
+  endianTest << x;
+  endianTest.reset();
+  gbyte t[4];
+  //Read the integer we just wrote into a raw byte array.
+  endianTest.readRaw(t, 4);
+  gout << "RawPacket must be in little-endian format." << endl;
+  gout << "RawPacket is in little-endian format: " << (t[0] == 15) << endl;
+  gout << "RawPacket is in big-endian format: " << (t[3] == 15) << endl;
+  gout << endl;
+
+  gout << " * Now writing a RawPacket..." << endl;
 
   //Create some binary and string data.
   gbyte block[16] = {'a', 'b', 'a', 'a', 'c', 'a', 'd', 'a', 'e', '1', 'a',
