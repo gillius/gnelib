@@ -64,16 +64,18 @@ public:
 
   /**
    * Intializes this class, given the flow control parameters.
-   * @param outRate the maximum rate in bytes per second to send.
+   * @param outRate the maximum rate in bytes per second to send.  If this is
+   *        0 or less, then the rate is unlimited.
    * @param inRate the maximum rate we allow the sender to send to us in
-   *        bytes per second.
+   *        bytes per second.  If this is 0 or less, then the requested
+   *        incoming rate has no bounds.
 	 * @param listener the ConnectionListener instance that will be setup as
 	 *        the initial listener for the events.  It can be NULL to start
 	 *        with but must be set before performing any operation that
 	 *        that generates events, but preferably as soon as possible.
    */
   //##ModelId=3B0753810073
-  Connection(int outRate, int inRate, ConnectionListener* listener = NULL);
+  Connection(int outRate = 0, int inRate = 0, ConnectionListener* listener = NULL);
 
 	/**
 	 * A Connection will automatically disconnect if it is connected when it

@@ -115,7 +115,8 @@ protected:
 	 * delete it).  If the connection is successful you can get your pointer
 	 * back through the resulting ServerConnection class by using
 	 * Connection::getListener.\n
-	 * This function can be called from multiple threads at the same time.
+	 * This function can be called from multiple threads at the same time.\n
+   * See Connection::Connection for more info about inRate and outRate.
 	 */
   //##ModelId=3BCFAE5A0064
 	virtual void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) = 0;
