@@ -39,6 +39,11 @@ ConnectionEventGenerator::~ConnectionEventGenerator() {
   delete[] sockBuf;
 }
 
+/**
+ * \bug I think it might be possible for a syncronization error to occur
+ *      where an event can be generated on a Connection that was JUST
+ *      shutdown.
+ */
 //##ModelId=3B07538100BC
 void ConnectionEventGenerator::run() {
   while (running) {

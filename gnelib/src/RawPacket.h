@@ -33,6 +33,7 @@ namespace GNE {
  * where a file can "mimic" a server to provide the necessary packets to
  * restore the game state.\n
  * See the example "expacket" for an example of the usage of this class.
+ * \bug I don't think RawPacket handles signed ordinals properly yet.
  */
 //##ModelId=3B075380030F
 class RawPacket {

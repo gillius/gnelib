@@ -176,13 +176,13 @@ protected:
   /**
    * The reliable socket.
    */
-  //##ModelId=3AE4E2340334
+  //##ModelId=3B08920B01C2
   NLsocket rsocket;
 
   /**
    * The unreliable socket.
    */
-  //##ModelId=3B00ABDD0078
+  //##ModelId=3B0891DB000A
   NLsocket usocket;
 
   /**
