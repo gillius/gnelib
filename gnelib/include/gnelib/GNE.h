@@ -169,7 +169,7 @@ namespace GNE {
   /**
    * A numeric representation of the current version of this library.
    */
-  const double VER = 0.46;
+  const double VER = 0.60;
 
   /**
    * A string representation of the name of the library and the current
