@@ -22,7 +22,7 @@
 
 #include "gneintern.h"
 #include "Thread.h"
-#include "Time.h"
+#include "TimeGne.h"
 
 namespace GNE {
 class TimerCallback;

@@ -20,6 +20,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+//This include file has to be named strangly because of a conflict with the
+//standard C include time.h.  Both MSVC and GCC have given us problems with
+//including this file, despite the usage between #include <> and #include ""
+
 #include "gneintern.h"
 
 namespace GNE {

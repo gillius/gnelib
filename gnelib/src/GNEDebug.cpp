@@ -38,7 +38,7 @@ bool initDebug(int levelMask, const char* fileName) {
 
 	buf = new char[512];
 	if (fileName == NULL) {
-		time_t now = time (NULL);
+		time_t now = time(NULL);
 		struct tm *t = localtime (&now);
 		strftime (buf, 100, "gne%H'%M'%S.log", t);
 	} else

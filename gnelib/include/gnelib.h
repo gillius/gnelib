@@ -39,7 +39,7 @@
 #include "gnelib/ServerConnectionCreator.h"
 #include "gnelib/ServerConnection.h"
 #include "gnelib/Thread.h"
-#include "gnelib/Time.h"
+#include "gnelib/TimeGne.h"
 #include "gnelib/Timer.h"
 #include "gnelib/TimerCallback.h"
 #include "gnelib/GNEDebug.h"

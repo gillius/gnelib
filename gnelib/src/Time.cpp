@@ -18,7 +18,7 @@
  */
 
 #include "gneintern.h"
-#include "Time.h"
+#include "TimeGne.h"
 
 namespace GNE {
 
