@@ -72,10 +72,23 @@ public:
 
   /**
    * Sets a new event listener.  All new events will be sent to the new
-   * listener.  If events are still being processed by the old listener, this
-   * change will not affect those running events, however, depending on the
-   * event it could block events for the new listener until it completes.
-   * The passed listener cannot be NULL.
+   * listener.  The function will block until the current event being
+   * processed (by the old listener) completes.  If this is called from the
+   * event thread itself the function returns immediately and the next event
+   * will be sent to the new listener.
+   *
+   * If the passed listener is NULL, this will hold the event thread.  This
+   * does NOT stop event generation -- generated events still will enter the
+   * queue but the actual event function will not be called until a proper
+   * listener is set.
+   *
+   * You MUST have an event listener set because the event thread must call
+   * its required events before this object can be destroyed.
+   *
+   * If you care not to receive events because you are using SyncConnection,
+   * you will probably want to set ConnectionListener::getNullListener as the
+   * listener to discard all events before you wrap this Connection with a
+   * SyncConnection.
    */
   //##ModelId=3BCE75A80282
   void setListener(ConnectionListener* listener);
@@ -89,9 +102,11 @@ public:
 
   /**
    * If stats is enabled, returns Connection stats.
-   * @param reliable If greater than 0, returns reliable stats only.<br>
-   *                 If 0, returns unreliable transfer stats only.<br>
-   *                 If less than 0, returns cumulative stats for both.
+   * @param reliable <ul>
+   *                 <li>If greater than 0, returns reliable stats only.</li>
+   *                 <li>If 0, returns unreliable transfer stats only.</li>
+   *                 <li>If less than 0, returns cumulative stats for
+   *                     both.</li></ul>
    * @return various connection stats.
    * @see ConnectionStats
    * @see GNE::enableStats

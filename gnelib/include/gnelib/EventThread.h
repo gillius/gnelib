@@ -71,22 +71,13 @@ public:
   virtual ~EventThread();
 
   /**
-   * Returns the currently registered event Listener.  This can be useful to
-   * delete your registered user right after disconnection, so you won't have
-   * to keep track of the pointer after you allocate it.
+   * Use GNE::Connection::getListener.
    */
   //##ModelId=3C106F0203D8
   ConnectionListener* getListener() const;
   
   /**
-   * Sets a new event listener.  All new events will be sent to the new
-   * listener.  If events are still being processed by the old listener, this
-   * function will wait until that event completes, then it will release.
-   * At the completion of this statement you know for certain that the old
-   * listener is not being addressed by this thread any longer.\n
-   * If this function is called from an event itself, then the change will
-   * take place at the start of the next event.
-   * The passed listener cannot be NULL.
+   * Use GNE::Connection::setListener.
    */
   //##ModelId=3C106F0203DA
   void setListener(ConnectionListener* listener);
