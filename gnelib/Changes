@@ -1,4 +1,5 @@
 GNE 0.55 to current
+  Added ObjectBroker, ObjectBrokerClient, ObjectBrokerServer.
   Added ChannelProvider and ChannelPacket to add in channel functionality into
     GNE.
   Added clock synchronization capability into the PingPacket class.

@@ -185,6 +185,9 @@
 				RelativePath="src\NetworkObject.cpp">
 			</File>
 			<File
+				RelativePath="src\ObjectBroker.cpp">
+			</File>
+			<File
 				RelativePath="src\ObjectBrokerClient.cpp">
 			</File>
 			<File
@@ -352,6 +355,9 @@
 			</File>
 			<File
 				RelativePath="include\gnelib\NetworkObject.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ObjectBroker.h">
 			</File>
 			<File
 				RelativePath="include\gnelib\ObjectBrokerClient.h">
