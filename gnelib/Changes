@@ -1,4 +1,7 @@
 GNE 0.70 to current
+  Spruce up some documentation, including clairifications on GNE init/shutdown
+    functions and CustomPacket::getBuffer and miscellaneous spelling corrections.
+  Fixed bug with setGameInformation not working after shutdown and restart.
   Fixed bug in ChannelProvider
   Fixed MSVC 2k3 compile bug in ConsoleStreambuf
   
