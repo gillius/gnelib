@@ -93,7 +93,7 @@ void* Thread::threadStart(void* thread) {
   return 0;
 }
 
-Thread::Thread(std::string name2, int priority2) : type(USER), shutdown(false),
+Thread::Thread(std::string name2, int priority2) : shutdown(false), type(USER),
 name(name2), started(false), running(false), joined(false), priority(priority2) {
   id = new ThreadIDData();
   gnedbgo( 5, "Thread created" );
@@ -228,7 +228,7 @@ void Thread::join() {
 void Thread::detach() {
 #ifndef WIN32
   //We only need to detach on POSIX systems
-  valassert(pthread_detach( thread_id ), 0);
+  valassert(pthread_detach( id->thread_id ), 0);
 #endif
 }
 
