@@ -44,6 +44,15 @@ public:
   virtual ~ConnectionListener();
 
   /**
+   * A Connection must always have a non-NULL listener if it is to be used,
+   * but if you will only be using a SyncConnection for the whole time, there
+   * is no need to create your own listener.  This listener will ignore all
+   * events.
+   */
+  //##ModelId=3C09B42D0144
+  static ConnectionListener* getNullListener();
+
+  /**
    * Event triggered after there is a successful connection.  The connection
 	 * process will not be considered complete until this function completes.
 	 * \nNote: Only ClientConnection generates this event.  The SyncConnection

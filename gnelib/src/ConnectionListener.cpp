@@ -26,6 +26,11 @@ namespace GNE {
 ConnectionListener::~ConnectionListener() {
 }
 
+ConnectionListener* ConnectionListener::getNullListener() {
+  static ConnectionListener nullListener;
+  return &nullListener;
+}
+
 //##ModelId=3BCA83910078
 void ConnectionListener::onConnect(SyncConnection& conn) {
 }
