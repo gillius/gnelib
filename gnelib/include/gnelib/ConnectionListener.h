@@ -49,6 +49,7 @@ public:
 	 * \nNote: Only ClientConnection generates this event.  The SyncConnection
 	 * is currently wrapped around a ClientConnection, and you should use
 	 * SyncConnection::getConnection to get the ClientConnection.
+   * \nIn the near future the ability to refuse connections will be added.
    */
   //##ModelId=3BCA83910078
   virtual void onConnect(SyncConnection* conn);
@@ -77,6 +78,7 @@ public:
    * If the connection failed, though, the function
 	 * ServerConnectionListener::onListenFailure instead of this function is
 	 * called.
+   * \nIn the near future the ability to refuse connections will be added.
    */
   //##ModelId=3BCFAE5900AA
   virtual void onNewConn(SyncConnection* newConn);
