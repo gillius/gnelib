@@ -64,12 +64,9 @@ public:
   int getType() const;
 
   /**
-   * Returns the max size of this packet in bytes.  When overloading this
+   * Returns the current size of this packet in bytes.  When overloading this
    * function, call getSize on the parent class then add the sizes of your
    * additional variables.\n
-   * Note that "max size" is important, in case of strings.  Usually when we
-   * are getting a packet's size, it is because we are checking to make sure
-   * it can fit in the buffer.
    */
   //##ModelId=3B0753810159
   virtual int getSize() const;
