@@ -80,7 +80,20 @@ namespace GNE {
   typedef signed   char  gint8;
   typedef unsigned char  guint8;
   typedef guint8         gbyte;
+
+  /**
+   * A gbool is 'false' only when its value is 0, else it is 'true'.
+   */
   typedef guint8         gbool;
+
+  /**
+   * One possible true value for a gbool.
+   */
+  const gbool gTrue = 1;
+  /**
+   * The only false value for a gbool.
+   */
+  const gbool gFalse = 0;
   
   typedef signed   short gint16;
   typedef unsigned short guint16;
