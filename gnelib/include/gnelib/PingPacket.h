@@ -131,6 +131,15 @@ public:
   static int recoverLostRequests(Time limit);
 
   /**
+   * Returns the number of pending requests.  This number increases by 1
+   * every time a request is made, and goes down by one with a successful
+   * call to getPing.  The number will also decrease if recoverLostReqests
+   * is called and finds late requests.
+   */
+  //##ModelId=3C67292703D9
+  static int reqsPending();
+
+  /**
    * Returns a newly allocated exact copy of this packet.
    */
   //##ModelId=3C65C6D000D7

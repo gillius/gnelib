@@ -101,6 +101,14 @@ int PingPacket::recoverLostRequests(Time limit) {
   return ret;
 }
 
+//##ModelId=3C67292703D9
+int PingPacket::reqsPending() {
+  sync.acquire();
+  int ret = requests.size();
+  sync.release();
+  return ret;
+}
+
 //##ModelId=3C65C6D000D7
 Packet* PingPacket::makeClone() const {
   return new PingPacket(*this);
