@@ -117,8 +117,8 @@ bool SyncConnection::isReleased() const {
  */
 //##ModelId=3BC3CFE50014
 SyncConnection& SyncConnection::operator >> (Packet& packet) throw (Error) {
-  assert(!isReleased());
   checkError();
+  assert(!isReleased());
   recvNotify.acquire();
   while (!conn->stream().isNextPacket()) {
     recvNotify.wait();
@@ -159,8 +159,8 @@ SyncConnection& SyncConnection::operator >> (Packet& packet) throw (Error) {
 
 //##ModelId=3BC3DBB000AA
 SyncConnection& SyncConnection::operator << (const Packet& packet) throw (Error) {
-  assert(!isReleased());
   checkError();
+  assert(!isReleased());
 
   conn->stream().writePacket(packet, true);
 
