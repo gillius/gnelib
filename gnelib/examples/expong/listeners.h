@@ -244,8 +244,9 @@ public:
     if (listener == connecting.lock()) {
       //Only display an error for our real player.  We don't want to see the
       //ConnectionRefused errors.
-      gout << acquire << "Connection error: " << error << endl;
-      gout << "  Error received from " << from << endl << release;
+      LockObject lock( gout );
+      gout << "Connection error: " << error << endl;
+      gout << "  Error received from " << from << endl;
       connecting.reset();
     }
 
@@ -268,7 +269,7 @@ public:
     LockCV lock(sync);
 
     params.setUnrel(false);
-    if (accept && !(connecting.lock()) ) {
+    if (accept && connecting.expired() ) {
       //If no one is connecting and we are accepting connections
       PongClient::sptr temp = PongClient::create( remotePlayer, localPlayer );
       connecting = temp;
@@ -283,23 +284,26 @@ public:
   PongClient::sptr waitForPlayer() {
     LockCV lock(sync);
 
-    while (!(player.lock()) && !kbhit()) {
-      //We wait for 250ms to recheck kbhit for pressed keys.
-      sync.timedWait(250);
+    //Thanks go to Peter Dimov for refactoring this code bit!
+    for (;;) {
+      if( PongClient::sptr p = player.lock() ) {
+        return p;
+
+      } else if( kbhit() ) {
+        //We were woken up by a keypress, so refuse any further connections.
+        accept = false;
+
+        //We don't need to wait around if anyone is in the middle of connecting,
+        //because shutting down GNE will close any open connections, and we will
+        //be closing down if we aborted this connection.
+
+        //Return that no client connected.
+        return PongClient::sptr();
+
+      } else {
+        sync.timedWait(250);
+      }
     }
-    if (!(player.lock())) {
-      //We were woken up by a keypress, so refuse any further connections.
-      accept = false;
-
-      //We don't need to wait around if anyone is in the middle of connecting,
-      //because shutting down GNE will close any open connections, and we will
-      //be closing down if we aborted this connection.
-
-      //Return that no client connected.
-      return PongClient::sptr();
-    }
-
-    return player.lock();
   }
 
 private:
