@@ -138,6 +138,21 @@ Package=<4>
 
 ###############################################################################
 
+Project: "expong"=".\examples\expong\expong.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name gne
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "exrawtest"=".\EXAMPLES\exrawtest\exrawtest.dsp" - Package Owner=<4>
 
 Package=<5>
