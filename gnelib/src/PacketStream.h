@@ -32,8 +32,11 @@ class Packet;
 //##ModelId=3AE35F9E001E
 class PacketStream {
 public:
+  /**
+   * Creates a new PacketStream with the given flow control parameters.
+   */
   //##ModelId=3AE3605F032A
-  PacketStream();
+  PacketStream(int outRate2, int inRate2);
 
   //##ModelId=3AE36060001E
   virtual ~PacketStream();

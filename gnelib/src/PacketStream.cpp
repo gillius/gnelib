@@ -22,7 +22,8 @@
 #include "Packet.h"
 
 //##ModelId=3AE3605F032A
-PacketStream::PacketStream() : writer(writeSync) {
+PacketStream::PacketStream(int outRate2, int inRate2)
+: inRate(inRate2), outRate(outRate2), writer(writeSync) {
 }
 
 //##ModelId=3AE36060001E
@@ -59,16 +60,14 @@ Packet* PacketStream::getNextPacketToSend() {
 }
 
 //##ModelId=3AE4C60C026C
-int PacketStream::getInRate() const
-{
-    return inRate;
+int PacketStream::getInRate() const {
+  return inRate;
 }
 
 
 //##ModelId=3AE4C60C0316
-int PacketStream::getOutRate() const
-{
-    return outRate;
+int PacketStream::getOutRate() const {
+  return outRate;
 }
 
 
