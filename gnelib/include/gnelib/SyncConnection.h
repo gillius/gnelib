@@ -97,7 +97,9 @@ public:
 	 * Attempts to connect to the remote side, and waits for the connection to
 	 * complete, throwing an Error if it was unsuccessful.  Your event listener
 	 * will receive the onConnect event resulting from this -- it is not
-	 * repressed just like onDisconnect is not repressed.
+	 * repressed just like onDisconnect is not repressed.  Many times though,
+   * when using this method you won't have a need for onConnect, but if you
+   * do create one, connect will wait until onConnect is finished.
 	 * \nIt is important that the wrapped Connection is a ClientConnection, 
 	 * otherwise undefined behavior (likely a crash) will result.
 	 */
