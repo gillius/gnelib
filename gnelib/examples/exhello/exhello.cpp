@@ -1,5 +1,5 @@
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
@@ -33,10 +33,12 @@
 #include "../../src/gnelib.h"
 #include <iostream>
 #include <cstring>
+#include <string>
 
 using namespace std;
 using namespace GNE;
 using namespace GNE::Console;
+using namespace GNE::PacketParser;
 
 void errorExit(const char* error);
 int getPort(const char* prompt);
@@ -45,40 +47,114 @@ string getAddressString(NLaddress addr);
 void doServer(int outRate, int inRate, int port);
 void doClient(int outRate, int inRate, int port);
 
+class HelloPacket : public Packet {
+public:
+	HelloPacket() : Packet(MIN_USER_ID) {}
+	HelloPacket(string message2) : Packet(MIN_USER_ID), message(message2) {}
+  virtual ~HelloPacket() {}
+
+  Packet* makeClone() const {
+    return new HelloPacket(*this);
+  }
+
+  int getSize() const {
+    return Packet::getSize() + sizeof(message) + 1;
+  }
+
+  void writePacket(RawPacket& raw) const {
+    Packet::writePacket(raw);
+    raw << message;
+  }
+
+  void readPacket(RawPacket& raw) {
+    Packet::readPacket(raw);
+    raw >> message;
+  }
+
+  static Packet* create() {
+    return new HelloPacket();
+  }
+
+	string getMessage() {
+		return message;
+	}
+
+private:
+	string message;
+};
+
 class OurClient : public ClientConnection {
 public:
   OurClient(int outRate, int inRate) 
-    : ClientConnection(outRate, inRate) {}
+    : ClientConnection(outRate, inRate) {
+		mprintf("Client instance created.\n");
+	}
+
+	virtual ~OurClient() {
+		mprintf("Client instance killed.\n");
+	}
 
   void onConnect() {
     mprintf("Connection to server successful.\n");
   }
 
+	void onFailure(Connection::FailureType errorType) {
+		Connection::onFailure(errorType);
+		mprintf("Socket failure: %s\n", Connection::FailureStrings[errorType].c_str());
+	}
+
   void onConnectFailure(FailureType errorType) {
     mprintf("Connection to server failed.\n");
   }
-
-  virtual ~OurClient() {}
 private:
 };
 
 class OurServer : public ServerConnection {
 public:
   OurServer(int outRate, int inRate, NLsocket rsocket2)
-    : ServerConnection(outRate, inRate, rsocket2) {}
+    : ServerConnection(outRate, inRate, rsocket2), received(false) {
+		mprintf("Server instance created\n");
+	}
 
-  virtual ~OurServer() {}
+  virtual ~OurServer() {
+		mprintf("Server instance killed\n");
+	}
 
   void onNewConn() {
-    mprintf("Connection received.\n");
+    mprintf("Connection received; waiting for message...\n");
+		quit.acquire();
+		quit.timedWait(5000);
+		quit.release();
+		if (!received)
+			mprintf("No message received.\n");
     detach(true);
   }
 
+	void onReceive() {
+		Packet* message = stream().getNextPacket();
+		if (message->getType() == MIN_USER_ID) {
+			HelloPacket* helloMessage = (HelloPacket*)message;
+			mprintf("got message: \"");
+			mprintf(helloMessage->getMessage().c_str());
+			mprintf("\"\n");
+			received = true;
+		} else
+			mprintf("got bad packet.\n");
+		delete message;
+	}
+
+	void onFailure(Connection::FailureType errorType) {
+		Connection::onFailure(errorType);
+		mprintf("Socket failure: %s\n", Connection::FailureStrings[errorType].c_str());
+	}
+
   void onConnFailure(FailureType errorType) {
-    mprintf("Connection failure.\n");
+    mprintf("Connection failure while connecting.\n");
     detach(true);
   }
 private:
+	ConditionVariable quit;
+	bool received;
 };
 
 class OurCreator : public ServerConnectionCreator {
@@ -103,11 +179,14 @@ private:
 };
 
 int main(int argc, char* argv[]) {
-  initGNE(NL_IP, atexit);
+  if (initGNE(NL_IP, atexit)) {
+		exit(1);
+	}
   setUserVersion(1); //sets our user protocol version number, used in
                      //the connection process by GNE to version check.
   initConsole(atexit);
   setTitle("GNE Basic Connections Example");
+  registerPacket(MIN_USER_ID, HelloPacket::create);
 
   //It's okay to use iostreams instead of the Console functions when we are
   //only accessing the console from one thread.
@@ -165,6 +244,9 @@ string getAddressString(NLaddress addr) {
 }
 
 void doServer(int outRate, int inRate, int port) {
+#ifdef _DEBUG
+	initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "server.log");
+#endif
   OurListener server(outRate, inRate);
   if (server.open(port))
     errorExit("Cannot open server socket.");
@@ -178,6 +260,9 @@ void doServer(int outRate, int inRate, int port) {
 }
 
 void doClient(int outRate, int inRate, int port) {
+#ifdef _DEBUG
+	initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "client.log");
+#endif
   string host;
   cout << "Enter hostname or IP address: ";
   cin >> host;
@@ -188,9 +273,15 @@ void doClient(int outRate, int inRate, int port) {
   
   cout << "Connecting to: " << getAddressString(addr) << endl;
   OurClient client(outRate, inRate);
-  client.open(addr); //let port take 0 default, for any local port.
+  if (client.open(addr)) //let port take 0 default, for any local port.
+    errorExit("Cannot open client socket.");
   client.connect();
   client.join();     //join on the connection thread
+	HelloPacket message("Hello, server!");
+	client.stream().writePacket(message, true);
+	client.stream().waitToSendAll();
   //if we did not call join, we would have called client.detach(false)
   //instead for true async connections.
 }
+
+
