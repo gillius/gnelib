@@ -1,9 +1,8 @@
 # mingw specific makefile
 
-# set up all the variables used in the main makefile
+include makefile.gcc
 
-CPP                  = g++
-CC                   = gcc
+# set up all the variables used in the main makefile
 
 CP                   = cp
 RM                   = rm -f
@@ -15,9 +14,6 @@ AR                   = ar
 EXAMPLE_LIBS         = $(LIB_STATIC) -lNL
 
 LDFLAGS              = -mthreads
-
-DEBUGFLAGS           = -g -D_DEBUG -Wall
-OPTIMIZEFLAGS        = -Wall -O3 -s
 
 ifdef DEBUGMODE
 CPPFLAGS             = $(DEBUGFLAGS)
@@ -32,28 +28,9 @@ endif
 
 LIB_STATIC           = lib/mingw/$(LIB_STATIC_NAME)
 
-ifndef NO_OLD_CPP
-CPPFLAGS            += -DOLD_CPP
-endif
-
-EXAMPLE_CPP          = $(wildcard examples/*/*.cpp)
-
-EXAMPLE_O            = $(EXAMPLE_CPP:.cpp=.o)
-
 EXE_MASK             = examples/%.exe
 
 EXAMPLE_EXE          = $(addprefix examples/,$(notdir $(EXAMPLE_O:.o=.exe)))
-
-LIB_CPP              = $(wildcard src/*.cpp)
-LIB_C                = $(wildcard src/*.c)
-
-LIB_CPP_O            = $(LIB_CPP:.cpp=.o)
-LIB_C_O              = $(LIB_C:.c=.o)
-LIB_O                = $(LIB_CPP_O) $(LIB_C_O)
-
-DEPENDENCIES         = $(notdir $(LIB_O:.o=.d))
-
-VPATH                = $(dir $(EXAMPLE_CPP))
 
 LIBDIR               = $(MINGDIR)/lib/
 

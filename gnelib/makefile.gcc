@@ -1,0 +1,27 @@
+# makefile for GCC compilers in various platforms.
+
+CPP                  = g++
+CC                   = gcc
+
+COMMONFLAGS          = -Wall -Iinclude
+DEBUGFLAGS           = $(COMMONFLAGS) -g -D_DEBUG
+OPTIMIZEFLAGS        = $(COMMONFLAGS) -O3 -s
+
+ifdef OLD_CPP
+CPPFLAGS            += -DOLD_CPP
+endif
+
+EXAMPLE_CPP          = $(wildcard examples/*/*.cpp)
+
+EXAMPLE_O            = $(EXAMPLE_CPP:.cpp=.o)
+
+LIB_CPP              = $(wildcard src/*.cpp)
+LIB_C                = $(wildcard src/*.c)
+
+LIB_CPP_O            = $(LIB_CPP:.cpp=.o)
+LIB_C_O              = $(LIB_C:.c=.o)
+LIB_O                = $(LIB_CPP_O) $(LIB_C_O)
+
+DEPENDENCIES         = $(notdir $(LIB_O:.o=.d))
+
+VPATH                = $(dir $(EXAMPLE_CPP))
