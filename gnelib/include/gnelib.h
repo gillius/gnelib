@@ -28,6 +28,7 @@
 #include "src/PacketStream.h"
 #include "src/ListServerConnection.h"
 #include "src/Packet.h"
+#include "src/PacketParser.h"
 #include "src/RawPacket.h"
 #include "src/ConnectionEventGenerator.h"
 #include "src/ConnectionEventListener.h"

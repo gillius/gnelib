@@ -129,6 +129,10 @@ SOURCE=.\src\Packet.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\PacketParser.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\PacketStream.cpp
 # End Source File
 # Begin Source File
@@ -218,6 +222,10 @@ SOURCE=.\src\Mutex.h
 # Begin Source File
 
 SOURCE=.\src\Packet.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\PacketParser.h
 # End Source File
 # Begin Source File
 
