@@ -1,4 +1,7 @@
-GNE 0.45 to current
+GNE 0.49 to current
+  Added MSVC.NET support by adding solution and project files.
+
+GNE 0.45 to 0.49
   Added Thread::waitForAllThreads to verify the completion of detached
     threads, and updated the exthreads example to test/show this new method.
   Added a += operator to the Time class: operator+=(const Time& rhs)
