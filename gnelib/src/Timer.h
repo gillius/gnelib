@@ -45,20 +45,25 @@ public:
   virtual ~Timer();
 
   /**
-   * Returns the current time from some arbitrary point.  Resolution is only
-   * guaranteed to the millisecond.  The time returned is an absolute time,
-   * usually relative to midnight, Jan 1, 1970.
+   * Returns the current time from some arbitray point in the past.  This is
+   * usually a very high precision timer.  Where possible, the rdtsc
+   * instruction is used to get time on x86 platforms.  Anything else the
+   * highest precision timer will be used.
+   * Resolutions:\n
+   * Windows/x86: (probably) 1 / CPU clock speed
    */
   //##ModelId=3AE86872030C
   static Time getCurrentTime();
 
   /**
-   * Called to set the current time to zero -- called when the library is
-   * initalized.  This function can be called afterwards to reset the
-   * counter back to zero but this should not be necessary.
+   * Returns the current time from the system clock.
+   * The time returned is an absolute time,
+   * usually relative to midnight, Jan 1, 1970.\n
+   * Resolutions:\n
+   * Windows: 10ms
    */
-  //##ModelId=3AEB9AB4038E
-  static void initTime();
+  //##ModelId=3AF4797001CC
+  static Time getAbsoluteTime();
 
   /**
    * Starts the timer running and calling the callback.
@@ -86,12 +91,6 @@ public:
   bool isRunning();
 
 private:
-  /**
-   * The starting time from initTime()
-   */
-  //##ModelId=3AEBA397028B
-  static Time startTime;
-
   /**
    * Next time the callback will be activated.
    */

@@ -21,9 +21,6 @@
 #include "Timer.h"
 #include "Time.h"
 
-//##ModelId=3AEBA397028B
-Time Timer::startTime;
-
 //##ModelId=3AE868370122
 Timer::Timer(TimerCallback& theListener, int rate)
 : running(false), callbackRate(rate), listener(theListener) {
@@ -33,12 +30,23 @@ Timer::Timer(TimerCallback& theListener, int rate)
 Timer::~Timer() {
 }
 
-#ifdef WIN32
-#include <sys/timeb.h>
-#endif
-
 //##ModelId=3AE86872030C
 Time Timer::getCurrentTime() {
+  Time ret;
+#ifdef WIN32
+  LARGE_INTEGER t, freq;
+  QueryPerformanceFrequency(&freq);
+  QueryPerformanceCounter(&t);
+  ret.setuSec(int((t.QuadPart % freq.QuadPart) * 1000000 / freq.QuadPart));
+  ret.setSec(int(t.QuadPart / freq.QuadPart));
+#else
+#error Need to port Timer::getCurrentTime()
+#endif
+  return ret;
+}
+
+//##ModelId=3AF4797001CC
+Time Timer::getAbsoluteTime() {
   Time ret;
 #ifdef WIN32
   _timeb t;
@@ -46,13 +54,9 @@ Time Timer::getCurrentTime() {
   ret.setSec(t.time);
   ret.setuSec(t.millitm * 1000);
 #else
-#error Need to port Timer::getCurrentTime()
+#error Need to port Timer::getAbsoluteTime()
 #endif
   return ret;
-}
-
-//##ModelId=3AEB9AB4038E
-void Timer::initTime() {
 }
 
 //##ModelId=3AEB9AB50050
@@ -71,4 +75,3 @@ void Timer::run() {
 bool Timer::isRunning() {
   return running;
 }
-
