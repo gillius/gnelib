@@ -23,6 +23,7 @@
 #include "gneintern.h"
 
 namespace GNE {
+class Address;
 
 /**
  * A class used to centralize shared elements between Connection and
@@ -60,7 +61,7 @@ public:
    * @param reliable socket select
    */
   //##ModelId=3BB2CB41030C
-  NLaddress getLocalAddress(bool reliable) const;
+  Address getLocalAddress(bool reliable) const;
 
   /**
    * Returns the remote address of this connection, if it is connected,
@@ -68,7 +69,7 @@ public:
    * @param reliable socket select
    */
   //##ModelId=3BB2CB41037A
-  NLaddress getRemoteAddress(bool reliable) const;
+  Address getRemoteAddress(bool reliable) const;
 
 	/**
 	 * Performs a low-level read on a socket.

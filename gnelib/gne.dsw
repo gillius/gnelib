@@ -35,6 +35,24 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name exrawtest
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name exaddr
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "exaddr"=".\EXAMPLES\EXADDR\exaddr.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name gne
+    End Project Dependency
 }}}
 
 ###############################################################################

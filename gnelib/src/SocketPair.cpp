@@ -19,18 +19,21 @@
 
 #include "gneintern.h"
 #include "SocketPair.h"
+#include "Address.h"
+
+namespace GNE {
 
 //##ModelId=3BB2348D0348
-GNE::SocketPair::SocketPair(NLsocket reliable, NLsocket unreliable)
+SocketPair::SocketPair(NLsocket reliable, NLsocket unreliable)
 : r(reliable), u(unreliable) {
 }
 
 //##ModelId=3BB2349B015E
-GNE::SocketPair::~SocketPair() {
+SocketPair::~SocketPair() {
 }
 
 //##ModelId=3BB2351603A2
-void GNE::SocketPair::disconnect() {
+void SocketPair::disconnect() {
 	if (r != NL_INVALID) {
 		nlClose(r);
 		r = NL_INVALID;
@@ -42,7 +45,7 @@ void GNE::SocketPair::disconnect() {
 }
 
 //##ModelId=3BB2CB41030C
-NLaddress GNE::SocketPair::getLocalAddress(bool reliable) const {
+Address SocketPair::getLocalAddress(bool reliable) const {
   NLaddress ret;
   if (reliable) {
     assert(r != NL_INVALID);
@@ -51,11 +54,11 @@ NLaddress GNE::SocketPair::getLocalAddress(bool reliable) const {
     assert(u != NL_INVALID);
     nlGetLocalAddr(u, &ret);
   }
-  return ret;
+  return Address(ret);
 }
 
 //##ModelId=3BB2CB41037A
-NLaddress GNE::SocketPair::getRemoteAddress(bool reliable) const {
+Address SocketPair::getRemoteAddress(bool reliable) const {
   NLaddress ret;
   if (reliable) {
     assert(r != NL_INVALID);
@@ -64,11 +67,11 @@ NLaddress GNE::SocketPair::getRemoteAddress(bool reliable) const {
     assert(u != NL_INVALID);
     nlGetRemoteAddr(u, &ret);
   }
-  return ret;
+  return Address(ret);
 }
 
 //##ModelId=3B6B302400CA
-int GNE::SocketPair::rawRead(bool reliable, const NLbyte* buf, int bufSize) const {
+int SocketPair::rawRead(bool reliable, const NLbyte* buf, int bufSize) const {
   NLsocket act;
   if (reliable)
     act = r;
@@ -79,7 +82,7 @@ int GNE::SocketPair::rawRead(bool reliable, const NLbyte* buf, int bufSize) cons
 }
 
 //##ModelId=3B6B302401D6
-int GNE::SocketPair::rawWrite(bool reliable, const NLbyte* buf, int bufSize) const {
+int SocketPair::rawWrite(bool reliable, const NLbyte* buf, int bufSize) const {
   NLsocket act;
   if (reliable)
     act = r;
@@ -89,3 +92,4 @@ int GNE::SocketPair::rawWrite(bool reliable, const NLbyte* buf, int bufSize) con
   return int(nlWrite(act, (NLvoid*)buf, (NLint)bufSize));
 }
 
+} //Namespace GNE

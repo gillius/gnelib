@@ -24,6 +24,7 @@
 #include "ServerConnection.h"
 #include "Connection.h"
 #include "GNE.h"
+#include "Address.h"
 
 namespace GNE {
 
@@ -81,11 +82,11 @@ void ServerConnectionListener::onReceive() {
 }
 
 //##ModelId=3B075381030D
-NLaddress ServerConnectionListener::getLocalAddress() const {
-  NLaddress ret;
+Address ServerConnectionListener::getLocalAddress() const {
   assert(socket != NL_INVALID);
+  NLaddress ret;
   nlGetLocalAddr(socket, &ret);
-  return ret;
+  return Address(ret);
 }
 
 //##ModelId=3B07538102D0

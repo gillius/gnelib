@@ -91,30 +91,26 @@ public:
   Stats getStats() const;
 
   /**
-	 * \bug result is undefined when the underlying socket isn't connected,
-	 *      but the user has no way to know if this function failed due to
-	 *      this case, unless the user has an intimate understanding of the
-	 *      implementation of Connection.
-   * Returns the local address of this connection.
+   * Returns the local address of this connection.  If the requested socket
+	 * has not been opened, the returned Address will be invalid (!isValid()).
    * @param reliable sometimes two sockets are used for reliable and
    *                 unreliable data.  Specify which low-level socket you
    *                 want the address of.
+	 * @see GNE::Address
    */
   //##ModelId=3B075381007B
-  NLaddress getLocalAddress(bool reliable) const;
+  Address getLocalAddress(bool reliable) const;
 
   /**
-	 * \bug result is undefined when the underlying socket isn't connected,
-	 *      but the user has no way to know if this function failed due to
-	 *      this case, unless the user has an intimate understanding of the
-	 *      implementation of Connection.
-   * Returns the remote address of this connection, if it is connected.
+   * Returns the remote address of this connection.  If the requested socket
+	 * is not connected, the returned Address will be invalid (!isValid()).
    * @param reliable sometimes two sockets are used for reliable and
    *                 unreliable data.  Specify which low-level socket you
    *                 want the address of.
+	 * @see GNE::Address
    */
   //##ModelId=3B075381007E
-  NLaddress getRemoteAddress(bool reliable) const;
+  Address getRemoteAddress(bool reliable) const;
 
   /**
    * Returns true if this Connection is active and ready to send/recieve.

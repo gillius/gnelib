@@ -25,3 +25,5 @@ expacket -- Shows how to derive a new type of packet, and create the proper
 exrawtest -- Basically a test of the RawPacket class.  Does show usage of the
   RawPacket class, but the usage in this case because this is a test uses the
   class is "hackish" ways.  The standard use of RawPackets is pretty trivial.
+
+exaddr -- A small test for the Address class that also shows its usage.

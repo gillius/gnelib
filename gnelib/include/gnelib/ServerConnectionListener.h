@@ -26,6 +26,7 @@
 #include "Connection.h"
 
 namespace GNE {
+class Address;
 
 /**
  * A connection that listens for other connections.  Inherit from this class,
@@ -94,7 +95,7 @@ public:
    * Returns the address of the listening socket.
    */
   //##ModelId=3B075381030D
-  NLaddress getLocalAddress() const;
+  Address getLocalAddress() const;
 
 private:
   //##ModelId=3B075380034A

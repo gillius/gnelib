@@ -21,6 +21,7 @@
 #include "ConnectionEventGenerator.h"
 #include "PacketParser.h"
 #include "GNE.h"
+#include "Address.h"
 
 namespace GNE {
   namespace PacketParser {
@@ -70,20 +71,17 @@ void shutdownGNE() {
   }
 }
 
-NLaddress getLocalAddress() {
+Address getLocalAddress() {
   assert(initialized);
-  NLaddress ret;
-  NLsocket temp = nlOpen(0, NL_RELIABLE);
-  nlGetLocalAddr(temp, &ret);
-  nlClose(temp);
-	nlSetAddrPort(&ret, 0);
-  return ret;
-}
+  NLaddress nlAddr;
 
-std::string addressToString(NLaddress addr) {
-  char buf[NL_MAX_STRING_LENGTH];
-  nlAddrToString(&addr, (NLbyte*)buf);
-  return std::string(buf);
+  NLsocket temp = nlOpen(0, NL_RELIABLE);
+  nlGetLocalAddr(temp, &nlAddr);
+  nlClose(temp);
+
+	Address ret(nlAddr);
+	ret.setPort(0);
+  return ret;
 }
 
 int getBytesRead() {

@@ -92,12 +92,35 @@ public:
 		mprintf("Client instance killed.\n");
 	}
 
+	void onDisconnect() { 
+		mprintf("Client just disconnected.\n");
+	}
+
   void onConnect() {
     mprintf("Connection to server successful.\n");
   }
 
+	void onReceive() {
+		/*
+		Packet* message = stream().getNextPacket();
+		if (message->getType() == MIN_USER_ID) {
+			HelloPacket* helloMessage = (HelloPacket*)message;
+			mprintf("got message: \"");
+			mprintf(helloMessage->getMessage().c_str());
+			mprintf("\"\n");
+		} else
+			mprintf("got bad packet.\n");
+		delete message;
+		*/
+	}
+
 	void onFailure(const Error& error) {
 		mprintf("Socket failure: %s\n", error.getDesc().c_str());
+	}
+
+	void onError(const Error& error) {
+		mprintf("Socket error: %s\n", error.getDesc().c_str());
+		disconnect();
 	}
 
   void onConnectFailure(const Error& error) {
@@ -115,11 +138,15 @@ public:
 	}
 
   virtual ~OurServer() {
-		mprintf("Server instance killed\n");
+		mprintf("ServerConnection instance killed\n");
+	}
+
+	void onDisconnect() { 
+		mprintf("ServerConnection just disconnected.\n");
 	}
 
   void onNewConn() {
-    mprintf("Connection received from %s; waiting for message...\n", addressToString(getRemoteAddress(true)).c_str());
+    mprintf("Connection received from %s; waiting for message...\n", getRemoteAddress(true).toString().c_str());
 		quit.acquire();
 		quit.timedWait(5000);
 		quit.release();
@@ -136,6 +163,13 @@ public:
 			mprintf(helloMessage->getMessage().c_str());
 			mprintf("\"\n");
 			received = true;
+
+			/*
+			//Send Response
+			mprintf("  Sending Response...\n");
+			HelloPacket response("Hello, client!");
+			stream().writePacket(response, true);
+			*/
 		} else
 			mprintf("got bad packet.\n");
 		delete message;
@@ -143,6 +177,11 @@ public:
 
 	void onFailure(const Error& error) {
 		mprintf("Socket failure: %s\n", error.getDesc().c_str());
+	}
+
+	void onError(const Error& error) {
+		mprintf("Socket error: %s\n", error.getDesc().c_str());
+		disconnect();
 	}
 
   void onConnFailure(const Error& error) {
@@ -188,7 +227,7 @@ int main(int argc, char* argv[]) {
   //It's okay to use iostreams instead of the Console functions when we are
   //only accessing the console from one thread.
 	cout << "GNE Basic Connections Example for " << GNE::VER_STR << endl;
-  cout << "Local address: " << addressToString(getLocalAddress()) << endl;
+  cout << "Local address: " << getLocalAddress() << endl;
   cout << "Should we act as the server, or the client?" << endl;
   cout << "Type 1 for client, 2 for server: ";
   int type;
@@ -236,7 +275,7 @@ void doServer(int outRate, int inRate, int port) {
   if (server.listen())
     errorExit("Cannot listen on server socket.");
 
-  cout << "Server is listening on: " << addressToString(server.getLocalAddress()) << endl;
+  cout << "Server is listening on: " << server.getLocalAddress() << endl;
   cout << "Press a key to shutdown server." << endl;
   getch();
   //When the server class is destructed, it will stop listening and shutdown.
@@ -250,24 +289,23 @@ void doClient(int outRate, int inRate, int port) {
   cout << "Enter hostname or IP address: ";
   cin >> host;
 
-	NLaddress temp;
-	nlGetAddrFromName((NLbyte*)host.c_str(), &temp);
-  cout << "Connecting to: " << addressToString(temp) << ':' << port << endl;
+	Address address(host);
+	address.setPort(port);
+  cout << "Connecting to: " << address << endl;
 
   OurClient client(outRate, inRate);
-  if (client.open(host, port)) //let localPort take 0 default, for any local port.
+  if (client.open(address, 0)) //localPort = 0, for any local port.
     errorExit("Cannot open client socket.");
 
   client.connect();
   client.join();     //join on the connection thread
+  //if we did not call join, we would have called client.detach(false)
+  //instead for true async connections.
 
 	//Send our information
 	HelloPacket message("Hello, server!");
 	client.stream().writePacket(message, true);
 	client.stream().waitToSendAll();
-  //if we did not call join, we would have called client.detach(false)
-  //instead for true async connections.
-
 	//When OurClient goes out of scope, the destructor will disconnect, so we
 	//need not call it explicitly.
 }

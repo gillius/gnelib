@@ -77,6 +77,6 @@ GNE::Error::operator bool() const {
 }
 
 //##ModelId=3BAEC74F0168
-bool GNE::Error::operator == (ErrorCode rhs) const {
+bool GNE::Error::operator == (const ErrorCode& rhs) const {
 	return (code == rhs);
 }

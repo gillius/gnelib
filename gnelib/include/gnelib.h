@@ -20,6 +20,7 @@
 #ifndef _GNELIB_H_
 #define _GNELIB_H_
 
+#include "gnelib/Address.h"
 #include "gnelib/ClientConnection.h"
 #include "gnelib/ConditionVariable.h"
 #include "gnelib/Connection.h"

@@ -20,6 +20,7 @@
 #include "gneintern.h"
 #include "ClientConnection.h"
 #include "ErrorGne.h"
+#include "Address.h"
 
 namespace GNE {
 
@@ -39,7 +40,9 @@ ClientConnection::~ClientConnection() {
  */
 //##ModelId=3B07538003BA
 void ClientConnection::run() {
-  NLboolean check = nlConnect(sockets.r, &address);
+	NLaddress addr = address.getAddress();
+	gnedbgo1(1, "Trying to connect to %s", address.toString().c_str());
+  NLboolean check = nlConnect(sockets.r, &addr);
   if (check == NL_TRUE) {
 		reg(true, false);
     connected = true;
@@ -47,34 +50,27 @@ void ClientConnection::run() {
 		gnedbgo2(2, "connection r: %i, u: %i", sockets.r, sockets.u);
     onConnect();
   } else {
+		gnedbgo2(1, "HawkNL error: %i %s", nlGetError(), nlGetErrorStr(nlGetError()));
+		gnedbgo2(1, "HawkNL error: %i %s", nlGetSystemError(), nlGetSystemErrorStr(nlGetSystemError()));
     onConnectFailure(Error::ConnectionTimeOut);
   }
 }
 
-/**
- * \bug check to see if the failure from nlGetAddrFromName is a valid thing
- *      to give nlOpen, and if an error will be generated there.
- */
 //##ModelId=3B07538003BB
-bool ClientConnection::open(std::string dest, int remotePort, int localPort) {
-  NLaddress addr;
-  nlGetAddrFromName((NLbyte*)dest.c_str(), &addr);
-
-	if (remotePort != 0) //Override any port possibly specifed in dest.
-		nlSetAddrPort(&addr, (NLushort)remotePort);
-
-  return open(addr, localPort);
-}
-
-//##ModelId=3B07538003BE
-bool ClientConnection::open(NLaddress dest, int localPort) {
-  address = dest;
-  sockets.r = nlOpen(localPort, NL_RELIABLE_PACKETS);
-  return (sockets.r == NL_INVALID);
+bool ClientConnection::open(Address dest, int localPort) {
+	if (!dest)
+		return true;
+	else {
+		address = dest;
+		sockets.r = nlOpen(localPort, NL_RELIABLE_PACKETS);
+		return (sockets.r == NL_INVALID);
+	}
 }
 
 //##ModelId=3B07538003C1
 void ClientConnection::connect() {
+	assert(sockets.r != NL_INVALID);
+	assert(address);
   start();
 }
 

@@ -88,7 +88,7 @@ public:
 	 * @param rhs an errorCode to test with.
 	 */
   //##ModelId=3BAEC74F0168
-  bool operator == (ErrorCode rhs) const;
+  bool operator == (const ErrorCode& rhs) const;
 
 private:
   //##ModelId=3BAEC9C101CD

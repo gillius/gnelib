@@ -24,6 +24,7 @@
 #include "ConnectionEventGenerator.h"
 #include "ErrorGne.h"
 #include "SocketPair.h"
+#include "Address.h"
 #include "GNE.h"
 
 namespace GNE {
@@ -51,13 +52,13 @@ Connection::Stats Connection::getStats() const {
 }
 
 //##ModelId=3B075381007B
-NLaddress Connection::getLocalAddress(bool reliable) const {
-  return sockets.getLocalAddress(reliable);
+Address Connection::getLocalAddress(bool reliable) const {
+  return Address(sockets.getLocalAddress(reliable));
 }
 
 //##ModelId=3B075381007E
-NLaddress Connection::getRemoteAddress(bool reliable) const {
-  return sockets.getRemoteAddress(reliable);
+Address Connection::getRemoteAddress(bool reliable) const {
+  return Address(sockets.getRemoteAddress(reliable));
 }
 
 //##ModelId=3B0753810081
@@ -114,7 +115,8 @@ void Connection::onReceive(bool reliable) {
 	NLbyte* buf = new NLbyte[RawPacket::RAW_PACKET_LEN];
 	int temp = sockets.rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
 	if (temp == NL_INVALID) {
-		if (nlGetError() == NL_MESSAGE_END) {
+		NLint error = nlGetError();
+		if (error == NL_MESSAGE_END || error == NL_SOCK_DISCONNECT) {
 			//in HawkNL 1.4b4 and later, this means that the connection was
 			//closed on the network-level because the client disconnected or
 			//has dropped.  Since we didn't get an "exit" packet, it's an error.

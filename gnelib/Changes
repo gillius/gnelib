@@ -1,5 +1,8 @@
 GNE 0.003 to 0.4
-  Cleaned up exhello example.
+  Added test/example exaddr for the Address class.
+  Added GNE::Address class which changes things everywhere, but is many many
+    times nicer due to implicit conversions and encapsulation.
+  Cleaned up exhello example, more complete code.
   Improved functions dealing with NLaddress, added GNE::addressToString.
   Fixed C callback in Thread so that Thread::run is now protected rather than
     public as it should be, and Thread::end is now private rather than
