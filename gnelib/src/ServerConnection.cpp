@@ -86,7 +86,11 @@ ServerConnection::~ServerConnection() {
 //##ModelId=3B0753810280
 void ServerConnection::run() {
   assert(sockets.r != NL_INVALID);
-  assert(eventListener != NULL);
+  assert(getListener() != NULL);
+  //endConnect will set the null listener to discard the events, so we
+  //have to cache the current listener.
+  ConnectionListener* origListener = getListener();
+
   //We cache the remote address because after an error occurs we may not be
   //able to get it to pass to the listen failure function.
   Address rAddr = getRemoteAddress(true);
@@ -96,7 +100,7 @@ void ServerConnection::run() {
   try {
     doHandshake();
   } catch (Error e) {
-    params->creator->onListenFailure(e, rAddr, getListener());
+    params->creator->onListenFailure(e, rAddr, origListener);
     //We delete ourselves when we terminate since we were never seen by the
     //user and no one has seen us yet.
     detach(true);
@@ -125,16 +129,12 @@ void ServerConnection::run() {
     sConn.release();
   } catch (Error e) {
     if (!onNewConnFinished) {
-      //endConnect will set the null listener to discard the events, so we
-      //have to cache the current listener.
-      ConnectionListener* cached = getListener();
-
       try {
         sConn.endConnect(false);
       } catch (Error e) {
         //The error might be re-reported, so we ignore it.
       }
-      params->creator->onListenFailure(e, rAddr, cached);
+      params->creator->onListenFailure(e, rAddr, origListener);
       //We delete ourselves when we terminate since we were never seen by the
       //user and no one has seen us yet.
       detach(true);

@@ -90,20 +90,23 @@ void ClientConnection::connect(SyncConnection* wrapped) {
 
 //##ModelId=3B07538003BA
 void ClientConnection::run() {
+  assert(getListener() != NULL);
   gnedbgo1(1, "Trying to connect to %s", params->dest.toString().c_str());
+  //endConnect will set the null listener to discard the events, so we
+  //have to cache the current listener.
+  ConnectionListener* origListener = getListener();
 
   NLaddress temp = params->dest.getAddress();
   NLboolean check = nlConnect(sockets.r, &temp);
 
   if (check == NL_TRUE) {
-    assert(eventListener != NULL);
     //Try to connect using the GNE protocol before we mess with any of the
     //user stuff.
     try {
       doHandshake();
     } catch (Error e) {
       gnedbgo1(1, "Connection failure during GNE handshake: %s", e.toString().c_str());
-      getListener()->onConnectFailure(e);
+      origListener->onConnectFailure(e);
       return;
     }
     gnedbgo(2, "GNE Protocol Handshake Successful.");
@@ -148,14 +151,10 @@ void ClientConnection::run() {
 
     } catch (Error e) {
       if (!onConnectFinished) {
-        //endConnect will set the null listener to discard the events, so we
-        //have to cache the current listener.
-        ConnectionListener* cached = getListener();
-        
         if (ourSConn)
           sConn.endConnect(false);
         
-        cached->onConnectFailure(e);
+        origListener->onConnectFailure(e);
       }
       if (ourSConn)
         delete params->sConnPtr;
@@ -165,10 +164,9 @@ void ClientConnection::run() {
       params = NULL;
     }
   } else {
-    assert(eventListener != NULL);
     Error err = Error::createLowLevelError(Error::ConnectionTimeOut);
     gnedbgo1(1, "Connection failure: %s", err.toString().c_str());
-    getListener()->onConnectFailure(err);
+    origListener->onConnectFailure(err);
   }
 }
 
