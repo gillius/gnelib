@@ -32,6 +32,7 @@ namespace GNE {
 ServerConnectionListener::ServerConnectionListener()
 : listening(false), listener(NULL) {
   listener = new ServerListener(*this);
+  gnedbgo(5, "created");
 }
 
 //##ModelId=3B0753810303
@@ -42,6 +43,7 @@ ServerConnectionListener::~ServerConnectionListener() {
     nlClose(socket);
   }
   delete listener;
+  gnedbgo(5, "destroyed");
 }
 
 //##ModelId=3B0753810305

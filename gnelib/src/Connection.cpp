@@ -36,7 +36,7 @@ namespace GNE {
 Connection::Connection(int outRate, int inRate, ConnectionListener* listener)
 : connecting(false), connected(false), rlistener(NULL), ulistener(NULL) {
   ps = new PacketStream(outRate, inRate, *this);
-  eventListener = new EventThread(this, listener);
+  eventListener = new EventThread(listener);
 }
 
 //##ModelId=3B0753810076
@@ -211,7 +211,7 @@ void Connection::processError(const Error& error) {
   default:
     errorSync.acquire();
     onFailure(error);
-    //The EventThread will disconnect us after onFailure finishes.
+    disconnect();
     errorSync.release();
     break;
   }

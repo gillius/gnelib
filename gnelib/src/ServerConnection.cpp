@@ -60,8 +60,8 @@ void ServerConnection::run() {
     ps->start();
     //Do connection negotiaion here
     getListener()->onNewConn(sync); //SyncConnection will relay this
-    sync.release();
     finishedConnecting();
+    sync.release();
   } catch (Error e) {
     ourCreator->onListenFailure(e, getRemoteAddress(true), getListener());
   }

@@ -28,8 +28,8 @@
 namespace GNE {
 
 //##ModelId=3C106F0203D4
-EventThread::EventThread(Connection* ourConn2, ConnectionListener* listener)
-: Thread("EventThr"), ourConn(ourConn2), eventListener(listener),
+EventThread::EventThread(ConnectionListener* listener)
+: Thread("EventThr"), eventListener(listener),
 started(false), onReceiveEvent(false), onDoneWritingEvent(false),
 onDisconnectEvent(false), failure(NULL) {
   gnedbgo(5, "created");
@@ -147,9 +147,11 @@ void EventThread::run() {
         eventListener->onFailure(*failure);
         delete failure;
         failure = NULL;
-        ourConn->disconnect();
+        //onFailure will be the second to last event.
+        onDisconnectEvent = true;
 
-      } else if (onDisconnectEvent) {
+      }
+      if (onDisconnectEvent) {
         eventListener->onDisconnect();
         return;  //terminate this thread since there are no other events to
                  //process -- onDisconnect HAS to be the last.

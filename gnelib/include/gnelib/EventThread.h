@@ -58,7 +58,7 @@ public:
    * Initializes this class as a event thread for listener.
    */
   //##ModelId=3C106F0203D4
-  EventThread(Connection* ourConn2, ConnectionListener* listener = NULL);
+  EventThread(ConnectionListener* listener = NULL);
 
   //##ModelId=3C106F0203D6
   virtual ~EventThread();
@@ -141,14 +141,6 @@ protected:
   void run();
 
 private:
-  /**
-   * Our associated connection.  This is only used to disconnect the
-   * connection when onFailure is processed, in case the PacketStream or
-   * another incompatable thread generated it.
-   */
-  //##ModelId=3C30E3FF022F
-  Connection* ourConn;
-
   //The listener for our events.  All on* events go here.  This is protected
   //so ClientConnection can send events as well.
   //##ModelId=3C106F1903BE

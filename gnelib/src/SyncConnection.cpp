@@ -189,7 +189,7 @@ void SyncConnection::onConnect(SyncConnection& conn) throw (Error) {
 
 //##ModelId=3BDB10A60078
 void SyncConnection::onConnectFailure(const Error& error) {
-  setError(error);
+  setError(error, true);
 }
 
 //##ModelId=3BDB10A60122
@@ -203,12 +203,12 @@ void SyncConnection::onDisconnect() {
 //##ModelId=3BDB10A60154
 void SyncConnection::onError(const Error& error) {
   conn->disconnect();
-  setError(error);
+  setError(error, false);
 }
 
 //##ModelId=3BDB10A601FE
 void SyncConnection::onFailure(const Error& error) {
-  setError(error);
+  setError(error, true);
 }
 
 //##ModelId=3BDB10A6029E
@@ -243,9 +243,9 @@ void SyncConnection::checkError() throw (Error) {
 }
 
 //##ModelId=3BDB10A602DA
-void SyncConnection::setError(const Error& error) {
+void SyncConnection::setError(const Error& error, bool wasFailure) {
   try {
-    if (!conn->isConnected()) //Release if conn was lost.
+    if (wasFailure) //Release if conn was lost.
       release(); //will throw an error if one was already set.
 
     sync.acquire();

@@ -1,4 +1,6 @@
 GNE 0.4 to Current
+  Added CustomPacket::getMaxUserDataSize to let the user know how large the
+    hosted RawPacket can be.
   Made Timer more robust and safe to call from its callback and from multiple
     threads at the same time.  Also gave user option to wait in stopTimer.
   Solaris makefiles and fix script added.  Compiles on Solaris using the GNU

@@ -204,7 +204,7 @@ private:
    * Sets the error.
    */
   //##ModelId=3BDB10A602DA
-  void setError(const Error& error);
+  void setError(const Error& error, bool wasFailure);
 
   /**
    * Syncronization for the Error object and release.

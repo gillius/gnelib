@@ -66,8 +66,8 @@ void ConnectionEventGenerator::run() {
           std::map<NLsocket, ReceiveEventListener*>::iterator iter = connections.find(sockBuf[numsockets]);
           //Check to make sure the listener didn't unregister while we were waiting.
           if (iter != connections.end()) {
-            mapCtrl.release();
             iter->second->onReceive();
+            mapCtrl.release();
           } else
             mapCtrl.release();
         }
