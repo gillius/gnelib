@@ -21,7 +21,7 @@ $(LIB_CPP_O): %.o: %.cpp
 $(LIB_C_O): %.o: %.c
 	$(CC) -Iinclude/gnelib -c -o $@ -MMD $(CFLAGS) $<
 
-$(EXAMPLE_EXE): $(EXE_MASK): $(EXAMPLE_DIR) %.o
+$(EXAMPLE_EXE): $(EXE_MASK): $(EXAMPLE_DIR) %.o $(LIB_STATIC)
 	$(CPP) -o $@ $(LDFLAGS) $< $(EXAMPLE_LIBS)
 
 $(EXAMPLE_O): %.o: %.cpp
