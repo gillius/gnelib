@@ -105,7 +105,7 @@ void Connection::disconnect() {
     gnedbgo2(2, "disconnecting r: %i, u: %i", sockets.r, sockets.u);
     ps->shutDown(); //PacketStream will try to send the required ExitPacket.
     ps->join();
-    onDisconnect();
+    eventListener->onDisconnect();
     //This will also shutdown the EventThread, and we will join on it in the
     //destructor (because this could be our EventThread, and you can't join
     //on yourself).
@@ -124,26 +124,6 @@ void Connection::disconnectSendAll(int waitTime) {
     ps->waitToSendAll(waitTime);
     disconnect();
   }
-}
-
-//##ModelId=3BB4208C0104
-void Connection::onDisconnect() {
-  eventListener->onDisconnect();
-}
-
-//##ModelId=3C70672B031B
-void Connection::onExit() {
-  eventListener->onExit();
-}
-
-//##ModelId=3B0753810085
-void Connection::onFailure(const Error& error) {
-  eventListener->onFailure(error);
-}
-
-//##ModelId=3BB4208C01E0
-void Connection::onError(const Error& error) {
-  eventListener->onError(error);
 }
 
 //##ModelId=3B07538100AC
@@ -221,7 +201,7 @@ void Connection::onReceive(bool reliable) {
 void Connection::processError(const Error& error) {
   switch(error.getCode()) {
   case Error::UnknownPacket:
-    onError(error);
+    eventListener->onError(error);
     break;
   default:
     //The EventThread will call disconnect.  This will prevent a deadlock
@@ -232,7 +212,7 @@ void Connection::processError(const Error& error) {
     unreg(true, true);
     //We call onFailure after unreg because a deadlock will occur if the
     //EventThread tries to disconnect before we unreg.
-    onFailure(error);
+    eventListener->onFailure(error);
     break;
   }
 }

@@ -170,18 +170,6 @@ protected:
   EventThread* eventListener;
 
   //For information about events, see the ConnectionListener class.
-  //##ModelId=3BB4208C0104
-  void onDisconnect();
-
-  //##ModelId=3C70672B031B
-  void onExit();
-
-  //##ModelId=3B0753810085
-  void onFailure(const Error& error);
-
-  //##ModelId=3BB4208C01E0
-  void onError(const Error& error);
-
   //##ModelId=3B07538100AC
   void onReceive();
 
@@ -272,6 +260,12 @@ private:
   };
 
   /**
+   * Make Listener a friend so it can call our onRecieve(bool)
+   * event, which will properly parse the packets.
+   */
+  friend class Listener;
+
+  /**
    * Used to keep some functions thread-safe.
    */
   //##ModelId=3BC3B98001C3
@@ -279,12 +273,6 @@ private:
   //Used for reg and unreg functions.
   //##ModelId=3C46133F02D5
   Mutex regSync;
-
-  /**
-   * Make Listener a friend so it can call our onRecieve(bool)
-   * event, which will properly parse the packets.
-   */
-  friend class Listener;
 
   //Possible ReceiveEventListeners that may or may not exist, but if they do
   //we need to kill them on exit.
