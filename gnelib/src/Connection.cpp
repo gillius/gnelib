@@ -32,7 +32,8 @@ static const std::string FailureStrings[] = {
 };
 
 //##ModelId=3AE3591A0186
-Connection::Connection(int outRate, int inRate, std::string address) {
+Connection::Connection(int outRate, int inRate)
+: ps(outRate, inRate), connected(false), socket(NL_INVALID) {
 }
 
 //##ModelId=3AE3591A0187
@@ -46,7 +47,24 @@ PacketStream& Connection::stream() {
 
 //##ModelId=3AE4C9DD0280
 Connection::Stats Connection::getStats() const {
+  assert(socket != NL_INVALID);
   return Stats();
+}
+
+//##ModelId=3AFF798800C8
+NLaddress Connection::getLocalAddress() const {
+  assert(socket != NL_INVALID);
+  NLaddress ret;
+  nlGetLocalAddr(socket, &ret);
+  return ret;
+}
+
+//##ModelId=3AFF79880136
+NLaddress Connection::getRemoteAddress() const {
+  assert(socket != NL_INVALID);
+  NLaddress ret;
+  nlGetRemoteAddr(socket, &ret);
+  return ret;
 }
 
 //##ModelId=3AE4A9820366
@@ -56,6 +74,8 @@ bool Connection::isConnected() const {
 
 //##ModelId=3AE4A9700212
 void Connection::disconnect() {
+  assert(socket != NL_INVALID);
+  nlClose(socket);
 }
 
 //##ModelId=3AE4C7FC021C

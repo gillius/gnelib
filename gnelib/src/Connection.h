@@ -83,11 +83,9 @@ public:
    * @param outRate the maximum rate in bytes per second to send.
    * @param inRate the maximum rate we allow the sender to send to us in
    *        bytes per second.
-   * @param address the target address to connect to, as a hostname or in
-   *        xxx.xxx.xxx.xxx:ppppp format
    */
   //##ModelId=3AE3591A0186
-  Connection(int outRate, int inRate, std::string address);
+  Connection(int outRate, int inRate);
 
   //##ModelId=3AE3591A0187
   virtual ~Connection();
@@ -106,6 +104,18 @@ public:
    */
   //##ModelId=3AE4C9DD0280
   Stats getStats() const;
+
+  /**
+   * Returns the local address of this connection.
+   */
+  //##ModelId=3AFF798800C8
+  NLaddress getLocalAddress() const;
+
+  /**
+   * Returns the remote address of this connection, if it is connected.
+   */
+  //##ModelId=3AFF79880136
+  NLaddress getRemoteAddress() const;
 
   /**
    * Returns true if this Connection is active and ready to send/recieve.
@@ -157,16 +167,17 @@ public:
   //##ModelId=3AE4C8F501CC
   virtual void onDoneWriting();
 
-private:
+protected:
+  //##ModelId=3AE4E2340334
+  NLsocket socket;
 
+private:
   //##ModelId=3AE44E3302DA
   PacketStream ps;
 
   //##ModelId=3AE4A97A038E
   bool connected;
 
-  //##ModelId=3AE4E2340334
-  NLsocket socket;
 };
 
 #endif /* CONNECTION_H_INCLUDED_C51DC478 */
