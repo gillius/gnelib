@@ -31,6 +31,8 @@ using namespace GNE;
 using namespace GNE::PacketParser;
 using namespace GNE::Console;
 
+const int TIMEOUT = 2000;
+
 void errorExit(const char* error);
 int getPort(const char* prompt);
 void doServer(int outRate, int inRate, int port);
@@ -60,6 +62,13 @@ public:
 
   void onReceive() {
     receivePackets();
+  }
+
+  void onTimeout() {
+    //The timeout is called when nothing has been received for our specified
+    //timeout, or since the last onTimeout event.
+    gout << "A connection is active and no message received or timeout in "
+         << "the last " << TIMEOUT << " ms." << endl;
   }
 
   void onFailure(const Error& error) {
@@ -118,6 +127,7 @@ public:
 
   void getNewConnectionParams(ConnectionParams& params) {
     params.setListener(new PingTest());
+    params.setTimeout(TIMEOUT);
   }
 
 private:
@@ -213,6 +223,7 @@ void doClient(int outRate, int inRate, int port) {
   ConnectionParams params(new PingTest());
   params.setOutRate(outRate);
   params.setInRate(inRate);
+  params.setTimeout(TIMEOUT);
   ClientConnection* client = new ClientConnection();
   if (client->open(address, params))
     errorExit("Cannot open client socket.");
