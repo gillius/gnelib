@@ -28,7 +28,9 @@ namespace PacketParser {
 
 static Mutex mapSync;
 
-static std::map<NLubyte, Packet* (*)()> packets;
+//Originally this was a map, but this array is only 2k, and its faster and
+// easier to use a static array in this case.
+static Packet* (*packets[256])();
 
 /**
  * \todo GNE authors -- don't forget to add additional packets to this
@@ -36,15 +38,19 @@ static std::map<NLubyte, Packet* (*)()> packets;
  */
 //This is a function defined only in GNE.cpp, as this is an internal init
 // function.  The additions are hardcoded so registerPacket can do the proper
-// asserts for the user's packets.
+// asserts for the user's packets.  This function must also be called to
+// properly init the parser.
 void registerGNEPackets() {
+  for (int c=0; c<256; c++) {
+    packets[c] = NULL;
+  }
   packets[0] = Packet::create;
 }
 
 void registerPacket(NLubyte id, Packet* (*createFunc)()) {
   assert(id >= MIN_USER_ID && id <= MAX_USER_ID);
   mapSync.acquire();
-  assert(packets.find(id) == packets.end());
+  assert(packets[id] == NULL);
   packets[id] = createFunc;
   mapSync.release();
 }
@@ -63,21 +69,21 @@ Packet* parseNextPacket(bool& endOfPackets, RawPacket& raw) {
   }
 
   //Check for packet registration, parsing if it is registered.
-  Packet* ret = NULL;
+  Packet* (*func)() = NULL;
 
   mapSync.acquire();
-  std::map<NLubyte, Packet* (*)()>::iterator loc = packets.find(nextId);
-  if (loc != packets.end()) {
-    ret = ((*loc).second)();
-  }
+  func = packets[nextId];
   mapSync.release();
 
   //This section is split off to keep the above critial section small as
   //many threads will be using this function, so we use this second if to
   //allow for better concurrency.
-  if (ret)
+  if (func) {
+    Packet* ret = func();
     ret->readPacket(raw);
-  return ret;
+    return ret;
+  }
+  return NULL;
 }
 
 }
