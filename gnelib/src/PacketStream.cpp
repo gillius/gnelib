@@ -163,7 +163,7 @@ void PacketStream::run() {
       RawPacket raw;
       next->packet->writePacket(raw);
       raw << PacketParser::END_OF_PACKET;
-      if (owner.sockets.rawWrite(next->reliable, (NLbyte*)raw.getData(), raw.getPosition()) == NL_INVALID) {
+      if (owner.sockets.rawWrite(next->reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
         owner.processError(Error::Write);
       }
       delete next->packet;

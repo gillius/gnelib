@@ -92,7 +92,7 @@ public:
    * @param bufSize the size of buf.
    */
   //##ModelId=3B6B302400CA
-  int rawRead(bool reliable, const NLbyte* buf, int bufSize) const;
+  int rawRead(bool reliable, const gbyte* buf, int bufSize) const;
 
   /**
    * Performs a low-level wrote on a socket.
@@ -101,7 +101,7 @@ public:
    * @param bufSize the size of data to be sent.
    */
   //##ModelId=3B6B302401D6
-  int rawWrite(bool reliable, const NLbyte* buf, int bufSize) const;
+  int rawWrite(bool reliable, const gbyte* buf, int bufSize) const;
 
   /**
    * The reliable socket.

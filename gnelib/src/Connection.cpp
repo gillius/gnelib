@@ -166,7 +166,7 @@ void Connection::finishedConnecting() {
 //##ModelId=3B07538100B0
 void Connection::onReceive(bool reliable) {
   //Create buffer into a RawPacket
-  NLbyte* buf = new NLbyte[RawPacket::RAW_PACKET_LEN];
+  gbyte* buf = new gbyte[RawPacket::RAW_PACKET_LEN];
   int temp = sockets.rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
   if (temp == NL_INVALID) {
     NLenum error = nlGetError();

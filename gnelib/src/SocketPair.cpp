@@ -102,7 +102,7 @@ ConnectionStats SocketPair::getStats(int reliable) const {
 }
 
 //##ModelId=3B6B302400CA
-int SocketPair::rawRead(bool reliable, const NLbyte* buf, int bufSize) const {
+int SocketPair::rawRead(bool reliable, const gbyte* buf, int bufSize) const {
   NLsocket act;
   if (reliable)
     act = r;
@@ -113,7 +113,7 @@ int SocketPair::rawRead(bool reliable, const NLbyte* buf, int bufSize) const {
 }
 
 //##ModelId=3B6B302401D6
-int SocketPair::rawWrite(bool reliable, const NLbyte* buf, int bufSize) const {
+int SocketPair::rawWrite(bool reliable, const gbyte* buf, int bufSize) const {
   NLsocket act;
   if (reliable)
     act = r;
