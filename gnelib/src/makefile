@@ -20,7 +20,7 @@ examples:
 	make -C ../examples
 
 install: $(ARC)
-	copy $< $(MINGDIR)\bin
+	copy $< $(MINGDIR)\lib
 	copy gnelib.h $(MINGDIR)\include
 
 clean:
