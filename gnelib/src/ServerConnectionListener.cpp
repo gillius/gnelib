@@ -184,12 +184,10 @@ void ServerConnectionListener::rawClose() {
 }
 
 void ServerConnectionListener::processOnListenFailure( const Error& error, const Address& from, const ConnectionListener::sptr& listener) {
-  //LockMutex lock( sync );
   onListenFailure( error, from, listener );
 }
 
 void ServerConnectionListener::processOnListenSuccess( const ConnectionListener::sptr& listener ) {
-  //LockMutex lock( sync );
   onListenSuccess( listener );
 }
 
