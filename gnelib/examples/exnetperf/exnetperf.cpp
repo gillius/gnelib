@@ -320,7 +320,7 @@ void doClient(int outRate, int inRate, int port) {
     errorExit("Cannot open client socket.");
 
   client->connect();
-  client->join();
+  client->waitForConnect();
 
   if (client->isConnected()) {
     

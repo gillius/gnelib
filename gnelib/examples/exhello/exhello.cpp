@@ -259,9 +259,7 @@ void doClient(int outRate, int inRate, int port) {
       errorExit("Cannot open client socket.");
     
     client->connect();
-    client->join();     //join on the connection thread
-    //if we did not call join, we would have called client.detach(false)
-    //instead for true async connections.
+    client->waitForConnect();
     
     //Check if our connection was successful.
     if (client->isConnected()) {
@@ -280,7 +278,7 @@ void doClient(int outRate, int inRate, int port) {
 
       //Wait a little for any responses.
       gout << "Waiting a couple of seconds for any responses..." << endl;
-      Thread::sleep(200);
+      Thread::sleep(2000);
       client->disconnectSendAll();      
     }
 

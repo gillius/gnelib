@@ -270,7 +270,7 @@ void doClient(int outRate, int inRate, int port) {
     errorExit("Cannot open client socket.");
 
   client->connect();
-  client->join();
+  client->waitForConnect();
 
   if (client->isConnected()) {
     gout << "Press a key to stop the testing. " << endl;

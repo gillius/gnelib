@@ -190,7 +190,7 @@ void doClient(int port) {
     errorExit("Unable to open ClientConnection.");
 
   client->connect();
-  client->join();
+  client->waitForConnect();
 
   if (client->isConnected()) {
     //Start the pingTimer to allow a ping meter
