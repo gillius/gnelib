@@ -115,6 +115,7 @@ private:
   /**
    * Address used only while connecting, then unused afterwards.
    */
+  NLaddress address;
 };
 
 }
