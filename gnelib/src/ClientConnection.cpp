@@ -22,7 +22,7 @@
 
 //##ModelId=3AE59FAB0000
 ClientConnection::ClientConnection(int outRate, int inRate, std::string address) 
-: Connection(outRate, inRate, address) {
+: Connection(outRate, inRate) {
 }
 
 //##ModelId=3AE59FAB003C
@@ -33,6 +33,9 @@ ClientConnection::~ClientConnection() {
 void ClientConnection::run() {
 }
 
+/**
+ * \todo time sync with server
+ */
 //##ModelId=3AE59FD4019A
 void ClientConnection::connect() {
 }

@@ -54,8 +54,6 @@ public:
   /**
    * Event triggered when a new connection has been negotiated and error
    * checked.
-   * Note you must call this function explicity from your overridden
-   * function FIRST so the underlying functions recieve this event.
    * @param newConn the new Connection created.  You are responsible for
    *                deallocating this new Connection.
    */
