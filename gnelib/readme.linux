@@ -13,8 +13,11 @@ console I/O.
 
 1. HawkNL
 
-You will need HawkNL 1.4 final or a later version to use GNE.
+You will need HawkNL 1.42 final or a later version to use GNE.
 (http://www.hawksoft.com/)
+HawkNL 1.4 will work but a bug in that version causes no stats to be reported
+(as in exnetperf), but if you are not using stats gathering then you don't
+have to upgrade.
 
 2. About pthreads and Linux
 

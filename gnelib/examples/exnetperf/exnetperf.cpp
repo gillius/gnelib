@@ -30,7 +30,7 @@
  */
 
 #include "../../include/gnelib.h"
-#include "rndalgor.cpp"
+#include "rndalgor.h"
 #include <iostream>
 #include "StatsDisplay.h" //Our helper class for displaying the stats.
 
@@ -68,7 +68,7 @@ private:
 };
 
 static StatsDisplay* sDisplay;
-static Randomizer random;
+static Randomizer rng;
 
 //The PerfTester class works on both the client and the server side.
 class PerfTester : public ConnectionListener {
@@ -136,7 +136,7 @@ public:
     //We pick a range of 2 to 100 because that is the typical GNE packet
     //size in game.  GNE is meant to combine the packets to optimize
     //bandwith.
-    //int packetSize = random.getNum() % 48 + 2;
+    //int packetSize = rng.getNum() % 48 + 2;
 
     //Big packet test, to represent GNE transmitting files or initial game
     //information.
@@ -145,7 +145,7 @@ public:
     //Create a packet with random data
     CustomPacket temp;
     for (int c = 0; c < packetSize; c++)
-      temp.getData() << random.getNum();
+      temp.getData() << rng.getNum();
 
     conn->stream().writePacket(temp, true);
     packetsOut++;

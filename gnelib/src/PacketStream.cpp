@@ -42,9 +42,9 @@ PacketStream::~PacketStream() {
   //Clear out our queues.
   PacketStreamData* outQ = NULL;
   Packet* inQ = NULL;
-  while (outQ = getNextPacketToSend())
+  while ((outQ = getNextPacketToSend()) != NULL)
     delete outQ;
-  while (inQ = getNextPacket())
+  while ((inQ = getNextPacket()) != NULL)
     delete inQ;
 
   gnedbgo(5, "destroyed");
