@@ -116,16 +116,25 @@ bool Time::operator >= (const Time& rhs) const {
 }
 
 Time Time::operator+(int rhs) const {
-  return Time(sec, microsec + rhs);
+  //written this way to avoid overflow.
+  Time ret( *this );
+  ret += rhs;
+  return ret;
 }
 
 Time& Time::operator+=(int rhs) {
-  microsec += rhs;
+  //We have to deal with overflows.  This is a little strange, but it lets me
+  //reuse the code in normalize.
+  int old_microsec = microsec;
+  microsec = rhs;
+  normalize();
+  microsec += old_microsec;
   normalize();
   return *this;
 }
 
 Time& Time::operator+=(const Time& rhs) {
+  //can't have overflow here
   microsec += rhs.microsec;
   sec += rhs.sec;
   normalize();
@@ -140,11 +149,25 @@ Time Time::operator-(const Time& rhs) const {
   return Time(sec - rhs.sec, microsec - rhs.microsec);
 }
 
-Time& Time::operator*=(int rhs) {
+void Time::doMultiply( int rhs ) {
   convert();
+
   microsec *= rhs;
   sec *= rhs;
   normalize();
+}
+
+Time& Time::operator*=(int rhs) {
+  if ( rhs < -2147 ) {
+    doMultiply( -2147 );
+    rhs /= -2147;
+  }
+  while ( rhs > 2147 ) {
+    doMultiply( 2147 );
+    rhs /= 2147;
+  }
+  doMultiply( rhs );
+
   return *this;
 }
 
@@ -173,8 +196,9 @@ void Time::normalize() {
     sec += (microsec / 1000000);
     microsec = microsec % 1000000;
   } else while (microsec < 0) {
-    sec--;
-    microsec += 1000000;
+    sec += microsec / 1000000 - 1;
+    microsec *= -1;
+    microsec = 1000000 - (microsec % 1000000);
   }
 }
 

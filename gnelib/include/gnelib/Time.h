@@ -205,6 +205,11 @@ protected:
   void convert();
 
 private:
+  /**
+   * Performs the operation *= for numbers [-2147, 2147].
+   */
+  void doMultiply( int rhs );
+
   int sec;
 
   int microsec;
