@@ -56,8 +56,9 @@ int main() {
     cout << "Unable to initialize GNE" << endl;
     exit(2);
   }
-  setUserVersion(1); //Sets our user protocol version number, used in
-                     //the connection process by GNE to version check.
+
+  setGameInformation("GNE Pong", 1);
+
   if (initConsole(atexit)) {
     cout << "Unable to initialize GNE Console" << endl;
     exit(3);

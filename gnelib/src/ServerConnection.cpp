@@ -53,6 +53,7 @@ public:
 
 //##ModelId=3B075381027A
 ServerConnection::ServerConnection(int outRate, int inRate, 
+                                   bool allowUnreliable,
                                    ConnectionListener* listener, 
                                    NLsocket rsocket2, 
                                    ServerConnectionListener* creator)
@@ -62,6 +63,7 @@ ServerConnection::ServerConnection(int outRate, int inRate,
   params = new ServerConnectionParams;
   params->outRate = outRate;
   params->inRate = inRate;
+  params->unrel = allowUnreliable;
   params->creator = creator;
   params->doJoin = true;
 }
@@ -172,7 +174,7 @@ void ServerConnection::doHandshake() throw (Error) {
     gnedbgo(2, "Unreliable requested.  Getting unrel info.");
     getUnreliableInfo();
   } else {
-    gnedbgo(2, "Unreliable connection not requested.");
+    gnedbgo(2, "Unreliable connection not requested or refused.");
   }
 }
 
@@ -206,7 +208,8 @@ void ServerConnection::getCRP() throw (Error) {
 
   gbool unreliable;
   crp >> unreliable;
-  params->unrel = (unreliable != 0);
+  //We use the unreliable connection only if both sides allow it.
+  params->unrel = (unreliable && params->unrel);
 
   //Now that we know the versions are OK, make the PacketStream
   ps = new PacketStream(params->outRate, maxOutRate, *this);
@@ -236,10 +239,13 @@ void ServerConnection::sendCAP() throw (Error) {
   cap << gTrue;
   cap << params->inRate;
   if (params->unrel) {
-    //If the client requested it, open an unreliable port and send the port
-    //number to the client.
+    //If the client requested it and we allowed it, open an unreliable port
+    //and send the port number to the client.
     sockets.u = nlOpen(0, NL_UNRELIABLE);
-    cap << sockets.getLocalAddress(false).getPort();
+    cap << (gint32)sockets.getLocalAddress(false).getPort();
+  } else {
+    //Send -1 to tell the client there will be no unreliable port
+    cap << (gint32)-1;
   }
 
   int check = sockets.rawWrite(true, cap.getData(), (NLint)cap.getPosition());

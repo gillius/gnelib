@@ -110,7 +110,7 @@ protected:
    * new connection.  The three parameters passed should be modified to give
    * the new connection's flow control parameters and listener.
    *
-   * The third parameter should be set to the initial event listener for the
+   * The last parameter should be set to the initial event listener for the
    * ServerConnection that is being created.  This could be an entirely new
    * ConnectionListener or an already existing one, it doesn't matter.  The
    * returned listener cannot be NULL, since onNewConn must be called or a
@@ -127,9 +127,16 @@ protected:
    * See PacketStream::PacketStream for more info about inRate and outRate.
    * @param inRate the maximum rate we will accept.
    * @param outRate the maximum rate of data we are able/willing to send.
+   * @param wantUnreliable set to true if you want to have an unreliable data
+   *   socket.  If either this function or the client refuses the unreliable
+   *   socket, then it will not be created, and any data marked to be sent
+   *   unreliably will instead be sent reliably.  You want want to disallow
+   *   this if you are not using unreliable data, or your firewall/gateway
+   *   makes UDP or IPX communication difficult or impossible.
    */
   //##ModelId=3BCFAE5A0064
-  virtual void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) = 0;
+  virtual void getNewConnectionParams(int& inRate, int& outRate,
+    bool& allowUnreliable, ConnectionListener*& listener) = 0;
 
 private:
   //This is simply so that ServerConnection can call onListenFailure when it fails.

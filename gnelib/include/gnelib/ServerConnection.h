@@ -39,20 +39,23 @@ class Error;
 class ServerConnection : public Connection, public Thread {
 public:
   /**
-   * Intializes this class.
-   * @see Connection#Connection(ConnectionListener*)
+   * Intializes this class.  Note that you won't create a ServerConnection
+   * directly.  The ServerConnectionListener does that for you.
+   * @see ServerConnectionListener
    * @param outRate the maximum rate in bytes per second to send.  If this is
    *        0, then the rate is unlimited.
    * @param inRate the maximum rate we allow the sender to send to us in
    *        bytes per second.  If this is 0, then the requested
    *        incoming rate has no bounds.
+   * @param allowUnreliable if true, allows unreliable sockets.
    * @param rsocket2 the reliable socket received from the accept command.
    * @param creator the ServerConnectionListener that created us, so that we
    *                may call its onListenFailure event.
    */
   //##ModelId=3B075381027A
-  ServerConnection(int outRate, int inRate, ConnectionListener* listener, 
-                   NLsocket rsocket2, ServerConnectionListener* creator);
+  ServerConnection(int outRate, int inRate, bool allowUnreliable,
+                   ConnectionListener* listener, NLsocket rsocket2,
+                   ServerConnectionListener* creator);
 
   /**
    * Destructs this ServerConnection object.  The user need not worry about

@@ -66,12 +66,18 @@ public:
   void onConnect(SyncConnection& conn2) throw (Error) {
     conn = conn2.getConnection();
     mprintf("Connection to server successful.\n");
-    mprintf("  From us at %s/TCP to client at %s/TCP.\n",
+    mprintf("  From us at %s/TCP to server at %s/TCP.\n",
       conn->getLocalAddress(true).toString().c_str(),
       conn->getRemoteAddress(true).toString().c_str());
-    mprintf("  From us at %s/UDP to client at %s/UDP.\n",
-      conn->getLocalAddress(false).toString().c_str(),
-      conn->getRemoteAddress(false).toString().c_str());
+    //Test to see if we have an unreliable local address, and if so, report
+    //what the addresses are.
+    if (conn->getLocalAddress(false)) {
+      mprintf("  From us at %s/UDP to server at %s/UDP.\n",
+        conn->getLocalAddress(false).toString().c_str(),
+        conn->getRemoteAddress(false).toString().c_str());
+    } else {
+      mprintf("  Unreliable connection refused by server.\n");
+    }
   }
 
   void onReceive() {
@@ -145,9 +151,15 @@ public:
     mprintf("  From us at %s/TCP to client at %s/TCP.\n",
       conn->getLocalAddress(true).toString().c_str(),
       conn->getRemoteAddress(true).toString().c_str());
-    mprintf("  From us at %s/UDP to client at %s/UDP.\n",
-      conn->getLocalAddress(false).toString().c_str(),
-      conn->getRemoteAddress(false).toString().c_str());
+    //Test to see if we have an unreliable local address, and if so, report
+    //what the addresses are.
+    if (conn->getLocalAddress(false)) {
+      mprintf("  From us at %s/UDP to client at %s/UDP.\n",
+        conn->getLocalAddress(false).toString().c_str(),
+        conn->getRemoteAddress(false).toString().c_str());
+    } else {
+      mprintf("  Unreliable connection refused by client.\n");
+    }
   }
 
   void onReceive() {
@@ -191,9 +203,15 @@ private:
   bool received;
 };
 
-void OurListener::getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
+void OurListener::getNewConnectionParams(int& inRate, int& outRate,
+                                         bool& allowUnreliable,
+                                         ConnectionListener*& listener) {
   inRate = iRate;
   outRate = oRate;
+  //We want to also listen for hellos from unreliable channels.  Note that
+  //exsynchello will NOT request unreliable, but that's OK -- if no
+  //unreliable socket exists, unreliable data will be sent reliable.
+  allowUnreliable = true;
   listener = new OurServer();
 }
 
@@ -236,12 +254,13 @@ void doClient(int outRate, int inRate, int port) {
       HelloPacket message("Hello, server!  I'm the event-driven client!");
       client->stream().writePacket(message, true);
       
-      //This line would also send the packet over the unreliable connection,
-      //were it uncommented, but it is left commented to be compatable with
-      //exsynchello.  SyncConnections are not for use with unreliable
-      //connections.  Uncommenting this line will make this program then work
-      //only with another exhello.
-      //client->stream().writePacket(message, false);
+      //This sends another hello over the unreliable connection.  exsynchello
+      //can't use unreliable connections because it uses SyncConnection, but
+      //it chose to refuse an unreliable connection when we connected.  When
+      //no unreliable connection exists, unreliable packets are sent reliably
+      //so doing this will send it over UDP (or IPX) when connecting to an
+      //exhello server, but over TCP (or SPX) when connecting to exsynchello.
+      client->stream().writePacket(message, false);
 
       //Wait a little for any responses.
       gout << "Waiting a couple of seconds for any responses..." << endl;

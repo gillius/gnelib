@@ -74,15 +74,19 @@ void ServerConnectionListener::onReceive() {
   NLsocket sock = nlAcceptConnection(socket);
   if (sock != NL_INVALID) {
     int inRate, outRate;
+    bool allowUnreliable;
     ConnectionListener* listener;
-    getNewConnectionParams(inRate, outRate, listener);
+    getNewConnectionParams(inRate, outRate, allowUnreliable, listener);
 
-    ServerConnection* newConn = new ServerConnection(outRate, inRate, listener, sock, this);
-    gnedbgo2(4, "Spawning a new ServerConnection %x on socket %i", newConn, sock);
+    ServerConnection* newConn = new ServerConnection(outRate, inRate,
+      allowUnreliable, listener, sock, this);
+    gnedbgo2(4, "Spawning a new ServerConnection %x on socket %i",
+      newConn, sock);
     newConn->start();
   } else {
     Error err = Error::createLowLevelError();
-    gnedbgo1(1, "Listening failure (accept failed): %s", err.toString().c_str());
+    gnedbgo1(1, "Listening failure (accept failed): %s",
+      err.toString().c_str());
     onListenFailure(err, NULL, NULL);
   }
 }

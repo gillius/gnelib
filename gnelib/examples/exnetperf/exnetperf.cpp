@@ -185,9 +185,12 @@ public:
     delete listener;
   }
 
-  void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
+  void getNewConnectionParams(int& inRate, int& outRate,
+                              bool& allowUnreliable,
+                              ConnectionListener*& listener) {
     inRate = iRate;
     outRate = oRate;
+    allowUnreliable = true;
     listener = new PerfTester();
   }
 

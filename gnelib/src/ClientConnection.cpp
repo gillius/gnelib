@@ -260,7 +260,10 @@ Address ClientConnection::getCAP() throw (Error) {
       ret.setPort((int)portNum);
 
     } else {
-      params->unrel = false;
+      if (params->unrel) {
+        gnedbgo(2, "The server refused our request for an unreliable connection.");
+        params->unrel = false;
+      }
     }
 
     return ret;

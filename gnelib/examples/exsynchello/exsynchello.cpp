@@ -58,17 +58,23 @@ public:
     ourConn = conn.getConnection();
     gout << acquire << "Connection received from "
          << conn.getConnection()->getRemoteAddress(true)
-         << "; waiting for message..." << endl << release;
+         << "; waiting for messages..." << endl << release;
 
     try {
-      HelloPacket message;
-      conn >> message;
-      received = true;
-      gout << acquire << "Got message: \"" << message.getMessage() << "\""
-           << endl << release;
-      
-      HelloPacket response("Hello, client!  I'm the syncronous server!");
-      conn << response;
+      //We loop this twice because we will be getting two requests, because
+      //exhello sends two packets to test reliable and unreliable testing,
+      //but since we refused unreliable connections in OurListener, we will
+      //get it reliably and on the SyncConnection.
+      for (int c=0; c<2; ++c) {
+        HelloPacket message;
+        conn >> message;
+        received = true;
+        gout << acquire << "Got message: \"" << message.getMessage() << "\""
+          << endl << release;
+        
+        HelloPacket response("Hello, client!  I'm the syncronous server!");
+        conn << response;
+      }
     } catch (Error e) {
       gout << acquire;
       gout << "An error occured during communications." << endl;
@@ -84,10 +90,17 @@ private:
   bool received;
 };
 
-void OurListener::getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
-    inRate = 3200;
-    outRate = 3200;
-    listener = new OurServer();
+void OurListener::getNewConnectionParams(int& inRate, int& outRate,
+                                         bool& allowUnreliable,
+                                         ConnectionListener*& listener) {
+  inRate = iRate;
+  outRate = oRate;
+  //We are only using sync connections, so we don't need the unreliable
+  //socket.  If anyone wants to send unreliable data to us, it will come
+  //through the reliable channel instead, so this is OK even though
+  //exhello will try to request an unreliable connection.
+  allowUnreliable = false;
+  listener = new OurServer();
 }
 
 int main(int argc, char* argv[]) {
@@ -111,7 +124,7 @@ void doClient(int outRate, int inRate, int port) {
 
   //Uncomment the loop for a stress test.
   //for (int i=0; i<100; ++i) {
-    //We use pointers and new here only to allow the possibility for a for
+    //We use pointers and new here only to allow the possibility for the for
     //loop.  Without the loop there is no reason why these cannot be on the
     //stack (auto variables).
     ClientConnection* clientConn
@@ -121,15 +134,18 @@ void doClient(int outRate, int inRate, int port) {
       //Since only one client can exist, acquire and release is not needed on
       //gout.
       gout << "Opening client socket." << endl;
-      client.open(address);
+      client.open(address, 0, 0, 0, false);
       gout << "Attempting to connect." << endl;
       client.connect();
       
-      gout << "Connection completed, sending message to server." << endl;
+      gout << "Connection completed, sending messages to server." << endl;
       HelloPacket message("Hello, server!  I'm the syncronous client!");
       client << message;
+      client << message;
       
-      gout << "Waiting for message from server." << endl;
+      gout << "Waiting for messages back from server." << endl;
+      client >> message;
+      gout << "Received \"" << message.getMessage() << "\" from the server." << endl;
       client >> message;
       gout << "Received \"" << message.getMessage() << "\" from the server." << endl;
       

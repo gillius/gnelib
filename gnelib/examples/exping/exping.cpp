@@ -116,8 +116,12 @@ public:
     delete listener;
   }
 
-  void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
+  void getNewConnectionParams(int& inRate, int& outRate,
+                              bool& allowUnreliable,
+                              ConnectionListener*& listener) {
     inRate = outRate = 0; //0 meaning no limits on rates.
+    //We don't use unreliable transfers in this program.
+    allowUnreliable = false;
     listener = new PingTest();
   }
 
@@ -145,8 +149,9 @@ int main() {
     cout << "Unable to initialize GNE" << endl;
     exit(2);
   }
-  setUserVersion(1); //Sets our user protocol version number, used in
-                     //the connection process by GNE to version check.
+
+  setGameInformation("GNE exping", 1);
+
   if (initConsole(atexit)) {
     cout << "Unable to initialize GNE Console" << endl;
     exit(3);
@@ -211,7 +216,7 @@ void doClient(int outRate, int inRate, int port) {
 
   //We allocate it on the heap because PingTest deletes this connection.
   ClientConnection* client = new ClientConnection(new PingTest());
-  if (client->open(address, outRate, inRate))
+  if (client->open(address, outRate, inRate, 0, false))
     errorExit("Cannot open client socket.");
 
   client->connect();

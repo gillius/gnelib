@@ -216,10 +216,13 @@ public:
     delete listener;
   }
 
-  void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
+  void getNewConnectionParams(int& inRate, int& outRate,
+                              bool& allowUnreliable,
+                              ConnectionListener*& listener) {
     sync.acquire();
 
     inRate = outRate = 0;
+    allowUnreliable = false;
     if (player || !accept) {
       listener = new RefuseClient();
     } else {
