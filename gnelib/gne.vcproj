@@ -26,6 +26,7 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)/include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
@@ -66,6 +67,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)/include&quot;"
 				PreprocessorDefinitions="WIN32,_DEBUG,_LIB"
 				BasicRuntimeChecks="3"
 				SmallerTypeCheck="FALSE"
@@ -109,6 +111,12 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
 				RelativePath=".\src\Address.cpp">
+			</File>
+			<File
+				RelativePath="ChannelPacket.cpp">
+			</File>
+			<File
+				RelativePath="src\ChannelProvider.cpp">
 			</File>
 			<File
 				RelativePath=".\src\ClientConnection.cpp">
@@ -229,7 +237,22 @@
 				RelativePath=".\include\gnelib\Address.h">
 			</File>
 			<File
+				RelativePath="include\gnelib\ChannelPacket.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ChannelProvider.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\Client.h">
+			</File>
+			<File
 				RelativePath=".\include\gnelib\ClientConnection.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ClientListener.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ClientPeer.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ConditionVariable.h">
@@ -286,6 +309,9 @@
 				RelativePath=".\include\gnelib\GNEDebug.h">
 			</File>
 			<File
+				RelativePath="include\gnelib\HighLevelListener.h">
+			</File>
+			<File
 				RelativePath=".\include\gnelib\ListServerConnection.h">
 			</File>
 			<File
@@ -293,6 +319,9 @@
 			</File>
 			<File
 				RelativePath="include\gnelib\MutexData.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\OldConsoleStreambuf.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\Packet.h">
@@ -310,6 +339,9 @@
 				RelativePath=".\include\gnelib\PingPacket.h">
 			</File>
 			<File
+				RelativePath="include\gnelib\PlayerList.h">
+			</File>
+			<File
 				RelativePath=".\include\gnelib\RateAdjustPacket.h">
 			</File>
 			<File
@@ -319,10 +351,19 @@
 				RelativePath=".\include\gnelib\ReceiveEventListener.h">
 			</File>
 			<File
+				RelativePath="include\gnelib\Server.h">
+			</File>
+			<File
 				RelativePath=".\include\gnelib\ServerConnection.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ServerConnectionListener.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ServerPlayer.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ServerPlayerListener.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\SocketPair.h">
