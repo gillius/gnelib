@@ -16,13 +16,20 @@ EXAMPLE_LIBS         = $(LIB_STATIC) -lNL -lwsock32 -lpthreadGC
 
 LDFLAGS              = -mthreads
 
-CPPFLAGS             = -Wall -O3 -s
+DEBUGFLAGS           = -g -D_DEBUG -W -Wall
+OPTIMIZEFLAGS        = -W -Wall -O3 -s
+
+ifdef DEBUGMODE
+CPPFLAGS             = $(DEBUGFLAGS)
+CFLAGS               = $(DEBUGFLAGS)
+else
+CPPFLAGS             = $(OPTIMIZEFLAGS)
+CFLAGS               = $(OPTIMIZEFLAGS)
+endif
 
 ifndef NO_OLD_CPP
 CPPFLAGS            += -DOLD_CPP
 endif
-
-CFLAGS               = -Wall -O3 -s
 
 EXAMPLE_CPP          = $(wildcard examples/*/*.cpp)
 

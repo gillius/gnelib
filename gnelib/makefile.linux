@@ -12,8 +12,16 @@ RMDIR                = rm -rf
 
 EXAMPLE_LIBS         = $(LIB_STATIC) -lNL -lncurses -lpthread
 
-CPPFLAGS             = -Wall -O3 -s
-CFLAGS               = -Wall -O3 -s
+DEBUGFLAGS           = -g -D_DEBUG -W -Wall
+OPTIMIZEFLAGS        = -W -Wall -O3 -s
+
+ifdef DEBUGMODE
+CPPFLAGS             = $(DEBUGFLAGS)
+CFLAGS               = $(DEBUGFLAGS)
+else
+CPPFLAGS             = $(OPTIMIZEFLAGS)
+CFLAGS               = $(OPTIMIZEFLAGS)
+endif
 
 ifndef NO_OLD_CPP
 CPPFLAGS            += -DOLD_CPP
