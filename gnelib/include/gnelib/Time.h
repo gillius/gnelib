@@ -43,7 +43,10 @@ public:
   Time();
 
   /**
-   * Initalizes this class with the time specified.
+   * Initalizes this class with the time specified.  The given time need not
+   * be normalized as this will be done automatically.  For example it is
+   * acceptable to pass in 0 seconds and 2,000,000 microseconds and it will
+   * be normalized to 2 seconds.
    */
   //##ModelId=3B07538103B0
   Time(int seconds, int microseconds);

@@ -36,11 +36,7 @@ class SyncConnection;
 
 /**
  * A class resembling any type of connection to a remote computer.  A
- * connection also manages flow control.  When a new Connection instance is
- * constructed the passed inRate and outRate parameters set a maximum
- * bandwith usage for either direction.  These values might stay the same or
- * reduce after a connection to the remote machine is made, based on that
- * machine's requested maximums.
+ * connection also manages flow control through its PacketStream.
  *
  * When you create a new Connection, you will want to register a
  * ConnectionListener for it so you can receive its events.
