@@ -76,8 +76,14 @@ protected:
   void flush_output();
 
 #if (_MSC_VER == 1310 )
+  //While still technically correct and valid, it's not quite as robust as the
+  //next line because this makes the assumption on what traits_type is defined
+  //as.
   int_type overflow(int_type meta = std::char_traits<char>::eof());
 #else
+  //For some reason, in MSVC.NET 2003 alone (not 2002), this line generates
+  //the following error:
+  //error C2653: 'char_traits<char>' : is not a class or namespace name
   int_type overflow(int_type meta = traits_type::eof());
 #endif
 
