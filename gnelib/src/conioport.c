@@ -17,7 +17,7 @@ void conio_init (int* enterKey, int* backspaceKey) {
   *backspaceKey = 8;
   system("cls");
 }
-void conio_exit () {}
+void conio_exit () { system("cls"); }
 int conio_kbhit () { return kbhit(); }
 int conio_getch () { return getch(); }
 
@@ -40,8 +40,8 @@ void conio_getxy(int* x, int* y) {
 void conio_getsize(int* x, int* y) {
   CONSOLE_SCREEN_BUFFER_INFO info;
   if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)) {
-    *x = info.dwSize.X;
-    *y = info.dwSize.Y;
+    *x = info.srWindow.Right + 1;
+    *y = info.srWindow.Bottom + 1;
   } else {
     *x = *y = -1;
   }
