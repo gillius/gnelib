@@ -1,3 +1,8 @@
+GNE 0.003 to 0.004
+  Created a new class, Error, that replaces the Connection::FailureType enum,
+    and allows the user some shortcuts and a better way to get a textual
+    description of the error.
+
 GNE 0.002 to 0.003
   Renamed the Time.h header file to TimeGne.h to resolve conflicts with the
     standard header file time.h.
