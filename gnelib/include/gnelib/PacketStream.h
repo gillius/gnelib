@@ -215,7 +215,12 @@ public:
   void setRates(int reqOutRate2, int maxInRate2);
 
   /**
-   * Blocks on this PacketStream until all packets have been sent.
+   * Blocks on this PacketStream until all packets have been sent.  Note that
+   * if you have set an active packet feeder, and it is constaly adding
+   * packets to the queue, this function is likely not to return until it
+   * times out, so you may want to communicate with that feeder somehow or
+   * turn off the feeder (by setting a NULL feeder) so more packets are not
+   * being continuously added.
    * @param waitTime the max amount of time in ms to wait for the outgoing
    *        packet queue to clear.
    */
