@@ -28,6 +28,10 @@
 Mutex Console::outSync;
 //##ModelId=3AF8ADDB0280
 bool Console::initialized = false;
+//##ModelId=3AFDB5190302
+const int Console::BACKSPACE = 8;
+//##ModelId=3AFDB5190226
+const int Console::ENTER = 13;
 
 //##ModelId=3AF8A1E2038E
 bool Console::init(int (*atexit_ptr)(void (*func)(void))) {
@@ -106,3 +110,34 @@ void Console::mlputchar(int x, int y, int ch) {
   outSync.release();
 }
 
+//##ModelId=3AFD8D7801A4
+int Console::lgetString(int x, int y, char* str, int maxlen) {
+  int currpos = 0;          //The next char to be typed
+  bool exit = false;
+  while (!exit) {
+    int ch = getch();
+    switch (ch) {
+    case ENTER:             //If user pressed RETURN
+      exit = true;
+      break;
+    case BACKSPACE:         //If backspace
+      currpos--;
+      if (currpos < 0)
+        currpos = 0;        //Hit the end
+      else
+        mlputchar(currpos+x, y, ' ');
+      break;
+    default:
+      currpos++;
+      if (currpos > maxlen) {
+        currpos = maxlen;   //Clip off at end
+      } else {
+        mlputchar(currpos-1+x, y, ch); //Display input
+        str[currpos-1] = (char)ch;     //update input string
+      }
+      break;
+    }
+    str[currpos] = '\0';
+  }
+  return currpos;
+}

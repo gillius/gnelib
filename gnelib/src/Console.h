@@ -27,7 +27,16 @@
  * Class for providing very basic console support, meant for use in the
  * example and test programs, and in console-only servers using GNE.  This
  * class's behavior is undefined when running in a Win32 application (not a
- * Win32 console) project.
+ * Win32 console) project.\n
+ * Functions that have m prefixed on them mean "multithreaded," because they
+ * are thread safe.  Functions with l prefixed on them mean "location,"
+ * because they perform their operations starting at the given coordinates
+ * rather than the current cursor location.  When one of these functions are
+ * called, the cursor is not returned to its original location (so you can't
+ * mix mprintf and mlprintf calls well).\n
+ * Note that the input functions are not thread-safe since there's only one
+ * keyboard to be used ;).  It is okay, however, to be using the console
+ * output functions at the same time you are using the input functions.
  */
 //##ModelId=3AF8A1A0033E
 class Console {
@@ -49,17 +58,20 @@ public:
 
   /**
    * Returns non-zero if a key is waiting in the buffer to be received by
-   * getch.
+   * getch.  You cannot use this call while an lgetstring is being processed.
    * @see getch
+   * @see lgetstring
    */
   //##ModelId=3AF8AADE038E
   static int kbhit();
 
   /**
    * Returns the next character in the input, blocking if no character is
-   * ready to be returned.
+   * ready to be returned.  You cannot use this call while an lgetstring
+   * is being processed.
    * @return the next character
    * @see kbhit
+   * @see lgetstring
    */
   //##ModelId=3AF8AADF0050
   static int getch();
@@ -90,6 +102,38 @@ public:
    */
   //##ModelId=3AFB705602B2
   static void mlputchar(int x, int y, int ch);
+
+  /**
+   * Gets input from the console.  This is a blocking call, because you
+   * cannot have multiple inputs at the same time, since there is no way for
+   * the user to choose which input to go to.  Also when you use this call,
+   * no other threads can be using kbhit or getch.  It is recommended that
+   * only one thread be in charge of input from the console.  It is okay,
+   * however, to be using the console output functions at the same time you
+   * are using the input functions.  When the user presses enter the input
+   * is complete.
+   * @param str a char* with size maxlen+1 where input will be stored.
+   * @param maxlen the maximum number of characters the user can input.
+   * @return the length of the string returned, from 0 <= x <= maxlen
+   * @see kbhit
+   * @see getch
+   */
+  //##ModelId=3AFD8D7801A4
+  static int lgetString(int x, int y, char* str, int maxlen);
+
+  /**
+   * The keycode the enter key gives from getch().
+   * @see getch
+   */
+  //##ModelId=3AFDB5190226
+  static const int ENTER;
+
+  /**
+   * The keycode the backspace key gives from getch().
+   * @see getch
+   */
+  //##ModelId=3AFDB5190302
+  static const int BACKSPACE;
 
 private:
   /**
