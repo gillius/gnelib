@@ -48,6 +48,8 @@ public:
    */
   explicit Packet(int id = 0);
 
+  Packet( const Packet& o );
+
   virtual ~Packet();
 
   /**
