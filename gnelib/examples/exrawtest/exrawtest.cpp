@@ -23,7 +23,7 @@
  * class is "hackish" ways.  The standard use of RawPackets is pretty trivial.
  */
 
-#include "../../src/gnelib.h"
+#include "../../include/gnelib.h"
 #include <iostream>
 
 using namespace std;

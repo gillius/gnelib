@@ -2,7 +2,7 @@
 #include <allegro.h>
 #include <winalleg.h>
 #include "../AllegroSample.h"
-#include "../../src/gnelib.h"
+#include "../../include/gnelib.h"
 
 const int BALLSNUM = 50;
 int NEWCOUNT = 0;

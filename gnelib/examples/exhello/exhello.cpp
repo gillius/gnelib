@@ -30,7 +30,7 @@
  * server.
  */
 
-#include "../../src/gnelib.h"
+#include "../../include/gnelib.h"
 #include <iostream>
 #include <cstring>
 #include <string>

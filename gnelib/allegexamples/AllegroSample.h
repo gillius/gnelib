@@ -1,6 +1,6 @@
 #include <allegro.h>
 #include <assert.h>
-#include "../src/gnelib.h"
+#include "../include/gnelib.h"
 
 class AllegroSample {
 public:	

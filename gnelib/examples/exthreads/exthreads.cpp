@@ -27,7 +27,7 @@
 //   to it so you can access/join it later.  When you join, access
 //   whatever data you want from it then delete it.
 
-#include "../../src/gnelib.h"
+#include "../../include/gnelib.h"
 
 #include <sys/timeb.h>
 #include <pthread.h>

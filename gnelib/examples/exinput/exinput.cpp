@@ -32,7 +32,7 @@
 // identically, meaning they aren't random.  So I generate some seed for each
 // star.
 
-#include "../../src/gnelib.h"
+#include "../../include/gnelib.h"
 #include <stdlib.h>
 #include <time.h>
 

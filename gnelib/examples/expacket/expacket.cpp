@@ -28,7 +28,7 @@
  * This example is mainly just for testing purposes of GNE.
  */
 
-#include "../../src/gnelib.h"
+#include "../../include/gnelib.h"
 #include <iostream>
 
 using namespace std;
