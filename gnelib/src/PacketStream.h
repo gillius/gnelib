@@ -108,6 +108,7 @@ public:
 	 * Overrides Thread::shutDown so that the PacketStream daemon thread will
 	 * be woken up since it might be waiting on a ConditionVariable.
 	 */
+  //##ModelId=3B8DC5D10096
 	void shutDown();
 
   /**
