@@ -2,6 +2,8 @@
 //belongs to George foot gfoot@users.sourceforge.net.  The Windows portion
 //of this code is public domain.
 
+#include <stdlib.h>
+
 #include "../include/gnelib/conioport.h"
 
 #ifdef WIN32
