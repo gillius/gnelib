@@ -24,10 +24,16 @@
  * This is an example to show the minimum code needed to connect and send
  * data, in this case, "Hello Server (or Client)!" to the other end of the
  * connection.  This program uses asyncronous event-driven methods.
+ *
  * Well... perhaps not the minimum.  Lots of errors can happen over network
  * connections that we have to handle for this program to properly execute
  * when conditions aren't perfectly ideal, like when we can't reach the
  * server.
+ *
+ * The good part is that once you get over a lot of the overhead needed to
+ * start a GNE program, that code can be used as a template for other GNE
+ * programs -- and additionally -- using more features of GNE and doing
+ * more will only require a little more code.
  */
 
 #include "../../include/gnelib.h"
@@ -236,6 +242,8 @@ void doClient(int outRate, int inRate, int port) {
   //for (int i=0; i <100; i++) {
     ConnectionParams params(new OurClient());
     params.setUnrel(true);
+    params.setOutRate(outRate);
+    params.setInRate(inRate);
     ClientConnection* client = new ClientConnection();
     if (client->open(address, params)) {
       delete client;
