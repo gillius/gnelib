@@ -99,6 +99,11 @@ Address ServerConnectionListener::getLocalAddress() const {
   return Address(ret);
 }
 
+//##ModelId=3C8435E6012D
+void ServerConnectionListener::onListenSuccess(ConnectionListener* listener) {
+  //The default behavior for this event is to do nothing.
+}
+
 //##ModelId=3B07538102D0
 ServerConnectionListener::ServerListener::ServerListener(ServerConnectionListener& listener)
 : conn(listener) {

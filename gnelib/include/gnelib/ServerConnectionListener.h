@@ -103,7 +103,28 @@ protected:
    *                 getNewConnectionParams was never called.
    */
   //##ModelId=3B075381030A
-  virtual void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) = 0;
+  virtual void onListenFailure(const Error& error, const Address& from,
+                               ConnectionListener* listener) = 0;
+
+  /**
+   * This is an optional event to catch which is called after
+   * ConnectionListener::onNewConn.  The default behavior for this event is
+   * to do nothing, but you may overload it to catch it.
+   *
+   * This method may block, but until it completes the connection will be
+   * marked as connecting and not as connected, and listener will not start
+   * to receive any events (besides the onNewConn it just got) until this
+   * function completes.
+   *
+   * See the expong example of a case where the onListenSuccess event can be
+   * useful, where the same implementation using only onNewConn would be
+   * harder to program and understand.
+   *
+   * @param listener The listener than you returned from
+   *                 getNewConnectionParams.
+   */
+  //##ModelId=3C8435E6012D
+  virtual void onListenSuccess(ConnectionListener* listener);
 
   /**
    * A new connection is starting, and now we want the parameters for this
