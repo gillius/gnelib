@@ -19,6 +19,9 @@
 
 #include "../../src/gnelib.h"
 
+using namespace GNE;
+using namespace Console;
+
 class TimeClass : public TimerCallback {
 public:
   TimeClass(int x2, int y2, std::string ourName)
@@ -30,7 +33,7 @@ public:
     Time currTime = Timer::getCurrentTime();
     Time diffTime = currTime - lastTime;
     lastTime = currTime;
-    Console::mlprintf(x, y, "(%i)Hello, I'm %s! change: %ius", callNum, name.c_str(), diffTime.getTotaluSec());
+    mlprintf(x, y, "(%i)Hello, I'm %s! change: %ius", callNum, name.c_str(), diffTime.getTotaluSec());
     callNum++;
   }
 
@@ -54,7 +57,7 @@ public:
   }
 
   void timerCallback() {
-    Console::mlprintf(x, y, "Count: %i", counter.getCount());
+    mlprintf(x, y, "Count: %i", counter.getCount());
   }
 
 private:
@@ -64,21 +67,21 @@ private:
 };
   
 int main() {
-  GNE::init(GNE::NO_NET, atexit);
-  Console::init(atexit);
-  Console::setTitle("GNE Timers Example");
+  initGNE(NO_NET, atexit);
+  initConsole(atexit);
+  setTitle("GNE Timers Example");
 
   //Doing some tests on Time class
-  Console::mprintf("Time class tests:\n");
+  mprintf("Time class tests:\n");
   Time t(0, 1000000);
-  Console::mprintf("%is, %ius\n", t.getSec(), t.getuSec());
+  mprintf("%is, %ius\n", t.getSec(), t.getuSec());
   t += 1000001; //add a little over one second
-  Console::mprintf("%is, %ius\n", t.getSec(), t.getuSec());
+  mprintf("%is, %ius\n", t.getSec(), t.getuSec());
   t.setSec(5);
-  Console::mprintf("%is, %ius\n", t.getSec(), t.getuSec());
+  mprintf("%is, %ius\n", t.getSec(), t.getuSec());
   t = t + Time(3, 5500000);
-  Console::mprintf("%is, %ius\n", t.getSec(), t.getuSec());
-  Console::mprintf("Timer class tests, press a key to quit:\n");
+  mprintf("%is, %ius\n", t.getSec(), t.getuSec());
+  mprintf("Timer class tests, press a key to quit:\n");
 
   //Create the timers, and pass true to allow our timer objects to
   //also destroy their callbacks when they die.
@@ -97,9 +100,9 @@ int main() {
   t4.startTimer();
   assert(t4.isRunning());
 
-  Console::getch(); //Wait for a keypress.
+  getch(); //Wait for a keypress.
 
-  Console::mlprintf(0, 14, "Shutting down timers, please wait...");
+  mlprintf(0, 14, "Shutting down timers, please wait...");
   t1.stopTimer();
   t2.stopTimer();
   t3.stopTimer();

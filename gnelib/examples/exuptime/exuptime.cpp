@@ -19,17 +19,20 @@
 
 #include "../../src/gnelib.h"
 
+using namespace GNE;
+using namespace GNE::Console;
+
 int main() {
-  GNE::init(GNE::NO_NET, atexit);
-  Console::init(atexit);
-  Console::setTitle("GNE Timer Example");
+  initGNE(NO_NET, atexit);
+  initConsole(atexit);
+  setTitle("GNE Timer Example");
   
-  Console::mprintf("The time in seconds, is:\n");
-  Console::mprintf("Time is from some arbitrary point in the past.\n");
-  Console::mprintf("In Windows, this is actually the system uptime, as it uses the rdtsc\n  instruction.");
-  while (!Console::kbhit()) {
+  mprintf("The time in seconds, is:\n");
+  mprintf("Time is from some arbitrary point in the past.\n");
+  mprintf("In Windows, this is actually the system uptime, as it uses the rdtsc\n  instruction.");
+  while (!kbhit()) {
     Time t = Timer::getCurrentTime();
-    Console::mlprintf(25, 0, "%i.%i  ", t.getSec(), t.getuSec());
+    mlprintf(25, 0, "%i.%i  ", t.getSec(), t.getuSec());
   }
 
   return 0;

@@ -21,6 +21,8 @@
  */
 
 #include "gneintern.h"
+
+namespace GNE {
 class ServerConnection;
 
 /**
@@ -28,19 +30,20 @@ class ServerConnection;
  * class.  Overload the create function to return a new copy of your custom
  * class.  You will eventually receive it through onNewConn.
  */
-//##ModelId=3B0175FC0078
+//##ModelId=3B0753800348
 class ServerConnectionCreator {
 public:
-  //##ModelId=3B0176250398
+  //##ModelId=3B0753810295
   virtual ~ServerConnectionCreator();
 
   /**
    * Overload this function to create your own ServerConnection child class.
    * The parameters should be used to initalize the ServerConnection.
    */
-  //##ModelId=3B0176470212
+  //##ModelId=3B0753810297
   virtual ServerConnection* create(int outRate, int inRate, NLsocket rsocket2) = 0;
 
 };
 
+}
 #endif /* SERVERCONNECTIONCREATOR_H_INCLUDED_C4FE3BD2 */

@@ -20,22 +20,24 @@
 #include "gneintern.h"
 #include "Counter.h"
 
-//##ModelId=3AE8693F0104
+namespace GNE {
+
+//##ModelId=3B07538100EB
 Counter::Counter() : count(0) {
 }
 
-//##ModelId=3AE8693F0140
+//##ModelId=3B07538100EC
 Counter::~Counter() {
 }
 
-//##ModelId=3AE8694203AC
+//##ModelId=3B07538100EE
 void Counter::timerCallback() {
   countSync.acquire();
   count++;
   countSync.release();
 }
 
-//##ModelId=3AED05900154
+//##ModelId=3B0753810118
 int Counter::getCount() {
   countSync.acquire();
   int ret = count;
@@ -43,10 +45,11 @@ int Counter::getCount() {
   return ret;
 }
 
-//##ModelId=3AED05960226
+//##ModelId=3B0753810119
 void Counter::setCount(int newCount) {
   countSync.acquire();
   count = newCount;
   countSync.release();
 }
 
+}

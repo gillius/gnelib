@@ -21,6 +21,8 @@
  */
 
 #include "gneintern.h"
+
+namespace GNE {
 class RawPacket;
 
 /**
@@ -31,7 +33,7 @@ class RawPacket;
  * virtual functions or the program will fail.\n
  * See the example expacket on how to properly derive from a Packet class.
  */
-//##ModelId=3AE450C3028A
+//##ModelId=3B075380030C
 class Packet {
 public:
   /**
@@ -43,22 +45,22 @@ public:
    * adds no data, but has a unique ID so it can be "recognized" easier.
    * @param id a number from 0 to 255.
    */
-  //##ModelId=3AE4D49C0168
+  //##ModelId=3B0753810151
   Packet(int id = 0);
 
-  //##ModelId=3AE4D49C019A
+  //##ModelId=3B0753810153
   virtual ~Packet();
 
   /**
    * Returns a newly allocated exact copy of this packet.
    */
-  //##ModelId=3B0723A6001E
+  //##ModelId=3B0753810155
   virtual Packet* makeClone() const;
 
   /**
    * Returns the type of this packet.
    */
-  //##ModelId=3AE4DA920276
+  //##ModelId=3B0753810157
   int getType() const;
 
   /**
@@ -69,7 +71,7 @@ public:
    * are getting a packet's size, it is because we are checking to make sure
    * it can fit in the buffer.
    */
-  //##ModelId=3B0723A600FA
+  //##ModelId=3B0753810159
   virtual int getSize() const;
 
   /**
@@ -79,7 +81,7 @@ public:
    * overloading this function, call writePacket on the parent class then
    * write your own variables.
    */
-  //##ModelId=3B06EDF30302
+  //##ModelId=3B075381015B
   virtual void writePacket(RawPacket& raw) const;
 
   /**
@@ -92,7 +94,7 @@ public:
    * of the actual Packet class, and has no signifiance to derived classes,
    * or to the end user.
    */
-  //##ModelId=3B06EE000352
+  //##ModelId=3B075381015E
   virtual void readPacket(RawPacket& raw);
 
   /**
@@ -102,7 +104,7 @@ public:
    * packet that comes after another have a higher timestamp.  This is
    * so that late(obsolete) packets can be dropped, if they should be.
    */
-  //##ModelId=3B06F74E00C8
+  //##ModelId=3B0753810150
   int timestamp;
 
 private:
@@ -111,4 +113,5 @@ private:
 
 };
 
+}
 #endif /* PACKET_H_INCLUDED_C51B374A */

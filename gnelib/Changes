@@ -1,4 +1,6 @@
 GNE 0.002 to 0.003
+  Entire library now in the GNE namespace.  Examples updated.  GNE and Console
+    classes now namespaces instead of "static" classes.
   New example expacket.
   New example exhello.
   Implemented the RawPacket class.

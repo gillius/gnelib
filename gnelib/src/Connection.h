@@ -25,6 +25,8 @@
 #include "PacketStream.h"
 #include "ConnectionEventListener.h"
 
+namespace GNE {
+
 /**
  * A class resembling any type of connection to a remote computer.  A
  * connection also manages flow control.  When a new Connection instance is
@@ -33,32 +35,32 @@
  * reduce after a connection to the remote machine is made, based on that
  * machine's requested maximums.
  */
-//##ModelId=3AE2167E01EA
+//##ModelId=3B075380029E
 class Connection {
 public:
   /**
    * A struct holding values returned by getStats.
    */
-  //##ModelId=3AE4CABD00F0
+  //##ModelId=3B075380029F
   struct Stats {
-    //##ModelId=3AE4CB9302D0
+    //##ModelId=3B0753810008
     int sent;
-    //##ModelId=3AE4CBBF03AC
+    //##ModelId=3B0753810009
     int recv;
-    //##ModelId=3AE4CBC403DE
+    //##ModelId=3B075381000A
     int maxAvgSent;
-    //##ModelId=3AE4CBD10046
+    //##ModelId=3B075381000B
     int maxAvgRecv;
-    //##ModelId=3AE4CBD601CC
+    //##ModelId=3B075381000C
     int avgSent;
-    //##ModelId=3AE4CBDC0000
+    //##ModelId=3B075381003C
     int avgRecv;
   };
 
   /**
    * An enum describing connection failure type.
    */
-  //##ModelId=3AE4F24B0276
+  //##ModelId=3B075381003D
   enum FailureType {
     NoError = 0,
     GNEHostVersionLow = 1,
@@ -83,17 +85,17 @@ public:
    * @param inRate the maximum rate we allow the sender to send to us in
    *        bytes per second.
    */
-  //##ModelId=3AE3591A0186
+  //##ModelId=3B0753810073
   Connection(int outRate, int inRate);
 
-  //##ModelId=3AE3591A0187
+  //##ModelId=3B0753810076
   virtual ~Connection();
 
   /**
    * Returns the PacketStream associated with this class.  Writing and
    * reading through this Connection is done through this PacketStream.
    */
-  //##ModelId=3AE4A6F00280
+  //##ModelId=3B0753810078
   PacketStream& stream();
 
   /**
@@ -101,7 +103,7 @@ public:
    * @return various connection stats.
    * @see ConnectionStats
    */
-  //##ModelId=3AE4C9DD0280
+  //##ModelId=3B0753810079
   Stats getStats() const;
 
   /**
@@ -110,7 +112,7 @@ public:
    *                 unreliable data.  Specify which low-level socket you
    *                 want the address of.
    */
-  //##ModelId=3AFF798800C8
+  //##ModelId=3B075381007B
   NLaddress getLocalAddress(bool reliable) const;
 
   /**
@@ -119,13 +121,13 @@ public:
    *                 unreliable data.  Specify which low-level socket you
    *                 want the address of.
    */
-  //##ModelId=3AFF79880136
+  //##ModelId=3B075381007E
   NLaddress getRemoteAddress(bool reliable) const;
 
   /**
    * Returns true if this Connection is active and ready to send/recieve.
    */
-  //##ModelId=3AE4A9820366
+  //##ModelId=3B0753810081
   bool isConnected() const;
 
   /**
@@ -134,7 +136,7 @@ public:
    * disconnectSendAll.
    * @see #disconnectSendAll()
    */
-  //##ModelId=3AE4A9700212
+  //##ModelId=3B0753810083
   void disconnect();
 
   /**
@@ -143,7 +145,7 @@ public:
    * possible.
    * @see #disconnect()
    */
-  //##ModelId=3AE4C7FC021C
+  //##ModelId=3B0753810084
   void disconnectSendAll();
 
   /**
@@ -151,13 +153,13 @@ public:
    * Note you must call this function explicity from your overridden
    * function FIRST so the underlying functions recieve this event.
    */
-  //##ModelId=3AE4CD3D00E6
+  //##ModelId=3B0753810085
   virtual void onFailure(FailureType errorType);
 
   /**
    * Event triggered when one or more packets have been recieved.
    */
-  //##ModelId=3AE4A776033E
+  //##ModelId=3B07538100AC
   virtual void onReceive();
 
   /**
@@ -167,7 +169,7 @@ public:
    * Note you must call this function explicity from your overridden
    * function FIRST so the underlying functions recieve this event.
    */
-  //##ModelId=3AE4C8F501CC
+  //##ModelId=3B07538100AE
   virtual void onDoneWriting();
 
 protected:
@@ -186,41 +188,42 @@ protected:
   /**
    * The PacketStream associated with this Connection.
    */
-  //##ModelId=3AE44E3302DA
+  //##ModelId=3B075381006E
   PacketStream* ps;
 
   /**
    * Is this Connection active and ready for communications?
    */
-  //##ModelId=3AE4A97A038E
+  //##ModelId=3B0753810072
   bool connected;
 
 private:
-  //##ModelId=3B0099530154
+  //##ModelId=3B07538002A0
   class ConnectionListener : public ConnectionEventListener {
   public:
-    //##ModelId=3B009D63019A
+    //##ModelId=3B075381004E
     ConnectionListener(Connection& listener, bool isReliable);
 
-    //##ModelId=3B009D630208
+    //##ModelId=3B0753810051
     virtual ~ConnectionListener();
 
-    //##ModelId=3B0099B700BE
+    //##ModelId=3B0753810053
     void onReceive();
 
   private:
-    //##ModelId=3B009D150352
+    //##ModelId=3B0753810049
     Connection& conn;
 
-    //##ModelId=3B009D3D03B6
+    //##ModelId=3B075381004D
     bool reliable;
 
   };
   friend class ConnectionListener;
 
-  //##ModelId=3B009E0903AC
+  //##ModelId=3B07538100B0
   void onReceive(bool reliable);
 
 };
 
+}
 #endif /* CONNECTION_H_INCLUDED_C51DC478 */

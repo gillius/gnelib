@@ -22,22 +22,24 @@
 
 #include "gneintern.h"
 
+namespace GNE {
+
 /**
  * The mutex class models a simple mutex.
  * This class is a wrapper for pthreads, so please read man pages or other
  * documentation for the equivalent pthreads functions if you need to
  * understand the specifics on the semantics of these functions.
  */
-//##ModelId=3AE208590280
+//##ModelId=3B07538002DE
 class Mutex {
 public:
   /**
    * Initalizes this mutex.
    */
-  //##ModelId=3AE20A040384
+  //##ModelId=3B075381014B
   Mutex();
 
-  //##ModelId=3AE20A040385
+  //##ModelId=3B075381014C
   virtual ~Mutex();
 
 	/**
@@ -46,13 +48,13 @@ public:
 	 * 2. If the mutex is locked, wait for it to become unlocked,
    *    then go to step 1.
    */
-  //##ModelId=3AE20A070398
+  //##ModelId=3B075381014E
   void acquire();
 
   /**
    * Releases a locked mutex.
    */
-  //##ModelId=3AE20A0D035C
+  //##ModelId=3B075381014F
   void release();
 
 private:
@@ -62,6 +64,5 @@ private:
   friend class ConditionVariable;
 };
 
+}
 #endif /* MUTEX_H_INCLUDED_C51DB1E6 */
-
-

@@ -21,30 +21,16 @@
 #include "ConnectionEventGenerator.h"
 #include "GNE.h"
 
-//##ModelId=3AE26F6A035C
-const double GNE::VER = 0.002;
+namespace GNE {
 
-//##ModelId=3AF8D89F00E6
-bool GNE::initialized = false;
+int userVersion = 0;
+ConnectionEventGenerator* eGen = NULL;
 
-//##ModelId=3AE4DF7A03AC
-const int GNE::UDP_HEADER_SIZE = 28;
+static bool initialized = false;
 
-//##ModelId=3AE26FC000A0
-const std::string GNE::VER_STR = "GNE v0.002 pre-alpha";
-
-//##ModelId=3AFF3E3500FA
-const NLenum GNE::NO_NET = 128;
-
-//##ModelId=3AFF6429023A
-int GNE::userVersion = 0;
-
-ConnectionEventGenerator* GNE::eGen = NULL;
-
-//##ModelId=3AE270BF0078
-bool GNE::init(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
+bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
   if (!initialized) {
-    atexit_ptr(shutdown);
+    atexit_ptr(shutdownGNE);
     if (networkType != NO_NET) {
       if (nlInit() == NL_FALSE)
         return true;
@@ -62,8 +48,7 @@ bool GNE::init(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
   return false;
 }
 
-//##ModelId=3AE270CE033E
-void GNE::shutdown() {
+void shutdownGNE() {
   if (initialized) {
     eGen->shutdown();
     eGen->join();
@@ -72,8 +57,7 @@ void GNE::shutdown() {
   }
 }
 
-//##ModelId=3AFF79890208
-NLaddress GNE::getLocalAddress() {
+NLaddress getLocalAddress() {
   assert(initialized);
   NLaddress ret;
   NLsocket temp = nlOpen(0, NL_RELIABLE);
@@ -82,46 +66,41 @@ NLaddress GNE::getLocalAddress() {
   return ret;
 }
 
-//##ModelId=3AEDEDE100AA
-int GNE::getBytesRead() {
+int getBytesRead() {
   assert(initialized);
   return nlGetInteger(NL_BYTES_RECEIVED);
 }
 
-//##ModelId=3AE4C988000A
-int GNE::getBytesWritten() {
+int getBytesWritten() {
   assert(initialized);
   return nlGetInteger(NL_BYTES_SENT);
 }
 
-//##ModelId=3AE4CA1D0122
-void GNE::enableStats() {
+void enableStats() {
   assert(initialized);
   nlEnable(NL_SOCKET_STATS);
 }
 
-//##ModelId=3AE4CA2803AC
-void GNE::disableStats() {
+void disableStats() {
   assert(initialized);
   nlDisable(NL_SOCKET_STATS);
 }
 
-//##ModelId=3AFF64290316
-void GNE::clearStats() {
+void clearStats() {
   assert(initialized);
   nlClear(NL_ALL_STATS);
 }
 
-//##ModelId=3AE4D10803CA
-int GNE::getOpenConnections() {
+int getOpenConnections() {
   assert(initialized);
   return nlGetInteger(NL_OPEN_SOCKETS);
 }
 
-//##ModelId=3AFF642A000A
-void GNE::setUserVersion(int version) {
+void setUserVersion(int version) {
   assert(initialized);
   userVersion = version;
+}
+
 }
 
 

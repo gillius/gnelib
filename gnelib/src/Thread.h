@@ -23,6 +23,8 @@
 #include "gneintern.h"
 #include "Mutex.h"
 
+namespace GNE {
+
 /**
  * A class resembling a thread.
  * Derive your own classes from this class that implement the run function.
@@ -37,7 +39,7 @@
  * join on this pointer, then delete at some later time.
  * \todo Priorities are not yet implemented.
  */
-//##ModelId=3AE11D2B03DE
+//##ModelId=3B075380034B
 class Thread {
 public:
   /**
@@ -45,7 +47,7 @@ public:
    * Creates the thread ready to be run, but is not yet started.
    * Same as calling Thread(Thread::DEF_NAME, Thread::DEF_PRI)
    */
-  //##ModelId=3AE12014000A
+  //##ModelId=3B0753810375
   Thread();
 
   /**
@@ -53,10 +55,10 @@ public:
    * @param name2 the name of this thread
    * @param priority2 the priority this thread has
    */
-  //##ModelId=3AE1224001CC
+  //##ModelId=3B0753810376
   Thread(std::string name2, int priority2);
 
-  //##ModelId=3AE120140046
+  //##ModelId=3B0753810379
   virtual ~Thread();
 
   /**
@@ -64,19 +66,19 @@ public:
    * @return the currently running thread, or NULL if no Thread object
    *         resembles this thread.
    */
-  //##ModelId=3AE126EF00D2
+  //##ModelId=3B075381037B
   static Thread* currentThread();
 
   /**
    * The currently running thread sleeps for the time given in milliseconds.
    */
-  //##ModelId=3AEEF76701E0
+  //##ModelId=3B075381037D
   static void sleep(int ms);
 
   /**
    * Returns the name of this thread.
    */
-  //##ModelId=3AE126FD00DC
+  //##ModelId=3B0753810380
   std::string getName() const;
 
   /**
@@ -86,7 +88,7 @@ public:
    * thread may not be joined after being detached.
    * @see detach
    */
-  //##ModelId=3AE1DFB40186
+  //##ModelId=3B0753810382
   void join();
 
   /**
@@ -107,7 +109,7 @@ public:
    *                   finishes executing.
    * @see join
    */
-  //##ModelId=3AEE3C5D00BE
+  //##ModelId=3B0753810383
   void detach(bool deleteThis);
 
   /**
@@ -115,50 +117,50 @@ public:
    * Derive your own class from Thread, and implement this function.
    * When this function returns, the thread ends.
    */
-  //##ModelId=3AE1DFBE006E
+  //##ModelId=3B0753810385
   virtual void run() = 0;
 
   /**
    * This function is called internally and automatically after run ends and
    * is used for internal library cleanup.  Do not call it directly.
    */
-  //##ModelId=3AEE3C5D02E4
+  //##ModelId=3B0753810387
   void end();
 
   /**
    * Determine the running state of the thread.
    */
-  //##ModelId=3AEE3C5D0384
+  //##ModelId=3B0753810388
   bool isRunning() const;
 
   /**
    * Returns if the thread has finished running after being started.
    */
-  //##ModelId=3AEE3C5E0154
+  //##ModelId=3B07538103A3
   bool hasEnded() const;
 
   /**
    * Starts this thread running.
    */
-  //##ModelId=3AE1DFC70230
+  //##ModelId=3B07538103A5
   void start();
   
   /**
    * Returns the priority of this class.
    */
-  //##ModelId=3AE20B3402EE
+  //##ModelId=3B07538103A6
   int getPriority() const;
 
   /**
    * Returns the underlying pthread_t for this thread.
    */
-  //##ModelId=3AE20B3F02E4
+  //##ModelId=3B07538103A8
   pthread_t getID() const;
 
   /**
    * The default priority of a thread.
    */
-  //##ModelId=3AE1EA0B02E4
+  //##ModelId=3B0753810334
   static const int DEF_PRI;
 
   /**
@@ -172,7 +174,7 @@ public:
    * priority for the network threads to reduce network latency in favor of a
    * little in-game fps.
    */
-  //##ModelId=3AE359B501B8
+  //##ModelId=3B0753810335
   static const int HIGH_PRI;
 
 private:
@@ -180,7 +182,7 @@ private:
    * This is an internal-only function called by the underlying pthreads
    * functions -- do not call.
    */
-  //##ModelId=3AECE4A00046
+  //##ModelId=3B07538103AA
   static void remove(Thread*);
 
   //##ModelId=3AE11D30014A
@@ -189,29 +191,28 @@ private:
   //##ModelId=3AE11D540136
   pthread_t thread_id;
 
-  //##ModelId=3AE11D5A01CC
+  //##ModelId=3B0753810336
   bool started;
 
-  //##ModelId=3AEE3C5C01A4
+  //##ModelId=3B0753810337
   bool ended;
 
-  //##ModelId=3AEE3C5C02EE
+  //##ModelId=3B0753810338
   bool detached;
 
   //##ModelId=3AE11D5F023A
   static std::map<pthread_t, Thread*> threads;
 
-  //##ModelId=3AE1286000C8
+  //##ModelId=3B0753810339
   int priority;
 
-  //##ModelId=3AEE3C5D0051
+  //##ModelId=3B075381033B
   Mutex sync;
 
-  //##ModelId=3AEE3C5D008D
+  //##ModelId=3B0753810371
   static Mutex mapSync;
 
 };
 
+}
 #endif /* THREAD_H_INCLUDED_C51E3746 */
-
-

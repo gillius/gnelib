@@ -24,11 +24,13 @@
 #include "Connection.h"
 #include "Thread.h"
 
+namespace GNE {
+
 /**
  * The server-side connection.  Once it is connected, there's very little to
  * no difference between ClientConnection and ServerConnection at this level.
  */
-//##ModelId=3B01D4CB024E
+//##ModelId=3B0753800310
 class ServerConnection : public Connection, public Thread {
 public:
   /**
@@ -37,17 +39,17 @@ public:
    * @param inRate the maximum rate we allow the sender to send to us in
    *        bytes per second.
    */
-  //##ModelId=3B01D4D6023A
+  //##ModelId=3B075381027A
   ServerConnection(int outRate, int inRate, NLsocket rsocket2);
 
-  //##ModelId=3B01D4D60276
+  //##ModelId=3B075381027E
   virtual ~ServerConnection();
 
   /**
    * Don't call this function directly.  This thread performs the connection
    * process.  The thread will have finished before onNewConn is called.
    */
-  //##ModelId=3B01D63700BE
+  //##ModelId=3B0753810280
   void run();
 
   /**
@@ -61,7 +63,7 @@ public:
    * If the connection failed, though, the function onConnFailure instead of
    * this function is called.\n
    */
-  //##ModelId=3B03149400AA
+  //##ModelId=3B0753810281
   virtual void onNewConn() = 0;
 
   /**
@@ -72,9 +74,10 @@ public:
    * pointer elsewhere so you can interact with and delete this object later.
    * @see onNewConn
    */
-  //##ModelId=3B0315A803DE
+  //##ModelId=3B0753810283
   virtual void onConnFailure(FailureType errorType) = 0;
 
 };
 
+}
 #endif /* SERVERCONNECTION_H_INCLUDED_C4FE6FF3 */

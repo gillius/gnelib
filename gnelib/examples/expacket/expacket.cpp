@@ -29,6 +29,8 @@
 #include <iostream>
 
 using namespace std;
+using namespace GNE;
+using namespace GNE::Console;
 
 class PersonPacket : public Packet {
 public:
@@ -64,8 +66,8 @@ void rawPacketTest();
 void packetTest();
 
 int main(int argc, char* argv[]) {
-  GNE::init(GNE::NO_NET, atexit);
-  Console::setTitle("GNE Packet Example");
+  initGNE(NO_NET, atexit);
+  setTitle("GNE Packet Test");
   
   rawPacketTest();
   cout << endl;

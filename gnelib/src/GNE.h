@@ -21,15 +21,15 @@
  */
 
 #include "gneintern.h"
-class ConnectionEventGenerator;
 
 /**
- * The main class for the library, containing all static members and methods
- * that do not apply directly to any other class.
+ * The namespace in which all of GNE resides in.  The namespace consists of
+ * a few global functions, some constants, classes, and the GNE::Console
+ * namespace, which holds the console IO functions.
  */
 //##ModelId=3AE26ED703DE
-class GNE {
-public:
+namespace GNE {
+class ConnectionEventGenerator;
   /**
    * Initalizes GNE and HawkNL.  Call this before using any HawkNL or GNE
    * functions.  Pass it the atexit function so shutdown will be called on
@@ -38,8 +38,7 @@ public:
    * @param networkType a HawkNL network driver, such as NL_IP or NL_IPX
    * @return true if GNE or HawkNL could not be initalized.
    */
-  //##ModelId=3AE270BF0078
-  static bool init(NLenum networkType, int (*atexit_ptr)(void (*func)(void)));
+  bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)));
 
   /**
    * Shutsdown GNE and HawkNL.  This function should be called only after all
@@ -50,15 +49,13 @@ public:
    * Note that it is possible that this function may block for a short time
    * (500ms or less), while the event generators shut down.
    */
-  //##ModelId=3AE270CE033E
-  static void shutdown();
+  void shutdownGNE();
 
   /**
    * Use this function to get the address of the default networking device on
    * this system, if possible.
    */
-  //##ModelId=3AFF79890208
-  static NLaddress getLocalAddress();
+  NLaddress getLocalAddress();
 
   /**
    * Exits from your main() function.  This should be used if you want any
@@ -73,59 +70,50 @@ public:
   /**
    * Returns how many total bytes GNE has read on all sockets.
    */
-  //##ModelId=3AEDEDE100AA
-  static int getBytesRead();
+  int getBytesRead();
 
   /**
    * Returns how many total bytes GNE has written on all sockets.
    */
-  //##ModelId=3AE4C988000A
-  static int getBytesWritten();
+  int getBytesWritten();
 
   /**
    * Enables stats gathering, which is off by default.  When stats is not
    * enabled, the get function's results is undefined.
    */
-  //##ModelId=3AE4CA1D0122
-  static void enableStats();
+  void enableStats();
 
   /**
    * Disables stats gathering, which is the default mode.
    */
-  //##ModelId=3AE4CA2803AC
-  static void disableStats();
+  void disableStats();
 
   /**
    * Clears all global stats.
    */
-  //##ModelId=3AFF64290316
-  static void clearStats();
+  void clearStats();
   
   /**
    * Returns the number of open low-level connections GNE has opened.
    */
-  //##ModelId=3AE4D10803CA
-  static int getOpenConnections();
+  int getOpenConnections();
 
   /**
    * Sets the user application protocol version number.
    * @see userVersion
    */
-  //##ModelId=3AFF642A000A
-  static void setUserVersion(int version);
+  void setUserVersion(int version);
 
   /**
    * A numeric representation of the current version of this library.
    */
-  //##ModelId=3AE26F6A035C
-  static const double VER;
+  const double VER = 0.003;
 
   /**
    * A string representation of the name of the library and the current
    * version.
    */
-  //##ModelId=3AE26FC000A0
-  static const std::string VER_STR;
+  const std::string VER_STR = "GNE v0.002 pre-alpha";
 
   /**
    * The low-level header size of a UDP header, which is used with the HawkNL
@@ -133,8 +121,7 @@ public:
    * finding and might be useful in getting stats or calculating actual
    * bandwith.
    */
-  //##ModelId=3AE4DF7A03AC
-  static const int UDP_HEADER_SIZE;
+  const int UDP_HEADER_SIZE = 28;
 
   /**
    * Normally you would pass a network type to GNE::init, but passing this
@@ -143,26 +130,24 @@ public:
    * initalize everything.
    * @see init
    */
-  //##ModelId=3AFF3E3500FA
-  static const NLenum NO_NET;
+  const NLenum NO_NET = 128;
 
   /**
    * The user's own protocol version number, 0 by default.  If you set this
    * number, GNE will version check not only its own library version, but
    * your application version as well on connect, and produce the appropriate
-   * error if there is a mismatch.
+   * error if there is a mismatch.\n
+   * To set this number, use setUserVersion(int).
    */
-  //##ModelId=3AFF6429023A
-  static int userVersion;
+  extern int userVersion;
 
-  //##ModelId=3AE34D930316
-  static ConnectionEventGenerator *eGen;
-
-private:
-  //##ModelId=3AF8D89F00E6
-  static bool initialized;
-
-};
+  /**
+   * The global event generator.  The library uses this internally to
+   * register and unregister connections.  The end-user will not have to use
+   * this object under any normal cirumstances.
+   */
+  extern ConnectionEventGenerator* eGen;
+}
 
 #endif /* GNE_H_INCLUDED_C51DF1DD */
 

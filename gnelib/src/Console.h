@@ -24,10 +24,10 @@
 #include "Mutex.h"
 
 /**
- * Class for providing very basic console support, meant for use in the
- * example and test programs, and in console-only servers using GNE.  This
- * class's behavior is undefined when running in a Win32 application (not a
- * Win32 console) project.\n
+ * Functions for providing very basic console support, meant for use in the
+ * example and test programs, and in console-only servers using GNE.  These
+ * functions's behavior is undefined when running in a Win32 application (not
+ * a Win32 console) project, or in any non-console environment.\n
  * Functions that have m prefixed on them mean "multithreaded," because they
  * are thread safe.  Functions with l prefixed on them mean "location,"
  * because they perform their operations starting at the given coordinates
@@ -38,23 +38,20 @@
  * keyboard to be used ;).  It is okay, however, to be using the console
  * output functions at the same time you are using the input functions.
  */
-//##ModelId=3AF8A1A0033E
-class Console {
-public:
+namespace GNE {
+namespace Console {
   /**
    * Initalizes the console part of GNE.  This may be called multiple times.
    * Pass it your atexit function so the console will be shutdown
    * automatically on program exit.
    * @return true if the console could not be initalized.
    */
-  //##ModelId=3AF8A1E2038E
-  static bool init(int (*atexit_ptr)(void (*func)(void)));
+  bool initConsole(int (*atexit_ptr)(void (*func)(void)));
 
   /**
    * Shuts down the console part of GNE.  This may be called multiple times.
    */
-  //##ModelId=3AF8A1ED037A
-  static void shutdown();
+  void shutdownConsole();
 
   /**
    * Returns non-zero if a key is waiting in the buffer to be received by
@@ -62,8 +59,7 @@ public:
    * @see getch
    * @see lgetString
    */
-  //##ModelId=3AF8AADE038E
-  static int kbhit();
+  int kbhit();
 
   /**
    * Returns the next character in the input, blocking if no character is
@@ -73,35 +69,30 @@ public:
    * @see kbhit
    * @see lgetString
    */
-  //##ModelId=3AF8AADF0050
-  static int getch();
+  int getch();
 
   /**
    * Function to sync on printf.
    * @return number of characters written.
    */
-  //##ModelId=3AF8A7EC026C
-  static int mprintf(char* format, ...);
+  int mprintf(char* format, ...);
   
   /**
    * Function to sync on printf, and print to a certain location.
    * @return number of characters written.
    * @see mprintf
    */
-  //##ModelId=3AF8A7ED00AA
-  static int mlprintf(int x, int y, char* format, ...);
+  int mlprintf(int x, int y, char* format, ...);
 
   /**
    * A syncronized version of the ANSI function putchar.
    */
-  //##ModelId=3AFB7047005A
-  static void mputchar(int ch);
+  void mputchar(int ch);
 
   /**
    * Like mputchar(), but with a specified location.
    */
-  //##ModelId=3AFB705602B2
-  static void mlputchar(int x, int y, int ch);
+  void mlputchar(int x, int y, int ch);
 
   /**
    * Gets input from the console.  This is a blocking call, because you
@@ -118,8 +109,7 @@ public:
    * @see kbhit
    * @see getch
    */
-  //##ModelId=3AFD8D7801A4
-  static int lgetString(int x, int y, char* str, int maxlen);
+  int lgetString(int x, int y, char* str, int maxlen);
 
   /**
    * Sets the title of the console window to the given parameter, where GNE
@@ -127,43 +117,27 @@ public:
    * set, this function does nothing.
    * @param title the new window title
    */
-  //##ModelId=3AFF64270366
-  static void setTitle(const char* title);
+  void setTitle(const char* title);
 
   /**
    * Gets the size of the console, in character columns and character rows.
    * @param x integer where the number of columns is stored.
    * @param y integer where the number of rows is stored.
    */
-  //##ModelId=3AFF64280168
-  static void getConsoleSize(int* x, int* y);
+  void getConsoleSize(int* x, int* y);
 
   /**
    * The keycode the enter key gives from getch().
    * @see getch
    */
-  //##ModelId=3AFDB5190226
-  static const int ENTER;
+  const int ENTER = 13;
 
   /**
    * The keycode the backspace key gives from getch().
    * @see getch
    */
-  //##ModelId=3AFDB5190302
-  static const int BACKSPACE;
-
-private:
-  /**
-   * Moves the cursor on the screen to (X, Y).
-   */
-  //##ModelId=3AF8A3AE001E
-  static void gotoxy(int x, int y);
-
-  //##ModelId=3AF8A1F80226
-  static Mutex outSync;
-
-  //##ModelId=3AF8ADDB0280
-  static bool initialized;
-};
+  const int BACKSPACE = 8;
+}
+}
 
 #endif

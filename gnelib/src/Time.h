@@ -22,39 +22,41 @@
 
 #include "gneintern.h"
 
+namespace GNE {
+
 /**
  * A class representing a time relative to a point in the past.  The time
  * is always proper ("normalized"), meaning that 999,999 is the highest value
  * for microseconds.  Setting a value higher than this will increase seconds.
  */
-//##ModelId=3AEB9AD500A0
+//##ModelId=3B075380037A
 class Time {
 public:
   /**
    * Initalizes this class with a time of 0.
    */
-  //##ModelId=3AEBA04C03A2
+  //##ModelId=3B07538103AF
   Time();
 
   /**
    * Initalizes this class with the time specified.
    */
-  //##ModelId=3AEEF7680320
+  //##ModelId=3B07538103B0
   Time(int seconds, int microseconds);
 
-  //##ModelId=3AEBA04C03DE
+  //##ModelId=3B07538103B3
   virtual ~Time();
 
   /**
    * Returns seconds.
    */
-  //##ModelId=3AEBA4AC0096
+  //##ModelId=3B07538103B5
   int getSec() const;
 
   /**
    * Returns microseconds.
    */
-  //##ModelId=3AEBA4B100C8
+  //##ModelId=3B07538103B7
   int getuSec() const;
 
   /**
@@ -64,13 +66,13 @@ public:
    * int is returned, 2147.483648 seconds is the maximum amount of time that
    * can be represented in a 32-bit integer in microseconds.
    */
-  //##ModelId=3AF9D5750082
+  //##ModelId=3B07538103DE
   int getTotaluSec() const;
 
   /**
    * Sets seconds.
    */
-  //##ModelId=3AEBA4BE0226
+  //##ModelId=3B07538103E0
   void setSec(int seconds);
 
   /**
@@ -79,43 +81,43 @@ public:
    *                     greater that 999,999, it will be normalized and the
    *                     value of seconds will increase.
    */
-  //##ModelId=3AEBA4C80032
+  //##ModelId=3B07538103E2
   void setuSec(int microseconds);
 
   /**
    * Returns the absolute value of the difference between these two times.
    */
-  //##ModelId=3AEBA53B00AA
+  //##ModelId=3B07538103E4
   Time diff(const Time& rhs) const;
 
   /**
    * Less-than operator that works as expected.
    */
-  //##ModelId=3AEBA4D200A0
+  //##ModelId=3B07538103E7
   bool operator<(const Time& rhs) const;
 
   /**
    * Greater-than operator that works as expected.
    */
-  //##ModelId=3AEBA4E003A2
+  //##ModelId=3B07538103EA
   bool operator>(const Time& rhs) const;
 
   /**
    * Time addition, adding microseconds of time.
    */
-  //##ModelId=3AEBA4F9021C
+  //##ModelId=3B07538103ED
   Time operator+(int rhs) const;
 
   /**
    * Time addition, adding microseconds of time to this object.
    */
-  //##ModelId=3AF9D5750122
+  //##ModelId=3B07538103F0
   void operator+=(int rhs);
 
   /**
    * Time addition that works as expected.
    */
-  //##ModelId=3AF9D57503B6
+  //##ModelId=3B07538103F2
   Time operator+(const Time& rhs) const;
 
   /**
@@ -123,26 +125,23 @@ public:
    * out of this.  Sometimes Time::diff will be what you want, instead.
    * @see diff
    */
-  //##ModelId=3AF9D57601F4
+  //##ModelId=3B07538103F5
   Time operator-(const Time& rhs) const;
 
 protected:
   /**
    * make sure that microsec stays under a second, adding to sec if needed.
    */
-  //##ModelId=3AECF2860320
+  //##ModelId=3B07538103F8
   void normalize();
 
 private:
-  //##ModelId=3AEBA0200262
+  //##ModelId=3B07538103AD
   int sec;
 
-  //##ModelId=3AEBA03501E0
+  //##ModelId=3B07538103AE
   int microsec;
 };
 
-
-
+}
 #endif /* TIME_H_INCLUDED_C51412BE */
-
-

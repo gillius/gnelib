@@ -32,25 +32,28 @@
 #include <sys/timeb.h>
 #include <pthread.h>
 
+using namespace GNE;
+using namespace GNE::Console;
+
 class HelloWorld : public Thread {
 public:
   HelloWorld(std::string myName) : Thread(myName, DEF_PRI) {
-    Console::mprintf("%s is born\n", myName.c_str());
+    mprintf("%s is born\n", myName.c_str());
   }
   virtual ~HelloWorld() {
-    Console::mprintf("%s dies.\n", getName().c_str());
+    mprintf("%s dies.\n", getName().c_str());
   }
 
   void run() {
-    Console::mprintf("Hello World!  My name is %s.\n Id: %i %i\n Ref: %x %x\n",
+    mprintf("Hello World!  My name is %s.\n Id: %i %i\n Ref: %x %x\n",
       getName().c_str(), getID(), pthread_self(), Thread::currentThread(), this);
   }
 };
 
 int main(int argc, char* argv[]) {
-  GNE::init(GNE::NO_NET, atexit);
-  Console::init(atexit);
-  Console::setTitle("GNE Threads Example");
+  initGNE(NO_NET, atexit);
+  initConsole(atexit);
+  setTitle("GNE Threads Example");
 
   HelloWorld* bob = new HelloWorld("Bob");
   bob->start();      //Tells bob to start his job.
@@ -66,15 +69,15 @@ int main(int argc, char* argv[]) {
                               //because sally->start() was called, and not
                               //because the thread has ACTUALLY started
                               //executing.
-  Console::mprintf("Waiting for Sally to end.\n");
+  mprintf("Waiting for Sally to end.\n");
   sally->join(); //we must either join or detach every thread.
-  Console::mprintf("Sally ended.  Killing Sally.\n");
+  mprintf("Sally ended.  Killing Sally.\n");
   assert(sally->hasEnded());
   delete sally;  //in the join case, we must delete the thread after joining.
 
-  Console::mprintf("Sally died.  Now waiting for Joe to end.\n");
+  mprintf("Sally died.  Now waiting for Joe to end.\n");
   while (!joe->hasEnded()) {}
-  Console::mprintf("Joe has ended.  Detaching Joe.\n");
+  mprintf("Joe has ended.  Detaching Joe.\n");
   joe->detach(true); //But even if we detach after a thread ends it will
                      //still destroy itself.
 
@@ -82,7 +85,7 @@ int main(int argc, char* argv[]) {
   clock_t start = clock();
   Time lastTime = Timer::getCurrentTime();
 
-  Console::mprintf("Sleeping for 2459 milliseconds.\n");
+  mprintf("Sleeping for 2459 milliseconds.\n");
   Thread::sleep(2459);
 
   Time diffTime = Timer::getCurrentTime();
@@ -90,8 +93,8 @@ int main(int argc, char* argv[]) {
   float sysNapTime = (float)(finish - start) / CLOCKS_PER_SEC;
   diffTime = diffTime - lastTime;
 
-  Console::mprintf("System reports sleeping time of %f\n", sysNapTime);
-  Console::mprintf("GNE timers report sleeping time of %i microseconds (us)\n", diffTime.getTotaluSec());
+  mprintf("System reports sleeping time of %f\n", sysNapTime);
+  mprintf("GNE timers report sleeping time of %i microseconds (us)\n", diffTime.getTotaluSec());
 
   //At this point, all threads that are running will be terminated.  When
   //main exits, everything goes.  Use join if you want to guarantee your

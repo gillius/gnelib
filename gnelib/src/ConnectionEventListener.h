@@ -22,22 +22,25 @@
 
 #include "gneintern.h"
 
+namespace GNE {
+
 /**
  * A class to act as an interface between ConnectionEventGenerator and its
  * listeners.
  */
-//##ModelId=3B0096800316
+//##ModelId=3B07538002DA
 class ConnectionEventListener {
 public:
-  //##ModelId=3B00A45A0348
+  //##ModelId=3B07538100E0
   virtual ~ConnectionEventListener();
 
   /**
    * This function is called when data arrives on the socket.
    */
-  //##ModelId=3B00969E0154
+  //##ModelId=3B07538100E2
   virtual void onReceive() = 0;
 
 };
 
+}
 #endif /* CONNECTIONEVENTLISTENER_H_INCLUDED_C4FF0565 */

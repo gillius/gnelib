@@ -22,13 +22,15 @@
 #include "Time.h"
 #include "TimerCallback.h"
 
-//##ModelId=3AE868370122
+namespace GNE {
+
+//##ModelId=3B0753820030
 Timer::Timer(TimerCallback* callback, int rate, bool destroy)
 : running(false), callbackRate(rate),
 listener(callback), destroyListener(destroy) {
 }
 
-//##ModelId=3AE8686C00BE
+//##ModelId=3B0753820034
 Timer::~Timer() {
   stopTimer();
   if (destroyListener)
@@ -38,7 +40,7 @@ Timer::~Timer() {
 /**
  * \todo write UNIX version
  */
-//##ModelId=3AE86872030C
+//##ModelId=3B0753820036
 Time Timer::getCurrentTime() {
   Time ret;
 #ifdef WIN32
@@ -56,7 +58,7 @@ Time Timer::getCurrentTime() {
 /**
  * \todo write UNIX version
  */
-//##ModelId=3AF4797001CC
+//##ModelId=3B0753820065
 Time Timer::getAbsoluteTime() {
   Time ret;
 #ifdef WIN32
@@ -70,7 +72,7 @@ Time Timer::getAbsoluteTime() {
   return ret;
 }
 
-//##ModelId=3AEB9AB50050
+//##ModelId=3B0753820067
 void Timer::startTimer() {
   assert(running == false);
   nextTime = getCurrentTime();
@@ -79,7 +81,7 @@ void Timer::startTimer() {
   start();
 }
 
-//##ModelId=3AEB9AB500BE
+//##ModelId=3B0753820068
 void Timer::stopTimer() {
   if (running) {
     running = false;
@@ -87,7 +89,7 @@ void Timer::stopTimer() {
   }
 }
 
-//##ModelId=3AE868A30294
+//##ModelId=3B0753820069
 void Timer::run() {
   while (running) {
     Time currTime, sleepTime;
@@ -102,7 +104,9 @@ void Timer::run() {
   }
 }
 
-//##ModelId=3AED05E7029E
+//##ModelId=3B075382006A
 bool Timer::isRunning() {
   return running;
+}
+
 }

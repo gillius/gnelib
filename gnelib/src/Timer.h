@@ -23,6 +23,8 @@
 #include "gneintern.h"
 #include "Thread.h"
 #include "Time.h"
+
+namespace GNE {
 class TimerCallback;
 
 /**
@@ -30,7 +32,7 @@ class TimerCallback;
  * A timer object calls its listeners back every so often based on the time
  * given.
  */
-//##ModelId=3AE8680C029E
+//##ModelId=3B075380037B
 class Timer : public Thread {
 public:
   /**
@@ -40,10 +42,10 @@ public:
    * @param destroy should the callback be destroyed when this object is
    *        destroyed?
    */
-  //##ModelId=3AE868370122
+  //##ModelId=3B0753820030
   Timer(TimerCallback* callback, int rate, bool destroy);
 
-  //##ModelId=3AE8686C00BE
+  //##ModelId=3B0753820034
   virtual ~Timer();
 
   /**
@@ -54,7 +56,7 @@ public:
    * Resolutions:\n
    * Windows/x86: (probably) 1 / CPU clock speed
    */
-  //##ModelId=3AE86872030C
+  //##ModelId=3B0753820036
   static Time getCurrentTime();
 
   /**
@@ -64,13 +66,13 @@ public:
    * Resolutions:\n
    * Windows: 10ms
    */
-  //##ModelId=3AF4797001CC
+  //##ModelId=3B0753820065
   static Time getAbsoluteTime();
 
   /**
    * Starts the timer running and calling the callback.
    */
-  //##ModelId=3AEB9AB50050
+  //##ModelId=3B0753820067
   void startTimer();
 
   /**
@@ -78,48 +80,45 @@ public:
    * until the timer is stopped, which may last as long as the timer's
    * callback.
    */
-  //##ModelId=3AEB9AB500BE
+  //##ModelId=3B0753820068
   void stopTimer();
 
   /**
    * Don't call this function.  This is the thread that will perform the
    * callbacks.
    */
-  //##ModelId=3AE868A30294
+  //##ModelId=3B0753820069
   void run();
 
   /**
    * Is this Timer running?
    */
-  //##ModelId=3AED05E7029E
+  //##ModelId=3B075382006A
   bool isRunning();
 
 private:
   /**
    * Next time the callbacks will be activated.
    */
-  //##ModelId=3AEBA39702C7
+  //##ModelId=3B07538103FB
   Time nextTime;
 
-  //##ModelId=3AEB9AB401E0
+  //##ModelId=3B0753820028
   bool running;
 
-  //##ModelId=3AE8695C0028
+  //##ModelId=3B0753820029
   int callbackRate;
 
-  //##ModelId=3AE86968026C
+  //##ModelId=3B075382002B
   TimerCallback* listener;
 
   /**
    * Should listener be destroyed with this object?
    */
-  //##ModelId=3AFF642B03D4
+  //##ModelId=3B075382002F
   bool destroyListener;
 
 };
 
-
-
+}
 #endif /* TIMER_H_INCLUDED_C517B9FE */
-
-

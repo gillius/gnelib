@@ -20,6 +20,8 @@
 #include "gneintern.h"
 #include "Connection.h"
 
+namespace GNE {
+
 //##ModelId=3AE5BA8F038E
 static const std::string FailureStrings[] = {
   "No error.",
@@ -32,12 +34,12 @@ static const std::string FailureStrings[] = {
   "Other low-level HawkNL error."
 };
 
-//##ModelId=3AE3591A0186
+//##ModelId=3B0753810073
 Connection::Connection(int outRate, int inRate)
 : ps(NULL), connected(false), rsocket(NL_INVALID), usocket(NL_INVALID) {
 }
 
-//##ModelId=3AE3591A0187
+//##ModelId=3B0753810076
 Connection::~Connection() {
   if (rsocket != NL_INVALID)
     nlClose(rsocket);
@@ -46,17 +48,17 @@ Connection::~Connection() {
   delete ps;
 }
 
-//##ModelId=3AE4A6F00280
+//##ModelId=3B0753810078
 PacketStream& Connection::stream() {
   return *ps;
 }
 
-//##ModelId=3AE4C9DD0280
+//##ModelId=3B0753810079
 Connection::Stats Connection::getStats() const {
   return Stats();
 }
 
-//##ModelId=3AFF798800C8
+//##ModelId=3B075381007B
 NLaddress Connection::getLocalAddress(bool reliable) const {
   NLaddress ret;
   if (reliable) {
@@ -69,7 +71,7 @@ NLaddress Connection::getLocalAddress(bool reliable) const {
   return ret;
 }
 
-//##ModelId=3AFF79880136
+//##ModelId=3B075381007E
 NLaddress Connection::getRemoteAddress(bool reliable) const {
   NLaddress ret;
   if (reliable) {
@@ -82,12 +84,12 @@ NLaddress Connection::getRemoteAddress(bool reliable) const {
   return ret;
 }
 
-//##ModelId=3AE4A9820366
+//##ModelId=3B0753810081
 bool Connection::isConnected() const {
   return connected;
 }
 
-//##ModelId=3AE4A9700212
+//##ModelId=3B0753810083
 void Connection::disconnect() {
   if (rsocket != NL_INVALID)
     nlClose(rsocket);
@@ -95,36 +97,37 @@ void Connection::disconnect() {
     nlClose(usocket);
 }
 
-//##ModelId=3AE4C7FC021C
+//##ModelId=3B0753810084
 void Connection::disconnectSendAll() {
 }
 
-//##ModelId=3AE4CD3D00E6
+//##ModelId=3B0753810085
 void Connection::onFailure(FailureType errorType) {
 }
 
-//##ModelId=3AE4A776033E
+//##ModelId=3B07538100AC
 void Connection::onReceive() {
 }
 
-//##ModelId=3AE4C8F501CC
+//##ModelId=3B07538100AE
 void Connection::onDoneWriting() {
 }
 
-//##ModelId=3B009E0903AC
+//##ModelId=3B07538100B0
 void Connection::onReceive(bool reliable) {
 }
 
-//##ModelId=3B009D63019A
+//##ModelId=3B075381004E
 Connection::ConnectionListener::ConnectionListener(Connection& listener, bool isReliable) 
 : conn(listener), reliable(isReliable) {
 }
 
-//##ModelId=3B009D630208
+//##ModelId=3B0753810051
 Connection::ConnectionListener::~ConnectionListener() {
 }
 
-//##ModelId=3B0099B700BE
+//##ModelId=3B0753810053
 void Connection::ConnectionListener::onReceive() {
 }
 
+}

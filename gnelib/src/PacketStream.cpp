@@ -21,66 +21,69 @@
 #include "PacketStream.h"
 #include "Packet.h"
 
-//##ModelId=3AE3605F032A
+namespace GNE {
+
+//##ModelId=3B07538101BD
 PacketStream::PacketStream(int outRate2, int inRate2)
 : inRate(inRate2), outRate(outRate2) {
 }
 
-//##ModelId=3AE36060001E
+//##ModelId=3B07538101C0
 PacketStream::~PacketStream() {
 }
 
-//##ModelId=3AE450930172
+//##ModelId=3B07538101C2
 int PacketStream::getInLength() const {
   return in.size();
 }
 
-//##ModelId=3AE450AD019A
+//##ModelId=3B07538101C4
 int PacketStream::getOutLength() const {
   return out.size();
 }
 
-//##ModelId=3AE44F5B0078
+//##ModelId=3B07538101C6
 bool PacketStream::isNextPacket() const {
   return (in.size() != 0);
 }
 
-//##ModelId=3AE4503000B4
+//##ModelId=3B07538101C8
 Packet* PacketStream::getNextPacket() {
   return NULL;
 }
 
-//##ModelId=3AE4503E023A
+//##ModelId=3B07538101C9
 void PacketStream::writePacket(const Packet& packet, bool reliable) {
 }
 
-//##ModelId=3AE4CDD70122
+//##ModelId=3B07538101FD
 Packet* PacketStream::getNextPacketToSend() {
   return NULL;
 }
 
-//##ModelId=3AE4C60C026C
+//##ModelId=3B07538101F5
 int PacketStream::getInRate() const {
   return inRate;
 }
 
 
-//##ModelId=3AE4C60C0316
+//##ModelId=3B07538101F7
 int PacketStream::getOutRate() const {
   return outRate;
 }
 
 
-//##ModelId=3AE4C70203C0
+//##ModelId=3B07538101F9
 void PacketStream::waitToSendAll() {
 }
 
 
-//##ModelId=3B00990701E0
+//##ModelId=3B07538101FA
 void PacketStream::run() {
 }
 
-//##ModelId=3B00A2910212
+//##ModelId=3B07538101FB
 void PacketStream::addIncomingPacket(Packet* packet) {
 }
 
+}

@@ -24,34 +24,36 @@
 #include "TimerCallback.h"
 #include "Mutex.h"
 
+namespace GNE {
+
 /**
  * An implementation of a TimerCallback that provides a simple counter.
  */
-//##ModelId=3AE8691D0032
+//##ModelId=3B07538002DB
 class Counter : public TimerCallback {
 public:
   /**
    * Initalize this Counter.  Pass this Counter into a Timer class to use it.
    * @see TimerCallback
    */
-  //##ModelId=3AE8693F0104
+  //##ModelId=3B07538100EB
   Counter();
 
-  //##ModelId=3AE8693F0140
+  //##ModelId=3B07538100EC
   virtual ~Counter();
 
   /**
    * The callback function that the Timer calls.  You should not call this
    * function directly.
    */
-  //##ModelId=3AE8694203AC
+  //##ModelId=3B07538100EE
   void timerCallback();
 
   /**
    * Returns the current count of this Counter.  This function is syncronized
    * with its own mutex so it is safe to call from multiple threads.
    */
-  //##ModelId=3AED05900154
+  //##ModelId=3B0753810118
   int getCount();
 
   /**
@@ -59,21 +61,18 @@ public:
    * with its own mutex so it is safe to call from multiple threads.
    * @param newCount the new value for the Counter
    */
-  //##ModelId=3AED05960226
+  //##ModelId=3B0753810119
   void setCount(int newCount);
 
 
 private:
-  //##ModelId=3AED04B002A8
+  //##ModelId=3B07538100E5
   int count;
 
-  //##ModelId=3AED04ED02BC
+  //##ModelId=3B07538100E7
   Mutex countSync;
 
 };
 
-
-
+}
 #endif /* COUNTER_H_INCLUDED_C517BD95 */
-
-

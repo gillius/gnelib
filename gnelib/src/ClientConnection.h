@@ -24,12 +24,14 @@
 #include "Connection.h"
 #include "Thread.h"
 
+namespace GNE {
+
 /**
  * A class that can connect to a remote target.  Inherit from this class,
  * overriding the functions from Connection and ClientConnection based on the
  * events you wish to respond to.
  */
-//##ModelId=3AE59EBB001E
+//##ModelId=3B0753800270
 class ClientConnection : public Connection, public Thread {
 public:
   /**
@@ -37,10 +39,10 @@ public:
    * @see Connection#Connection(int, int, std::string)
    * @see ClientConnection(int, int NLaddress)
    */
-  //##ModelId=3AE59FAB0000
+  //##ModelId=3B075380037F
   ClientConnection(int outRate, int inRate);
 
-  //##ModelId=3AE59FAB003C
+  //##ModelId=3B07538003B8
   virtual ~ClientConnection();
 
   /**
@@ -48,7 +50,7 @@ public:
    * while it is connecting.
    * @see Thread#run()
    */
-  //##ModelId=3AE5AF7A0384
+  //##ModelId=3B07538003BA
   void run();
 
   /**
@@ -59,7 +61,7 @@ public:
    * @param port local port to open on, default 0 for don't care.
    * @return true if the socket could not be opened.
    */
-  //##ModelId=3B00C2E40302
+  //##ModelId=3B07538003BB
   bool open(std::string dest, int port = 0);
 
   /**
@@ -68,7 +70,7 @@ public:
    * @param port local port to open on, default 0 for don't care.
    * @return true if the socket could not be opened.
    */
-  //##ModelId=3B00C2E50104
+  //##ModelId=3B07538003BE
   bool open(NLaddress dest, int port = 0);
 
   /**
@@ -90,7 +92,7 @@ public:
    * @see #onConnect()
    * @see #onConnectFailure()
    */
-  //##ModelId=3AE59FD4019A
+  //##ModelId=3B07538003C1
   void connect();
 
   /**
@@ -98,7 +100,7 @@ public:
    * you are joining on this object, the calling thread will still block
    * until this function returns.
    */
-  //##ModelId=3AE59FBB01A4
+  //##ModelId=3B07538003C2
   virtual void onConnect() = 0;
 
   /**
@@ -106,19 +108,16 @@ public:
    * you are joining on this object, the calling thread will still block
    * until this function returns.
    */
-  //##ModelId=3AE59FCA0168
+  //##ModelId=3B07538003C4
   virtual void onConnectFailure(FailureType errorType) = 0;
 
 private:
   /**
    * Address used only while connecting, then unused afterwards.
    */
-  //##ModelId=3B00C31A0064
-  NLaddress address;
 };
 
-
-
+}
 #endif /* CLIENTCONNECTION_H_INCLUDED_C51A7F46 */
 
 

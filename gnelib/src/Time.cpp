@@ -20,54 +20,56 @@
 #include "gneintern.h"
 #include "Time.h"
 
-//##ModelId=3AEBA04C03A2
+namespace GNE {
+
+//##ModelId=3B07538103AF
 Time::Time() : sec(0), microsec(0) {
 }
 
-//##ModelId=3AEEF7680320
+//##ModelId=3B07538103B0
 Time::Time(int seconds, int microseconds) 
 : sec(seconds), microsec(microseconds) {
   normalize();
 }
 
-//##ModelId=3AEBA04C03DE
+//##ModelId=3B07538103B3
 Time::~Time() {
 }
 
-//##ModelId=3AEBA4AC0096
+//##ModelId=3B07538103B5
 int Time::getSec() const {
   return sec;
 }
 
-//##ModelId=3AEBA4B100C8
+//##ModelId=3B07538103B7
 int Time::getuSec() const {
   return microsec;
 }
 
-//##ModelId=3AF9D5750082
+//##ModelId=3B07538103DE
 int Time::getTotaluSec() const {
   return (sec * 1000000 + microsec);
 }
 
-//##ModelId=3AEBA4BE0226
+//##ModelId=3B07538103E0
 void Time::setSec(int seconds) {
   sec = seconds;
 }
 
-//##ModelId=3AEBA4C80032
+//##ModelId=3B07538103E2
 void Time::setuSec(int microseconds) {
   microsec = microseconds;
   normalize();
 }
 
-//##ModelId=3AEBA53B00AA
+//##ModelId=3B07538103E4
 Time Time::diff(const Time& rhs) const {
   Time ret = operator-(rhs);
   ret.sec = labs(ret.sec);
   return ret;
 }
 
-//##ModelId=3AEBA4D200A0
+//##ModelId=3B07538103E7
 bool Time::operator<(const Time& rhs) const {
   return (sec < rhs.sec || ((sec == rhs.sec) && (microsec < rhs.microsec)));
 }
@@ -77,7 +79,7 @@ bool Time::operator>(const Time& rhs) const {
   return (sec > rhs.sec || ((sec == rhs.sec) && (microsec > rhs.microsec)));
 }
 
-//##ModelId=3AEBA4F9021C
+//##ModelId=3B07538103ED
 Time Time::operator+(int rhs) const {
   Time ret(*this);
   ret.microsec += rhs;
@@ -85,13 +87,13 @@ Time Time::operator+(int rhs) const {
   return ret;
 }
 
-//##ModelId=3AF9D5750122
+//##ModelId=3B07538103F0
 void Time::operator+=(int rhs) {
   microsec += rhs;
   normalize();
 }
 
-//##ModelId=3AF9D57503B6
+//##ModelId=3B07538103F2
 Time Time::operator+(const Time& rhs) const {
   Time t(sec + rhs.sec, microsec + rhs.microsec);
   t.normalize();
@@ -104,7 +106,7 @@ Time Time::operator -(const Time& rhs) const {
   return t;
 }
 
-//##ModelId=3AECF2860320
+//##ModelId=3B07538103F8
 void Time::normalize() {
   if (microsec > 999999) {
     sec += (microsec / 1000000);
@@ -115,3 +117,4 @@ void Time::normalize() {
   }
 }
 
+}

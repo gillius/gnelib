@@ -23,43 +23,45 @@
 #include "Time.h"
 #include "Timer.h"
 
-//##ModelId=3AE20E490140
+namespace GNE {
+
+//##ModelId=3B07538003CD
 ConditionVariable::ConditionVariable() {
   valassert(pthread_cond_init( &cond, NULL ), 0);
   ourMutex = true;
   mutex = new Mutex();
 }
 
-//##ModelId=3AE50F1A0398
+//##ModelId=3B07538003CE
 ConditionVariable::ConditionVariable(Mutex* m) {
   valassert(pthread_cond_init( &cond, NULL ), 0);
   mutex = m;
   ourMutex = false;
 }
 
-//##ModelId=3AE20E880104
+//##ModelId=3B07538003D0
 ConditionVariable::~ConditionVariable() {
   valassert(pthread_cond_destroy( &cond ), 0);
   if (ourMutex)
     delete mutex;
 }
 
-//##ModelId=3AE50F1B00FA
+//##ModelId=3B0753810000
 void ConditionVariable::acquire() {
   mutex->acquire();
 }
 
-//##ModelId=3AE50F1B0168
+//##ModelId=3B0753810001
 void ConditionVariable::release() {
   mutex->release();
 }
 
-//##ModelId=3AE20E5F02DA
+//##ModelId=3B0753810002
 void ConditionVariable::wait() {
   valassert(pthread_cond_wait(&cond, &mutex->mutex), 0);
 }
 
-//##ModelId=3AEEF7660032
+//##ModelId=3B0753810003
 void ConditionVariable::timedWait(int ms) {
   Time t = Timer::getAbsoluteTime();
   t += ms*1000;
@@ -71,14 +73,14 @@ void ConditionVariable::timedWait(int ms) {
   mutex->release();
 }
 
-//##ModelId=3AE20E7200B4
+//##ModelId=3B0753810005
 void ConditionVariable::signal() {
   valassert(pthread_cond_signal( &cond ), 0);
 }
 
-//##ModelId=3AE20E7A00FA
+//##ModelId=3B0753810006
 void ConditionVariable::broadcast() {
   valassert(pthread_cond_broadcast( &cond ), 0);
 }
 
-
+}

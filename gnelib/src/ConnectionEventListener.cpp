@@ -20,7 +20,10 @@
 #include "gneintern.h"
 #include "ConnectionEventListener.h"
 
-//##ModelId=3B00A45A0348
+namespace GNE {
+
+//##ModelId=3B07538100E0
 ConnectionEventListener::~ConnectionEventListener() {
 }
 
+}

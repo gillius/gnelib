@@ -20,19 +20,21 @@
 #include "gneintern.h"
 #include "ClientConnection.h"
 
-//##ModelId=3AE59FAB0000
+namespace GNE {
+
+//##ModelId=3B075380037F
 ClientConnection::ClientConnection(int outRate, int inRate)
 : Connection(outRate, inRate) {
 }
 
-//##ModelId=3AE59FAB003C
+//##ModelId=3B07538003B8
 ClientConnection::~ClientConnection() {
 }
 
 /**
  * \todo time sync with server
  */
-//##ModelId=3AE5AF7A0384
+//##ModelId=3B07538003BA
 void ClientConnection::run() {
   NLboolean check = nlConnect(rsocket, &address);
   if (check == NL_TRUE) {
@@ -43,21 +45,23 @@ void ClientConnection::run() {
   }
 }
 
-//##ModelId=3B00C2E40302
+//##ModelId=3B07538003BB
 bool ClientConnection::open(std::string dest, int port) {
   NLaddress addr;
   nlStringToAddr((NLbyte*)dest.c_str(), &addr);
   return open(addr, port);
 }
 
-//##ModelId=3B00C2E50104
+//##ModelId=3B07538003BE
 bool ClientConnection::open(NLaddress dest, int port) {
   address = dest;
   rsocket = nlOpen(port, NL_RELIABLE);
   return (rsocket == NL_INVALID);
 }
 
-//##ModelId=3AE59FD4019A
+//##ModelId=3B07538003C1
 void ClientConnection::connect() {
   start();
+}
+
 }

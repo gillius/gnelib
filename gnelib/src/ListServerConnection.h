@@ -24,6 +24,8 @@
 #include "Connection.h"
 #include "ClientConnection.h"
 
+namespace GNE {
+
 /**
  * A Client-side connection to a game list server for retriving a list of
  * games.  This stuff is all very preliminary.  List server code will be
@@ -31,13 +33,13 @@
  * \todo The List server code will be completed only after the rest of GNE
  *       works and has been tested and finalized.
  */
-//##ModelId=3AE2736B017C
+//##ModelId=3B07538002DC
 class ListServerConnection : public ClientConnection {
 public:
   /**
    * Data about each game.
    */
-  //##ModelId=3AE4AD7C01E0
+  //##ModelId=3B07538002DD
   struct GameListData {
     //##ModelId=3AE4B1420046
     std::string gameName;
@@ -51,33 +53,30 @@ public:
     //##ModelId=3AE4B21D0032
     std::string address;
 
-    //##ModelId=3AE4B23F0226
+    //##ModelId=3B075381011C
     int numPlayers;
 
-    //##ModelId=3AE4B24D0370
+    //##ModelId=3B075381011D
     int latency;
 
-    //##ModelId=3AE4B273029E
+    //##ModelId=3B075381011E
     void* gameSpecificData;
 
   };
 
-  //##ModelId=3AE4AA420046
+  //##ModelId=3B0753810120
   ListServerConnection(std::string address);
 
-  //##ModelId=3AE4AA420078
+  //##ModelId=3B0753810122
   virtual ~ListServerConnection();
 
-  //##ModelId=3AE4AAE000C8
+  //##ModelId=3B0753810124
   void setGame(std::string gameName);
 
-  //##ModelId=3AE4AB3A0000
+  //##ModelId=3B0753810126
   void getGameList();
 
 };
 
-
-
+}
 #endif /* LISTSERVERCONNECTION_H_INCLUDED_C51B5B1C */
-
-

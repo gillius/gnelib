@@ -20,23 +20,26 @@
 #include "gneintern.h"
 #include "ServerConnection.h"
 
-//##ModelId=3B01D4D6023A
+namespace GNE {
+
+//##ModelId=3B075381027A
 ServerConnection::ServerConnection(int outRate, int inRate, NLsocket rsocket2)
 : Connection(outRate, inRate) {
   rsocket = rsocket2;
 }
 
-//##ModelId=3B01D4D60276
+//##ModelId=3B075381027E
 ServerConnection::~ServerConnection() {
 }
 
-//##ModelId=3B01D63700BE
+//##ModelId=3B0753810280
 void ServerConnection::run() {
   assert(rsocket != NL_INVALID);
   onNewConn();
 }
 
-//##ModelId=3B0315A803DE
+//##ModelId=3B0753810283
 void ServerConnection::onConnFailure(Connection::FailureType errorType) {
 }
 
+}

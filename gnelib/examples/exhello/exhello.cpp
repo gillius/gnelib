@@ -35,6 +35,8 @@
 #include <cstring>
 
 using namespace std;
+using namespace GNE;
+using namespace GNE::Console;
 
 void errorExit(const char* error);
 int getPort(const char* prompt);
@@ -49,11 +51,11 @@ public:
     : ClientConnection(outRate, inRate) {}
 
   void onConnect() {
-    Console::mprintf("Connection to server successful.\n");
+    mprintf("Connection to server successful.\n");
   }
 
   void onConnectFailure(FailureType errorType) {
-    Console::mprintf("Connection to server failed.\n");
+    mprintf("Connection to server failed.\n");
   }
 
   virtual ~OurClient() {}
@@ -68,12 +70,12 @@ public:
   virtual ~OurServer() {}
 
   void onNewConn() {
-    Console::mprintf("Connection received.\n");
+    mprintf("Connection received.\n");
     detach(true);
   }
 
   void onConnFailure(FailureType errorType) {
-    Console::mprintf("Connection failure.\n");
+    mprintf("Connection failure.\n");
     detach(true);
   }
 private:
@@ -101,11 +103,11 @@ private:
 };
 
 int main(int argc, char* argv[]) {
-  GNE::init(NL_IP, atexit);
-  GNE::setUserVersion(1); //sets our user protocol version number, used in
-                          //the connection process by GNE to version check.
-  Console::init(atexit);
-  Console::setTitle("GNE Basic Connections Example");
+  initGNE(NL_IP, atexit);
+  setUserVersion(1); //sets our user protocol version number, used in
+                     //the connection process by GNE to version check.
+  initConsole(atexit);
+  setTitle("GNE Basic Connections Example");
 
   //It's okay to use iostreams instead of the Console functions when we are
   //only accessing the console from one thread.
@@ -117,12 +119,12 @@ int main(int argc, char* argv[]) {
 
   int port;
   if (type == 2) {
-    Console::setTitle("GNE Basic Connections Example -- Server");
+    setTitle("GNE Basic Connections Example -- Server");
     cout << "Reminder: ports <= 1024 on UNIX can only be used by the superuser." << endl;
     port = getPort("listen on");
     doServer(3000, 3000, port);
   } else {
-    Console::setTitle("GNE Basic Connections Example -- Client");
+    setTitle("GNE Basic Connections Example -- Client");
     port = getPort("connect to");
     doClient(3000, 3000, port);
   }
@@ -147,7 +149,7 @@ int getPort(const char* prompt) {
 }
 
 void displayAddress() {
-  NLaddress ourAddr = GNE::getLocalAddress();
+  NLaddress ourAddr = getLocalAddress();
   char buf[NL_MAX_STRING_LENGTH];
   nlAddrToString(&ourAddr, (NLbyte*)buf);
   char* temp = strchr(buf, ':');
@@ -171,7 +173,7 @@ void doServer(int outRate, int inRate, int port) {
 
   cout << "Server is listening on: " << getAddressString(server.getLocalAddress()) << endl;
   cout << "Press a key to shutdown server." << endl;
-  Console::getch();
+  getch();
   //When the server class is destructed, it will stop listening and shutdown.
 }
 

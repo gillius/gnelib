@@ -20,21 +20,23 @@
 #include "gneintern.h"
 #include "ListServerConnection.h"
 
-//##ModelId=3AE4AA420046
+namespace GNE {
+
+//##ModelId=3B0753810120
 ListServerConnection::ListServerConnection(std::string address) 
 : ClientConnection(0, 0) {
 }
 
-//##ModelId=3AE4AA420078
+//##ModelId=3B0753810122
 ListServerConnection::~ListServerConnection() {
 }
 
-//##ModelId=3AE4AAE000C8
+//##ModelId=3B0753810124
 void ListServerConnection::setGame(std::string gameName) {
 }
 
-//##ModelId=3AE4AB3A0000
+//##ModelId=3B0753810126
 void ListServerConnection::getGameList() {
 }
 
-
+}

@@ -20,24 +20,26 @@
 #include "gneintern.h"
 #include "Mutex.h"
 
-//##ModelId=3AE20A040384
+namespace GNE {
+
+//##ModelId=3B075381014B
 Mutex::Mutex() {
   valassert(pthread_mutex_init( &mutex, NULL ), 0);
 }
 
-//##ModelId=3AE20A040385
+//##ModelId=3B075381014C
 Mutex::~Mutex() {
   valassert(pthread_mutex_destroy( &mutex ), 0);
 }
 
-//##ModelId=3AE20A070398
+//##ModelId=3B075381014E
 void Mutex::acquire() {
   valassert(pthread_mutex_lock( &mutex ), 0);
 }
 
-//##ModelId=3AE20A0D035C
+//##ModelId=3B075381014F
 void Mutex::release() {
   valassert(pthread_mutex_unlock( &mutex ), 0);
 }
 
-
+}

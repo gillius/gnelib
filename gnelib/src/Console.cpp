@@ -24,52 +24,48 @@
 // OWE#$!()*%(!#%!5 THAT WAS A RETORICAL QUESTION!  THAT HURT !$#%(*!%
 #include "conioport.h"
 
-//##ModelId=3AF8A1F80226
-Mutex Console::outSync;
-//##ModelId=3AF8ADDB0280
-bool Console::initialized = false;
-//##ModelId=3AFDB5190302
-const int Console::BACKSPACE = 8;
-//##ModelId=3AFDB5190226
-const int Console::ENTER = 13;
+namespace GNE {
+namespace Console {
 
-//##ModelId=3AF8A1E2038E
-bool Console::init(int (*atexit_ptr)(void (*func)(void))) {
+static Mutex outSync;
+static bool initialized = false;
+
+/**
+* Moves the cursor on the screen to (X, Y).
+*/
+static void gotoxy(int x, int y);
+
+bool initConsole(int (*atexit_ptr)(void (*func)(void))) {
   if (!initialized) {
     conio_init();
     assert(atexit_ptr);
-    atexit_ptr(shutdown);
+    atexit_ptr(shutdownConsole);
     initialized = true;
   }
   return false;
 }
 
-//##ModelId=3AF8A1ED037A
-void Console::shutdown() {
+void shutdownConsole() {
   if (initialized) {
     conio_exit();
     initialized = false;
   }
 }
 
-//##ModelId=3AF8A3AE001E
-void Console::gotoxy(int x, int y) {
+void gotoxy(int x, int y) {
   //outSync MUST be acquired.
   conio_gotoxy(x, y);
 }
 
-//##ModelId=3AF8AADE038E
-int Console::kbhit() {
+int kbhit() {
   return conio_kbhit();
 }
 
-//##ModelId=3AF8AADF0050
-int Console::getch() {
+int getch() {
   return conio_getch();
 }
 
-//##ModelId=3AF8A7EC026C
-int Console::mprintf(char* format, ...) {
+int mprintf(char* format, ...) {
   va_list arg;
   
   va_start(arg, format);
@@ -81,8 +77,7 @@ int Console::mprintf(char* format, ...) {
   return ret;
 }
 
-//##ModelId=3AF8A7ED00AA
-int Console::mlprintf(int x, int y, char* format, ...) {
+int mlprintf(int x, int y, char* format, ...) {
   va_list arg;
   
   va_start(arg, format);
@@ -95,23 +90,20 @@ int Console::mlprintf(int x, int y, char* format, ...) {
   return ret;
 }
 
-//##ModelId=3AFB7047005A
-void Console::mputchar(int ch) {
+void mputchar(int ch) {
   outSync.acquire();
   putchar(ch);
   outSync.release();
 }
 
-//##ModelId=3AFB705602B2
-void Console::mlputchar(int x, int y, int ch) {
+void mlputchar(int x, int y, int ch) {
   outSync.acquire();
   gotoxy(x, y);
   putchar(ch);
   outSync.release();
 }
 
-//##ModelId=3AFD8D7801A4
-int Console::lgetString(int x, int y, char* str, int maxlen) {
+int lgetString(int x, int y, char* str, int maxlen) {
   int currpos = 0;          //The next char to be typed
   bool exit = false;
   while (!exit) {
@@ -142,12 +134,13 @@ int Console::lgetString(int x, int y, char* str, int maxlen) {
   return currpos;
 }
 
-//##ModelId=3AFF64270366
-void Console::setTitle(const char* title) {
+void setTitle(const char* title) {
   conio_settitle(title);
 }
 
-//##ModelId=3AFF64280168
-void Console::getConsoleSize(int* x, int* y) {
+void getConsoleSize(int* x, int* y) {
   conio_getsize(x, y);
+}
+
+}
 }

@@ -20,7 +20,10 @@
 #include "gneintern.h"
 #include "ServerConnectionCreator.h"
 
-//##ModelId=3B0176250398
+namespace GNE {
+
+//##ModelId=3B0753810295
 ServerConnectionCreator::~ServerConnectionCreator() {
 }
 
+}

@@ -22,27 +22,28 @@
 
 #include "gneintern.h"
 
+namespace GNE {
+
 /**
  * A pure interface class for usage in the Timer class.  Inherit from this
  * class and define timerCallback.
  */
-//##ModelId=3AE868D6019A
+//##ModelId=3B075380037C
 class TimerCallback {
 public:
-  //##ModelId=3AF78B950190
+  //##ModelId=3B075382006B
   TimerCallback();
 
-  //##ModelId=3AF78B9501CC
+  //##ModelId=3B075382006C
   virtual ~TimerCallback();
 
   /**
    * The function that the Timer calls at its firing rate.
    */
-  //##ModelId=3AE868E20334
+  //##ModelId=3B075382006E
   virtual void timerCallback() = 0;
 
 };
 
-
-
+}
 #endif /* TIMERCALLBACK_H_INCLUDED_C517B12B */

@@ -23,6 +23,8 @@
 #include "gneintern.h"
 #include "ConditionVariable.h"
 #include "Thread.h"
+
+namespace GNE {
 class ConnectionEventListener;
 
 /**
@@ -30,19 +32,19 @@ class ConnectionEventListener;
  * of GNE should not need to use or know about this class.  This class uses
  * nlPollGroup to check for events comming in on sockets.
  */
-//##ModelId=3AE34D620276
+//##ModelId=3B07538002A1
 class ConnectionEventGenerator : public Thread {
 public:
-  //##ModelId=3AE359220352
+  //##ModelId=3B07538100B9
   ConnectionEventGenerator();
 
-  //##ModelId=3AE359220384
+  //##ModelId=3B07538100BA
   virtual ~ConnectionEventGenerator();
 
   /**
    * The thread that listens for events.  Do not call this function directly.
    */
-  //##ModelId=3AE34D7900D2
+  //##ModelId=3B07538100BC
   void run();
 
   /**
@@ -50,25 +52,25 @@ public:
    * @param socket the low-level HawkNL socket for this connection.
    * @param conn the Connection class associated with the socket.
    */
-  //##ModelId=3AE4E158023A
+  //##ModelId=3B07538100BD
   void reg(NLsocket socket, ConnectionEventListener* conn);
 
   /**
    * Removes a Connection.
    * @param socket the low-level HawkNL socket for this connection.
    */
-  //##ModelId=3AE4E17D021C
+  //##ModelId=3B07538100DD
   void unreg(NLsocket socket);
 
   /**
    * Tells the event generator to shutdown.  This function is called
    * internally on library cleanup, so you should not call it.
    */
-  //##ModelId=3B00A4B703AC
+  //##ModelId=3B07538100DF
   void shutdown();
 
 private:
-  //##ModelId=3B0166F101CC
+  //##ModelId=3B07538100B3
   bool running;
 
   //##ModelId=3AE358F701FE
@@ -80,10 +82,11 @@ private:
   //##ModelId=3B0167440348
   NLsocket* sockBuf;
 
-  //##ModelId=3AE4E2E60348
+  //##ModelId=3B07538100B5
   ConditionVariable mapCtrl;
 };
 
+}
 #endif /* CONNECTIONEVENTGENERATOR_H_INCLUDED_C51B7986 */
 
 

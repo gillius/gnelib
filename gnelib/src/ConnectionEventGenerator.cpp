@@ -23,7 +23,9 @@
 #include "ConditionVariable.h"
 #include "Connection.h"
 
-//##ModelId=3AE359220352
+namespace GNE {
+
+//##ModelId=3B07538100B9
 ConnectionEventGenerator::ConnectionEventGenerator() 
 : running(true), group(NL_INVALID) {
   group = nlGroupCreate();
@@ -31,13 +33,13 @@ ConnectionEventGenerator::ConnectionEventGenerator()
   sockBuf = new NLsocket[NL_MAX_GROUP_SOCKETS];
 }
 
-//##ModelId=3AE359220384
+//##ModelId=3B07538100BA
 ConnectionEventGenerator::~ConnectionEventGenerator() {
   nlGroupDestroy(group);
   delete[] sockBuf;
 }
 
-//##ModelId=3AE34D7900D2
+//##ModelId=3B07538100BC
 void ConnectionEventGenerator::run() {
   while (running) {
     mapCtrl.acquire();
@@ -54,7 +56,7 @@ void ConnectionEventGenerator::run() {
   }
 }
 
-//##ModelId=3AE4E158023A
+//##ModelId=3B07538100BD
 void ConnectionEventGenerator::reg(NLsocket socket, ConnectionEventListener* conn) {
   mapCtrl.acquire();
   nlGroupAddSocket(group, socket);
@@ -63,7 +65,7 @@ void ConnectionEventGenerator::reg(NLsocket socket, ConnectionEventListener* con
   mapCtrl.signal();
 }
 
-//##ModelId=3AE4E17D021C
+//##ModelId=3B07538100DD
 void ConnectionEventGenerator::unreg(NLsocket socket) {
   assert(socket != NL_INVALID);
   assert(connections.find(socket) != connections.end());
@@ -73,9 +75,10 @@ void ConnectionEventGenerator::unreg(NLsocket socket) {
   mapCtrl.release();
 }
 
-//##ModelId=3B00A4B703AC
+//##ModelId=3B07538100DF
 void ConnectionEventGenerator::shutdown() {
   mapCtrl.signal();
   running = false;
 }
 
+}

@@ -25,13 +25,15 @@
 #include "Connection.h"
 #include "GNE.h"
 
-//##ModelId=3B01D3D70208
+namespace GNE {
+
+//##ModelId=3B07538102E4
 ServerConnectionListener::ServerConnectionListener(int outRate2, int inRate2, ServerConnectionCreator* creator2)
 : listening(false), listener(NULL), inRate(inRate2), outRate(outRate2), creator(creator2) {
   listener = new ServerListener(*this);
 }
 
-//##ModelId=3B01D3D7020B
+//##ModelId=3B0753810303
 ServerConnectionListener::~ServerConnectionListener() {
   if (listening) {
     GNE::eGen->unreg(socket);
@@ -41,13 +43,13 @@ ServerConnectionListener::~ServerConnectionListener() {
   delete creator;
 }
 
-//##ModelId=3B01D3D70227
+//##ModelId=3B0753810305
 bool ServerConnectionListener::open(int port) {
   socket = nlOpen(port, NL_RELIABLE_PACKETS);
   return (socket == NL_INVALID);
 }
 
-//##ModelId=3B01D3D70229
+//##ModelId=3B0753810307
 bool ServerConnectionListener::listen() {
   NLboolean ret = nlListen(socket);
   if (ret == NL_TRUE) {
@@ -58,16 +60,16 @@ bool ServerConnectionListener::listen() {
   return true;
 }
 
-//##ModelId=3B0334A90230
+//##ModelId=3B0753810308
 bool ServerConnectionListener::isListening() const {
   return listening;
 }
 
-//##ModelId=3B0334A90348
+//##ModelId=3B075381030A
 void ServerConnectionListener::onListenFailure(Connection::FailureType errorType) {
 }
 
-//##ModelId=3B01D3D70232
+//##ModelId=3B075381030F
 void ServerConnectionListener::onReceive() {
   NLsocket sock = nlAcceptConnection(socket);
   assert(sock != NL_INVALID);
@@ -75,7 +77,7 @@ void ServerConnectionListener::onReceive() {
   newConn->start();
 }
 
-//##ModelId=3B01D3D70230
+//##ModelId=3B075381030D
 NLaddress ServerConnectionListener::getLocalAddress() const {
   NLaddress ret;
   assert(socket != NL_INVALID);
@@ -83,16 +85,18 @@ NLaddress ServerConnectionListener::getLocalAddress() const {
   return ret;
 }
 
-//##ModelId=3B01D3D701FA
+//##ModelId=3B07538102D0
 ServerConnectionListener::ServerListener::ServerListener(ServerConnectionListener& listener)
 : conn(listener) {
 }
 
-//##ModelId=3B01D3D701FC
+//##ModelId=3B07538102D2
 ServerConnectionListener::ServerListener::~ServerListener() {
 }
 
-//##ModelId=3B01D3D701FE
+//##ModelId=3B07538102D4
 void ServerConnectionListener::ServerListener::onReceive() {
   conn.onReceive();
+}
+
 }

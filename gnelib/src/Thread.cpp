@@ -21,15 +21,17 @@
 #include "Thread.h"
 #include "ConditionVariable.h"
 
+namespace GNE {
+
 //##ModelId=3AE11D5F023A
 std::map<pthread_t, Thread*> Thread::threads;
-//##ModelId=3AE1EA0B02E4
+//##ModelId=3B0753810334
 const int Thread::DEF_PRI = 0;
-//##ModelId=3AE359B501B8
+//##ModelId=3B0753810335
 const int Thread::HIGH_PRI = 1;
 //##ModelId=3AE1F1CA00DC
 const std::string Thread::DEF_NAME = "Thread";
-//##ModelId=3AEE3C5D008D
+//##ModelId=3B0753810371
 Mutex Thread::mapSync;
 
 extern "C" {
@@ -44,21 +46,21 @@ extern "C" {
   }
 }
 
-//##ModelId=3AE12014000A
+//##ModelId=3B0753810375
 Thread::Thread() : name(DEF_NAME), thread_id(0), started(false), ended(false),
 detached(false), priority(DEF_PRI) {
 }
 
-//##ModelId=3AE1224001CC
+//##ModelId=3B0753810376
 Thread::Thread(std::string name2, int priority2) : name(name2), thread_id(0),
 started(false), ended(false), detached(false), priority(priority2) {
 }
 
-//##ModelId=3AE120140046
+//##ModelId=3B0753810379
 Thread::~Thread() {
 }
 
-//##ModelId=3AE126EF00D2
+//##ModelId=3B075381037B
 Thread* Thread::currentThread() {
   mapSync.acquire();
   std::map< pthread_t, Thread* >::iterator iter = threads.find( pthread_self() );
@@ -72,7 +74,7 @@ Thread* Thread::currentThread() {
   }
 }
 
-//##ModelId=3AEEF76701E0
+//##ModelId=3B075381037D
 void Thread::sleep(int ms) {
 #ifdef WIN32
   Sleep(ms);
@@ -84,18 +86,18 @@ void Thread::sleep(int ms) {
 #endif
 }
 
-//##ModelId=3AE126FD00DC
+//##ModelId=3B0753810380
 std::string Thread::getName() const {
   return name;
 }
 
-//##ModelId=3AE1DFB40186
+//##ModelId=3B0753810382
 void Thread::join() {
   assert( started );
   valassert(pthread_join( thread_id, NULL ), 0);
 }
 
-//##ModelId=3AEE3C5D00BE
+//##ModelId=3B0753810383
 void Thread::detach(bool deleteThis) {
   assert( started );
   assert( !detached );
@@ -114,7 +116,7 @@ void Thread::detach(bool deleteThis) {
   }
 }
 
-//##ModelId=3AEE3C5D02E4
+//##ModelId=3B0753810387
 void Thread::end() {
   sync.acquire();
   Thread::remove(this);
@@ -128,17 +130,17 @@ void Thread::end() {
     sync.release();
 }
 
-//##ModelId=3AEE3C5D0384
+//##ModelId=3B0753810388
 bool Thread::isRunning() const {
   return started;
 }
 
-//##ModelId=3AEE3C5E0154
+//##ModelId=3B07538103A3
 bool Thread::hasEnded() const {
   return ended;
 }
 
-//##ModelId=3AE1DFC70230
+//##ModelId=3B07538103A5
 void Thread::start() {
   started = true;
   pthread_create( &thread_id, NULL, threadStart, this );
@@ -147,22 +149,21 @@ void Thread::start() {
   mapSync.release();
 }
 
-//##ModelId=3AE20B3402EE
+//##ModelId=3B07538103A6
 int Thread::getPriority() const {
   return priority;
 }
 
-//##ModelId=3AE20B3F02E4
+//##ModelId=3B07538103A8
 pthread_t Thread::getID() const {
   return thread_id;
 }
 
-//##ModelId=3AECE4A00046
+//##ModelId=3B07538103AA
 void Thread::remove(Thread* thr) {
   mapSync.acquire();
   threads.erase(thr->getID());
   mapSync.release();
 }
 
-
-
+}

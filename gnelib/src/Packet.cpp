@@ -21,35 +21,39 @@
 #include "Packet.h"
 #include "RawPacket.h"
 
-//##ModelId=3AE4D49C0168
+namespace GNE {
+
+//##ModelId=3B0753810151
 Packet::Packet(int id) : type((NLubyte)id) {
 }
 
-//##ModelId=3AE4D49C019A
+//##ModelId=3B0753810153
 Packet::~Packet() {
 }
 
-//##ModelId=3B0723A6001E
+//##ModelId=3B0753810155
 Packet* Packet::makeClone() const {
   return new Packet(*this);
 }
 
-//##ModelId=3AE4DA920276
+//##ModelId=3B0753810157
 int Packet::getType() const {
   return (int)type;
 }
 
-//##ModelId=3B0723A600FA
+//##ModelId=3B0753810159
 int Packet::getSize() const {
   return sizeof(timestamp) + sizeof(type);
 }
 
-//##ModelId=3B06EDF30302
+//##ModelId=3B075381015B
 void Packet::writePacket(RawPacket& raw) const {
   raw << type << timestamp;
 }
 
-//##ModelId=3B06EE000352
+//##ModelId=3B075381015E
 void Packet::readPacket(RawPacket& raw) {
   raw >> timestamp;
+}
+
 }

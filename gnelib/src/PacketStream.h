@@ -24,46 +24,48 @@
 #include "ConditionVariable.h"
 #include "Mutex.h"
 #include "Thread.h"
+
+namespace GNE {
 class Packet;
 
 /**
  * This class resembles a packet stream through a connection.
  */
-//##ModelId=3AE35F9E001E
+//##ModelId=3B075380030D
 class PacketStream : public Thread {
 public:
   /**
    * Creates a new PacketStream with the given flow control parameters.
    */
-  //##ModelId=3AE3605F032A
+  //##ModelId=3B07538101BD
   PacketStream(int outRate2, int inRate2);
 
-  //##ModelId=3AE36060001E
+  //##ModelId=3B07538101C0
   virtual ~PacketStream();
 
   /**
    * Returns the current incoming queue length in packets.
    */
-  //##ModelId=3AE450930172
+  //##ModelId=3B07538101C2
   int getInLength() const;
 
   /**
    * Returns the current outgoing queue length in packets.
    */
-  //##ModelId=3AE450AD019A
+  //##ModelId=3B07538101C4
   int getOutLength() const;
 
   /**
    * Is there at least one packet in the incoming queue?
    */
-  //##ModelId=3AE44F5B0078
+  //##ModelId=3B07538101C6
   bool isNextPacket() const;
 
   /**
    * Returns the next packet from the queue, removing it from that queue.
    * It is your responsibility to deallocate the memory for this packet.
    */
-  //##ModelId=3AE4503000B4
+  //##ModelId=3B07538101C8
   Packet* getNextPacket();
 
   /**
@@ -71,34 +73,34 @@ public:
    * @param packet the packet to send.
    * @param should this packet be sent reliably if the connection supports it?
    */
-  //##ModelId=3AE4503E023A
+  //##ModelId=3B07538101C9
   void writePacket(const Packet& packet, bool reliable);
 
   /**
    * Returns the actual incoming data rate, which may be the same or less
    * that what was originally requested on connection.
    */
-  //##ModelId=3AE4C60C026C
+  //##ModelId=3B07538101F5
   int getInRate() const;
 
   /**
    * Returns the actual outgoing data rate, which may be the same or less
    * that what was originally requested on connection.
    */
-  //##ModelId=3AE4C60C0316
+  //##ModelId=3B07538101F7
   int getOutRate() const;
 
   /**
    * Blocks on this PacketStream until all packets have been sent.
    */
-  //##ModelId=3AE4C70203C0
+  //##ModelId=3B07538101F9
   void waitToSendAll();
 
   /**
    * Internal function -- Do not call.  This thread handles throttled writes
    * to the socket.
    */
-  //##ModelId=3B00990701E0
+  //##ModelId=3B07538101FA
   void run();
 
   /**
@@ -107,7 +109,7 @@ public:
    * for the user to call, if they want to delay processing of the packets
    * for a later time and see what other packets are available.
    */
-  //##ModelId=3B00A2910212
+  //##ModelId=3B07538101FB
   void addIncomingPacket(Packet* packet);
 
 private:
@@ -115,36 +117,35 @@ private:
   //##ModelId=3AE45A8302E4
   std::queue<Packet*> in;
 
-  //##ModelId=3AE45C4303DE
+  //##ModelId=3B075380030E
   struct PacketStreamData {
-    //##ModelId=3AE45C440066
+    //##ModelId=3B0753810188
     Packet* packet;
-    //##ModelId=3AE45C44006A
+    //##ModelId=3B075381018C
     bool    reliable;
   };
-  //##ModelId=3AE4CDD70122
+  //##ModelId=3B07538101FD
   Packet* getNextPacketToSend();
 
   //##ModelId=3AE45B56017C
   std::queue<PacketStreamData*> out;
 
-  //##ModelId=3AE4C5D30226
+  //##ModelId=3B075381018E
   int inRate;
 
-  //##ModelId=3AE4C5F7038E
+  //##ModelId=3B075381018F
   int outRate;
 
-  //##ModelId=3AE4C45D0046
+  //##ModelId=3B0753810191
   ConditionVariable writeSync;
 
-  //##ModelId=3AE4CED502C6
+  //##ModelId=3B0753810196
   Mutex inQCtrl;
 
-  //##ModelId=3AE4CF72001E
+  //##ModelId=3B07538101B9
   Mutex outQCtrl;
 
 };
 
+}
 #endif /* PACKETSTREAM_H_INCLUDED_C51CCBFF */
-
-

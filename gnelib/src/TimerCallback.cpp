@@ -20,10 +20,14 @@
 #include "gneintern.h"
 #include "TimerCallback.h"
 
-//##ModelId=3AF78B950190
+namespace GNE {
+
+//##ModelId=3B075382006B
 TimerCallback::TimerCallback() {
 }
 
-//##ModelId=3AF78B9501CC
+//##ModelId=3B075382006C
 TimerCallback::~TimerCallback() {
+}
+
 }

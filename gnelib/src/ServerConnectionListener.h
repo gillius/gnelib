@@ -25,12 +25,14 @@
 #include "ServerConnectionCreator.h"
 #include "Connection.h"
 
+namespace GNE {
+
 /**
  * A connection that listens for other connections.  Inherit from this class,
  * overriding the functions from Connection and ClientConnection based on the
  * events you wish to respond to.
  */
-//##ModelId=3B01D3D7006E
+//##ModelId=3B0753800349
 class ServerConnectionListener {
 public:
   /**
@@ -41,14 +43,14 @@ public:
    * @param creator2 the class to create your custom ServerConnection objects.
    *                 This object will be destroyed with the class.
    */
-  //##ModelId=3B01D3D70208
+  //##ModelId=3B07538102E4
   ServerConnectionListener(int outRate2, int inRate2, ServerConnectionCreator* creator2);
 
   /**
    * The destructor will close down a listening object, so when you are done
    * listening, just destroy this object.
    */
-  //##ModelId=3B01D3D7020B
+  //##ModelId=3B0753810303
   virtual ~ServerConnectionListener();
 
   /**
@@ -56,7 +58,7 @@ public:
    * @param port the port to listen on.
    * @return true if could not open a socket on the port.
    */
-  //##ModelId=3B01D3D70227
+  //##ModelId=3B0753810305
   bool open(int port);
 
   /**
@@ -67,13 +69,13 @@ public:
    * @see #onNewConn(Connection*)
    * @return true, if there was an error.
    */
-  //##ModelId=3B01D3D70229
+  //##ModelId=3B0753810307
   bool listen();
 
   /**
    * Returns true if this ServerConnectionListener is active.
    */
-  //##ModelId=3B0334A90230
+  //##ModelId=3B0753810308
   bool isListening() const;
 
   /**
@@ -85,56 +87,56 @@ public:
    * function FIRST so the underlying functions recieve this event.
    * @param errorType the type of error
    */
-  //##ModelId=3B0334A90348
+  //##ModelId=3B075381030A
   virtual void onListenFailure(Connection::FailureType errorType);
 
   /**
    * Returns the address of the listening socket.
    */
-  //##ModelId=3B01D3D70230
+  //##ModelId=3B075381030D
   NLaddress getLocalAddress() const;
 
 private:
-  //##ModelId=3B01D3D7006F
+  //##ModelId=3B075380034A
   class ServerListener : public ConnectionEventListener {
   public:
-    //##ModelId=3B01D3D701FA
+    //##ModelId=3B07538102D0
     ServerListener(ServerConnectionListener& listener);
 
-    //##ModelId=3B01D3D701FC
+    //##ModelId=3B07538102D2
     virtual ~ServerListener();
 
-    //##ModelId=3B01D3D701FE
+    //##ModelId=3B07538102D4
     void onReceive();
 
   private:
-    //##ModelId=3B01D3D701F6
+    //##ModelId=3B075381029E
     ServerConnectionListener& conn;
 
   };
   friend class ServerListener;
 
-  //##ModelId=3B01D3D70232
+  //##ModelId=3B075381030F
   void onReceive();
 
-  //##ModelId=3B0334A900E6
+  //##ModelId=3B07538102D7
   bool listening;
 
-  //##ModelId=3B01D3D70202
+  //##ModelId=3B07538102D9
   ServerListener* listener;
 
-  //##ModelId=3B01D3D70206
+  //##ModelId=3B07538102DD
   int inRate;
 
-  //##ModelId=3B01D3D70207
+  //##ModelId=3B07538102DE
   int outRate;
 
   //##ModelId=3B01D48100DC
   NLsocket socket;
 
-  //##ModelId=3B01E1F40227
+  //##ModelId=3B07538102E0
   ServerConnectionCreator* creator;
 };
 
+}
 #endif
-

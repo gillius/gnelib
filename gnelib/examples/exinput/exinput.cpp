@@ -36,6 +36,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+using namespace GNE;
+using namespace GNE::Console;
+
 class Star : public Thread {
 public:
   Star(int width, int height) : running(true) {
@@ -55,9 +58,9 @@ public:
   void run() {
     srand(randSeed); //See above on why I do this.
     while (running) {
-      Console::mlputchar(x, y, star);
+      mlputchar(x, y, star);
       Thread::sleep(rand() % 4000 + 1000);
-      Console::mlputchar(x, y, ' ');
+      mlputchar(x, y, ' ');
       if (running)
         Thread::sleep(rand() % 1000);
     }
@@ -78,12 +81,12 @@ const int NUM_STARS = 45;
 Star* stars[NUM_STARS];
 
 int main(int argc, char* argv[]) {
-  GNE::init(GNE::NO_NET, atexit);
-  Console::init(atexit);
-  Console::setTitle("GNE Console Input Test");
+  initGNE(NO_NET, atexit);
+  initConsole(atexit);
+  setTitle("GNE Console Input Test");
 
   int width, height;
-  Console::getConsoleSize(&width, &height);
+  getConsoleSize(&width, &height);
   if (width == 0)
     width = 80; //our best guess
   if (height == 0)
@@ -98,28 +101,28 @@ int main(int argc, char* argv[]) {
   for (c = 0; c < NUM_STARS; c++)
     stars[c]->start();
 
-  Console::mlprintf(0, height-2, "Please press a key.");
+  mlprintf(0, height-2, "Please press a key.");
 
-  while (!Console::kbhit()) {}
-  int ch = Console::getch();
+  while (!kbhit()) {}
+  int ch = getch();
   
   //Process the key, treating enter and BS specially
   char buf[10];
-  if (ch == Console::ENTER)
+  if (ch == ENTER)
     sprintf(buf, "ENTER");
-  else if (ch == Console::BACKSPACE)
+  else if (ch == BACKSPACE)
     sprintf(buf, "BACKSPACE");
   else
     sprintf(buf, "%c(%i)", (char)ch, ch);
 
-  Console::mlprintf(0, height-2, "You pressed: %s, now please type up to 30 chars below and hit enter:", buf);
+  mlprintf(0, height-2, "You pressed: %s, now please type up to 30 chars below and hit enter:", buf);
   char str[31];
-  int size = Console::lgetString(0, height-1, str, 30);
+  int size = lgetString(0, height-1, str, 30);
   //since we don't know the size of the string we clear everything first.
   //We could do it better perhaps using strlen but who cares?
   //We just don't want the screen to scroll though by putting too many spaces.
-  Console::mlprintf(0, height-2, "                                                                           ");
-  Console::mlprintf(0, height-2, "You typed: \"%s\"(%i == %i). Goodnight stars!", str, size, strlen(str));
+  mlprintf(0, height-2, "                                                                           ");
+  mlprintf(0, height-2, "You typed: \"%s\"(%i == %i). Goodnight stars!", str, size, strlen(str));
 
   for (c = 0; c < NUM_STARS; c++)
     stars[c]->stop();
