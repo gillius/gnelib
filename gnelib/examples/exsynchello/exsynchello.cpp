@@ -57,8 +57,8 @@ public:
          << conn.getConnection()->getRemoteAddress(true)
          << "; waiting for message..." << endl;
 
-    HelloPacket message;
     try {
+      HelloPacket message;
       conn >> message;
       received = true;
       gout << "Got message: \"" << message.getMessage() << "\"" << endl;
@@ -69,6 +69,7 @@ public:
     } catch (Error e) {
       gout << "An error occured during communications." << endl;
       gout << "  The error was: " << e << endl << release;
+      throw;
     }
   }
 

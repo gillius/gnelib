@@ -128,8 +128,7 @@ public:
     Packet* message = conn->stream().getNextPacket();
     if (message->getType() == MIN_USER_ID) {
       HelloPacket* helloMessage = (HelloPacket*)message;
-      mprintf("got message: \"");
-      mprintf(helloMessage->getMessage().c_str());
+      mprintf("got message: \"%s\"\n", helloMessage->getMessage().c_str());
       mprintf("\"\n");
       received = true;
 
