@@ -105,6 +105,10 @@ SOURCE=.\src\ConnectionWriter.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\Console.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Counter.cpp
 # End Source File
 # Begin Source File
@@ -165,6 +169,10 @@ SOURCE=.\src\ConditionVariable.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\conioport.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Connection.h
 # End Source File
 # Begin Source File
@@ -174,6 +182,10 @@ SOURCE=.\src\ConnectionEventGenerator.h
 # Begin Source File
 
 SOURCE=.\src\ConnectionWriter.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\Console.h
 # End Source File
 # Begin Source File
 
