@@ -56,4 +56,9 @@ void Packet::readPacket(RawPacket& raw) {
   raw >> timestamp;
 }
 
+//##ModelId=3B089AE802BC
+Packet* Packet::create() {
+  return new Packet();
+}
+
 }

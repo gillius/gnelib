@@ -21,6 +21,7 @@
  */
 
 #include "gneintern.h"
+#include "Packet.h"
 
 namespace GNE {
 class RawPacket;
@@ -97,6 +98,9 @@ public:
   //##ModelId=3B075381015E
   virtual void readPacket(RawPacket& raw);
 
+  //##ModelId=3B089AE802BC
+  static Packet* create();
+
   /**
    * The 32-bit timestamp for this packet.  You may use any system for
    * timestamping, for example seconds, milliseconds, or frames.  However,
@@ -108,7 +112,7 @@ public:
   int timestamp;
 
 private:
-  //##ModelId=3AE4D15E021C
+  //##ModelId=3B089B520140
   NLubyte type;
 
 };
