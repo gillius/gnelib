@@ -1,0 +1,4 @@
+This directory contains examples using GNE with the Allegro game programming
+library.
+
+exballs -- Allegro ball example by networm.
