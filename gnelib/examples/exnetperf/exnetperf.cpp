@@ -357,6 +357,8 @@ void doClient(int outRate, int inRate, int port) {
       mlprintf(0, 24, clr);
     }
     
+    //Turn off the PacketFeeder so when we disconnect we won't wait forever.
+    client.stream().setFeeder(NULL);
     client.disconnectSendAll();
   
   } else {
