@@ -157,8 +157,7 @@ public:
 
   static NetworkObject* createFromPacket( int objId, const Packet& packet ) {
     assert( packet.getType() == PositionedTextPacket::ID );
-    const PositionedTextPacket& ptp =
-      reinterpret_cast<const PositionedTextPacket&>(packet);
+    const PositionedTextPacket& ptp = (const PositionedTextPacket&)packet;
 
     return new PositionedText( objId, ptp.msg, ptp.x, ptp.y );
   }
@@ -217,7 +216,7 @@ public:
   }
 
   virtual Packet* createUpdatePacket( const void* param ) {
-    const bool& updateText = *(reinterpret_cast<const bool*>(param));
+    const bool& updateText = *((const bool*)(param));
     if ( updateText ) {
       return new PositionedTextTextUpdatePacket( msg );
     } else {
@@ -246,12 +245,12 @@ public:
     int type = packet.getType();
     if ( type == PositionedTextPositionUpdatePacket::ID ) {
       const PositionedTextPositionUpdatePacket& p =
-        reinterpret_cast<const PositionedTextPositionUpdatePacket&>(packet);
+        (const PositionedTextPositionUpdatePacket&)packet;
       setPos( p.x, p.y );
 
     } else if ( type == PositionedTextTextUpdatePacket::ID ) {
       const PositionedTextTextUpdatePacket& p =
-        reinterpret_cast<const PositionedTextTextUpdatePacket&>(packet);
+        (const PositionedTextTextUpdatePacket&)packet;
       setText( p.msg );
 
     } else {

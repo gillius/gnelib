@@ -153,8 +153,7 @@ int main(int argc, char* argv[]) {
 bool genericHandler( const Packet& packet, ObjectBrokerClient& obc,
                      TextConsole& out ) {
   try {
-    PositionedText& obj =
-      reinterpret_cast<PositionedText&>( obc.usePacket( packet ) );
+    PositionedText& obj = (PositionedText&)( obc.usePacket( packet ) );
 
     if ( obj.isDead() )
       delete &obj;
@@ -197,8 +196,7 @@ doSerializationTest( const ObjectCreationPacket::sptr& p ) {
   Packet* newPacket = PacketParser::parseNextPacket( eop, raw );
   assert( newPacket != NULL );
 
-  return ObjectCreationPacket::sptr(
-    reinterpret_cast<ObjectCreationPacket*>( newPacket ) );
+  return ObjectCreationPacket::sptr( (ObjectCreationPacket*) newPacket );
 }
 
 void registerObjects() {
