@@ -45,8 +45,16 @@ void doClient(int outRate, int inRate, int port);
 
 class OurClient : public ClientConnection {
 public:
-  OurClient(int outRate, int inRate, NLaddress address) 
-    : ClientConnection(outRate, inRate, address) {}
+  OurClient(int outRate, int inRate) 
+    : ClientConnection(outRate, inRate) {}
+
+  void onConnect() {
+    Console::mprintf("Connection to server successful.\n");
+  }
+
+  void onConnectFailure(FailureType errorType) {
+    Console::mprintf("Connection to server failed.\n");
+  }
 
   virtual ~OurClient() {}
 private:
@@ -54,14 +62,40 @@ private:
 
 class OurServer : public ServerConnection {
 public:
-  OurServer(int outRate, int inRate) 
-    : ServerConnection(outRate, inRate) {
-  }
+  OurServer(int outRate, int inRate, NLsocket rsocket2)
+    : ServerConnection(outRate, inRate, rsocket2) {}
 
   virtual ~OurServer() {}
 
-  void onNewConn(Connection* newConn) {
+  void onNewConn() {
+    Console::mprintf("Connection received.\n");
+    detach(true);
   }
+
+  void onConnFailure(FailureType errorType) {
+    Console::mprintf("Connection failure.\n");
+    detach(true);
+  }
+private:
+};
+
+class OurCreator : public ServerConnectionCreator {
+public:
+  OurCreator() {}
+  virtual ~OurCreator() {}
+
+  ServerConnection* create(int outRate, int inRate, NLsocket rsocket2) {
+    return new OurServer(outRate, inRate, rsocket2);
+  }
+};
+
+class OurListener : public ServerConnectionListener {
+public:
+  OurListener(int outRate, int inRate) 
+    : ServerConnectionListener(outRate, inRate, new OurCreator()) {
+  }
+
+  virtual ~OurListener() {}
 
 private:
 };
@@ -129,13 +163,16 @@ string getAddressString(NLaddress& addr) {
 }
 
 void doServer(int outRate, int inRate, int port) {
-  OurServer server(outRate, inRate);
+  OurListener server(outRate, inRate);
   if (server.open(port))
     errorExit("Cannot open server socket.");
   if (server.listen())
     errorExit("Cannot listen on server socket.");
 
   cout << "Server is listening on: " << getAddressString(server.getLocalAddress()) << endl;
+  cout << "Press a key to shutdown server." << endl;
+  Console::getch();
+  //When the server class is destructed, it will stop listening and shutdown.
 }
 
 void doClient(int outRate, int inRate, int port) {
@@ -148,5 +185,10 @@ void doClient(int outRate, int inRate, int port) {
   nlSetAddrPort(&addr, (NLushort)port);
   
   cout << "Connecting to: " << getAddressString(addr) << endl;
-  OurClient client(outRate, inRate, addr);
+  OurClient client(outRate, inRate);
+  client.open(addr); //let port take 0 default, for any local port.
+  client.connect();
+  client.join();     //join on the connection thread
+  //if we did not call join, we would have called client.detach(false)
+  //instead for true async connections.
 }
