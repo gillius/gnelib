@@ -71,6 +71,36 @@ private:
   friend class ConditionVariable;
 };
 
+/**
+ * A small helper class for Mutex which locks the mutex in its ctor and
+ * unlocks it in its destructor.  This is handy if a largish function has
+ * multiple exit points espically if it throws exceptions.  This class makes
+ * sure that once you lock the mutex it will be unlocked when you leave the
+ * scope.\n
+ * A LockMutex instance may not be copied, and you must specify a mutex to
+ * lock in its constructor.\n
+ * This class might be expanded in the future to allow it to be released
+ * early, and provide additional features, but its core functionality will
+ * remain the same.
+ */
+class LockMutex {
+public:
+  LockMutex(Mutex& mutexToLock) : mutex(mutexToLock) {
+    mutex.acquire();
+  }
+
+  ~LockMutex() {
+    mutex.release();
+  }
+private:
+  //LockMutex cannot be copied or constructed defaultly.
+  LockMutex();
+  LockMutex(LockMutex&);
+  LockMutex& operator= (LockMutex& rhs);
+
+  Mutex& mutex;
+};
+
 }
 #endif /* MUTEX_H_INCLUDED_C51DB1E6 */
 

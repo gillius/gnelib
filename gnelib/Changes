@@ -1,4 +1,7 @@
 GNE 0.45 to current
+  Added the LockMutex class as a convenience.  It locks a mutex on creation
+    and unlocks it on deletion which is useful for use in functions with many
+    exit points, or functions that throw exceptions.
   Fixed a bug with an assert being outside of a guarded section and actually
     causing errors it was supposed to fix.
 
