@@ -132,6 +132,9 @@
 				RelativePath=".\src\Console.cpp">
 			</File>
 			<File
+				RelativePath="src\ConsoleBuffer.cpp">
+			</File>
+			<File
 				RelativePath=".\src\ConsoleStream.cpp">
 			</File>
 			<File
@@ -201,6 +204,9 @@
 				RelativePath=".\src\SyncConnection.cpp">
 			</File>
 			<File
+				RelativePath="src\TextConsole.cpp">
+			</File>
+			<File
 				RelativePath=".\src\Thread.cpp">
 			</File>
 			<File
@@ -245,6 +251,9 @@
 			</File>
 			<File
 				RelativePath=".\include\gnelib\Console.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ConsoleBuffer.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ConsoleStream.h">
@@ -317,6 +326,9 @@
 			</File>
 			<File
 				RelativePath=".\include\gnelib\SyncConnection.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\TextConsole.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\Thread.h">

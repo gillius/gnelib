@@ -45,3 +45,6 @@ expong -- It's console pong.  Over the internet.  What kind of nonsense is
   this?  Anyways, this is a COMPLETE game example showing how to do a simple
   framework for a fully functional and correct GNE game that will expand to
   fit most projects.  This means all error handling and the whole shebang.
+  
+exconsole -- shows off the new ConsoleBuffer/TextConsole classes, and acts
+  also as a partial test of these classes.

@@ -25,6 +25,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exuptime", "EXAMPLES\exupti
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gne", "gne.vcproj", "{A7CC192B-C3BE-4517-8811-10BACB066620}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exconsole", "examples\exconsole\exconsole.vcproj", "{75D4D4F5-986E-4AFC-A483-524A47AB4744}"
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		ConfigName.0 = Debug
@@ -43,6 +45,7 @@ Global
 		{49A8EA0C-C9F5-4E52-826C-A41BBC103D67}.0 = {A7CC192B-C3BE-4517-8811-10BACB066620}
 		{56D4173E-A100-4F34-AB6C-516B69A295E5}.0 = {A7CC192B-C3BE-4517-8811-10BACB066620}
 		{86603849-8832-4C2F-964E-9C054CDE98B0}.0 = {A7CC192B-C3BE-4517-8811-10BACB066620}
+		{75D4D4F5-986E-4AFC-A483-524A47AB4744}.0 = {A7CC192B-C3BE-4517-8811-10BACB066620}
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{68217462-4C6D-4246-B55A-2ADF4F77170C}.Debug.ActiveCfg = Debug|Win32
@@ -97,6 +100,10 @@ Global
 		{A7CC192B-C3BE-4517-8811-10BACB066620}.Debug.Build.0 = Debug|Win32
 		{A7CC192B-C3BE-4517-8811-10BACB066620}.Release.ActiveCfg = Release|Win32
 		{A7CC192B-C3BE-4517-8811-10BACB066620}.Release.Build.0 = Release|Win32
+		{75D4D4F5-986E-4AFC-A483-524A47AB4744}.Debug.ActiveCfg = Debug|Win32
+		{75D4D4F5-986E-4AFC-A483-524A47AB4744}.Debug.Build.0 = Debug|Win32
+		{75D4D4F5-986E-4AFC-A483-524A47AB4744}.Release.ActiveCfg = Release|Win32
+		{75D4D4F5-986E-4AFC-A483-524A47AB4744}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

@@ -1,4 +1,6 @@
 GNE 0.55 to current
+  Added the ConsoleBuffer and TextConsole classes, a word-wrapping window
+    that supports scrolling, and an arbitrary rendering device.
   Changed header include scheme to get rid of any extra header files I could,
     most notably my main goal was to get rid of forcing the user to have
     windows.h included indirectly through gnelib.h.
