@@ -292,6 +292,10 @@ void PacketStream::run() {
         //Release the mutex in case rawWrite blocks
         outQCtrl.release();
         if (owner.sockets.rawWrite(reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
+          //We sleep here for a bit because we want to favor onExit if that is going to
+          //happen.  Else this failure will occur.  Or we will favor a "real" error
+          //more descriptive than a write error.
+          Thread::sleep( 250 );
           owner.processError( LowLevelError(Error::Write) );
         }
         outQCtrl.acquire();

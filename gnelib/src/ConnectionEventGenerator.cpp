@@ -49,9 +49,6 @@ ConnectionEventGenerator::~ConnectionEventGenerator() {
 }
 
 /**
- * \bug I think it might be possible for a syncronization error to occur
- *      where an event can be generated on a Connection that is shutting
- *      down.
  * \bug If nlPollGroup fails, the error is not reported.  Instead the results
  *      are ignored, and the call is made again (or in debug mode, the
  *      assert fails).
@@ -63,22 +60,28 @@ void ConnectionEventGenerator::run() {
       mapCtrl.wait();
     }
     mapCtrl.release();
+
     if (!shutdown) {
       int numsockets = nlPollGroup(group, NL_READ_STATUS, sockBuf, NL_MAX_GROUP_SOCKETS, 250);
+
       if (numsockets != NL_INVALID) {
         numsockets--;
         for (; numsockets >= 0; numsockets--) {
-          mapCtrl.acquire();
+          LockCVEx lock( mapCtrl );
           ConnectionsMapIter iter = connections.find(sockBuf[numsockets]);
+          ReceiveEventListener::sptr listener;
+
           //Check to make sure the listener didn't unregister while we were waiting.
-          if (iter != connections.end()) {
-            //I'm 99.5% sure this won't cause deadlocks anymore, and onReceive
-            //MUST be in this lock to make sure we don't call it after it has
-            //been unregistered.
-            iter->second->onReceive();
-          }
-          mapCtrl.release();
+          if (iter != connections.end())
+            listener = iter->second;
+
+          //Release mapCtrl, so we don't cause any deadlocks
+          lock.release();
+
+          if ( listener )
+            listener->onReceive();
         }
+
       } else {
         //The only valid error is NL_INVALID_SOCKET which happens if we close
         //a socket while nlPollGroup is using it.

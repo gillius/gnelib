@@ -45,36 +45,32 @@ EventThread::sptr EventThread::create( const Connection::sptr& conn ) {
 }
 
 EventThread::~EventThread() {
-  eventSync.acquire();
+  //we shouldn't have to lock anything since only one thread should ever be here.
+
   while (!eventQueue.empty()) {
     delete eventQueue.front();
     eventQueue.pop();
   }
-  eventSync.release();
+
   delete failure;
+
   gnedbgo(5, "destroyed");
 }
 
 ConnectionListener::sptr EventThread::getListener() const {
-  listenSync.acquire();
-  ConnectionListener::sptr ret = eventListener;
-  listenSync.release();
-  return ret;
+  LockCV lock( listenSync );
+  return eventListener;
 }
 
 void EventThread::setListener( const ConnectionListener::sptr& listener) {
-  //Acquire listenSync to wait for the current event to complete.
-  listenSync.acquire();
+  LockCV lock( listenSync );
 
   //Acquire eventSync because of the wait loop check
-  eventSync.acquire();
+  LockCV lock2( eventSync );
   eventListener = listener;
 
   //Signal the event thread in case it is waiting for a listener.
   eventSync.signal();
-  eventSync.release();
-
-  listenSync.release();
 }
 
 int EventThread::getTimeout() const {
@@ -82,14 +78,15 @@ int EventThread::getTimeout() const {
 }
 
 void EventThread::setTimeout(int ms) {
-  timeSync.acquire();
-  if (ms != 0) {
-    timeout = Time(0, ms * 1000);
-    nextTimeout = Timer::getAbsoluteTime() + timeout;
-  } else {
-    nextTimeout = timeout = Time();
+  {
+    LockMutex lock( timeSync );
+    if (ms != 0) {
+      timeout = Time(0, ms * 1000);
+      nextTimeout = Timer::getAbsoluteTime() + timeout;
+    } else {
+      nextTimeout = timeout = Time();
+    }
   }
-  timeSync.release();
 
   //Wake up the event thread if it is sleeping, which is needed if there is
   //no timeout currently and the event thread is waiting forever on eventSync.
@@ -100,39 +97,43 @@ void EventThread::onDisconnect() {
   gnedbgo(1, "onDisconnect Event triggered.");
   //We acquire the mutex to avoid the possiblity of a deadlock between the
   // test for the shutdown variable and the wait.
-  eventSync.acquire();
+  LockCV lock( eventSync );
   onDisconnectEvent = true;
   eventSync.signal();
-  eventSync.release();
 }
 
 void EventThread::onExit() {
-  assert(failure == NULL); //only onFailure or onExit can happen.
   gnedbgo(1, "onExit Event triggered.");
 
-  eventSync.acquire();
-  onExitEvent = true;
-  eventSync.signal();
-  eventSync.release();
+  //Guarantee that either onExit or onFailure will be called, never both.
+  LockCV lock( eventSync );
+  if ( !failure && !onDisconnectEvent ) {
+    onExitEvent = true;
+    eventSync.signal();
+  } else {
+    gnedbgo(1, "onExit event ignored due to failure or disconnect.");
+  }
 }
 
 void EventThread::onFailure(const Error& error) {
-  assert(!onExitEvent); //only onFailure or onExit can happen.
   gnedbgo1(1, "onFailure Event: %s", error.toString().c_str());
 
-  eventSync.acquire();
-  failure = new Error(error);
-  eventSync.signal();
-  eventSync.release();
+  //Guarantee that either onExit or onFailure will be called, never both.
+  LockCV lock( eventSync );
+  if ( !onExitEvent && !onDisconnectEvent ) {
+    failure = new Error(error);
+    eventSync.signal();
+  } else {
+    gnedbgo(1, "onFailure event ignored due to onExit or disconnect.");
+  }
 }
 
 void EventThread::onError(const Error& error) {
   gnedbgo1(1, "onError Event: %s", error.toString().c_str());
 
-  eventSync.acquire();
+  LockCV lock( eventSync );
   eventQueue.push(new Error(error));
   eventSync.signal();
-  eventSync.release();
 }
 
 void EventThread::onReceive() {
@@ -141,10 +142,9 @@ void EventThread::onReceive() {
   //reset the timeout counter
   resetTimeout();
 
-  eventSync.acquire();
+  LockCV lock( eventSync );
   onReceiveEvent = true;
   eventSync.signal();
-  eventSync.release();
 }
 
 void EventThread::shutDown() {
@@ -152,16 +152,15 @@ void EventThread::shutDown() {
   //can't do that we couldn't respond to shutdown either.
   ourConn->disconnect();
 
-  eventSync.acquire();
+  LockCV lock( eventSync );
   eventSync.signal();
-  eventSync.release();
 }
 
 void EventThread::run() {
   while ( true ) {
     //Yup.  No checking of shutdown.  When shutDown is called we call disconnect
     //on our connection, which should lead to a graceful shutdown.
-    eventSync.acquire();
+    LockCVEx eventLock( eventSync );
     //Wait while we have no listener and/or we have no events.
     while (!eventListener || (!onReceiveEvent && !failure &&
            !onDisconnectEvent && eventQueue.empty() &&
@@ -176,30 +175,32 @@ void EventThread::run() {
         checkForTimeout();
       }
     }
-    eventSync.release();
+    eventLock.release();
 
     checkForTimeout();
 
+    //To prevent deadlocks, we copy our listener, so that we don't need to hold
+    //listenSync during the event.
+    LockCVEx listenLock( listenSync );
+    ConnectionListener::sptr listener = eventListener;
+    listenLock.release();
+
     //Check for events, processing them if events are pending
-    if (failure) {
-      listenSync.acquire();
-      eventListener->onFailure(*failure);
-      listenSync.release();
+    if (onExitEvent) {
+      listener->onExit();
+      ourConn->disconnect();
+      onExitEvent = false; //set this after onDisconnectEvent is set
+      //we want to reevaluate listener (because of SyncConnection), so we don't
+      //directly call onDisconnect here.
+
+    } else if (failure) {
+      listener->onFailure(*failure);
       ourConn->disconnect();
       delete failure;
-      failure = NULL;
-
-    } else if (onExitEvent) {
-      onExitEvent = false;
-      listenSync.acquire();
-      eventListener->onExit();
-      listenSync.release();
-      ourConn->disconnect();
+      failure = NULL; //set this after onDisconnectEvent is set
 
     } else if (onDisconnectEvent) {
-      listenSync.acquire();
-      eventListener->onDisconnect();
-      listenSync.release();
+      listener->onDisconnect();
       return;  //terminate this thread since there are no other events to
       //process -- onDisconnect HAS to be the last.
 
@@ -207,29 +208,22 @@ void EventThread::run() {
       //This is set to false before in case we get more packets during the
       //onReceive event.
       onReceiveEvent = false;
-      listenSync.acquire();
-      eventListener->onReceive();
-      listenSync.release();
+      listener->onReceive();
 
     } else if (onTimeoutEvent) {
       onTimeoutEvent = false;
-      listenSync.acquire();
-      eventListener->onTimeout();
-      listenSync.release();
+      listener->onTimeout();
 
     } else {
-      eventSync.acquire();
-
-      //When we get here this is the only reason left why we were woken up!
+      LockCVEx lock( eventSync );
       assert(!eventQueue.empty());
       Error* e = eventQueue.front();
-      listenSync.acquire();
-      eventListener->onError(*e);
-      listenSync.release();
-      delete e;
       eventQueue.pop();
+      lock.release();
 
-      eventSync.release();
+      //When we get here this is the only reason left why we were woken up!
+      listener->onError(*e);
+      delete e;
     }
   }
 }
@@ -248,11 +242,11 @@ void EventThread::checkForTimeout() {
 }
 
 void EventThread::resetTimeout() {
-  timeSync.acquire();
+  LockMutex lock( timeSync );
+
   if ( timeout != Time() ) {
     nextTimeout = Timer::getAbsoluteTime() + timeout;
   }
-  timeSync.release();
 }
 
 void EventThread::onTimeout() {
@@ -261,10 +255,9 @@ void EventThread::onTimeout() {
   //reset the timeout counter
   resetTimeout();
 
-  eventSync.acquire();
+  LockCV lock( eventSync );
   onTimeoutEvent = true;
   eventSync.signal();
-  eventSync.release();
 }
 
 } //namespace GNE

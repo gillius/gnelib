@@ -37,7 +37,7 @@
 namespace GNE {
 
 Connection::Connection()
-: connecting(false), connected(false), exiting(false) {
+: connecting(false), connected(false) {
 }
 
 void Connection::disconnectAll() {
@@ -192,11 +192,10 @@ void Connection::checkVersions(RawPacket& raw) {
 }
 
 void Connection::onReceive() {
-  //we don't need to lock sync because we are being called from the CEG.
-  //disconnect doesn't modify eventThread until we are unreg'd.
-  //in fact locking sync would cause deadlock.
-  assert( eventThread );
-  eventThread->onReceive();
+  LockMutex lock( sync );
+
+  if( eventThread )
+    eventThread->onReceive();
 }
 
 void Connection::finishedConnecting() {
@@ -210,10 +209,34 @@ void Connection::finishedConnecting() {
   }
 }
 
+template <typename T>
+class ArrayDeleter {
+public:
+  ArrayDeleter( T* ptr ) : ptr(ptr) {}
+
+  ~ArrayDeleter() {
+    delete[] ptr;
+  }
+
+private:
+  T* ptr;
+};
+
 void Connection::onReceive(bool reliable) {
-  //Create buffer into a RawPacket
+  //TODO: move this to RAII somehow.
   gbyte* buf = new gbyte[RawPacket::RAW_PACKET_LEN];
-  int temp = sockets.rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
+  ArrayDeleter<gbyte> deleter( buf );
+  int temp = 0;
+
+  //We have to assert that the connection is still active, since we can be
+  //disconnected at any time.
+  {
+    LockMutex lock( sync );
+    if ( connected || connecting )
+      temp = sockets.rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
+    else
+      return; //ignore the event.
+  }
   if (temp == NL_INVALID) {
     NLenum error = nlGetError();
     if (error == NL_MESSAGE_END) {
@@ -232,7 +255,9 @@ void Connection::onReceive(bool reliable) {
     //We should never get this now, because HawkNL traps this message, but
     //for completeness we check for it anyways.
     processError(Error::ConnectionDropped);
+
   } else {
+    //Stream read success
     RawPacket raw(buf);
     
     //parse the packets and add them to the PacketStream
@@ -241,16 +266,17 @@ void Connection::onReceive(bool reliable) {
     while ((next = PacketParser::parseNextPacket(errorCheck, raw)) != NULL) {
       //We want to intercept ExitPackets, else we just add it.
       if (next->getType() == ExitPacket::ID) {
-        exiting = true;
-        //we don't need to lock sync because we are being called from the CEG.
-        //disconnect doesn't modify eventThread until we are unreg'd.
-        //in fact locking sync would cause deadlock.
-        assert( eventThread );
-        eventThread->onExit();
+        //All further errors will be ignored after we call onExit, this replaces
+        //the old "exiting" flag.
+        LockMutex lock( sync ); //protect on eventThread
+        if( eventThread )       //have we not disconnected?
+          eventThread->onExit();
+
+        PacketParser::destroyPacket( next );
+
       } else
         ps->addIncomingPacket(next);
     }
-    delete[] buf;
     
     //Start the event
     if (errorCheck == false) {
@@ -263,41 +289,27 @@ void Connection::onReceive(bool reliable) {
   }
 }
 
-/**
- * \bug we can still get multiple failures if the read fails then PacketStream
- *      fails.  I don't think this will cause a deadlock though if we unreg,
- *      trigger onFailure then PacketStream fails because then the eGen won't
- *      block.
- */
 void Connection::processError(const Error& error) {
-  //If we got an ExitPacket, then any errors that we get should be ignored
-  //because the socket will fail when we disconnect.
   switch(error.getCode()) {
+
   case Error::UnknownPacket:
-    if (!exiting) {
-      //we don't need to lock sync because we are being called from the CEG.
-      //disconnect doesn't modify eventThread until we are unreg'd.
-      //in fact locking sync would cause deadlock.
-      assert( eventThread );
-      eventThread->onError(error);
+    {
+      LockMutex lock( sync ); //protect on eventThread
+      if( eventThread )       //have we not disconnected?
+        eventThread->onError(error);
     }
     break;
-  default:
-    //The EventThread will call disconnect.  This will prevent a deadlock
-    //where PacketStream and another thread is trying to disconnect at the
-    //same time.
-    //But if we don't disconnect we generate endless error messages because
-    //we need to unregister immediately.  So we do that.
-    unreg(true, true);
 
-    //We call onFailure after unreg because a deadlock will occur if the
-    //EventThread tries to disconnect before we unreg.
-    if (!exiting) {
-      //we don't need to lock sync because we are being called from the CEG.
-      //disconnect doesn't modify eventThread until we are unreg'd.
-      //in fact locking sync would cause deadlock.
-      assert( eventThread );
-      eventThread->onFailure(error);
+  default:
+    {
+      LockMutex lock( sync ); //lock early since unreg needs it anyway.
+
+      //if we don't unreg we generate endless error messages because
+      //we need to unregister immediately.  So we do that.
+      unreg(true, true);
+
+      if( eventThread )       //have we not disconnected?
+        eventThread->onFailure(error);
     }
     break;
   }
