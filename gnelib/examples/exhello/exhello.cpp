@@ -101,7 +101,6 @@ public:
   }
 
 	void onReceive() {
-		/*
 		Packet* message = stream().getNextPacket();
 		if (message->getType() == MIN_USER_ID) {
 			HelloPacket* helloMessage = (HelloPacket*)message;
@@ -111,7 +110,6 @@ public:
 		} else
 			mprintf("got bad packet.\n");
 		delete message;
-		*/
 	}
 
 	void onFailure(const Error& error) {
@@ -164,12 +162,10 @@ public:
 			mprintf("\"\n");
 			received = true;
 
-			/*
 			//Send Response
 			mprintf("  Sending Response...\n");
 			HelloPacket response("Hello, client!");
 			stream().writePacket(response, true);
-			*/
 		} else
 			mprintf("got bad packet.\n");
 		delete message;
