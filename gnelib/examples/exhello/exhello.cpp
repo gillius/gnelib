@@ -98,13 +98,13 @@ public:
     mprintf("Connection to server successful.\n");
   }
 
-	void onFailure(Error error) {
-		Connection::onFailure(error);
+	void onFailure(const Error& error) {
 		mprintf("Socket failure: %s\n", error.getDesc().c_str());
 	}
 
-  void onConnectFailure(Error error) {
+  void onConnectFailure(const Error& error) {
     mprintf("Connection to server failed.\n");
+		mprintf("GNE reported error: %s\n", error.getDesc().c_str());
   }
 private:
 };
@@ -143,12 +143,11 @@ public:
 		delete message;
 	}
 
-	void onFailure(Error error) {
-		Connection::onFailure(error);
+	void onFailure(const Error& error) {
 		mprintf("Socket failure: %s\n", error.getDesc().c_str());
 	}
 
-  void onConnFailure(Error error) {
+  void onConnFailure(const Error& error) {
     mprintf("Connection failure while connecting.\n");
     detach(true);
   }

@@ -65,11 +65,6 @@ bool Connection::isConnected() const {
   return connected;
 }
 
-/**
- * \bug I think because of the PacketStream thread, if you disconnect, you
- *      cannot reconnect because you cannot restart threads.  If the Thread
- *      class is restartable, then this will be fine.
- */
 //##ModelId=3B0753810083
 void Connection::disconnect() {
 	if (connected) {
@@ -79,6 +74,7 @@ void Connection::disconnect() {
 		gnedbgo2(2, "disconnecting r: %i, u: %i", sockets.r, sockets.u);
 		ps->shutDown();
 		ps->join();
+		onDisconnect();
 		sockets.disconnect();
 		connected = false;
 	}
@@ -92,10 +88,14 @@ void Connection::disconnectSendAll() {
 	}
 }
 
+void Connection::onDisconnect() {
+}
+
 //##ModelId=3B0753810085
-void Connection::onFailure(Error error) {
-	gnedbgo1(1, "onFailure Event: %s", error.getDesc().c_str());
-	disconnect();
+void Connection::onFailure(const Error& error) {
+}
+
+void Connection::onError(const Error& error) {
 }
 
 //##ModelId=3B07538100AC
@@ -116,17 +116,17 @@ void Connection::onReceive(bool reliable) {
 			//in HawkNL 1.4b4 and later, this means that the connection was
 			//closed on the network-level because the client disconnected or
 			//has dropped.  Since we didn't get an "exit" packet, it's an error.
-			onFailure(Error::ConnectionDropped);
+			processError(Error::ConnectionDropped);
 		} else {
 			//This is some other bad error that we need to report
 			reportHawkNLErroro();
-			onFailure(Error::Read);
+			processError(Error::Read);
 		}
 	} else if (temp == 0) {
 		//In HawkNL 1.4b3 and earlier, this _USED_ to mean that...
 		//This means the connection was closed on the network-level because
 		//remote computer has purposely closed or has dropped.
-		onFailure(Error::ConnectionDropped);
+		processError(Error::ConnectionDropped);
 	} else {
 		RawPacket raw(buf);
 		
@@ -143,11 +143,25 @@ void Connection::onReceive(bool reliable) {
 			//These are level 4 since the explicit event log is generated in onFailure
 			gnedbgo1(4, "Unknown packet encountered in a message that has %i bytes", temp);
 			gnedbgo2(4, "First bytes are %i and %i", (int)buf[0], (int) buf[1]);
-			onFailure(Error::UnknownPacket);
+			processError(Error::UnknownPacket);
 		} else {
 			gnedbgo1(4, "onReceive event triggered, %i bytes recv", temp);
 			onReceive();
 		}
+	}
+}
+
+void Connection::processError(const Error& error) {
+	switch(error.getCode()) {
+		case Error::UnknownPacket:
+			gnedbgo1(1, "onError Event: %s", error.getDesc().c_str());
+			onError(error);
+			break;
+		default:
+			gnedbgo1(1, "onFailure Event: %s", error.getDesc().c_str());
+			onFailure(error);
+			disconnect();
+			break;
 	}
 }
 

@@ -111,7 +111,7 @@ public:
 	 * @see Connection::disconnect()
    */
   //##ModelId=3B07538003C4
-  virtual void onConnectFailure(Error error) = 0;
+  virtual void onConnectFailure(const Error& error) = 0;
 
 private:
   /**

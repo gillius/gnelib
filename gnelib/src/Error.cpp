@@ -48,7 +48,7 @@ const std::string ErrorStrings[] = {
 	"Remote computer suddenly disconnected without warning, or dropped (TCP) (in pre-alpha GNE, this is expected for now...)",
 	"Network error when trying to read from connection.",
 	"Network error when trying to write to connection.",
-	"Unknown packet type encountered or corrupted data received.",
+	"Unknown packet type encountered or corrupted data received -- possible additional data loss.",
 	"Other GNE (not a low-level network) error.",
   "Other low-level HawkNL error."
 };

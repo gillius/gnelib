@@ -68,6 +68,10 @@ public:
   //##ModelId=3B0753810073
   Connection(int outRate, int inRate);
 
+	/**
+	 * A Connection will automatically disconnect if it is connected when it
+	 * is destructed.
+	 */
   //##ModelId=3B0753810076
   virtual ~Connection();
 
@@ -140,22 +144,51 @@ public:
   //##ModelId=3B0753810084
   void disconnectSendAll();
 
-  /**
-   * This is called when something bad happens, such as a timeout.
-   * Note you must call this function explicity from your overridden
-   * function FIRST so the underlying functions recieve this event.
+	/**
+	 * An event triggered when a socket is closing for any reason.  This event
+	 * is always called once and only once if a socket was connected.  At the
+	 * time this event is called, the sockets are still connected, so you can
+	 * get their address (for logging and/or reporting reasons), but you cannot
+	 * send any more data or receive any from this event.
 	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread.  Therefore, no receive events for any 
-	 * connection will be called until this function completes.
+	 * is only a single event thread.  Therefore, some events for any 
+	 * connection will not be called until this function completes.
+	 */
+	virtual void onDisconnect();
+
+  /**
+   * This event is triggered when a fatal error occurs in a connection.
+	 * When a fatal error occurs, communications cannot contiune and the
+	 * socket will be disconnected.  An onDisconnect() event will occur
+	 * immediately after this event completes.  Most errors in GNE are fatal.
+	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
+	 * is only a single event thread.  Therefore, some events for any 
+	 * connection will not be called until this function completes.
+	 * @see onError()
    */
   //##ModelId=3B0753810085
-  virtual void onFailure(Error error);
+  virtual void onFailure(const Error& error);
+
+	/**
+	 * This event is triggered when a non-fatal error occurs in a connection
+	 * that does not force the connection to close, for example an unknown
+	 * packet encounted is an error, but the connection can still proceed.\n
+	 * After this event is processed, connections resume normally.
+	 * disconnect() may also be called at this point if you wish to terminate
+	 * the connection anyways.
+	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
+	 * is only a single event thread.  Therefore, some events for any 
+	 * connection will not be called until this function completes.
+	 * @see onFailure()
+	 * @see disconnect()
+   */
+	virtual void onError(const Error& error);
 
   /**
    * Event triggered when one or more packets have been recieved.
 	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread.  Therefore, no receive events for any 
-	 * connection will be called until this function completes.
+	 * is only a single event thread.  Therefore, some events for any 
+	 * connection will not be called until this function completes.
    */
   //##ModelId=3B07538100AC
   virtual void onReceive();
@@ -262,6 +295,11 @@ private:
   //##ModelId=3B07538100B0
   void onReceive(bool reliable);
 
+	/**
+	 * Determines whether the error given is fatal or non-fatal, and calls the
+	 * appropriate event, and handles disconnects if necessary.
+	 */
+	void processError(const Error& error);
 };
 
 }
