@@ -18,50 +18,118 @@
  */
 
 #include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/GNE.h"
 #include "../include/gnelib/ClientConnection.h"
 #include "../include/gnelib/ConnectionListener.h"
 #include "../include/gnelib/Error.h"
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/SyncConnection.h"
 #include "../include/gnelib/EventThread.h"
+#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/PacketParser.h"
 
 namespace GNE {
 
+/**
+ * Simply just a class to temporarily hold connection parameters until the
+ * ClientConnection is connected, then it is useless.
+ */
+class ClientConnectionParams {
+public:
+  Address dest;
+  int outRate;
+  int inRate;
+  bool unrel;
+  SyncConnection* sConnPtr;
+};
+
 //##ModelId=3B075380037F
-ClientConnection::ClientConnection(int outRate, int inRate, ConnectionListener* listener)
-  : Connection(outRate, inRate, listener), Thread("CliConn") {
+ClientConnection::ClientConnection(ConnectionListener* listener)
+  : Connection(listener), Thread("CliConn"), params(NULL) {
   gnedbgo(5, "created");
 }
 
   //##ModelId=3B07538003B8
 ClientConnection::~ClientConnection() {
+  delete params;
   gnedbgo(5, "destroyed");
 }
 
-/**
- * \todo time sync with server, and do negotiations.
- */
+//##ModelId=3B07538003BB
+bool ClientConnection::open(const Address& dest, int outRate, int inRate,
+                            int localPort, bool wantUnreliable) {
+  if (!dest || outRate < 0 || inRate < 0 || localPort < 0 ||
+      localPort > 65535)
+    return true;
+  else {
+    params = new ClientConnectionParams;
+    params->dest = dest;
+    params->inRate = inRate;
+    params->outRate = outRate;
+    params->unrel = wantUnreliable;
+
+    sockets.r = nlOpen(localPort, NL_RELIABLE_PACKETS);
+  }
+  return (sockets.r == NL_INVALID);
+}
+
+//##ModelId=3B07538003C1
+void ClientConnection::connect(SyncConnection* wrapped) {
+  assert(sockets.r != NL_INVALID);
+  assert(params);
+  assert(params->dest);
+  params->sConnPtr = wrapped;
+  start();
+}
+
 //##ModelId=3B07538003BA
 void ClientConnection::run() {
-  gnedbgo1(1, "Trying to connect to %s", address.toString().c_str());
+  gnedbgo1(1, "Trying to connect to %s", params->dest.toString().c_str());
 
-  NLaddress temp = address.getAddress();
+  NLaddress temp = params->dest.getAddress();
   NLboolean check = nlConnect(sockets.r, &temp);
 
   if (check == NL_TRUE) {
+    assert(eventListener != NULL);
+    //Try to connect using the GNE protocol before we mess with any of the
+    //user stuff.
+    try {
+      //Start the GNE protocol connection process.
+      //The first packet is from client to server, and is the connection
+      //request packet (CRP).
+      gnedbgo(4, "Sending the CRP.");
+      sendCRP();
+
+      //Now we expect to receive the connection accepted packet (CAP) or the
+      //refused connection packet, and then based on that set up the
+      //unreliable connection.
+      Address temp = getCAP();
+      gnedbgo(4, "Received the CAP.");
+
+      if (params->unrel) {
+        gnedbgo(4, "Setting up the unreliable connection");
+        setupUnreliable(temp);
+      } else
+        gnedbgo(4, "Unreliable connection not requested.");
+
+    } catch (Error e) {
+      gnedbgo1(1, "Connection failure during GNE handshake: %s", e.toString().c_str());
+      getListener()->onConnectFailure(e);
+      return;
+    }
+
     //We don't want to doubly-wrap SyncConnections, so we check for a wrapped
     //one here and else make our own.
     bool ourSConn = false;
-    if (!sConnPtr) {
-      sConnPtr = new SyncConnection(this);
+    if (!params->sConnPtr) {
+      params->sConnPtr = new SyncConnection(this);
       ourSConn = true;
     } else
-      assert(sConnPtr == getListener());
+      assert(params->sConnPtr == getListener());
     //The sConn reference variable is used only for syntactical convienence.
-    SyncConnection& sConn = *sConnPtr;
+    SyncConnection& sConn = *params->sConnPtr;
     
     bool onConnectFinished = false;
-    assert(eventListener != NULL);
     try {
       //We only want to hold events on our own SyncConnection.  On a user
       //supplied SyncConnection, when it fails we will fail, and
@@ -71,9 +139,7 @@ void ClientConnection::run() {
       ps->start();
       connecting = true;
       eventListener->start();
-      reg(true, false);
-
-      //Do GNE protocol negotiations here
+      reg(true, (sockets.u != NL_INVALID));
 
       gnedbgo2(2, "Starting onConnect r: %i, u: %i", sockets.r, sockets.u);
       getListener()->onConnect(sConn); //SyncConnection will relay this
@@ -83,8 +149,13 @@ void ClientConnection::run() {
       if (ourSConn) {
         sConn.endConnect(true);
         sConn.release();
-        delete sConnPtr;
+        delete params->sConnPtr;
       }
+
+      //We are done using the ClientConnectionParams.
+      delete params;
+      params = NULL;
+
     } catch (Error e) {
       if (!onConnectFinished) {
         if (ourSConn)
@@ -93,7 +164,11 @@ void ClientConnection::run() {
       }
       //else onDisconnect should get called.
       if (ourSConn)
-        delete sConnPtr;
+        delete params->sConnPtr;
+
+      //We are done using the ClientConnectionParams.
+      delete params;
+      params = NULL;
     }
   } else {
     assert(eventListener != NULL);
@@ -103,29 +178,129 @@ void ClientConnection::run() {
   }
 }
 
-//##ModelId=3B07538003BB
-bool ClientConnection::open(const Address& dest, int localPort) {
-  if (!dest)
-    return true;
-  else {
-    address = dest;
-    sockets.r = nlOpen(localPort, NL_RELIABLE_PACKETS);
-    return (sockets.r == NL_INVALID);
+void ClientConnection::sendCRP() throw (Error) {
+  GNEProtocolVersionNumber ver = GNE::getGNEProtocolVersion();
+
+  RawPacket crp;
+  crp << ver.version << ver.subVersion << ver.build;
+  crp << GNE::getUserVersion();
+  crp << (guint32)params->inRate;
+  crp << ((params->unrel) ? gTrue : gFalse);
+
+  int check = nlWrite(sockets.r, (NLvoid*)crp.getData(), (NLint)crp.getPosition());
+  //The write should succeed and have sent all of our data.
+  if (check != crp.getPosition())
+    throw Error::createLowLevelError(Error::Write);
+}
+
+const int REFLEN = sizeof(gbool) + sizeof(guint8) + sizeof(guint8) +
+                   sizeof(guint16) + sizeof(guint32);
+
+const int CAPLEN = sizeof(gbool) + sizeof(guint32);
+
+Address ClientConnection::getCAP() throw (Error) {
+  gbyte* capBuf = new gbyte[RawPacket::RAW_PACKET_LEN];
+  int check = nlRead(sockets.r, (NLvoid*)capBuf, RawPacket::RAW_PACKET_LEN);
+  if (check == NL_INVALID) {
+    delete[] capBuf;
+    throw Error::createLowLevelError(Error::Read);
   }
+
+  //The packet must be at least as large to check if it is a CAP or a
+  //refusal packet.
+  if (check < sizeof(gbool)) {
+    delete[] capBuf;
+    throw new Error(Error::ProtocolViolation);
+  }
+
+  //Now parse the CAP (or refusal packet)
+  RawPacket cap(capBuf);
+  gbool isCAP;
+  cap >> isCAP;
+
+  if (isCAP) {
+    //Check to make sure packet sizes match.
+    //The size should be CAPLEN if we are not expecting the unreliable info.
+    //but if we are expecting it we'll get another guint16.
+    if (check != ((params->unrel) ? (CAPLEN + sizeof(guint16)) : CAPLEN)) {
+      delete[] capBuf;
+      throw new Error(Error::ProtocolViolation);
+    }
+
+    //Get the max rate the remote end allows.
+    guint32 maxOutRate;
+    cap >> maxOutRate;
+
+    //Now we have enough info to create our PacketStream.
+    //Take the lowest of the out rates.
+    if ((int)maxOutRate < params->outRate)
+      params->outRate = (int)maxOutRate;
+    ps = new PacketStream(params->outRate, params->inRate, *this);
+
+    Address ret = params->dest;
+    if (params->unrel) {
+      //Get the unreliable connection information
+      guint16 portNum;
+      cap >> portNum;
+      ret.setPort((int)portNum);
+    }
+    //else the result of the returned Address is undefined.
+
+    delete[] capBuf;
+    return ret;
+  }
+  //else we got a refusal packet
+  if (check != REFLEN) {
+    delete[] capBuf;
+    throw new Error(Error::ProtocolViolation);
+  }
+
+  //Get the version numbers
+  GNEProtocolVersionNumber them;
+  cap >> them.version >> them.subVersion >> them.build;
+
+  guint32 themUser;
+  cap >> themUser;
+
+  //We are done with the CAP packet
+  delete[] capBuf;
+
+  //Check the GNE version numbers.  This will throw the right exception if
+  //the versions do not match.
+  GNE::checkVersions(them, themUser);
+
+  //If the version numbers are all the same our connection was simply
+  //just refused.
+  throw new Error(Error::ConnectionRefused);
+
+  //We should never reach this point.
+  assert(false);
+  return Address();
 }
 
-//##ModelId=3B07538003C1
-void ClientConnection::connect(SyncConnection* wrapped) {
-  assert(sockets.r != NL_INVALID);
-  assert(address);
-  sConnPtr = wrapped;
-  start();
+void ClientConnection::setupUnreliable(const Address& dest) throw (Error) {
+  assert(dest);
+  sockets.u = nlOpen(0, NL_UNRELIABLE);
+  if (sockets.u == NL_INVALID)
+    throw Error::createLowLevelError(Error::CouldNotOpenSocket);
+  nlSetRemoteAddr(sockets.u, &dest.getAddress());
+
+  //Now send back our local info, and send a dummy packet out first to open
+  //up any possible firewalls or gateways.
+  int check = 0;
+
+  guint16 ourPort = (guint16)sockets.getLocalAddress(false).getPort();
+  RawPacket resp;
+  resp << ourPort;
+  check = nlWrite(sockets.r, (NLvoid*)resp.getData(), (NLint)resp.getPosition());
+  if (check != resp.getPosition())
+    throw Error::createLowLevelError(Error::Write);
+
+  resp.reset();
+  resp << PacketParser::END_OF_PACKET;
+  check = nlWrite(sockets.u, (NLvoid*)resp.getData(), (NLint)resp.getPosition());
+  if (check != resp.getPosition())
+    throw Error::createLowLevelError(Error::Write);
 }
 
 }
-
-
-
-
-
-

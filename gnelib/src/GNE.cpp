@@ -23,6 +23,7 @@
 #include "../include/gnelib/PacketParser.h"
 #include "../include/gnelib/GNE.h"
 #include "../include/gnelib/Address.h"
+#include "../include/gnelib/Error.h"
 
 namespace GNE {
   namespace PacketParser {
@@ -139,6 +140,28 @@ guint32 getUserVersion() {
 void setUserVersion(guint32 version) {
   assert(initialized);
   userVersion = version;
+}
+
+void checkVersions(const GNEProtocolVersionNumber& otherGNE,
+                     guint32 otherUser) throw (Error) {
+  GNEProtocolVersionNumber us = getGNEProtocolVersion();
+
+  //Check the GNE version numbers
+  if (otherGNE.version != us.version &&
+      otherGNE.subVersion != us.subVersion &&
+      otherGNE.build != us.build) {
+    if ((otherGNE.version > us.version) ||
+        (otherGNE.version == us.version && otherGNE.subVersion > us.subVersion) ||
+        (otherGNE.subVersion == us.subVersion && otherGNE.build > us.build))
+      throw new Error(Error::GNETheirVersionHigh);
+    else
+      throw new Error(Error::GNETheirVersionLow);
+  }
+
+  //Check the user version numbers
+  if (userVersion != otherUser) {
+    throw new Error(Error::UserVersionMismatch);
+  }
 }
 
 }

@@ -1,4 +1,9 @@
 GNE 0.45 to current
+  Handshaking as specified in the GNE protocol specs is now implemented.
+  When an unreliable connection does not exist, packets marked as being sent
+    over the unreliable packet stream are sent over the reliable stream
+    instead.
+  Added adjustCount function in the Counter class.
   RawPacket class updated to use the GNE protocol data types.  Nulls are now
     allowed in the middle of strings.  Max string size is 255 bytes.
   RawPacket example updated to better test new GNE protocol requirements.

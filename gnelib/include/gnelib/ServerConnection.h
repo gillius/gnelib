@@ -27,6 +27,8 @@
 namespace GNE {
 class ConnectionListener;
 class ServerConnectionListener;
+class ServerConnectionParams;
+class Error;
 
 /**
  * A GNE "internal" class.  Users will use this class, but probably only as
@@ -38,7 +40,12 @@ class ServerConnection : public Connection, public Thread {
 public:
   /**
    * Intializes this class.
-   * @see Connection#Connection(int, int, ConnectionListener*)
+   * @see Connection#Connection(ConnectionListener*)
+   * @param outRate the maximum rate in bytes per second to send.  If this is
+   *        0, then the rate is unlimited.
+   * @param inRate the maximum rate we allow the sender to send to us in
+   *        bytes per second.  If this is 0, then the requested
+   *        incoming rate has no bounds.
    * @param rsocket2 the reliable socket received from the accept command.
    * @param creator the ServerConnectionListener that created us, so that we
    *                may call its onListenFailure event.
@@ -70,12 +77,16 @@ protected:
   void run();
 
 private:
-  /**
-   * Used only while connecting to transmit an error if necessary.
-   * @see run
-   */
-  //##ModelId=3BCFAE590227
-  ServerConnectionListener* ourCreator;
+  Error getCRP();
+
+  void sendRefusal();
+
+  void sendCAP() throw (Error);
+
+  void getUnreliableInfo() throw (Error);
+
+  //Temporary storage to hold variables before and during connecting.
+  ServerConnectionParams* params;
 };
 
 }

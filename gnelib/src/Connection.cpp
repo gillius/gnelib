@@ -33,9 +33,8 @@
 namespace GNE {
 
 //##ModelId=3B0753810073
-Connection::Connection(int outRate, int inRate, ConnectionListener* listener)
-: connecting(false), connected(false), rlistener(NULL), ulistener(NULL) {
-  ps = new PacketStream(outRate, inRate, *this);
+Connection::Connection(ConnectionListener* listener)
+: ps(NULL), connecting(false), connected(false), rlistener(NULL), ulistener(NULL) {
   eventListener = new EventThread(listener);
 }
 
@@ -75,6 +74,7 @@ void Connection::setListener(ConnectionListener* listener) {
 
 //##ModelId=3B0753810078
 PacketStream& Connection::stream() {
+  assert(ps != NULL);
   return *ps;
 }
 
@@ -112,9 +112,12 @@ void Connection::disconnect() {
     //This will also shutdown the EventThread, and we will join on it in the
     //destructor (because this could be our EventThread, and you can't join
     //on yourself).
-    sockets.disconnect();
     connected = connecting = false;
   }
+  //We always call the low-level disconnect in case errors happened while
+  //opening before connecting or for some other reason they are left open --
+  //and calling disconnect multiple times does not hurt.
+  sockets.disconnect();
   sync.release();
 }
 

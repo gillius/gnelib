@@ -32,6 +32,7 @@
 namespace GNE {
   class Address;
   class ConnectionEventGenerator;
+  class Error;
 
   /**
    * Initalizes GNE and HawkNL.  Call this before using any HawkNL or GNE
@@ -131,6 +132,16 @@ namespace GNE {
    * error if there is a mismatch.
    */
   void setUserVersion(guint32 version);
+
+  /**
+   * Compares other versions against this library.  This is used internally
+   * by GNE to compare versions.  It throws Error::GNETheirVersionHigh,
+   * Error::GNETheirVersionLow, or Error::GNEUserVersionMismatch if the
+   * versions are different, else if the versions are both the same it
+   * returns nor throws anything.  It checks the GNE version numbers first.
+   */
+  void checkVersions(const GNEProtocolVersionNumber& otherGNE,
+                     guint32 otherUser) throw (Error);
 
   /**
    * A numeric representation of the current version of this library.

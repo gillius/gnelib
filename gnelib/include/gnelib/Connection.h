@@ -40,7 +40,8 @@ class SyncConnection;
  * constructed the passed inRate and outRate parameters set a maximum
  * bandwith usage for either direction.  These values might stay the same or
  * reduce after a connection to the remote machine is made, based on that
- * machine's requested maximums.\n
+ * machine's requested maximums.
+ *
  * When you create a new Connection, you will want to register a
  * ConnectionListener for it so you can receive its events.
  */
@@ -49,18 +50,13 @@ class Connection {
 public:
   /**
    * Intializes this class, given the flow control parameters.
-   * @param outRate the maximum rate in bytes per second to send.  If this is
-   *        0 or less, then the rate is unlimited.
-   * @param inRate the maximum rate we allow the sender to send to us in
-   *        bytes per second.  If this is 0 or less, then the requested
-   *        incoming rate has no bounds.
    * @param listener the ConnectionListener instance that will be setup as
    *        the initial listener for the events.  It can be NULL to start
-   *        with but must be set before performing any operation that
-   *        that generates events, but preferably as soon as possible.
+   *        with but must be set before performing any other operations on
+   *        this Connection instance.
    */
   //##ModelId=3B0753810073
-  Connection(int outRate = 0, int inRate = 0, ConnectionListener* listener = NULL);
+  Connection(ConnectionListener* listener = NULL);
 
   /**
    * A Connection will automatically disconnect if it is connected when it
@@ -97,8 +93,8 @@ public:
 
   /**
    * If stats is enabled, returns Connection stats.
-   * @param reliable If greater than 0, returns reliable stats only.\n
-   *                 If 0, returns unreliable transfer stats only.\n
+   * @param reliable If greater than 0, returns reliable stats only.<br>
+   *                 If 0, returns unreliable transfer stats only.<br>
    *                 If less than 0, returns cumulative stats for both.
    * @return various connection stats.
    * @see ConnectionStats
