@@ -18,6 +18,7 @@
  */
 
 #include "gneintern.h"
+#include "ConnectionEventGenerator.h"
 #include "GNE.h"
 
 //##ModelId=3AE26F6A035C
@@ -38,6 +39,8 @@ const NLenum GNE::NO_NET = 128;
 //##ModelId=3AFF6429023A
 int GNE::userVersion = 0;
 
+ConnectionEventGenerator* GNE::eGen = NULL;
+
 //##ModelId=3AE270BF0078
 bool GNE::init(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
   if (!initialized) {
@@ -50,6 +53,8 @@ bool GNE::init(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
       nlEnable(NL_BLOCKING_IO);
       nlEnable(NL_TCP_NO_DELAY);
       nlDisable(NL_SOCKET_STATS);
+      eGen = new ConnectionEventGenerator();
+      eGen->start();
       initialized = true; //We need only to set this to true if we are using HawkNL
     }
     return false;
@@ -60,6 +65,8 @@ bool GNE::init(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
 //##ModelId=3AE270CE033E
 void GNE::shutdown() {
   if (initialized) {
+    eGen->shutdown();
+    eGen->join();
     nlShutdown();
     initialized = false;
   }

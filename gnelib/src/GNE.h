@@ -155,12 +155,12 @@ public:
   //##ModelId=3AFF6429023A
   static int userVersion;
 
+  //##ModelId=3AE34D930316
+  static ConnectionEventGenerator *eGen;
+
 private:
   //##ModelId=3AF8D89F00E6
   static bool initialized;
-
-  //##ModelId=3AE34D930316
-  ConnectionEventGenerator *eGen;
 
 };
 
