@@ -61,10 +61,10 @@ const int PersonPacket::ID = MIN_USER_ID;
  * error conditions of the PacketParser.  This class also demonstrates the
  * absolute minimum code to derive from Packet.
  */
-class UnknownPacket : public Packet {
+class MyUnknownPacket : public Packet {
 public:
-  UnknownPacket() : Packet(ID) {}
-  virtual ~UnknownPacket() {}
+  MyUnknownPacket() : Packet(ID) {}
+  virtual ~MyUnknownPacket() {}
 
   static const int ID;
 
@@ -81,7 +81,7 @@ public:
   }
 };
 
-const int ::UnknownPacket::ID = MIN_USER_ID + 1;
+const int MyUnknownPacket::ID = MIN_USER_ID + 1;
 
 void packetTest(const PersonPacket&, const PersonPacket&);
 void parseTest(const Packet&, const Packet&);

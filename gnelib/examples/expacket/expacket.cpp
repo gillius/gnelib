@@ -105,7 +105,7 @@ void packetTest(const PersonPacket& jason, const PersonPacket& elias) {
 void parseTest(const Packet& jason, const Packet& elias) {
   gout << "Starting packet tests.  If no \"Unexpected values\" are seen, everything worked." << endl;
   Packet packet1;
-  ::UnknownPacket packet2;
+  MyUnknownPacket packet2;
 
   Buffer raw1;
   
@@ -136,10 +136,10 @@ void parseTest(const Packet& jason, const Packet& elias) {
 
   raw1.rewind();
   //After we register, we should be able to completely read the Buffer.
-  defaultRegisterPacket<::UnknownPacket>();
+  defaultRegisterPacket<MyUnknownPacket>();
 
   try {
-    while( next = parseNextPacket(raw1) )
+    while( (next = parseNextPacket(raw1)) )
       PacketParser::destroyPacket( next );
 
   } catch ( Error& e ) {
