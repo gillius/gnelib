@@ -74,10 +74,14 @@ Thread* Thread::currentThread() {
 
 //##ModelId=3AEEF76701E0
 void Thread::sleep(int ms) {
+#ifdef WIN32
+  Sleep(ms);
+#else
   ConditionVariable sleeper;
   sleeper.acquire();
   sleeper.timedWait(ms);
   sleeper.release();
+#endif
 }
 
 //##ModelId=3AE126FD00DC
