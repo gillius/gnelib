@@ -137,7 +137,7 @@ void ConsoleBuffer::doUpdate( int hints ) {
       assert( yoff + height + currRow - textHeight >= yoff );
       assert( yoff + height + currRow - textHeight < yoff + height );
       render( xoff + currCol, yoff + height + currRow - textHeight,
-        string( *iter, currCol ), hints );
+        string( *iter, currCol, string::npos ), hints );
       currCol = 0;
       ++currRow;
       assert( iter != lines.rend() );
@@ -149,7 +149,7 @@ void ConsoleBuffer::doUpdate( int hints ) {
   assert( yoff + height - textHeight >= yoff );
   assert( yoff + height - textHeight < yoff + height );
   render( xoff + currCol, yoff + height - textHeight,
-    string( lastLine, currCol ), hints );
+    string( lastLine, currCol, string::npos ), hints );
   currCol = stringWidth( lastLine );
 }
 
@@ -157,8 +157,8 @@ void ConsoleBuffer::processInput() {
   //Pull words at a time out of input.
   string currWord;
   string::size_type pos = 0;
+  string inputStr = input.str();
   do {
-    const string& inputStr( input.str() );
     pos = inputStr.find_first_of( allDelims );
     if (pos == 0 && !isReqDelim( inputStr[0] ) ) {
       //We have an optional delim (or newline) at the start of the word.
@@ -171,25 +171,27 @@ void ConsoleBuffer::processInput() {
         ++pos;
       //Now let's get our word, and remove it from the input.
       currWord = string( inputStr, 0, pos );
-      input.str( string( inputStr, pos ) );
-      //For some reason, seeking to position 0 on a string "" fails, so we use
-      //this condition.
-      if ( input.str().length() > 0 )
-        input.seekp( (std::streamoff)input.str().length() );
-      assert( input );
+      inputStr = string( inputStr, pos, string::npos );
 
       //Now we have removed a word from the buffer, possibly with a leading
       //optional delim, and possibly with a trailing required delim.
       processWord( currWord );
     }
   } while ( pos != string::npos );
+
+  //This is a little workaround for a compliance bug in libstdc++-2 (GCC2)
+  //and for a crashing bug in MSVC6.
+  //Remove what we've used from the input stream.
+  input.str( "" );
+  input << inputStr;
+  assert( input );
 }
 
 void ConsoleBuffer::processWord( string currWord ) {
   assert( (int)currWord.length() > 0 );
   int currLen = 0;
   if ( currWord[0] == '\n' ) {
-    pushLastLine( string( currWord, 1 ) );
+    pushLastLine( string( currWord, 1, string::npos ) );
     assert( stringWidth( lastLine ) <= width );
 
   } else {
@@ -202,7 +204,7 @@ void ConsoleBuffer::processWord( string currWord ) {
       //We are word wrapping.  If the starting character of currWord is an
       //optional delimiter (like a space) we want to remove it.
       if ( isOptDelim( currWord[0] ) )
-        currWord = string( currWord, 1 );
+        currWord = string( currWord, 1, string::npos );
       pushLastLine( indent + currWord );
       assert( stringWidth( lastLine ) <= width );
     }

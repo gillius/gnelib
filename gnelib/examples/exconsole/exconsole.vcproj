@@ -32,7 +32,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="HawkNL.lib"
-				OutputFile="$(OutDir)/exconsole.exe"
+				OutputFile="../exconsoled.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/exconsole.pdb"
@@ -77,7 +77,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="HawkNL.lib"
-				OutputFile="$(OutDir)/exconsole.exe"
+				OutputFile="../exconsole.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"

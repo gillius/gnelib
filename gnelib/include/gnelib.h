@@ -20,6 +20,15 @@
 #ifndef _GNELIB_H_
 #define _GNELIB_H_
 
+#ifdef _MSC_VER
+/*
+ * Disable following warnings:
+ *
+ * warning C4786: identifier was truncated to '255' characters in the debug information
+ */
+#pragma warning( disable : 4786)
+#endif
+
 #include "gnelib/Address.h"
 #include "gnelib/ClientConnection.h"
 #include "gnelib/ConnectionListener.h"
