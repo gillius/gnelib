@@ -27,6 +27,10 @@
 #include "../include/gnelib/Errors.h"
 #include "../include/gnelib/PingPacket.h"
 
+#ifndef WIN32
+#include <signal.h>
+#endif
+
 namespace GNE {
   namespace PacketParser {
     //this is declared here only so the user cannot access it, and the "real"
@@ -58,6 +62,9 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
       eGen->start();
       initialized = true; //We need only to set this to true if we are using HawkNL
     }
+#ifndef WIN32
+    signal(SIGPIPE, SIG_IGN);
+#endif
     atexit_ptr(shutdownGNE);
     return false;
   }
