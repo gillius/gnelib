@@ -32,7 +32,6 @@
 #include "WeakPtr.h"
 
 namespace GNE {
-class Connection;
 class ConnectionListener;
 class EventThread;
 class SyncConnection;
@@ -345,6 +344,25 @@ protected:
   void unreg(bool reliable, bool unreliable);
 
 private:
+  class Listener : public ReceiveEventListener {
+  public:
+    typedef SmartPtr<Listener> sptr;
+    typedef WeakPtr<Listener> wptr;
+
+  public:
+    Listener(const Connection::sptr& listener, bool isReliable);
+
+    virtual ~Listener();
+
+    void onReceive();
+
+  private:
+    Connection::sptr conn;
+
+    bool reliable;
+
+  };
+
   /**
    * A weak reference to the EventThread that will we will keep forever, that
    * comes from eventListenerTemp.
@@ -371,8 +389,8 @@ private:
   //Used for reg and unreg functions.
   Mutex regSync;
 
-  bool relReg;
-  bool unRelReg;
+  Listener::wptr rlistener;
+  Listener::wptr ulistener;
 
   //PacketStream might call our processError function.
   friend class PacketStream;
