@@ -85,9 +85,6 @@ void Timer::stopTimer() {
   }
 }
 
-/**
- * \todo enable sleeping.
- */
 //##ModelId=3AE868A30294
 void Timer::run() {
   while (running) {
