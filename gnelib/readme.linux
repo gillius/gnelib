@@ -1,17 +1,19 @@
 Linux(Unix) specific information for GNE.
 
-You need GCC 3.x and/or the latest libstdc++ libraries to use GNE, because the
-old libstdc++ that many have installed is not ISO C++ 98 compliant and
-therefore will not compile the streambufs code that enables gout and gin to
-work.  In the future a gcc 2.9x version will likely be provided.
+The streambufs code in GNE that enables gout and gin to work uses the latest
+libstdc++ libraries, which are usually only shipped with GCC 3.x. The old
+libstdc++ is not ISO C++ 98 compliant, but is installed on many systems, so by
+default GNE supports the 2.9.x libstdc++ version. If you want to use the new
+libstdc++ code, set the environment variable NO_OLD_CPP.
 
 1. HawkNL
 
-You'll need HawkNL 1.4 final or a later version to use GNE.
+You will need HawkNL 1.4 final or a later version to use GNE.
+(http://www.hawksoft.com/)
 
 2. About pthreads and Linux
 
-Pthreads should be already present as part of the standard libs on your OS.
+Pthreads should be already present as part of the standard libraries on your OS.
 
 3. ncurses
 
@@ -32,7 +34,7 @@ To compile the library and examples. Then type:
 
 make install
 
-To install GNE into the following defautl locations:
+To install GNE into the following default locations:
 
 /usr/local/lib/libgnelib.a
 /usr/local/include/gnelib.h

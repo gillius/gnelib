@@ -37,10 +37,10 @@ $(EXAMPLES_DIR):
 endif
 
 clean:
-	$(RM) $(EXAMPLE_O) $(EXAMPLE_EXE) $(LIB_O) $(LIB_STATIC) $(DEPENDENCIES)
+	$(RM) $(EXAMPLE_O) $(LIB_O) $(DEPENDENCIES)
 
 veryclean: clean
-	$(RM) makefile.os
+	$(RM) makefile.os $(EXAMPLE_EXE) $(LIB_STATIC)
 
 install: $(LIB_STATIC)
 	$(CP) $< $(LIBDIR)

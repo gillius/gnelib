@@ -17,6 +17,11 @@ EXAMPLE_LIBS         = $(LIB_STATIC) -lNL -lwsock32 -lpthreadGC
 LDFLAGS              = -mthreads
 
 CPPFLAGS             = -Wall -O3 -s
+
+ifndef NO_OLD_CPP
+CPPFLAGS            += -DOLD_CPP
+endif
+
 CFLAGS               = -Wall -O3 -s
 
 EXAMPLE_CPP          = $(wildcard examples/*/*.cpp)
@@ -34,7 +39,7 @@ LIB_CPP_O            = $(LIB_CPP:.cpp=.o)
 LIB_C_O              = $(LIB_C:.c=.o)
 LIB_O                = $(LIB_CPP_O) $(LIB_C_O)
 
-DEPENDENCIES         = $(LIB_O:.o=.d)
+DEPENDENCIES         = $(notdir $(LIB_O:.o=.d))
 
 LIB_STATIC_NAME      = libgnelib.a
 LIB_STATIC           = lib/mingw/$(LIB_STATIC_NAME)
