@@ -155,13 +155,13 @@ namespace Console {
    * The keycode the enter key gives from getch().
    * @see getch
    */
-  const int ENTER = 13;
+  extern int ENTER;
 
   /**
    * The keycode the backspace key gives from getch().
    * @see getch
    */
-  const int BACKSPACE = 8;
+  extern int BACKSPACE;
 }
 }
 

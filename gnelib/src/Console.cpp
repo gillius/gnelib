@@ -28,9 +28,13 @@ namespace Console {
 static Mutex outSync;
 static bool initialized = false;
 
+//Our global key codes for enter and backspace
+int ENTER;
+int BACKSPACE;
+
 bool initConsole(int (*atexit_ptr)(void (*func)(void))) {
   if (!initialized) {
-    conio_init();
+    conio_init(&ENTER, &BACKSPACE);
     assert(atexit_ptr);
     atexit_ptr(shutdownConsole);
     initialized = true;
@@ -96,18 +100,15 @@ int lgetString(int x, int y, char* str, int maxlen) {
   bool exit = false;
   while (!exit) {
     int ch = getch();
-    switch (ch) {
-    case ENTER:             //If user pressed RETURN
+    if (ch == ENTER) {      //If user pressed RETURN
       exit = true;
-      break;
-    case BACKSPACE:         //If backspace
+    } else if (ch == BACKSPACE) {//If backspace
       currpos--;
       if (currpos < 0)
         currpos = 0;        //Hit the end
       else
         mlputchar(currpos+x, y, ' ');
-      break;
-    default:
+    } else {
       currpos++;
       if (currpos > maxlen) {
         currpos = maxlen;   //Clip off at end
@@ -115,7 +116,6 @@ int lgetString(int x, int y, char* str, int maxlen) {
         mlputchar(currpos-1+x, y, ch); //Display input
         str[currpos-1] = (char)ch;     //update input string
       }
-      break;
     }
     str[currpos] = '\0';
   }

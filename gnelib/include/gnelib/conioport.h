@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void conio_init ();
+void conio_init (int* enterKey, int* backspaceKey);
 void conio_exit ();
 int conio_kbhit ();
 int conio_getch ();
