@@ -29,13 +29,12 @@
 namespace GNE {
   class ConsoleBuffer;
 
-  typedef std::ostream& (*CBFType)(std::ostream&);
+
+  namespace Console {
+    class ConsoleManipulator;
+  }
 }
 
-template <class T>
-GNE::ConsoleBuffer& operator << (GNE::ConsoleBuffer& buf, const T& rhs);
-
-GNE::ConsoleBuffer& operator << (GNE::ConsoleBuffer& buf, GNE::CBFType f);
 namespace GNE {
 
 /**
@@ -131,6 +130,18 @@ public:
    * be a redundant operation.
    */
   void update();
+
+  template <class T>
+  ConsoleBuffer& operator << (const T& rhs) {
+    input << rhs;
+    if (autoRender)
+      update();
+    return *this;
+  }
+
+  typedef std::ostream& (*CBFType)(std::ostream&);
+
+  ConsoleBuffer& operator << (CBFType f);
 
 protected:
   /**
@@ -262,19 +273,8 @@ private:
   std::list<std::string> lines;
 
   typedef std::list<std::string>::reverse_iterator LineIterator;
-
-  template <class T> friend ConsoleBuffer& ::operator<<(ConsoleBuffer& buf, const T& rhs);
-  friend ConsoleBuffer& ::operator<<(ConsoleBuffer& buf, CBFType f);
 };
 
 } //namespace GNE
-
-template <class T>
-GNE::ConsoleBuffer& operator << (GNE::ConsoleBuffer& buf, const T& rhs) {
-  buf.input << rhs;
-  if (buf.autoRender)
-    buf.update();
-  return buf;
-}
 
 #endif

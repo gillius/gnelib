@@ -31,6 +31,21 @@ using namespace std;
 using namespace GNE;
 using namespace GNE::Console;
 
+class ConsoleTest : public Thread {
+public:
+  ConsoleTest( ConsoleBuffer& cb ) : cb(cb) {
+  }
+
+  void run() {
+    cb << acquirecb << "This line should not ";
+    sleep( 1000 );
+    cb << "be broken up." << endl << releasecb;
+  }
+
+private:
+  ConsoleBuffer& cb;
+};
+
 int main(int argc, char* argv[]) {
   if (initGNE(NO_NET, atexit)) {
     exit(1);
@@ -61,6 +76,16 @@ int main(int argc, char* argv[]) {
   getch();
   console.clear();
 
+  console << "Now testing multithreaded locking:" << endl;
+  ConsoleTest tester( console );
+  tester.start();
+  Thread::sleep( 250 );
+  console << acquirecb << "This line should also be together."
+    << endl << releasecb;
+  tester.join();
+  getch();
+  console.clear();
+
   console << "Now entering into interactive typing mode.  Keep in mind " <<
     "that the console is word-buffered, meaning you have to type in a " <<
     "delimiting character (like a space, dash, or return) before you see " <<
@@ -75,7 +100,7 @@ int main(int argc, char* argv[]) {
     val = getch();
   }
 
-  console << "Now erasing the console after a key is pressed." << endl;
+  console << endl << "Now erasing the console after a key is pressed." << endl;
   getch();
   console.erase();
   getch();

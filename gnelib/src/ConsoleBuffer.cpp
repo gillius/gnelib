@@ -234,11 +234,13 @@ bool ConsoleBuffer::isOptDelim( char ch ) {
   return ret;
 }
 
+ConsoleBuffer& ConsoleBuffer::operator << (CBFType f) {
+  f(input);
+  if (autoRender)
+    update();
+  return *this;
+}
+
 } //namespace GNE
 
-GNE::ConsoleBuffer& operator << (GNE::ConsoleBuffer& buf, GNE::CBFType f) {
-  f(buf.input);
-  if (buf.autoRender)
-    buf.update();
-  return buf;
-}
+
