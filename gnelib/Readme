@@ -34,17 +34,3 @@ The following things are needed for GNE:
     UNIX already has pthreads support.
   * A curses implementation such as ncurses will be needed to use GNE under
     a UNIX platform
-
-ALPHA NOTES -- IMPORTANT:
-This version is only an alpha version of GNE. So that means take a look at what
-the tests do and the capabilities of GNE. Note that the API can still change
-significantly from this release to the beta, at which time I plan on trying to
-freeze the API as much as possible until final release. At this current point
-in the alpha though I'm not expecting much changes any longer on the core API
-that is implemented now.
-
-At this time most of the functions are implemented, but still a few of
-the functions do not fully follow their post-conditions and are minimal
-functionality -- for example you can send and recieve data, but it is not yet
-throttled, connections do actually connect, but don't handshake or check for
-all errors, etc.
