@@ -51,7 +51,13 @@ Packet* CustomPacket::makeClone() const {
 
 //##ModelId=3C0B257E03CA
 int CustomPacket::getSize() const {
-  return Packet::getSize() + sizeof(NLshort) + RawPacket::RAW_PACKET_LEN;
+  return Packet::getSize() + sizeof(NLshort) + data->getPosition();
+}
+
+//##ModelId=3C30EFBD0226
+int CustomPacket::getMaxUserDataSize() {
+  Packet packet;
+  return RawPacket::RAW_PACKET_LEN - packet.getSize() - sizeof(NLshort);
 }
 
 //##ModelId=3C0B257E03CC

@@ -69,10 +69,18 @@ public:
   virtual Packet* makeClone() const;
 
   /**
-   * Returns the max size of this packet in bytes.
+   * @see Packet::getSize()
    */
   //##ModelId=3C0B257E03CA
   virtual int getSize() const;
+
+  /**
+   * Returns the maximum possible size of the user's data in this packet. Use
+   * this value rather than RawPacket::RAW_PACKET_LEN.  The value returned is
+   * the maximum size the hosted RawPacket can be.
+   */
+  //##ModelId=3C30EFBD0226
+  static int getMaxUserDataSize();
 
   /**
    * Writes the packet to the given RawPacket.  The RawPacket data should
