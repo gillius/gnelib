@@ -235,6 +235,7 @@ void doClient(int outRate, int inRate, int port) {
   //uncomment the loop to perform a stress test.
   //for (int i=0; i <100; i++) {
     ConnectionParams params(new OurClient());
+    params.setUnrel(true);
     ClientConnection* client = new ClientConnection();
     if (client->open(address, params)) {
       delete client;
