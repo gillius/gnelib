@@ -75,6 +75,7 @@ struct ConnectionStats {
    * a single Connection.  When getting global stats this is all open
    * sockets, wether user controlled or maintained privately by GNE.
    */
+  //##ModelId=3C106F02037E
   int openSockets;
 };
 

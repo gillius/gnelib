@@ -90,6 +90,7 @@ static void addStats(NLsocket s, ConnectionStats& st) {
   st.openSockets++;
 }
 
+//##ModelId=3C106F030036
 ConnectionStats SocketPair::getStats(int reliable) const {
   ConnectionStats ret;
   memset((void*)&ret, 0, sizeof(ret));

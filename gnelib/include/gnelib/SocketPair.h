@@ -82,7 +82,7 @@ public:
    * @see ConnectionStats
 	 * @see GNE::enableStats
    */
-  //##ModelId=3B0753810079
+  //##ModelId=3C106F030036
   ConnectionStats getStats(int reliable) const;
 
 	/**
