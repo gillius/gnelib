@@ -122,7 +122,10 @@ public:
    * this function).  This function throws an Error if some underlying
    * pending operations failed since the last call on this SyncConnection.\n
    * If release is called when the SyncConnection is already released, no
-   * errors will be thrown.
+   * errors will be thrown.\n
+   * onReceive will be called in the original listener after release if
+   * necessary, and onDoneWriting will be called after release if any data
+   * since writing packets 
 	 */
   //##ModelId=3BDB10A50316
 	void release() throw (Error);
@@ -182,6 +185,8 @@ private:
 	void onFailure(const Error& error);
   //##ModelId=3BDB10A6029E
 	void onReceive();
+  //##ModelId=3C1081BC015B
+  void onDoneWriting();
 
 	/**
 	 * A ConditionVariable we can wait on to wait for incoming data.
@@ -226,6 +231,13 @@ private:
 	 */
   //##ModelId=3BDB10A5020E
 	ConnectionListener* oldListener;
+
+  /**
+   * If this is true, we have an outstanding unexplained onDoneWriting event
+   * that will be passed on when we release, as with onReceive.
+   */
+  //##ModelId=3C1081BC0024
+  bool onDoneWritingEvent;
 };
 
 } // namespace GNE

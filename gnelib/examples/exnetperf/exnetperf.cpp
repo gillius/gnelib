@@ -58,7 +58,8 @@ const Pos& getNextPos() {
 //The PerfTester class works on both the client and the server side.
 class PerfTester : public ConnectionListener {
 public:
-  PerfTester(const Pos& ourPos2) : packets(0), ourPos(ourPos2), conn(NULL) {}
+  PerfTester(const Pos& ourPos2) : packetsIn(0), ourPos(ourPos2),
+    packetsOut(0), conn(NULL) {}
   ~PerfTester() {}
 
   void onDisconnect() { 
@@ -72,11 +73,17 @@ public:
 
   void onNewConn(SyncConnection& conn2) {
     conn = conn2.getConnection();
+    conn2.release();
     writePackets();
   }
 
   void onReceive() {
-    delete conn->stream().getNextPacket();
+    Packet* next = conn->stream().getNextPacket();
+    while (next != NULL) {
+      delete next;
+      packetsIn++;
+      next = conn->stream().getNextPacket();
+    }
     //We don't need to do anything to the data we are being sent.  The low-
     //level routines will keep track of the stats for us.
     updateStats();
@@ -103,10 +110,10 @@ public:
 
   //Try to send out some more packets.
   void writePackets() {
-    packets++;
     CustomPacket temp;
     temp.getData() << "Hello World!";
     conn->stream().writePacket(temp, true);
+    packetsOut++;
 
     updateStats();
   }
@@ -120,11 +127,26 @@ public:
     //Printfs are so much nicer in this case, eh?
     mlprintf(ourPos.x, ourPos.y, "%-20s%10s%10s%10s",
       conn->getRemoteAddress(true).toString().c_str(), "tot =" , "rel +", "unrel");
-    mlprintf(ourPos.x, ourPos.y+1, "%-20s%10d%10d%10d",
-      "bytesin", packets, rel.bytesRecv, unrel.bytesRecv);
+    mlprintf(ourPos.x, ourPos.y+1, "%-20s%10d", "HiLvlPkts in", packetsIn);
+    mlprintf(ourPos.x, ourPos.y+2, "%-20s%10d", "HiLvlPkts out", packetsOut);
+    mlprintf(ourPos.x, ourPos.y+3, "%-20s%10d%10d%10d",
+      "bytesin", all.bytesRecv, rel.bytesRecv, unrel.bytesRecv);
+    mlprintf(ourPos.x, ourPos.y+4, "%-20s%10d%10d%10d",
+      "bytesout", all.bytesSent, rel.bytesSent, unrel.bytesSent);
+    mlprintf(ourPos.x, ourPos.y+5, "%-20s%10d%10d%10d",
+      "inRate", all.avgBytesRecv, rel.avgBytesRecv, unrel.avgBytesRecv);
+    mlprintf(ourPos.x, ourPos.y+6, "%-20s%10d%10d%10d",
+      "outRate", all.avgBytesSent, rel.avgBytesSent, unrel.avgBytesSent);
+    mlprintf(ourPos.x, ourPos.y+7, "%-20s%10d%10d%10d",
+      "maxInRate", all.maxAvgBytesRecv, rel.maxAvgBytesRecv, unrel.maxAvgBytesRecv);
+    mlprintf(ourPos.x, ourPos.y+8, "%-20s%10d%10d%10d",
+      "maxOutRate", all.maxAvgBytesSent, rel.maxAvgBytesSent, unrel.maxAvgBytesSent);
+    mlprintf(ourPos.x, ourPos.y+9, "%-20s%10d%10d%10d",
+      "sockets", all.openSockets, rel.openSockets, unrel.openSockets);
   }
 private:
-  int packets;
+  int packetsIn;
+  int packetsOut;
   Pos ourPos;
   Connection* conn;
 };
@@ -155,6 +177,11 @@ void updateGlobalStats() {
   ConnectionStats all = GNE::getGlobalStats();
   mlprintf(gpos.x, gpos.y, "%-20s%10s", "global", "tot");
   mlprintf(gpos.x, gpos.y+1, "%-20s%10d", "bytesin", all.bytesRecv);
+  mlprintf(gpos.x, gpos.y+2, "%-20s%10d", "bytesout", all.bytesSent);
+  mlprintf(gpos.x, gpos.y+3, "%-20s%10d", "inRate", all.avgBytesRecv);
+  mlprintf(gpos.x, gpos.y+4, "%-20s%10d", "outRate", all.avgBytesSent);
+  mlprintf(gpos.x, gpos.y+5, "%-20s%10d", "maxInRate", all.maxAvgBytesRecv);
+  mlprintf(gpos.x, gpos.y+6, "%-20s%10d", "maxOutRate", all.maxAvgBytesSent);
 }
 
 void errorExit(const char* error) {

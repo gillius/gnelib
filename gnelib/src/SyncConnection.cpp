@@ -32,7 +32,8 @@
 namespace GNE {
 
 //##ModelId=3BC3CB1703B6
-SyncConnection::SyncConnection(Connection* target) : currError(Error::NoError), conn(target) {
+SyncConnection::SyncConnection(Connection* target)
+: currError(Error::NoError), conn(target), onDoneWritingEvent(false) {
   gnedbgo1(2, "Wrapping Connection %x into a SyncConnection.", conn);
   oldListener = conn->getListener();
   conn->setListener(this);
@@ -85,11 +86,14 @@ void SyncConnection::release() throw (Error) {
   sync.acquire();
   if (oldListener != NULL) { //if not released
     gnedbgo1(2, "Releasing Connection %x", conn);
-    //Nofify the async event listener if data has come in since our last recv
-    if (conn->stream().isNextPacket())
-      oldListener->onReceive();
     conn->setListener(oldListener);
     oldListener = NULL;
+
+    //Notify the old listener for onReceive and onDoneWriting if needed.
+    if (conn->stream().isNextPacket())
+      conn->onReceive();
+    if (onDoneWritingEvent)
+      conn->onDoneWriting();
 
     //Notify any receivers there was an error, and set release error if there
     //was no error already, otherwise don't change it.
@@ -162,6 +166,7 @@ SyncConnection& SyncConnection::operator << (const Packet& packet) throw (Error)
   checkError();
   assert(!isReleased());
 
+  onDoneWritingEvent = false;
   conn->stream().writePacket(packet, true);
 
   return *this;
@@ -220,6 +225,11 @@ void SyncConnection::onReceive() {
   if (isReleased())
     conn->getListener()->onReceive();
   sync.release();
+}
+
+//##ModelId=3C1081BC015B
+void SyncConnection::onDoneWriting() {
+  onDoneWritingEvent = true;
 }
 
 //##ModelId=3BDB10A6029F

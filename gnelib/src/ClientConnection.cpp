@@ -23,6 +23,7 @@
 #include "../include/gnelib/Error.h"
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/SyncConnection.h"
+#include "../include/gnelib/EventThread.h"
 
 namespace GNE {
 
@@ -50,10 +51,11 @@ void ClientConnection::run() {
     assert(eventListener != NULL);
     try {
       SyncConnection sync(this);
+      eventListener->start();
       reg(true, false);
       ps->start();
       connecting = true;
-      eventListener->onConnect(sync); //SyncConnection will relay this
+      getListener()->onConnect(sync); //SyncConnection will relay this
       sync.release();
       connected = true;
       connecting = false;
@@ -61,14 +63,13 @@ void ClientConnection::run() {
       //The client should catch any errors in onConnect, but release can
       //give an error, so we catch it.
       gnedbgo1(1, "Connection failure: %s", e.toString().c_str());
-      eventListener->onConnectFailure(e);
+      getListener()->onConnectFailure(e);
     }
   } else {
     assert(eventListener != NULL);
-    Error err = Error::createLowLevelError();
-    err.setCode(Error::ConnectionTimeOut);
+    Error err = Error::createLowLevelError(Error::ConnectionTimeOut);
     gnedbgo1(1, "Connection failure: %s", err.toString().c_str());
-    eventListener->onConnectFailure(err);
+    getListener()->onConnectFailure(err);
   }
 }
 

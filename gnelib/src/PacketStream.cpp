@@ -163,10 +163,8 @@ void PacketStream::run() {
       if (out.empty())
         done = true;
       outQCtrl.release();
-      if (done) {
-        gnedbgo(4, "onDoneWriting event triggered.");
+      if (done)
         owner.onDoneWriting();
-      }
     }
   }
 }

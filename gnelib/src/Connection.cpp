@@ -28,30 +28,34 @@
 #include "../include/gnelib/SocketPair.h"
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/GNE.h"
+#include "../include/gnelib/EventThread.h"
 
 namespace GNE {
 
 //##ModelId=3B0753810073
 Connection::Connection(int outRate, int inRate, ConnectionListener* listener)
-: eventListener(listener), connecting(false), connected(false),
-rlistener(NULL), ulistener(NULL) {
+: connecting(false), connected(false), rlistener(NULL), ulistener(NULL) {
   ps = new PacketStream(outRate, inRate, *this);
+  eventListener = new EventThread(listener);
 }
 
 //##ModelId=3B0753810076
 Connection::~Connection() {
   disconnect();
+  if (eventListener)
+    eventListener->join();
   delete ps;
+  delete eventListener;
 }
 
 //##ModelId=3BCE75A80280
 ConnectionListener* Connection::getListener() const {
-  return eventListener;
+  return eventListener->getListener();
 }
 
 //##ModelId=3BCE75A80282
 void Connection::setListener(ConnectionListener* listener) {
-  eventListener = listener;
+  eventListener->setListener(listener);
 }
 
 //##ModelId=3B0753810078
@@ -83,13 +87,16 @@ bool Connection::isConnected() const {
 void Connection::disconnect() {
   sync.acquire();
   if (connecting || connected) {
-    //This is nessacary because we can't join on ps if it has already been
+    //This is necessary because we can't join on ps if it has already been
     //  shutdown and/or never started
     unreg(true, true);
     gnedbgo2(2, "disconnecting r: %i, u: %i", sockets.r, sockets.u);
     ps->shutDown();
     ps->join();
     onDisconnect();
+    eventListener->shutDown();
+    //We will join on it when we are destructing, in case disconnect was
+    //called from an event.
     sockets.disconnect();
     connected = connecting = false;
   }
@@ -106,31 +113,26 @@ void Connection::disconnectSendAll() {
 
 //##ModelId=3BB4208C0104
 void Connection::onDisconnect() {
-  assert(eventListener != NULL);
   eventListener->onDisconnect();
 }
 
 //##ModelId=3B0753810085
 void Connection::onFailure(const Error& error) {
-  assert(eventListener != NULL);
   eventListener->onFailure(error);
 }
 
 //##ModelId=3BB4208C01E0
 void Connection::onError(const Error& error) {
-  assert(eventListener != NULL);
   eventListener->onError(error);
 }
 
 //##ModelId=3B07538100AC
 void Connection::onReceive() {
-  assert(eventListener != NULL);
   eventListener->onReceive();
 }
 
 //##ModelId=3B07538100AE
 void Connection::onDoneWriting() {
-  assert(eventListener != NULL);
   eventListener->onDoneWriting();
 }
 
@@ -148,7 +150,7 @@ void Connection::onReceive(bool reliable) {
       processError(Error::ConnectionDropped);
     } else {
       //This is some other bad error that we need to report
-      processError(Error::createLowLevelError().setCode(Error::Read));
+      processError(Error::createLowLevelError(Error::Read));
     }
   } else if (temp == 0) {
     //In HawkNL 1.4b3 and earlier, this _USED_ to mean that...
@@ -172,7 +174,6 @@ void Connection::onReceive(bool reliable) {
       gnedbgo1(4, "Unknown packet encountered in a message that has %i bytes", temp);
       processError(Error::UnknownPacket);
     } else {
-      gnedbgo1(4, "onReceive event triggered, %i bytes recv", temp);
       onReceive();
     }
   }
@@ -182,14 +183,11 @@ void Connection::onReceive(bool reliable) {
 void Connection::processError(const Error& error) {
   switch(error.getCode()) {
   case Error::UnknownPacket:
-  case Error::Write:
-    gnedbgo1(1, "onError Event: %s", error.toString().c_str());
     errorSync.acquire();
     onError(error);
     errorSync.release();
     break;
   default:
-    gnedbgo1(1, "onFailure Event: %s", error.toString().c_str());
     errorSync.acquire();
     onFailure(error);
     errorSync.release();

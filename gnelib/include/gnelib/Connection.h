@@ -31,6 +31,8 @@
 
 namespace GNE {
 class ConnectionListener;
+class EventThread;
+class SyncConnection;
 
 /**
  * A class resembling any type of connection to a remote computer.  A
@@ -156,10 +158,7 @@ public:
   void disconnectSendAll();
 
 protected:
-	//The listener for our events.  All on* events go here.  This is protected
-	//so ClientConnection can send events as well.
-  //##ModelId=3BCE75A80245
-	ConnectionListener* eventListener;
+	EventThread* eventListener;
 
 	//For information about events, see the ConnectionListener class.
   //##ModelId=3BB4208C0104
@@ -274,7 +273,11 @@ private:
   //##ModelId=3B6E14AC0100
 	Listener* ulistener;
 
+  //PacketStream might call our processError function.
   friend class PacketStream;
+
+  //SyncConnection might call our onReceive and onDoneWriting events.
+  friend class SyncConnection;
 
 	/**
 	 * Parses the packets recieved, then calls onReceive.
@@ -292,6 +295,3 @@ private:
 
 }
 #endif /* CONNECTION_H_INCLUDED_C51DC478 */
-
-
-

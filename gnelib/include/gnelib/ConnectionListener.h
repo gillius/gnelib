@@ -34,7 +34,15 @@ class SyncConnection;
  * Override the events you want to receive with this listener.  The provided
  * functions do nothing, so that event overloading is optional in all cases.\n
  * onConnect and onConnectFailure are generated only by ClientConnection and
- * onNewConn is generated only by ServerConnection.
+ * onNewConn is generated only by ServerConnection.\n
+ * Note that there is only one event thread per Connection, so one one event
+ * will be active at a time.  Take this into consideration that you may not
+ * need to provide syncronization and mutexes.  onNewConn or onConnect or
+ * onConnectFailure are guaranteed to be the first events from a connection,
+ * and won't be called multiple times.  onDisconnect will always be the last
+ * called (except after onConnectFailure, where there never was a connection)
+ * and will only be called once.  Since only one event can be active at a
+ * time, you will want to return quickly so other events can be processed.
  * @see ServerConnectionListener::onListenFailure
  */
 //##ModelId=3BCA810C0276
@@ -55,20 +63,19 @@ public:
   /**
    * Event triggered after there is a successful connection.  The connection
 	 * process will not be considered complete until this function completes.
+   * \nIf an error occurs then the connection needs to be killed, so conn can
+   * throw its Error outside your function.  Catch it if you need to clean up
+   * anything you were doing, but remember to rethrow it.
 	 * \nNote: Only ClientConnection generates this event.  The SyncConnection
 	 * is currently wrapped around a ClientConnection, and you should use
 	 * SyncConnection::getConnection to get the ClientConnection.
-   * \nRemember that conn will trap your events like onReceive and
-   * onDoneWriting.  So if you will not be using conn, you should release it
-   * if you are writing and reading using the PacketStream only because you
-   * will want to get onDoneWriting most likely.  onDoneWriting and
-   * onReceive can be called BEFORE onConnect finishes in this case if you
-   * release!  After onConnect finishes, conn will be released regardless of
-   * what you did with it or if you released it.
+   * \nYou should not release the SyncConnection.  You can still interact
+   * with the PacketStream directly, though, but the events will be delayed
+   * until this function completes.
    * \nIn the near future the ability to refuse connections will be added.
    */
   //##ModelId=3BCA83910078
-  virtual void onConnect(SyncConnection& conn);
+  virtual void onConnect(SyncConnection& conn) throw (Error);
 
   /**
    * Event triggered when a connection failed.\n
@@ -87,24 +94,23 @@ public:
    * checked.  This object is a newly allocated object created from your
    * ServerConnectionCreator object, and this function will be the first time
    * you code has "seen" this object, so you will have to register it into
-   * some internal list so you can interact with and delete it later.\n
+   * some internal list so you can interact with and delete it later.
+   * \nIf an error occurs then the connection needs to be killed, so conn can
+   * throw its Error outside your function.  Catch it if you need to clean up
+   * anything you were doing, but remember to rethrow it.\n
 	 * Note: Only ServerConnection generates this function.  The SyncConnection
 	 * is currently wrapped around a ServerConnection, and you should use
 	 * SyncConnection::getConnection to get the ServerConnection.\n
    * If the connection failed, though, the function
 	 * ServerConnectionListener::onListenFailure instead of this function is
 	 * called.
-   * \nRemember that newConn will trap your events like onReceive and
-   * onDoneWriting.  So if you will not be using newConn, you should release
-   * it if you are writing and reading using the PacketStream only because
-   * you will want to get onDoneWriting most likely.  onDoneWriting and
-   * onReceive can be called BEFORE onConnect finishes in this case if you
-   * release!  After onConnect finishes, conn will be released regardless of
-   * what you did with it or if you released it.
+   * \nYou should not release the SyncConnection.  You can still interact
+   * with the PacketStream directly, though, but the events will be delayed
+   * until this function completes.
    * \nIn the near future the ability to refuse connections will be added.
    */
   //##ModelId=3BCFAE5900AA
-  virtual void onNewConn(SyncConnection& newConn);
+  virtual void onNewConn(SyncConnection& newConn) throw (Error);
 
 	/**
 	 * An event triggered when a socket is closing for any reason.  This event
@@ -116,8 +122,8 @@ public:
 	 * you can destroy this object after onDisconnect is called and it is not
 	 * listening for any other connections.
 	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread.  Therefore, some events for any 
-	 * connection will not be called until this function completes.
+	 * is only a single event thread per connection.  Therefore, no other
+   * events will be called until this function completes for this connection.
 	 * @see ~Connection()
 	 */
   //##ModelId=3BCA83BA02F8
@@ -131,8 +137,8 @@ public:
 	 * Connection::disconnect() may also be called at this point if you wish
 	 * to terminate the connection anyways.
 	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread.  Therefore, some events for any 
-	 * connection will not be called until this function completes.
+	 * is only a single event thread per connection.  Therefore, no other
+   * events will be called until this function completes for this connection.
 	 * @see onFailure()
 	 * @see disconnect()
    */
@@ -145,18 +151,22 @@ public:
 	 * socket will be disconnected.  An onDisconnect() event will occur
 	 * immediately after this event completes.  Most errors in GNE are fatal.
 	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread.  Therefore, some events for any 
-	 * connection will not be called until this function completes.
+	 * is only a single event thread per connection.  Therefore, no other
+   * events will be called until this function completes for this connection.
 	 * @see onError()
    */
   //##ModelId=3BCA83C803A2
   virtual void onFailure(const Error& error);
 
   /**
-   * Event triggered when one or more packets have been recieved.
+   * Event triggered when one or more packets have been recieved.  It is
+   * possible to get more packets while in this function, but if packets
+   * arrive during this event, it will be called again, so you don't have to
+   * make sure they have all been processed (there is no sure way to do
+   * that.).
 	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread.  Therefore, some events for any 
-	 * connection will not be called until this function completes.
+	 * is only a single event thread per connection.  Therefore, no other
+   * events will be called until this function completes for this connection.
    */
   //##ModelId=3BCA83CF0208
   virtual void onReceive();
@@ -166,8 +176,8 @@ public:
    * Note that this does not mean that data is immediately ready to be sent
    * again -- there could still be a flow control delay.\n
 	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single writer thread per connection.  Therefore, no more
-	 * writing will take place until this function completes.
+	 * is only a single event thread per connection.  Therefore, no other
+   * events will be called until this function completes for this connection.
    */
   //##ModelId=3BCA83D101F4
   virtual void onDoneWriting();

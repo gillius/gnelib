@@ -23,6 +23,7 @@
 #include "../include/gnelib/SyncConnection.h"
 #include "../include/gnelib/ServerConnectionListener.h"
 #include "../include/gnelib/Address.h"
+#include "../include/gnelib/EventThread.h"
 
 namespace GNE {
 
@@ -53,15 +54,16 @@ void ServerConnection::run() {
 	connecting = true;
 	try {
 		SyncConnection sync(this);
-		//Do connection negotiaion here
+    eventListener->start();
 		reg(true, false);
 		ps->start();
-		eventListener->onNewConn(sync); //SyncConnection will relay this
+		//Do connection negotiaion here
+		getListener()->onNewConn(sync); //SyncConnection will relay this
 		sync.release();
 		connected = true;
 		connecting = false;
 	} catch (Error e) {
-		ourCreator->onListenFailure(e, getRemoteAddress(true), eventListener);
+		ourCreator->onListenFailure(e, getRemoteAddress(true), getListener());
 	}
 }
 

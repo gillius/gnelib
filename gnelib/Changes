@@ -1,4 +1,12 @@
 GNE 0.4 to Current
+  Bugfixes related to Win32 Console I/O.  Now properly detects size in Win 2k
+    and clears the screen on exit (to be consistant with curses, and to not
+    clobber the command prompt if it exists).
+  Slight modifications to the Thread API -- shouldn't affect user programs
+    though but adds a few capabilites like overloading Thread::start().
+  New and very much improved event handling system "under the hood" which has
+    its own thread now.  This will fix a lot of threading-related bugs and
+    cut down on the complexity of ConnectionListener implementations A LOT.
   Implemented and refined the API related to getting Connection stats.
   Due to some issues, Connection::Stats is now no longer a nested class and
     is now called ConnectionStats.

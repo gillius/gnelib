@@ -137,6 +137,10 @@ SOURCE=.\src\Error.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\EventThread.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\GNE.cpp
 # End Source File
 # Begin Source File
@@ -262,6 +266,10 @@ SOURCE=.\include\gnelib\CustomPacket.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\Error.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\EventThread.h
 # End Source File
 # Begin Source File
 
