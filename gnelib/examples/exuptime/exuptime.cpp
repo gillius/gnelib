@@ -18,6 +18,7 @@
  */
 
 #include "../../include/gnelib.h"
+#include <ostream> //for endl
 
 using namespace std; //for endl
 using namespace GNE;

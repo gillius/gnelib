@@ -21,8 +21,9 @@
 #include "../include/gnelib/ConsoleStream.h"
 #include "../include/gnelib/ConsoleStreambuf.h"
 #include "../include/gnelib/Mutex.h"
+#include <ostream>
 
-std::ostream& operator << (std::ostream& o, GNE::Console::ConsoleManipulator& cm) {
+std::ostream& operator << (std::ostream& o, const GNE::Console::ConsoleManipulator& cm) {
   cm.action(o);
   return o;
 }
@@ -45,7 +46,7 @@ ConsoleMutex::~ConsoleMutex() {
 }
 
 //##ModelId=3BF88CAB02EB
-void ConsoleMutex::action(std::ostream& o) {
+void ConsoleMutex::action(std::ostream& o) const {
   if (acq)
     sync.acquire();
   else
@@ -66,7 +67,7 @@ moveTo::~moveTo() {
 }
 
 //##ModelId=3BF8BBF90352
-void moveTo::action(std::ostream& o) {
+void moveTo::action(std::ostream& o) const {
   ((goutbuf*)(o.rdbuf()))->setNextWriteLoc(x, y);
 }
 

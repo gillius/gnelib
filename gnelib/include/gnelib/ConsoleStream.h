@@ -33,7 +33,7 @@ public:
   virtual ~ConsoleManipulator() {};
 
   //##ModelId=3BF8BBF9027A
-  virtual void action(std::ostream& o) = 0;
+  virtual void action(std::ostream& o) const = 0;
 };
 
 /**
@@ -50,7 +50,7 @@ public:
 
   //Perform a release or an acquire, based on acq.
   //##ModelId=3BF88CAB02EB
-  void action(std::ostream& o);
+  void action(std::ostream& o) const;
 
 private:
   //acq is true if we are trying to acquire, false if release.
@@ -82,7 +82,7 @@ public:
   virtual ~moveTo();
 
   //##ModelId=3BF8BBF90352
-  void action(std::ostream& o);
+  void action(std::ostream& o) const;
 private:
   //##ModelId=3BF8BBF9034B
   int x, y;
@@ -91,6 +91,6 @@ private:
 }
 }
 
-std::ostream& operator << (std::ostream& o, GNE::Console::ConsoleManipulator& cm);
+std::ostream& operator << (std::ostream& o, const GNE::Console::ConsoleManipulator& cm);
 
 #endif
