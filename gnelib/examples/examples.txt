@@ -8,3 +8,5 @@ exuptime -- Very small example using Timer::getCurrentTime, which uses the
   cycles since system start, so this is one way of getting system uptime.
 
 extimer -- Shows usage of the Timer class.
+
+exinput -- Shows usage of the Console class, also uses timers.
