@@ -1,4 +1,6 @@
 GNE 0.55 to current
+  Fixed a extremely unlikely condition where a SyncConnection may be waiting
+    forever to get its next packet.
   Major reworking of the connecting code, and added a state to Connection to
     help keep track of things.  These changes fixed some bugs including at
     least one deadlock, and increased robustness when GNE is shutdown while
@@ -36,7 +38,7 @@ GNE 0.55 to current
   Modified exisiting packet classes and examples to use RawPacket::getSizeOf.
   Added RawPacket::getSizeOf functions.  You should now use these rather than
     the sizeof operator when determining the serialized size of the packet.
-  Added RawPacket opeartors to read and write GNE::Time objects.
+  Added RawPacket operators to read and write GNE::Time objects.
   Added operators *, /, *=, /= for integers in the Time class.
   Added Time::getTotalmSec, to return total milliseconds time.
   Added a debugging system for mutexes which is active when compiling GNE in
