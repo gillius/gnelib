@@ -57,8 +57,7 @@ void ClientConnection::run() {
       connecting = true;
       getListener()->onConnect(sync); //SyncConnection will relay this
       sync.release();
-      connected = true;
-      connecting = false;
+      finishedConnecting();
     } catch (Error e) {
       //The client should catch any errors in onConnect, but release can
       //give an error, so we catch it.

@@ -189,6 +189,12 @@ protected:
   //##ModelId=3B075381006E
   PacketStream* ps;
 
+  /**
+   * The connecting has just finished and the flags need to be changed.
+   * Since this needs a mutex, we make a function to handle this.
+   */
+  void finishedConnecting();
+
 	/**
 	 * Is this connecting?  We need to know this so we don't report as ready
 	 * for communications, but still want to disconnect.  This will be set

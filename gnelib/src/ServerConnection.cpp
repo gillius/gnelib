@@ -61,8 +61,7 @@ void ServerConnection::run() {
 		//Do connection negotiaion here
 		getListener()->onNewConn(sync); //SyncConnection will relay this
 		sync.release();
-		connected = true;
-		connecting = false;
+    finishedConnecting();
 	} catch (Error e) {
 		ourCreator->onListenFailure(e, getRemoteAddress(true), getListener());
 	}

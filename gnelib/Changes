@@ -1,4 +1,9 @@
 GNE 0.4 to Current
+  Fixed obscure and ironically small race condition while setting the
+    connecting flags which could cause recursive deletions and onDisconnects.
+    Ironic because out of all of the code, the condition only can occur
+    if the threads switched between two unconditional boolean assignments,
+    but it happened.  I guess it was good to find it now rather than later!
   You can now delete the connection associated with a ConnectionListener in
     onDisconnect (previously you could never do this).  You can still delete
     it from any thread other than the EventThread at any time.

@@ -148,6 +148,14 @@ void Connection::onDoneWriting() {
   eventListener->onDoneWriting();
 }
 
+void Connection::finishedConnecting() {
+  sync.acquire();
+  assert(connecting && !connected);
+  connected = true;
+  connecting = false;
+  sync.release();
+}
+
 //##ModelId=3B07538100B0
 void Connection::onReceive(bool reliable) {
   //Create buffer into a RawPacket
