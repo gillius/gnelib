@@ -4,57 +4,21 @@ The main platform support for GNE is MSVC, so this port should be the least
 quirky.  The MSVC workspace file in the root directory of the project should
 contain everything needed to compile the library and the examples.
 
-Use the installmsvc.bat file to do an interactive setup that will walk you
-through the ENTIRE install process, excluding how to actually BUILD the
-project -- read below for those instructions.
+INSTALLATION INSTRUCTIONS:
 
-When the installer starts MSVC 6 (if you have it):
-Pick set active configuration in build.  You have several options here.
-The buildall project builds the GNE library and all of the examples.  Select
-  debug or relase mode, depending on your preference.
-You may also choose only to select the GNE project itself, to skip building of
-  the examples.
+You can view detailed installation instructions at
+http://www.rit.edu/~jpw9607/gne/tutorials/msvcinstall.htm
 
-When the installer starts MSVC.NET (if you have it):
-Pick the active configuaration you want (debug or release).
-Then select the GNE project and hit build project to just build GNE.
-Or, you can select build solution to build GNE and all examples.
+NOTE: GNE only works under MSVC.NET or later.  MSVC6 will not work.
 
-When you are compiling you can build debug, release, or both modes.  The
-installer will check your work.  If you did not successfully generate any
-.lib files, it will ask you to compile again.  If you can't get GNE to
-compile, press ctrl-C in the installer and seek help at the GNE site.
+If you cannot view the tutorial, here is a short set of instructions for the
+knowledgable:
 
-If you have the doxygen program, and it is in your path (so that you can run
-it simply by typing "doxygen") then the installer can generate documentation
-for you using it.  You can find more info about doxygen in the main Readme
-file.
+Install HawkNL, preferably with NL_WIN_THREADS defined.  You need to make sure
+that HawkNL is visible in your compiler's include paths by adding the HawkNL
+directory.
 
-------------------------------------------------------------------------------
-MANUAL INSTALLATION INSTRUCTIONS:
+The same applies for Boost, although Boost does not need to be compiled first.
 
-Install HawkNL if needed by copying HawkNL.lib and nl.h into your lib and
-include directories for your compiler.  Then load up the .dsw (MSVC6) or .sln
-(MSVC.NET) file, and compile the library.
-
-When you get the libary compiled, copy the include sub tree into your MSVC
-include directory.  gnelib.h should be in the actual include directory itself,
-and the subdirectory gnelib should exist under it.  This is to keep your
-includes directory as clean as possible.
-
-There will be a gned.lib file and gne.lib file (the first is debug, the second
-is release mode) in the /lib/msvc directory.  Copy these files into the lib
-directory for MSVC.
-
-Once this is done, you should be able to #include <gnelib.h> and link in the
-gned.lib or gne.lib file into your project and be up and running.  If you run
-into any troubles, please visit the website or contact the authors -- these
-links are listed in the main readme file.
-
-------------------------------------------------------------------------------
-
-HawkNL needs to be properly installed as well.
-This library uses DLL files that will need to be distributed with your
-programs.  You can copy it into your Windows directory on your own system
-for convinence, but you can keep them in the same directory as the exe when you
-distribute the program to users.
+Then load the gne.sln namespace and compile.  It will generate gne.lib or
+gned.lib depending on release or debug mode.

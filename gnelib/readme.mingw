@@ -1,21 +1,21 @@
 MingW specific information for GNE.
 
-The streambufs code in GNE that enables gout and gin to work uses the latest
-libstdc++ libraries, which are usually only shipped with GCC 3.x. The old
-libstdc++ is not ISO C++ 98 compliant, but is used by the current mingw, so by
-default GNE supports the 2.9.x libstdc++ version. If you want to use the new
-libstdc++ code, set the environment variable NO_OLD_CPP.
+If you have an old GCC 2.95 system, note that you will need to add OLD_CPP=1
+to your make line.
 
-Automatic Installation
+Detailed instructions are provided in the GNE tutorials.  You can view them
+online at http://www.rit.edu/~jpw9607/gne/tutorials/mingwinstall.htm.
 
-At a command prompt, run the installming.bat installation script, which will
-walk you through the install process, step by step, including installation of
-the mingw precompiled version of HawkNL if needed.
+Installation:
 
-Manual Installation
+Install HawkNL.  HawkNL has its own installation process, which does involve
+a makefile.
 
-Install HawkNL if needed, into your include and lib directories.  There is a
-makefile for HawkNL.
+Install Boost.  GNE does not make use of any of the compiled parts of Boost,
+so no compilation is needed.
+
+If you did not install HawkNL and Boost into your compiler's default search
+paths, you need to give paths to the files in the LibPaths.mak file.
 
 Inside a command prompt, type:
 
@@ -34,3 +34,10 @@ this from your system (and it might be a good idea before upgrading to a newer
 version as well), use:
 
 make uninstall
+
+NOTE: MINGDIR must be set for make install to work.  It will install the files
+into MINGDIR/include and MINGDIR/lib.
+
+Example:
+SET MINGDIR=C:\mingw
+make install

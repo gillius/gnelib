@@ -1,15 +1,10 @@
 Linux(Unix) specific information for GNE.
 
-The streambufs code in GNE that enables gout and gin to work uses the latest
-libstdc++ libraries, which are usually only shipped with GCC 3.x. The old
-libstdc++ is not ISO C++ 98 compliant, but is installed on many systems, so by
-default GNE supports the 2.9.x libstdc++ version. If you want to use the new
-libstdc++ code, set the environment variable NO_OLD_CPP.
+If you have an old GCC 2.95 system, note that you will need to add OLD_CPP=1
+to your make line.
 
-OLD_CPP works also on GCC 3.x and the new libstdc++ in addition to
-NO_OLD_CPP and seems to work just as well.  But it is suggested that you use
-the NO_OLD_CPP version, espically if you encounter any errors related to
-console I/O.
+Detailed instructions are provided in the GNE tutorials.  You can view them
+online at http://www.rit.edu/~jpw9607/gne/tutorials/linuxinstall.htm.
 
 1. ncurses
 
@@ -21,6 +16,12 @@ libncurses-devel comes with it which installs everything you need.
 
 Install HawkNL.  HawkNL has its own installation process, which does involve
 a makefile.
+
+Install Boost.  GNE does not make use of any of the compiled parts of Boost,
+so no compilation is needed.
+
+If you did not install HawkNL and Boost into your compiler's default search
+paths, you need to give paths to the files in the LibPaths.mak file.
 
 In a shell, execute:
 
