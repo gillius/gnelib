@@ -1511,6 +1511,18 @@
 			concurrency 	"Sequential"
 			opExportControl 	"Public"
 			uid        	0)
+		    (object Operation "Time"
+			quid       	"3AEEF7680320"
+			parameters 	(list Parameters
+			    (object Parameter "seconds"
+				quid       	"3AEEF768038E"
+				type       	"int")
+			    (object Parameter "microseconds"
+				quid       	"3AEEF7690122"
+				type       	"int"))
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
 		    (object Operation "~Time"
 			quid       	"3AEBA04C03DE"
 			stereotype 	"virtual"
@@ -1519,12 +1531,14 @@
 			uid        	0)
 		    (object Operation "getSec"
 			quid       	"3AEBA4AC0096"
+			stereotype 	"const"
 			result     	"int"
 			concurrency 	"Sequential"
 			opExportControl 	"Public"
 			uid        	0)
 		    (object Operation "getuSec"
 			quid       	"3AEBA4B100C8"
+			stereotype 	"const"
 			result     	"int"
 			concurrency 	"Sequential"
 			opExportControl 	"Public"
@@ -1551,6 +1565,7 @@
 			uid        	0)
 		    (object Operation "diff"
 			quid       	"3AEBA53B00AA"
+			stereotype 	"const"
 			parameters 	(list Parameters
 			    (object Parameter "rhs"
 				quid       	"3AEBA548012C"
@@ -1562,6 +1577,7 @@
 			quidu      	"3AEB9AD500A0")
 		    (object Operation "operator<"
 			quid       	"3AEBA4D200A0"
+			stereotype 	"const"
 			parameters 	(list Parameters
 			    (object Parameter "rhs"
 				quid       	"3AEBA4F401EA"
@@ -1572,6 +1588,7 @@
 			uid        	0)
 		    (object Operation "operator>"
 			quid       	"3AEBA4E003A2"
+			stereotype 	"const"
 			parameters 	(list Parameters
 			    (object Parameter "rhs"
 				quid       	"3AEBA4EF02F8"
@@ -1582,6 +1599,7 @@
 			uid        	0)
 		    (object Operation "operator+"
 			quid       	"3AEBA4F9021C"
+			stereotype 	"const"
 			parameters 	(list Parameters
 			    (object Parameter "rhs"
 				quid       	"3AEBA54C02EE"
@@ -1597,20 +1615,9 @@
 			concurrency 	"Sequential"
 			opExportControl 	"Protected"
 			uid        	0)
-		    (object Operation "Time"
-			quid       	"3AEEF7680320"
-			parameters 	(list Parameters
-			    (object Parameter "seconds"
-				quid       	"3AEEF768038E"
-				type       	"int")
-			    (object Parameter "microseconds"
-				quid       	"3AEEF7690122"
-				type       	"int"))
-			concurrency 	"Sequential"
-			opExportControl 	"Public"
-			uid        	0)
 		    (object Operation "getTotaluSec"
 			quid       	"3AF9D5750082"
+			stereotype 	"const"
 			result     	"int"
 			concurrency 	"Sequential"
 			opExportControl 	"Public"
@@ -1627,6 +1634,7 @@
 			uid        	0)
 		    (object Operation "operator+"
 			quid       	"3AF9D57503B6"
+			stereotype 	"const"
 			parameters 	(list Parameters
 			    (object Parameter "rhs"
 				quid       	"3AF9D5760078"
@@ -1638,6 +1646,7 @@
 			quidu      	"3AEB9AD500A0")
 		    (object Operation "operator-"
 			quid       	"3AF9D57601F4"
+			stereotype 	"const"
 			parameters 	(list Parameters
 			    (object Parameter "rhs"
 				quid       	"3AF9D5760262"
@@ -1746,6 +1755,34 @@
 			quid       	"3AF8AADF0050"
 			stereotype 	"static"
 			result     	"int"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "mputchar"
+			quid       	"3AFB7047005A"
+			stereotype 	"static"
+			parameters 	(list Parameters
+			    (object Parameter "ch"
+				quid       	"3AFB70CE0258"
+				type       	"int"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "mlputchar"
+			quid       	"3AFB705602B2"
+			stereotype 	"static"
+			parameters 	(list Parameters
+			    (object Parameter "x"
+				quid       	"3AFB71010384"
+				type       	"int")
+			    (object Parameter "y"
+				quid       	"3AFB7102003C"
+				type       	"int")
+			    (object Parameter "ch"
+				quid       	"3AFB71020118"
+				type       	"int"))
+			result     	"void"
 			concurrency 	"Sequential"
 			opExportControl 	"Public"
 			uid        	0))
@@ -2021,7 +2058,7 @@
 		max_height 	28350
 		max_width  	21600
 		origin_x   	5892
-		origin_y   	1575
+		origin_y   	0
 		items      	(list diagram_item_list
 		    (object ClassView "Class" "Logical View::Thread" @1
 			ShowCompartmentStereotypes 	TRUE
@@ -2829,10 +2866,10 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@26
-			    location   	(4848, 1944)
+			    location   	(4794, 1944)
 			    fill_color 	13434879
 			    nlines     	1
-			    max_width  	404
+			    max_width  	512
 			    justify    	0
 			    label      	"Time")
 			icon_style 	"Icon"
@@ -2841,7 +2878,7 @@
 			quidu      	"3AEB9AD500A0"
 			compartment 	(object Compartment
 			    Parent_View 	@26
-			    location   	(4848, 2005)
+			    location   	(4794, 2005)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -2855,20 +2892,20 @@
 			    fill_color 	16777215
 			    anchor     	2
 			    nlines     	19
-			    max_width  	412)
-			width      	422
+			    max_width  	534)
+			width      	530
 			height     	1036
 			annotation 	8
 			autoResize 	TRUE)
 		    (object AssociationViewNew "$UNNAMED$25" @27
-			location   	(5419, 2450)
+			location   	(5446, 2450)
 			stereotype 	TRUE
 			line_color 	3342489
 			quidu      	"3AEBA39702C6"
 			roleview_list 	(list RoleViews
 			    (object RoleView "$UNNAMED$26" @28
 				Parent_View 	@27
-				location   	(319, -725)
+				location   	(346, -725)
 				font       	(object Font
 				    size       	10
 				    face       	"Arial"
@@ -2880,7 +2917,7 @@
 				    default_color 	TRUE)
 				label      	(object SegLabel @29
 				    Parent_View 	@28
-				    location   	(5545, 2409)
+				    location   	(5552, 2409)
 				    font       	(object Font
 					size       	10
 					face       	"Arial"
@@ -2908,7 +2945,7 @@
 				line_style 	0)
 			    (object RoleView "nextTime" @30
 				Parent_View 	@27
-				location   	(319, -725)
+				location   	(346, -725)
 				font       	(object Font
 				    size       	10
 				    face       	"Arial"
@@ -2920,7 +2957,7 @@
 				    default_color 	TRUE)
 				label      	(object SegLabel @31
 				    Parent_View 	@30
-				    location   	(5293, 2409)
+				    location   	(5341, 2409)
 				    font       	(object Font
 					size       	10
 					face       	"Arial"
@@ -4586,22 +4623,11 @@
 		    (object InheritView "" @117
 			stereotype 	TRUE
 			line_color 	3342489
-			quidu      	"3AE8681C0366"
-			client     	@21
-			supplier   	@1
-			vertices   	(list Points
-			    (5578, 2192)
-			    (5267, 1920)
-			    (4253, 1404))
-			line_style 	0)
-		    (object InheritView "" @118
-			stereotype 	TRUE
-			line_color 	3342489
 			quidu      	"3AE59F42024E"
 			client     	@3
 			supplier   	@1
 			line_style 	0)
-		    (object InheritView "" @119
+		    (object InheritView "" @118
 			stereotype 	TRUE
 			line_color 	3342489
 			quidu      	"3AE59EC70078"
@@ -4612,7 +4638,7 @@
 			    (3388, 1974)
 			    (2986, 1620))
 			line_style 	0)
-		    (object ClassView "Class" "Logical View::Console" @120
+		    (object ClassView "Class" "Logical View::Console" @119
 			ShowCompartmentStereotypes 	TRUE
 			IncludeAttribute 	TRUE
 			IncludeOperation 	TRUE
@@ -4627,11 +4653,11 @@
 			    color      	0
 			    default_color 	TRUE)
 			label      	(object ItemLabel
-			    Parent_View 	@120
-			    location   	(4401, 469)
+			    Parent_View 	@119
+			    location   	(4396, 419)
 			    fill_color 	13434879
 			    nlines     	1
-			    max_width  	448
+			    max_width  	458
 			    justify    	0
 			    label      	"Console")
 			icon_style 	"Icon"
@@ -4639,8 +4665,8 @@
 			fill_color 	13434879
 			quidu      	"3AF8A1A0033E"
 			compartment 	(object Compartment
-			    Parent_View 	@120
-			    location   	(4401, 530)
+			    Parent_View 	@119
+			    location   	(4396, 480)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -4653,12 +4679,23 @@
 			    icon_style 	"Icon"
 			    fill_color 	13434879
 			    anchor     	2
-			    nlines     	10
-			    max_width  	468)
-			width      	466
-			height     	586
+			    nlines     	12
+			    max_width  	475)
+			width      	476
+			height     	686
 			annotation 	8
-			autoResize 	TRUE)))
+			autoResize 	TRUE)
+		    (object InheritView "" @120
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"3AE8681C0366"
+			client     	@21
+			supplier   	@1
+			vertices   	(list Points
+			    (5588, 2131)
+			    (5334, 1849)
+			    (4253, 1376))
+			line_style 	0)))
 	    (object ClassDiagram "Threading"
 		quid       	"3AE273A2035C"
 		title      	"Threading"
@@ -5513,8 +5550,8 @@
 |aConnectionEventGenerator.h,3af2275a
 |UConnectionWriter.cpp,3af2275a
 |SConnectionWriter.h,3af2275a
-|LConsole.cpp,3af9b6a0
-|JConsole.h,3af8b318
+|LConsole.cpp,3afb714c
+|JConsole.h,3afb710c
 |LCounter.cpp,3af2275a
 |JCounter.h,3af2275a
 |HGNE.cpp,3af8d89e
@@ -5533,9 +5570,9 @@
 |SServerConnection.h,3af2275a
 |KThread.cpp,3af2275a
 |IThread.h,3af2275a
-|ITime.cpp,3af9d576
-|GTime.h,3af9d576
-|JTimer.cpp,3af9caa8
+|ITime.cpp,3afb6dc8
+|GTime.h,3afb6d5a
+|JTimer.cpp,3af9fee4
 |HTimer.h,3af82ffe
 |RTimerCallback.cpp,3af78bc0
 |PTimerCallback.h,3af78bba
@@ -5653,14 +5690,16 @@
 |ConnectionWriter::ConnectionWriter,f,L,3AE4C448001E,TConditionVariable&,,3fa,465
 |ConnectionWriter::run,f,L,3AE4C4B60140,A,4ab,4e4
 |ConnectionWriter::~ConnectionWriter,f,L,3AE4C448005A,A,467,4a9
-|Console,t,O,3AF8A1A0033E,A,519,b0e
+|Console,t,O,3AF8A1A0033E,A,519,c1b
 |Console::getch,f,N,3AF8AADF0050,A,6fb,744
 |Console::gotoxy,f,N,3AF8A3AE001E,Iint,int,,63b,6ae
 |Console::init,f,N,3AF8A1E2038E,aint(*)(void(*func)(void)),,4e2,5be
 |Console::initialized,f,N,3AF8ADDB0280,A,4a5,4e0
 |Console::kbhit,f,N,3AF8AADE038E,A,6b0,6f9
 |Console::mlprintf,f,N,3AF8A7ED00AA,Sint,int,char*,...,,821,91f
+|Console::mlputchar,f,N,3AFB705602B2,Mint,int,int,,997,a2a
 |Console::mprintf,f,N,3AF8A7EC026C,Kchar*,...,,746,81f
+|Console::mputchar,f,N,3AFB7047005A,Eint,,921,995
 |Console::outSync,f,N,3AF8A1F80226,A,474,4a4
 |Console::shutdown,f,N,3AF8A1ED037A,A,5c0,639
 |Counter,t,Q,3AE8691D0032,A,482,871
@@ -5742,28 +5781,28 @@
 |Thread::start,f,f,3AE1DFC70230,A,d98,e5d
 |Thread::threads,f,f,3AE11D5F023A,A,3ee,434
 |Thread::~Thread,f,f,3AE120140046,A,735,763
-|Time,t,i,3AEB9AD500A0,A,4ec,ed7
+|Time,t,i,3AEB9AD500A0,A,4ec,f0d
 |Time::Time,f,h,3AEBA04C03A2,A,3cd,40c
 |Time::Time,f,h,3AEEF7680320,Iint,int,,40e,48b
-|Time::diff,f,h,3AEBA53B00AA,Mconst Time&,,654,6d7
-|Time::getSec,f,h,3AEBA4AC0096,A,4b9,4f6
-|Time::getTotaluSec,f,h,3AF9D5750082,A,53d,597
-|Time::getuSec,f,h,3AEBA4B100C8,A,4f8,53b
-|Time::normalize,f,h,3AECF2860320,A,9ef,ac9
-|Time::operator -,f,h,,Mconst Time&,,974,9ed
-|Time::operator+,f,h,3AEBA4F9021C,Eint,,7fb,880
-|Time::operator+,f,h,3AF9D57503B6,Mconst Time&,,8e1,972
-|Time::operator+=,f,h,3AF9D5750122,Eint,,882,8df
-|Time::operator<,f,h,3AEBA4D200A0,Mconst Time&,,6d9,768
-|Time::setSec,f,h,3AEBA4BE0226,Eint,,599,5e5
-|Time::setuSec,f,h,3AEBA4C80032,Eint,,5e7,652
+|Time::diff,f,h,3AEBA53B00AA,Rconst Time&,const,666,6ef
+|Time::getSec,f,h,3AEBA4AC0096,Fconst,4b9,4fc
+|Time::getTotaluSec,f,h,3AF9D5750082,Fconst,549,5a9
+|Time::getuSec,f,h,3AEBA4B100C8,Fconst,4fe,547
+|Time::normalize,f,h,3AECF2860320,A,a25,aff
+|Time::operator -,f,h,,Rconst Time&,const,9a4,a23
+|Time::operator+,f,h,3AEBA4F9021C,Jint,const,81f,8aa
+|Time::operator+,f,h,3AF9D57503B6,Rconst Time&,const,90b,9a2
+|Time::operator+=,f,h,3AF9D5750122,Eint,,8ac,909
+|Time::operator<,f,h,3AEBA4D200A0,Rconst Time&,const,6f1,786
+|Time::setSec,f,h,3AEBA4BE0226,Eint,,5ab,5f7
+|Time::setuSec,f,h,3AEBA4C80032,Eint,,5f9,664
 |Time::~Time,f,h,3AEBA04C03DE,A,48d,4b7
 |Timer,t,k,3AE8680C029E,A,4e6,c64
 |Timer::Timer,f,j,3AE868370122,TTimerCallback*,int,,3fb,480
 |Timer::getAbsoluteTime,f,j,3AF4797001CC,A,68d,779
 |Timer::getCurrentTime,f,j,3AE86872030C,A,4f7,667
-|Timer::isRunning,f,j,3AED05E7029E,A,a2e,a74
-|Timer::run,f,j,3AE868A30294,A,8bb,a2c
+|Timer::isRunning,f,j,3AED05E7029E,A,a0c,a52
+|Timer::run,f,j,3AE868A30294,A,899,a0a
 |Timer::startTimer,f,j,3AEB9AB50050,A,77b,82b
 |Timer::stopTimer,f,j,3AEB9AB500BE,A,82d,897
 |Timer::~Timer,f,j,3AE8686C00BE,A,482,4d1
