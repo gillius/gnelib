@@ -12,7 +12,11 @@ EXAMPLE_CPP          = $(wildcard examples/*/*.cpp)
 
 EXAMPLE_O            = $(EXAMPLE_CPP:.cpp=.o)
 
-EXAMPLE_EXE          = $(addprefix examples/,$(notdir $(EXAMPLE_O:.o=.exe)))
+EXE_MASK             = examples/bin/%
+
+EXAMPLE_DIR          = examples/bin
+
+EXAMPLE_EXE          = $(addprefix examples/bin/,$(notdir $(EXAMPLE_O:.o=.exe)))
 
 LIB_CPP              = $(wildcard src/*.cpp)
 
@@ -25,3 +29,6 @@ VPATH                = $(dir $(EXAMPLE_CPP))
 LIBDIR               = /usr/local/lib/
 
 INCDIR               = /usr/local/include/
+
+examples/bin:
+	mkdir examples/bin

@@ -23,7 +23,7 @@ $(LIB_STATIC): $(LIB_O)
 $(LIB_O): %.o: %.cpp
 	$(CPP) -Iinclude/gnelib -c -o $@ $(CPPFLAGS) $<
 
-$(EXAMPLE_EXE): examples/%.exe: %.o
+$(EXAMPLE_EXE): $(EXE_MASK): $(EXAMPLE_DIR) %.o
 	$(CPP) -o $@ $(LDFLAGS) $< $(EXAMPLE_LIBS)
 
 $(EXAMPLE_O): %.o: %.cpp
