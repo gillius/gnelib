@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX"gneintern.h" /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fr /YX"gneintern.h" /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -122,6 +122,10 @@ SOURCE=.\src\ListServerConnection.cpp
 # Begin Source File
 
 SOURCE=.\src\Mutex.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\OnReceiveEventThread.cpp
 # End Source File
 # Begin Source File
 
@@ -218,6 +222,10 @@ SOURCE=.\src\ListServerConnection.h
 # Begin Source File
 
 SOURCE=.\src\Mutex.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\OnReceiveEventThread.h
 # End Source File
 # Begin Source File
 
