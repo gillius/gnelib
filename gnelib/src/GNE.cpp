@@ -26,6 +26,7 @@
 #include "../include/gnelib/Error.h"
 #include "../include/gnelib/Errors.h"
 #include "../include/gnelib/PingPacket.h"
+#include "../include/gnelib/ObjectBrokerClient.h"
 
 #ifndef WIN32
 #include <signal.h>
@@ -48,6 +49,7 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
   if (!initialized) {
     gnedbg(1, "GNE initalized");
     PacketParser::registerGNEPackets();
+    ObjectBrokerClient::staticInit();
     if (networkType != NO_NET) {
       if (nlInit() == NL_FALSE)
         return true;
