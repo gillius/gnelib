@@ -19,7 +19,7 @@
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
 			CharacterSet="2"
 			ManagedExtensions="FALSE"
-			WholeProgramOptimization="TRUE">
+			WholeProgramOptimization="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				GlobalOptimizations="TRUE"
@@ -31,7 +31,7 @@
 				MinimalRebuild="FALSE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="../include/gnelib/gneintern.h"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
