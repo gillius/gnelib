@@ -91,3 +91,18 @@ int Console::mlprintf(int x, int y, char* format, ...) {
   return ret;
 }
 
+//##ModelId=3AFB7047005A
+void Console::mputchar(int ch) {
+  outSync.acquire();
+  putchar(ch);
+  outSync.release();
+}
+
+//##ModelId=3AFB705602B2
+void Console::mlputchar(int x, int y, int ch) {
+  outSync.acquire();
+  gotoxy(x, y);
+  putchar(ch);
+  outSync.release();
+}
+

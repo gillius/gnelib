@@ -79,6 +79,18 @@ public:
   //##ModelId=3AF8A7ED00AA
   static int mlprintf(int x, int y, char* format, ...);
 
+  /**
+   * A syncronized version of the ANSI function putchar.
+   */
+  //##ModelId=3AFB7047005A
+  static void mputchar(int ch);
+
+  /**
+   * Like mputchar(), but with a specified location.
+   */
+  //##ModelId=3AFB705602B2
+  static void mlputchar(int x, int y, int ch);
+
 private:
   /**
    * Moves the cursor on the screen to (X, Y).
