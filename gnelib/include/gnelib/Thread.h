@@ -327,9 +327,7 @@ private:
 
   int priority;
 
-#ifndef WIN32
-  Mutex joinSync; //needed for pthreads-based platforms.
-#endif
+  Mutex joinSync; //needed for multiple threads joining.
 };
 
 }

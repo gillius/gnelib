@@ -241,15 +241,17 @@ void Thread::shutDown() {
 }
 
 void Thread::join() {
-  assert( !joined && started );
+  assert( started );
   if ( started ) {
-    joined = true;
-#ifdef WIN32
-    valassert(WaitForSingleObject( id->hThread, INFINITE ), WAIT_OBJECT_0);
-#else
     LockMutex lock( joinSync );
-    valassert(pthread_join( id->thread_id, NULL ), 0);
+    if ( !joined ) {
+#ifdef WIN32
+      valassert(WaitForSingleObject( id->hThread, INFINITE ), WAIT_OBJECT_0);
+#else
+      valassert(pthread_join( id->thread_id, NULL ), 0);
 #endif
+      joined = true;
+    }
   }
 }
 
