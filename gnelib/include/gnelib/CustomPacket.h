@@ -77,6 +77,16 @@ public:
    * CustomPacket.  You need to call rewind or flip (at this point, both are
    * equivalent) on the buffer before pulling data from it, or a buffer
    * overflow exception will result.
+   *
+   * You can use the return from this method directly to modify the buffer, or
+   * you can store the returned reference (for a very short time) and work on
+   * that.  Here are two examples:
+   *
+   * <pre> CustomPacket cp;
+   * cp.getBuffer() << 15 << "whatever";
+   * //or
+   * Buffer& buf( cp.getBuffer() );
+   * buf << 15 << "whatever";</pre>
    */
   Buffer& getBuffer();
 
