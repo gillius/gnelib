@@ -1,5 +1,5 @@
-#ifndef SERVERCONNECTION_H_INCLUDED_C51A4E36
-#define SERVERCONNECTION_H_INCLUDED_C51A4E36
+#ifndef SERVERCONNECTION_H_INCLUDED_C4FE6FF3
+#define SERVERCONNECTION_H_INCLUDED_C4FE6FF3
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
  * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
@@ -21,104 +21,60 @@
  */
 
 #include "gneintern.h"
-#include "ConnectionEventListener.h"
 #include "Connection.h"
+#include "Thread.h"
 
 /**
- * A connection that listens for other connections.  Inherit from this class,
- * overriding the functions from Connection and ClientConnection based on the
- * events you wish to respond to.
+ * The server-side connection.  Once it is connected, there's very little to
+ * no difference between ClientConnection and ServerConnection at this level.
  */
-//##ModelId=3AE59EF1015E
-class ServerConnection {
+//##ModelId=3B01D4CB024E
+class ServerConnection : public Connection, public Thread {
 public:
   /**
-   * Initalizes this class.
-   * @param outRate max outbandwith per client
-   * @param inRate max clients can send to us.
-   * @param port the port number to listen on.
+   * Intializes this class, given the flow control parameters.
+   * @param outRate the maximum rate in bytes per second to send.
+   * @param inRate the maximum rate we allow the sender to send to us in
+   *        bytes per second.
    */
-  //##ModelId=3AE59FAF033E
-  ServerConnection(int outRate, int inRate);
+  //##ModelId=3B01D4D6023A
+  ServerConnection(int outRate, int inRate, NLsocket rsocket2);
 
-  //##ModelId=3AE59FAF037A
+  //##ModelId=3B01D4D60276
   virtual ~ServerConnection();
 
   /**
-   * Opens a socket ready for listening, but not yet listening.
-   * @param port the port to listen on.
-   * @return true if could not open a socket on the port.
+   * Don't call this function directly.  This thread performs the connection
+   * process.  The thread will have finished before onNewConn is called.
    */
-  //##ModelId=3B009F57037A
-  bool open(int port);
-
-  /**
-   * Starts this socket listening.  onNewConn will be called when a new
-   * connection has been negotiated and error checked.
-   * @see onListenFailure
-   * @see #onNewConn(Connection*)
-   * @return true, if there was an error.
-   */
-  //##ModelId=3AE5A0F60028
-  bool listen();
+  //##ModelId=3B01D63700BE
+  void run();
 
   /**
    * Event triggered when a new connection has been negotiated and error
-   * checked.
-   * @param newConn the new Connection created.  You are responsible for
-   *                deallocating this new Connection.
+   * checked.  This object is a newly allocated object created from your
+   * ServerConnectionCreator object, and this function will be the first time
+   * you code has "seen" this object, so you will have to register it into
+   * some internal list so you can interact with and delete it later.  This
+   * functionality could exist in your ServerConnectionCreator::create(),
+   * though rather than in this function.\n
+   * If the connection failed, though, the function onConnFailure instead of
+   * this function is called.\n
    */
-  //##ModelId=3AE5A10D00A0
-  virtual void onNewConn(Connection* newConn) = 0;
+  //##ModelId=3B03149400AA
+  virtual void onNewConn() = 0;
 
   /**
-   * There was a failure when trying to listen on this socket.  This is not
-   * called when the actual low-level listen fails (that error is returned
-   * from listen), but instead high-level errors while connecting such as a
-   * version mismatch are sent here.
-   * Note you must call this function explicity from your overridden
-   * function FIRST so the underlying functions recieve this event.
-   * @param errorType the type of error
+   * Event triggered when the connection failed.  Either this function or
+   * onNewConn will be called when a new connection is made.  If you want to
+   * get rid of this object right now, call detach(true) in this function. If
+   * you want the object to stick around, like onNewConn, you must save a
+   * pointer elsewhere so you can interact with and delete this object later.
+   * @see onNewConn
    */
-  //##ModelId=3AE5A1310208
-  virtual void onListenFailure(Connection::FailureType errorType);
-
-  /**
-   * Returns the address of the listening socket.
-   */
-  //##ModelId=3B00A3BE0352
-  NLaddress getLocalAddress() const;
-
-private:
-  //##ModelId=3B009B9E02C6
-  class ServerListener : public ConnectionEventListener {
-  public:
-    //##ModelId=3B009DCD03C0
-    ServerListener(ServerConnection& listener);
-
-    //##ModelId=3B009DCE0046
-    virtual ~ServerListener();
-
-    //##ModelId=3B009BAA00F0
-    void onReceive();
-
-  private:
-    //##ModelId=3B009DB1029E
-    ServerConnection& conn;
-
-  };
-  friend class ServerListener;
-
-  //##ModelId=3AE5AF95021C
-  void onReceive();
-
-  //##ModelId=3B009AE2032A
-  NLsocket socket;
+  //##ModelId=3B0315A803DE
+  virtual void onConnFailure(FailureType errorType) = 0;
 
 };
 
-
-
-#endif /* SERVERCONNECTION_H_INCLUDED_C51A4E36 */
-
-
+#endif /* SERVERCONNECTION_H_INCLUDED_C4FE6FF3 */
