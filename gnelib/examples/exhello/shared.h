@@ -34,9 +34,11 @@ class OurServer;
 
 class HelloPacket : public Packet {
 public:
-  HelloPacket() : Packet(MIN_USER_ID) {}
+  HelloPacket() : Packet(ID) {}
   HelloPacket(string message2) : Packet(MIN_USER_ID), message(message2) {}
   virtual ~HelloPacket() {}
+
+  static const int ID;
 
   Packet* makeClone() const {
     return new HelloPacket(*this);
@@ -67,6 +69,8 @@ public:
 private:
   string message;
 };
+
+const int HelloPacket::ID = MIN_USER_ID;
 
 class OurListener : public ServerConnectionListener {
 public:
