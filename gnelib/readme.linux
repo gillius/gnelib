@@ -1,15 +1,24 @@
 Linux(Unix) specific information for GNE.
 
-1. About HawkNL and Linux
+You need GCC 3.x and/or the latest libstdc++ libraries to use GNE, because the
+old libstdc++ that many have installed is not ISO C++ 98 compliant and
+therefore will not compile the streambufs code that enables gout and gin to
+work.  In the future a gcc 2.9x version will likely be provided.
 
-HawkNL does include a makefile for linux, but as of writing this, it doesn't
-work at all. Should be fixed with the next version though.
+1. HawkNL
+
+You'll need HawkNL 1.4 final or a later version to use GNE.
 
 2. About pthreads and Linux
 
 Pthreads should be already present as part of the standard libs on your OS.
 
-3. Installation
+3. ncurses
+
+GNE uses the ncurses library.  GNE was created with the libncurses5.2 library,
+others may or may not work.
+
+4. Installation
 
 In a shell, execute:
 

@@ -25,3 +25,11 @@ Once this is done, you should be able to #include <gnelib.h> and link in the
 gned.lib or gne.lib file into your project and be up and running.  If you run
 into any troubles, please visit the website or contact the authors -- these
 links listed in the main readme file.
+
+------------------------------------------------------------------------------
+
+The pthreads library and HawkNL both need to be properly installed as well.
+These libraries both use DLL files that will need to be distributed with your
+programs.  You can copy these into your Windows directory on your own system
+for convinence, but you can keep them in the same directory as the exe when you
+distribute the program to users.

@@ -1,5 +1,13 @@
 MingW specific information for GNE.
 
+You need GCC 3.x and/or the latest libstdc++ libraries to use GNE, because the
+old libstdc++ that many have installed is not ISO C++ 98 compliant and
+therefore will not compile the streambufs code that enables gout and gin to
+work.  In the future a gcc 2.9x version will likely be provided.
+
+I have heard recently that a GCC 3.x version of MingW has been released, and
+this might be able to compile GNE (if it includes the new libstdc++ as well).
+
 1. About HawkNL and mingw
 
 HawkNL doesn't include a makefile for mingw as of writing this, but it should

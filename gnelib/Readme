@@ -2,7 +2,9 @@
 
 GNE
 Game Networking Engine
-http://www.rit.edu/~jpw9607/
+http://www.rit.edu/~jpw9607/gne/
+
+  Visit the site to get up-to-date links to things you need for GNE.
 
   GNE is released under the terms of the LGPL.  It is a library for providing
 networking for games.
@@ -15,35 +17,35 @@ you may generate them yourself by using doxygen (a free program).
 
 Dependancies
 
-  The following things are needed for GNE:
+The following things are needed for GNE:
 
   * ANSI C++ compiler
-    - Out-of-the-Box for MSVC 6, and MingW32
-    - Planned support for GCC under Linux and UNIX
+    + Out-of-the-Box for MSVC 6, Linux gcc 3.x
+    + Planned support for Solaris 8 (this might already work using the Linux
+      makefiles with GNU make, need testers!)
+    + MSVC 4 or 5 might also work, and other *NIX as well, but testers are
+      needed for this!
+  * The HawkNL networking library from HawkSoft , version 1.4 final or higher.
+    The download link is on the left sidebar when you are in the HawkNL
+    section.
+  * pthreads implementation (pthreads-win32 for Windows used for Windows),
+    UNIX already has pthreads support.
+  * libncurses5.2 or later will be needed for *NIX versions of GNE.
 
-  * The HawkNL networking library from HawkSoft, version 1.4 beta 4 or higher.
-    The download link is on the left sidebar when you are in the HawkNL section.
-	http://www.hawksoft.com/hawknl/
-
-  * pthreads implementation (pthreads-win32 for Windows used for Windows), UNIX
-    already has pthreads support.
-	http://sources.redhat.com/pthreads-win32/
-
+MingW32 should also be supported if you use the new GCC I think. The old
+libstdc++ that was used with gcc 2.9x is not compatable (since it is not ISO
+C++ 98 compliant). The new one that is used with gcc 3 is. In the future a
+backport to gcc 2.9x will be done, hopefully for GNE 0.45. MSVC 6 and the Sun
+CC compiler used on Solaris 8 and gcc 3.x are ISO 98 compliant.
 
 ALPHA NOTES -- IMPORTANT:
-  This version is only an alpha version of GNE.  So that means take a
-look at what the tests do and the capabilities of GNE.  Note that the API
-can still change a lot from this release to the beta, at which time I plan
-on freezing the API until final release.
+This version is only an alpha version of GNE. So that means take a look at what
+the tests do and the capabilities of GNE. Note that the API can still change
+significantly from this release to the beta, at which time I plan on trying to
+freeze the API as much as possible until final release.
 
-  At this time most of the functions are implemented somewhat, but still a
-large majority of the functions do not fully follow their post-conditions and
-are minimal functionality -- for example you can send data, but it is not yet
+At this time most of the functions are implemented somewhat, but still a few of
+the functions do not fully follow their post-conditions and are minimal
+functionality -- for example you can send and recieve data, but it is not yet
 throttled, connections do actually connect, but don't handshake or check for
-errors, etc.  Also some of the examples are still not "perfect coding,"
-espically the exhello example, assumes some of the internal workings of GNE
-since I was trying to code in minimal functionality to get it started.
-
-  That API that makes exhello need to know some things about how GNE works
-will likely be changing, so I can get rid of the silly "delete this" and
-detaching the own thread, which can cause some confusion from users of GNE.
+all errors, etc.
