@@ -49,13 +49,13 @@ public:
    * Returns seconds.
    */
   //##ModelId=3AEBA4AC0096
-  int getSec();
+  int getSec() const;
 
   /**
    * Returns microseconds.
    */
   //##ModelId=3AEBA4B100C8
-  int getuSec();
+  int getuSec() const;
 
   /**
    * Returns the total time in microseconds.  This function can be useful
@@ -65,7 +65,7 @@ public:
    * can be represented in a 32-bit integer in microseconds.
    */
   //##ModelId=3AF9D5750082
-  int getTotaluSec();
+  int getTotaluSec() const;
 
   /**
    * Sets seconds.
@@ -86,25 +86,25 @@ public:
    * Returns the absolute value of the difference between these two times.
    */
   //##ModelId=3AEBA53B00AA
-  Time diff(const Time& rhs);
+  Time diff(const Time& rhs) const;
 
   /**
    * Less-than operator that works as expected.
    */
   //##ModelId=3AEBA4D200A0
-  bool operator<(const Time& rhs);
+  bool operator<(const Time& rhs) const;
 
   /**
    * Greater-than operator that works as expected.
    */
   //##ModelId=3AEBA4E003A2
-  bool operator>(const Time& rhs);
+  bool operator>(const Time& rhs) const;
 
   /**
    * Time addition, adding microseconds of time.
    */
   //##ModelId=3AEBA4F9021C
-  Time operator+(int rhs);
+  Time operator+(int rhs) const;
 
   /**
    * Time addition, adding microseconds of time to this object.
@@ -116,7 +116,7 @@ public:
    * Time addition that works as expected.
    */
   //##ModelId=3AF9D57503B6
-  Time operator+(const Time& rhs);
+  Time operator+(const Time& rhs) const;
 
   /**
    * Time subtraction that works as expected.  You might get negative values
@@ -124,7 +124,7 @@ public:
    * @see diff
    */
   //##ModelId=3AF9D57601F4
-  Time operator-(const Time& rhs);
+  Time operator-(const Time& rhs) const;
 
 protected:
   /**

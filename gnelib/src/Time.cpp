@@ -35,17 +35,17 @@ Time::~Time() {
 }
 
 //##ModelId=3AEBA4AC0096
-int Time::getSec() {
+int Time::getSec() const {
   return sec;
 }
 
 //##ModelId=3AEBA4B100C8
-int Time::getuSec() {
+int Time::getuSec() const {
   return microsec;
 }
 
 //##ModelId=3AF9D5750082
-int Time::getTotaluSec() {
+int Time::getTotaluSec() const {
   return (sec * 1000000 + microsec);
 }
 
@@ -61,24 +61,24 @@ void Time::setuSec(int microseconds) {
 }
 
 //##ModelId=3AEBA53B00AA
-Time Time::diff(const Time& rhs) {
+Time Time::diff(const Time& rhs) const {
   Time ret = operator-(rhs);
   ret.sec = labs(ret.sec);
   return ret;
 }
 
 //##ModelId=3AEBA4D200A0
-bool Time::operator<(const Time& rhs) {
+bool Time::operator<(const Time& rhs) const {
   return (sec < rhs.sec || ((sec == rhs.sec) && (microsec < rhs.microsec)));
 }
 
 //##ModelId=3AEBA4E003A2
-bool Time::operator>(const Time& rhs) {
+bool Time::operator>(const Time& rhs) const {
   return (sec > rhs.sec || ((sec == rhs.sec) && (microsec > rhs.microsec)));
 }
 
 //##ModelId=3AEBA4F9021C
-Time Time::operator+(int rhs) {
+Time Time::operator+(int rhs) const {
   Time ret(*this);
   ret.microsec += rhs;
   ret.normalize();
@@ -92,13 +92,13 @@ void Time::operator+=(int rhs) {
 }
 
 //##ModelId=3AF9D57503B6
-Time Time::operator+(const Time& rhs) {
+Time Time::operator+(const Time& rhs) const {
   Time t(sec + rhs.sec, microsec + rhs.microsec);
   t.normalize();
   return t;
 }
 
-Time Time::operator -(const Time& rhs) {
+Time Time::operator -(const Time& rhs) const {
   Time t(sec - rhs.sec, microsec - rhs.microsec);
   t.normalize();
   return t;
