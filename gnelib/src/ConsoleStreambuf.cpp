@@ -106,6 +106,12 @@ int goutbuf::sync() {
 }
 
 //##ModelId=3BF8444503D0
+/**
+ * \bug does not handle nulls in the stream properly in all cases although
+ *      most of the time it works.  It seems at least for the case of
+ *      a null followed by a newline it ignores the newline.  Other cases
+ *      seem to work.
+ */
 void goutbuf::flush_output() {
   //We always have a space for the null pointer because we reserved an
   //extra position when we called setp, and we do so again at the end of
