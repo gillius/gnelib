@@ -68,13 +68,24 @@ public:
   ErrorCode getCode() const;
 
 	/**
+	 * Sets the error code for this error, useful after a call to
+	 * createLowLevelError() to specify a more appropriate high-level error
+	 * code.  The Error object still retains the low-level specific error
+	 * information.
+	 * @returns a constant reference to this object, a nice way so you can do:\n
+	 *          function( Error::createLowLevelError().setCode(Error::Read) );
+	 */
+  //##ModelId=3BBA9D6E01E1
+	const Error& setCode(ErrorCode newCode);
+
+	/**
 	 * Returns a string description of this error.  When possible, the string
 	 * is "programmer-friendly," so you will probably want to only use this to
 	 * write a debug message or out to a log, and tell the user more about the
 	 * error.
 	 */
   //##ModelId=3BAEC1DF014A
-  std::string getDesc() const;
+  std::string toString() const;
 
 	/**
 	 * Returns error.getCode() != NoError, a handy shortcut so you can test for
@@ -90,9 +101,31 @@ public:
   //##ModelId=3BAEC74F0168
   bool operator == (const ErrorCode& rhs) const;
 
+	/**
+	 * Returns an error object with the error code OtherLowLevelError, but
+	 * retains specific error information from the HawkNL/winsock/sockets/etc
+	 * low-level library that was at the time this function was called.  The
+	 * additional information will be displayed along with the normal error
+	 * message given by toString().
+	 * @see setCode()
+	 */
+  //##ModelId=3BBA9D6E02BC
+	static Error createLowLevelError();
+
 private:
   //##ModelId=3BAEC9C101CD
   ErrorCode code;
+
+	/**
+	 * A possible error code for HawkNL.
+	 */
+	NLint hawkError;
+
+	/**
+	 * A possible error code for the system given by HawkNL.
+	 */
+  //##ModelId=3BBA9D6E01E0
+	int sysError;
 };
 
 } // namespace GNE

@@ -37,6 +37,8 @@
     OtherLowLevelError = 12
   };*/
 
+namespace GNE {
+
 const std::string ErrorStrings[] = {
   "No error.",
   "The host has an earlier version of GNE than this one.",
@@ -50,33 +52,57 @@ const std::string ErrorStrings[] = {
 	"Network error when trying to write to connection.",
 	"Unknown packet type encountered or corrupted data received -- possible additional data loss.",
 	"Other GNE (not a low-level network) error.",
-  "Other low-level HawkNL error."
+  "Low-level HawkNL error:"
 };
 
 //##ModelId=3BAEC1A30050
-GNE::Error::Error(ErrorCode ec) : code(ec) {
+Error::Error(ErrorCode ec) : code(ec), hawkError(NL_NO_ERROR), sysError(0) {
 }
 
 //##ModelId=3BAEC1A30051
-GNE::Error::~Error() {
+Error::~Error() {
 }
 
 //##ModelId=3BAEC1A30053
-GNE::Error::ErrorCode GNE::Error::getCode() const {
+Error::ErrorCode Error::getCode() const {
 	return code;
 }
 
+//##ModelId=3BBA9D6E01E1
+const Error& Error::setCode(Error::ErrorCode newCode) {
+	code = newCode;
+	return *this;
+}
+
 //##ModelId=3BAEC1DF014A
-std::string GNE::Error::getDesc() const {
-	return ErrorStrings[code];
+std::string Error::toString() const {
+	std::stringstream ret;
+	ret << ErrorStrings[code];
+	if (hawkError != NL_NO_ERROR && hawkError != NL_SOCKET_ERROR)
+		ret << " HawkNL error " << hawkError << ": " << nlGetErrorStr(hawkError);
+	if (sysError != 0)
+		ret << " System error " << sysError << ": " << nlGetSystemErrorStr(sysError);
+	return ret.str();
 }
 
 //##ModelId=3BAEC39201C2
-GNE::Error::operator bool() const {
+Error::operator bool() const {
 	return (code == NoError);
 }
 
 //##ModelId=3BAEC74F0168
-bool GNE::Error::operator == (const ErrorCode& rhs) const {
+bool Error::operator == (const ErrorCode& rhs) const {
 	return (code == rhs);
+}
+
+//##ModelId=3BBA9D6E02BC
+Error Error::createLowLevelError() {
+	Error ret(Error::NoError);
+	if (nlGetError() == NL_SOCKET_ERROR)
+		ret.sysError = nlGetSystemError();
+	else
+		ret.hawkError = nlGetError();
+	return ret;
+}
+
 }

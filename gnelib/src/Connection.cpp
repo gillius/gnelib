@@ -123,8 +123,7 @@ void Connection::onReceive(bool reliable) {
 			processError(Error::ConnectionDropped);
 		} else {
 			//This is some other bad error that we need to report
-			reportHawkNLErroro();
-			processError(Error::Read);
+			processError(Error::createLowLevelError().setCode(Error::Read));
 		}
 	} else if (temp == 0) {
 		//In HawkNL 1.4b3 and earlier, this _USED_ to mean that...
@@ -159,11 +158,12 @@ void Connection::onReceive(bool reliable) {
 void Connection::processError(const Error& error) {
 	switch(error.getCode()) {
 		case Error::UnknownPacket:
-			gnedbgo1(1, "onError Event: %s", error.getDesc().c_str());
+		case Error::Write:
+			gnedbgo1(1, "onError Event: %s", error.toString().c_str());
 			onError(error);
 			break;
 		default:
-			gnedbgo1(1, "onFailure Event: %s", error.getDesc().c_str());
+			gnedbgo1(1, "onFailure Event: %s", error.toString().c_str());
 			onFailure(error);
 			disconnect();
 			break;

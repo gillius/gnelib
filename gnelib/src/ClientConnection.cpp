@@ -40,9 +40,8 @@ ClientConnection::~ClientConnection() {
  */
 //##ModelId=3B07538003BA
 void ClientConnection::run() {
-	NLaddress addr = address.getAddress();
 	gnedbgo1(1, "Trying to connect to %s", address.toString().c_str());
-  NLboolean check = nlConnect(sockets.r, &addr);
+  NLboolean check = nlConnect(sockets.r, &address.getAddress());
   if (check == NL_TRUE) {
 		reg(true, false);
     connected = true;

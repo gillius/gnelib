@@ -1,4 +1,5 @@
 GNE 0.003 to 0.4
+  Improvements with Error generation and handling.
   Added test/example exaddr for the Address class.
   Added GNE::Address class which changes things everywhere, but is many many
     times nicer due to implicit conversions and encapsulation.

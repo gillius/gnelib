@@ -47,6 +47,7 @@
 
 //Standard C++ includes
 #include <string>
+#include <sstream>
 #include <map>
 #include <queue>
 
@@ -74,7 +75,6 @@
  * error code with string, and if it is a system error, reports the system
  * error and string.
  */
-#define reportHawkNLErroro()             if (nlGetError() == NL_SOCKET_ERROR) gnedbgo2(1, "HawkNL reported system error %i: %s", nlGetSystemError(), nlGetSystemErrorStr(nlGetSystemError())); else	gnedbgo2(1, "HawkNL error %i: %s", nlGetError(), nlGetErrorStr(nlGetError()));
 #define gnedbg(LEVEL, MESSAGE)           GNE::doTrace(LEVEL, __FILE__, __LINE__, MESSAGE)
 #define gnedbg1(LEVEL, MESSAGE, P1)      GNE::doTrace(LEVEL, __FILE__, __LINE__, MESSAGE, P1)
 #define gnedbg2(LEVEL, MESSAGE, P1, P2)  GNE::doTrace(LEVEL, __FILE__, __LINE__, MESSAGE, P1, P2)
@@ -82,7 +82,6 @@
 #define gnedbgo1(LEVEL, MESSAGE, P1)     GNE::doTrace(LEVEL, __FILE__, __LINE__, "%x: "MESSAGE, this, P1)
 #define gnedbgo2(LEVEL, MESSAGE, P1, P2) GNE::doTrace(LEVEL, __FILE__, __LINE__, "%x: "MESSAGE, this, P1, P2)
 #else
-#define reportHawkNLErroro()             (void(0))
 #define gnedbg(LEVEL, MESSAGE)           (void(0))
 #define gnedbg1(LEVEL, MESSAGE, P1)      (void(0))
 #define gnedbg2(LEVEL, MESSAGE, P1, P2)  (void(0))

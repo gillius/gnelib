@@ -115,17 +115,17 @@ public:
 	}
 
 	void onFailure(const Error& error) {
-		mprintf("Socket failure: %s\n", error.getDesc().c_str());
+		mprintf("Socket failure: %s\n", error.toString().c_str());
 	}
 
 	void onError(const Error& error) {
-		mprintf("Socket error: %s\n", error.getDesc().c_str());
+		mprintf("Socket error: %s\n", error.toString().c_str());
 		disconnect();
 	}
 
   void onConnectFailure(const Error& error) {
     mprintf("Connection to server failed.\n");
-		mprintf("GNE reported error: %s\n", error.getDesc().c_str());
+		mprintf("GNE reported error: %s\n", error.toString().c_str());
   }
 private:
 };
@@ -176,11 +176,11 @@ public:
 	}
 
 	void onFailure(const Error& error) {
-		mprintf("Socket failure: %s\n", error.getDesc().c_str());
+		mprintf("Socket failure: %s\n", error.toString().c_str());
 	}
 
 	void onError(const Error& error) {
-		mprintf("Socket error: %s\n", error.getDesc().c_str());
+		mprintf("Socket error: %s\n", error.toString().c_str());
 		disconnect();
 	}
 

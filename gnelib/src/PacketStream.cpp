@@ -118,6 +118,8 @@ int PacketStream::getOutRate() const {
 //##ModelId=3B07538101F9
 void PacketStream::waitToSendAll() {
 	//Only temporary for now
+	//When we write this function for real, make sure that if the PacketSteam
+	//is shutting down that we properly exit from this function.
 	Thread::sleep(2000);
 }
 
@@ -148,7 +150,9 @@ void PacketStream::run() {
 			RawPacket raw;
 			next->packet->writePacket(raw);
 			raw << PacketParser::END_OF_PACKET;
-      owner.sockets.rawWrite(next->reliable, raw.getData(), raw.getPosition());
+      if (owner.sockets.rawWrite(next->reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
+				owner.processError(Error::Write);
+			}
 			delete next;
     }
   }

@@ -73,7 +73,7 @@ void ConnectionEventGenerator::run() {
 				}
 			} else {
 				if (!(nlGetError() == NL_SOCKET_ERROR && nlGetSystemError() == 10004)) {
-					reportHawkNLErroro();
+					gnedbgo1(1, "%s", Error::createLowLevelError().toString().c_str());
 					assert(false);
 				} else
 					gnedbgo(1, "nlPollGroup call canceled (perhaps to do low-level socket close).  Trying again.");
