@@ -17,9 +17,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef _DEBUG
 
 #include "../include/gnelib/gneintern.h"
+
+#ifdef _DEBUG
+
 #include "../include/gnelib/GNEDebug.h"
 #include "../include/gnelib/Mutex.h"
 #include "../include/gnelib/Thread.h"

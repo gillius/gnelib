@@ -61,7 +61,7 @@
 #include <boost/weak_ptr.hpp>
 
 //Other standard includes
-#include <assert.h>
+#include <cassert>
 
 #ifndef WIN32
 #include <pthread.h>
