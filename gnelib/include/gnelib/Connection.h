@@ -154,6 +154,7 @@ public:
 	 * is only a single event thread.  Therefore, some events for any 
 	 * connection will not be called until this function completes.
 	 */
+  //##ModelId=3BB4208C0104
 	virtual void onDisconnect();
 
   /**
@@ -182,6 +183,7 @@ public:
 	 * @see onFailure()
 	 * @see disconnect()
    */
+  //##ModelId=3BB4208C01E0
 	virtual void onError(const Error& error);
 
   /**
@@ -299,6 +301,7 @@ private:
 	 * Determines whether the error given is fatal or non-fatal, and calls the
 	 * appropriate event, and handles disconnects if necessary.
 	 */
+  //##ModelId=3BB4208C0280
 	void processError(const Error& error);
 };
 

@@ -88,6 +88,7 @@ void Connection::disconnectSendAll() {
 	}
 }
 
+//##ModelId=3BB4208C0104
 void Connection::onDisconnect() {
 }
 
@@ -95,6 +96,7 @@ void Connection::onDisconnect() {
 void Connection::onFailure(const Error& error) {
 }
 
+//##ModelId=3BB4208C01E0
 void Connection::onError(const Error& error) {
 }
 
@@ -151,6 +153,7 @@ void Connection::onReceive(bool reliable) {
 	}
 }
 
+//##ModelId=3BB4208C0280
 void Connection::processError(const Error& error) {
 	switch(error.getCode()) {
 		case Error::UnknownPacket:
