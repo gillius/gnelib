@@ -74,7 +74,7 @@ static StatsDisplay* sDisplay;
 static Randomizer rng;
 
 //The PerfTester class works on both the client and the server side.
-class PerfTester : public ConnectionListener {
+class PerfTester : public ConnectionListener, public PacketFeeder {
 public:
   PerfTester() : packetsIn(0), packetsOut(0), conn(NULL) {}
   ~PerfTester() {}
@@ -91,14 +91,12 @@ public:
   void onConnect(SyncConnection& conn2) {
     serverSide = false;
     conn = conn2.getConnection();
-    writePackets(); //Send an initial batch of data.
     sDisplay->addConn(conn, &packetsIn, &packetsOut);
   }
 
   void onNewConn(SyncConnection& conn2) {
     serverSide = true;
     conn = conn2.getConnection();
-    writePackets();
     sDisplay->addConn(conn, &packetsIn, &packetsOut);
   }
 
@@ -129,7 +127,16 @@ public:
     mprintf("  GNE reported error: %s   ", error.toString().c_str());
   }
 
-  void onDoneWriting() {
+  //The implementation of the only PacketFeeder interface method
+  void onLowPackets(PacketStream& ps) {
+    //  Note that while only one event from a connection through its
+    //ConnectionListener will be processed at a time, the PacketFeeder does
+    //not follow this rule, so any of the events plus onLowPackets may be
+    //running at the same time from different threads.
+    //  The feeder will be called after the connection starts since there are
+    //no packets to send yet.
+
+    //We don't need to use ps because we store the connection pointer.
     writePackets();
   }
 
@@ -188,7 +195,10 @@ public:
 
   void getNewConnectionParams(ConnectionParams& params) {
     params.setRates(oRate, iRate);
-    params.setListener(new PerfTester());
+
+    PerfTester* tester = new PerfTester();
+    params.setListener(tester);
+    params.setFeeder(tester);
   }
 
 private:
@@ -302,8 +312,10 @@ void doClient(int outRate, int inRate, int port) {
   gout << "Connecting to: " << address << endl;
   gout << "Press a key except r to stop the testing.  Press r to change rates." << endl;
 
-  ConnectionParams params(new PerfTester());
+  PerfTester* tester = new PerfTester();
+  ConnectionParams params( tester );
   params.setRates(outRate, inRate);
+  params.setFeeder( tester );
   ClientConnection client;
   if (client.open(address, params))
     errorExit("Cannot open client socket.");

@@ -38,6 +38,7 @@
 #include "gnelib/ListServerConnection.h"
 #include "gnelib/Mutex.h"
 #include "gnelib/Packet.h"
+#include "gnelib/PacketFeeder.h"
 #include "gnelib/PacketStream.h"
 #include "gnelib/PacketParser.h"
 #include "gnelib/PingPacket.h"

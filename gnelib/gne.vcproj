@@ -286,6 +286,9 @@
 				RelativePath=".\include\gnelib\Packet.h">
 			</File>
 			<File
+				RelativePath="include\gnelib\PacketFeeder.h">
+			</File>
+			<File
 				RelativePath=".\include\gnelib\PacketParser.h">
 			</File>
 			<File

@@ -68,10 +68,6 @@ void ConnectionListener::onFailure(const Error& error) {
 void ConnectionListener::onReceive() {
 }
 
-//##ModelId=3BCA83D101F4
-void ConnectionListener::onDoneWriting() {
-}
-
 } //namespace GNE
 
 

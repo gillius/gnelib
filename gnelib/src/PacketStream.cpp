@@ -20,6 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/PacketStream.h"
 #include "../include/gnelib/Packet.h"
+#include "../include/gnelib/PacketFeeder.h"
 #include "../include/gnelib/Connection.h"
 #include "../include/gnelib/RawPacket.h"
 #include "../include/gnelib/RateAdjustPacket.h"
@@ -42,7 +43,7 @@ namespace GNE {
 //##ModelId=3B07538101BD
 PacketStream::PacketStream(int reqOutRate2, int maxOutRate2, Connection& ourOwner)
 : Thread("PktStrm", Thread::HIGH_PRI), owner(ourOwner), maxOutRate(maxOutRate2),
-reqOutRate(reqOutRate2) {
+reqOutRate(reqOutRate2), feeder(NULL), feederTimeout(0), lowPacketsThreshold(0) {
   assert(reqOutRate2 >= 0);
   assert(maxOutRate2 >= 0);
 
@@ -101,13 +102,48 @@ int PacketStream::getOutLength(bool reliable) const {
   int ret;
   outQCtrl.acquire();
 
-  if (reliable)
-    ret = outRel.size();
-  else
-    ret = outUnrel.size();
+  ret = reliable ? outRel.size() : outUnrel.size();
 
   outQCtrl.release();
   return ret;
+}
+
+//##ModelId=3CE60C490079
+void PacketStream::setFeeder(PacketFeeder* newFeeder) {
+  outQCtrl.acquire();
+  feeder = newFeeder;
+
+  //The broadcasts in this function and the next few are to wake up the
+  //thread so it will reevaluate if it will generate an onLowPackets event.
+  outQCtrl.broadcast();
+  outQCtrl.release();
+}
+
+//##ModelId=3CE60C490092
+void PacketStream::setLowPacketThreshold(int limit) {
+  lowPacketsThreshold = limit;
+  outQCtrl.broadcast();
+}
+
+//##ModelId=3CE60C4900A6
+int PacketStream::getLowPacketThreshold() const {
+  return lowPacketsThreshold;
+}
+
+//##ModelId=3CE60C4900B0
+void PacketStream::setFeederTimeout(int ms) {
+  assert(ms >= 0);
+
+  //Do nothing on invalid input.
+  if (ms >= 0) {
+    feederTimeout = ms;
+    outQCtrl.broadcast();
+  }
+}
+
+//##ModelId=3CE60C4900C4
+int PacketStream::getFeederTimeout() const {
+  return feederTimeout;
 }
 
 //##ModelId=3B07538101C6
@@ -215,17 +251,39 @@ void PacketStream::shutDown() {
  */
 //##ModelId=3B07538101FA
 void PacketStream::run() {
+  int numPackets = 0;
+
   outQCtrl.acquire();
   while (!shutdown) {
-    while (outRel.empty() && outUnrel.empty() && !shutdown) {
-      outQCtrl.wait();
+    //Check the numpackets and call the feeder if needed.
+    numPackets = (int)(outRel.size() + outUnrel.size());
+
+    if (numPackets > 0) {
+      //Trigger the onLowPackets event if needed
+      onLowPackets(numPackets);
+
+    } else {
+      //Waiting loop for when there are no packets
+      while (numPackets == 0 && !shutdown) {
+        onLowPackets(numPackets);
+        //Reevaluate numPackets because onLowPackets may add more packets.
+        numPackets = (int)(outRel.size() + outUnrel.size());
+
+        if (numPackets <= 0) {
+          if (feederTimeout)
+            outQCtrl.timedWait(feederTimeout);
+          else
+            outQCtrl.wait();
+        }
+      }
     }
-    //Check which queue woke us up.  If they are both empty it will not
-    //matter as this means shutdown is true.  Doing the check this way gives
-    //absolute priority to reliable packets.
-    bool reliable = !outRel.empty();
 
     if (!shutdown) {
+      //Check which queue woke us up.  Doing the check this way gives
+      //absolute priority to reliable packets.
+      bool reliable = !outRel.empty();
+      assert(reliable || !outUnrel.empty());
+
       //Do throttled writes
       updateRates();
       if (outRemain > 0) {
@@ -241,15 +299,8 @@ void PacketStream::run() {
         if (owner.sockets.rawWrite(reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
           owner.processError( LowLevelError(Error::Write) );
         }
-        
-        //Discover if we are really done writing, and if so, queue the
-        //onDoneWriting event.
         outQCtrl.acquire();
-        if (outRel.empty() && outUnrel.empty()) {
-          //Broadcast a wakeup in case someone is waiting in waitToSendAll.
-          outQCtrl.broadcast();
-          owner.onDoneWriting();
-        }
+        
       } else {
         //Else we don't have any available bandwidth and we must wait!
         outQCtrl.release();
@@ -347,6 +398,14 @@ void PacketStream::updateRates() {
   } else {
     //Else, we are not rate limiting, so we set outRemain to some fake value.
     outRemain = 1;
+  }
+}
+
+//##ModelId=3CE60C4900CF
+void PacketStream::onLowPackets( int numPackets ) {
+  if (feeder && numPackets <= lowPacketsThreshold) {
+    gnedbgo(4, "onLowPackets event generated.");
+    feeder->onLowPackets(*this);
   }
 }
 

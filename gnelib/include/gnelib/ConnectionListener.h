@@ -39,13 +39,17 @@ class SyncConnection;
  * onNewConn is generated only by ServerConnection.
  *
  * Note that there is only one event thread per Connection, so one one event
- * will be active at a time.  Take this into consideration that you may not
- * need to provide syncronization and mutexes.  onNewConn or onConnect or
- * onConnectFailure are guaranteed to be the first events from a connection,
- * and won't be called multiple times.  onDisconnect will always be the last
- * called (except after onConnectFailure, where there never was a connection)
- * and will only be called once.  Since only one event can be active at a
- * time, you will want to return quickly so other events can be processed.
+ * will be active at a time.  Take this into consideration that you may be
+ * able to eliminated some syncronization and mutexes that would otherwise be
+ * needed.  onNewConn or onConnect or onConnectFailure are guaranteed to be
+ * the first events from a connection, and won't be called multiple times.
+ * onDisconnect will always be the last called (except after
+ * onConnectFailure, where there never was a connection) and will only be
+ * called once.  Since only one event can be active at a time, you will want
+ * to return quickly so other events can be processed, but note that if you
+ * have a PacketFeeder set up for a connection, those events are independent
+ * of ConnectionListener's events, so both types of events can be occuring
+ * at the same time.
  *
  * @see ServerConnectionListener::onListenFailure
  */
@@ -273,18 +277,6 @@ public:
    */
   //##ModelId=3BCA83CF0208
   virtual void onReceive();
-
-  /**
-   * Event triggered when the write buffer was filled and is now empty.
-   * Note that this does not mean that data is immediately ready to be sent
-   * again -- there could still be a flow control delay.
-   *
-   * This event must be "non-blocking" -- like most GNE events -- as there
-   * is only a single event thread per connection.  Therefore, no other
-   * events will be called until this function completes for this connection.
-   */
-  //##ModelId=3BCA83D101F4
-  virtual void onDoneWriting();
 
 };
 

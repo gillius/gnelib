@@ -34,8 +34,8 @@ namespace GNE {
 
 //##ModelId=3BC3CB1703B6
 SyncConnection::SyncConnection(Connection* target)
-: currError(Error::NoError), conn(target),
-released(false), onDoneWritingEvent(false), connectMode(false) {
+: currError(Error::NoError), conn(target), released(false),
+connectMode(false) {
   gnedbgo(5, "created");
   gnedbgo1(2, "Wrapping Connection %x into a SyncConnection.", conn);
   oldListener = conn->getListener();
@@ -149,8 +149,6 @@ void SyncConnection::doRelease() {
     //there are no errors that invalidated the stream (detected above).
     if (conn->stream().isNextPacket())
       conn->onReceive();
-    if (onDoneWritingEvent)
-      conn->onDoneWriting();
 
     //Then we can start the events up again knowing that if there was a
     //failure that onDisconnect will go to the original listener.
@@ -220,7 +218,6 @@ SyncConnection& SyncConnection::operator << (const Packet& packet) {
   checkError();
   assert(!isReleased());
 
-  onDoneWritingEvent = false;
   conn->stream().writePacket(packet, true);
 
   return *this;
@@ -278,13 +275,6 @@ void SyncConnection::onExit() {
 void SyncConnection::onReceive() {
   //Notify anyone who is waiting for data to come in (namely operator <<).
   recvNotify.signal();
-}
-
-//##ModelId=3C1081BC015B
-void SyncConnection::onDoneWriting() {
-  //setListener in release acts like a mutex so that this flag being set will
-  //never be lost.
-  onDoneWritingEvent = true;
 }
 
 //##ModelId=3BDB10A6029F

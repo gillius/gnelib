@@ -87,6 +87,11 @@ void ClientConnection::connect(SyncConnection* wrapped) {
   start();
 }
 
+/**
+ * \bug The PacketFeeder is set after onNewConn, so it is possible that if
+ *      the user sets a different PacketFeeder right after connecting, it
+ *      might "get lost" and if set during onNewConn, is definitely lost.
+ */
 //##ModelId=3B07538003BA
 void ClientConnection::run() {
   assert(getListener() != NULL);
@@ -133,6 +138,10 @@ void ClientConnection::run() {
       eventListener->start();
       reg(true, (sockets.u != NL_INVALID));
 
+      //Setup the packet feeder
+      ps->setFeederTimeout( params->cp.getFeederTimeout() );
+      ps->setLowPacketThreshold( params->cp.getLowPacketThreshold() );
+
       gnedbgo2(2, "Starting onConnect r: %i, u: %i", sockets.r, sockets.u);
       getListener()->onConnect(sConn); //SyncConnection will relay this
       onConnectFinished = true;
@@ -143,6 +152,9 @@ void ClientConnection::run() {
         sConn.release();
         delete params->sConnPtr;
       }
+
+      //Setup the packet feeder
+      ps->setFeeder( params->cp.getFeeder() );
 
       //We are done using the ClientConnectionParams.
       delete params;

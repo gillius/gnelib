@@ -93,6 +93,21 @@ public:
   void reset();
 
   /**
+   * Returns the serialized size of the given string.  This is meant for use
+   * in your overridden Packet::getSize method to find the size of strings.
+   * For all other primitives, use sizeof(variable).
+   */
+  //##ModelId=3CE60C49010A
+  static int getStringSize(std::string x) { return (int)(x.size() + 1); }
+
+  /**
+   * Returns the maximum possible serialized size of a string of the given
+   * length in ASCII characters.
+   */
+  //##ModelId=3CE60C49011E
+  static int getStringSize(int x) { return x + 1; }
+
+  /**
    * Writes raw data starting at the current position.  This acts similar to
    * the memcpy function.
    */

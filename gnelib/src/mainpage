@@ -94,7 +94,7 @@ you'll probably not need to use them directly in normal circumstances.
   Basically, what a mutex does is it only allows one thread into a section
   of code at a time.  You should use a mutex around a section of code that
   accesses any data on the heap (ie static variables or allocated using new
-  or malloc).
+  or malloc) that is shared by more than one thread.
 
   For more information a link to a pthreads tutorial:
   http://www.llnl.gov/computing/tutorials/workshops/workshop/pthreads/MAIN.html

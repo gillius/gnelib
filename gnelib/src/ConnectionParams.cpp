@@ -24,14 +24,15 @@ namespace GNE {
 
 //##ModelId=3CBE05D4035C
 ConnectionParams::ConnectionParams(ConnectionListener* Listener)
-: listener(Listener), timeout(0), outRate(0), inRate(0), localPort(0),
-unrel(false) {
+: listener(Listener), feeder(NULL), feederTimeout(0), feederThresh(0),
+timeout(0), outRate(0), inRate(0), localPort(0), unrel(false) {
 }
 
 //##ModelId=3CBE05D4035E
 bool ConnectionParams::checkParams() const {
   return (outRate < 0 || inRate < 0 || localPort < 0 || localPort > 65535
-    || listener == NULL || timeout < 0);
+    || listener == NULL || timeout < 0 || feederTimeout < 0
+    || feederThresh < 0);
 }
 
 //##ModelId=3CBE05D40362
@@ -42,6 +43,36 @@ void ConnectionParams::setListener(ConnectionListener* Listener) {
 //##ModelId=3CBE05D40364
 ConnectionListener* ConnectionParams::getListener() const {
   return listener;
+}
+
+//##ModelId=3CE60C4803CD
+void ConnectionParams::setFeeder(PacketFeeder* Feeder) {
+  feeder = Feeder;
+}
+
+//##ModelId=3CE60C4803CF
+PacketFeeder* ConnectionParams::getFeeder() const {
+  return feeder;
+}
+
+//##ModelId=3CE60C4803D1
+void ConnectionParams::setFeederTimeout(int FeederTimeout) {
+  feederTimeout = feederTimeout;
+}
+
+//##ModelId=3CE60C4803D3
+int ConnectionParams::getFeederTimeout() const {
+  return feederTimeout;
+}
+
+//##ModelId=3CE60C4803D5
+void ConnectionParams::setLowPacketThreshold(int limit) {
+  feederThresh = limit;
+}
+
+//##ModelId=3CE60C4803D7
+int ConnectionParams::getLowPacketThreshold() const {
+  return feederThresh;
 }
 
 //##ModelId=3CC4E33800D3

@@ -1,4 +1,9 @@
 GNE 0.49 to current
+  Removed the onWritingDone method from ConnectionListener.  This concept has
+    been replaced by the more flexible and efficent PacketFeeder callback
+    object.
+  Added static methods in RawPacket for finding serialized string size
+    suitable for using in a packet's getSize method.
   Added and implemented connection timeouts which generate an onTimeout event
     after a given time of idleness on a connection which can be used to
     discover dropped connections or slow connections.

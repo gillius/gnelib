@@ -198,11 +198,6 @@ void Connection::onReceive() {
   eventListener->onReceive();
 }
 
-//##ModelId=3B07538100AE
-void Connection::onDoneWriting() {
-  eventListener->onDoneWriting();
-}
-
 //##ModelId=3C30E3FF01DE
 void Connection::finishedConnecting() {
   sync.acquire();

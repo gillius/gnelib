@@ -235,9 +235,6 @@ protected:
   //##ModelId=3B07538100AC
   void onReceive();
 
-  //##ModelId=3B07538100AE
-  void onDoneWriting();
-
   /**
    * The pair of sockets.
    */

@@ -129,12 +129,6 @@ public:
   void onReceive();
 
   /**
-   * For more information about these events, see ConnectionListener.
-   */
-  //##ModelId=3C106F0203E2
-  void onDoneWriting();
-
-  /**
    * Overrides Thread::shutDown so that the daemon thread will
    * be woken up since it might be waiting on a ConditionVariable.  Once it
    * shuts down it should not be activated again.
@@ -208,8 +202,6 @@ private:
 
   //##ModelId=3C106F0203CC
   bool onReceiveEvent;
-  //##ModelId=3C106F0203CD
-  bool onDoneWritingEvent;
   //##ModelId=3CC4E338010B
   bool onTimeoutEvent;
 

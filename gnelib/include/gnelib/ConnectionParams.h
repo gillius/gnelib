@@ -24,6 +24,7 @@
 
 namespace GNE {
 class ConnectionListener;
+class PacketFeeder;
 
 /**
  * A class to encapsulate parameters about a connection.  The parameter list
@@ -66,9 +67,44 @@ public:
   ConnectionListener* getListener() const;
 
   /**
+   * The PacketFeeder receives onLowPackets events which are entirely
+   * independant of the serialized event queue of events sent to the
+   * ConnectionListener.  The default is NULL, and any point is valid.
+   * @see PacketStream::setFeeder
+   */
+  //##ModelId=3CE60C4803CD
+  void setFeeder(PacketFeeder* Feeder);
+
+  //##ModelId=3CE60C4803CF
+  PacketFeeder* getFeeder() const;
+
+  /**
+   * Sets the timeout of the PacketFeeder for this Connection.  Default is 0
+   * meaning no timeouts generated.  Valid values are 0 and positive integers
+   * given in milliseconds.
+   * @see PacketStream::setFeederTimeout
+   */
+  //##ModelId=3CE60C4803D1
+  void setFeederTimeout(int FeederTimeout);
+
+  //##ModelId=3CE60C4803D3
+  int getFeederTimeout() const;
+
+  /**
+   * The low packet threshold for the PacketFeeder.  Default value is 0, 0 or
+   * any positive integer is valid.
+   * @see PacketStream::setLowPacketThreshold
+   */
+  //##ModelId=3CE60C4803D5
+  void setLowPacketThreshold(int limit);
+
+  //##ModelId=3CE60C4803D7
+  int getLowPacketThreshold() const;
+
+  /**
    * Sets the timeout for this connection in milliseconds.  A value of 0
    * signifies that no timeouts should occur.  Values less than 0 are invalid.
-   * @see GNE::Connection::setTimeout
+   * @see Connection::setTimeout
    */
   //##ModelId=3CC4E33800D3
   void setTimeout(int ms);
@@ -144,6 +180,15 @@ public:
 private:
   //##ModelId=3CBE05D4034F
   ConnectionListener* listener;
+
+  //##ModelId=3CE60C4803C7
+  PacketFeeder* feeder;
+
+  //##ModelId=3CE60C4803CB
+  int feederTimeout;
+
+  //##ModelId=3CE60C4803CC
+  int feederThresh;
 
   //##ModelId=3CC4E33800C9
   int timeout;

@@ -82,6 +82,11 @@ ServerConnection::~ServerConnection() {
   gnedbgo(5, "destroyed");
 }
 
+/**
+ * \bug The PacketFeeder is set after onNewConn, so it is possible that if
+ *      the user sets a different PacketFeeder right after connecting, it
+ *      might "get lost" and if set during onNewConn, is definitely lost.
+ */
 //##ModelId=3B0753810280
 void ServerConnection::run() {
   assert(sockets.r != NL_INVALID);
@@ -117,6 +122,10 @@ void ServerConnection::run() {
     eventListener->start();
     reg(true, (sockets.u != NL_INVALID));
 
+    //Setup the packet feeder
+    ps->setFeederTimeout( params->cp.getFeederTimeout() );
+    ps->setLowPacketThreshold( params->cp.getLowPacketThreshold() );
+
     gnedbgo2(2, "Starting onNewConn r: %i, u: %i", sockets.r, sockets.u);
     getListener()->onNewConn(sConn); //SyncConnection will relay this
     onNewConnFinished = true;
@@ -129,6 +138,10 @@ void ServerConnection::run() {
     //sure onDisconnect gets called starting with endConnect().
     sConn.endConnect(true);
     sConn.release();
+
+    //Setup the packet feeder
+    ps->setFeeder( params->cp.getFeeder() );
+
   } catch (Error& e) {
     if (!onNewConnFinished) {
       sConn.endConnect(false);

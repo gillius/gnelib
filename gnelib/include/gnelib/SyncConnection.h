@@ -315,13 +315,6 @@ private:
   volatile bool released;
 
   /**
-   * If this is true, we have an outstanding unexplained onDoneWriting event
-   * that will be passed on when we release, as with onReceive.
-   */
-  //##ModelId=3C1081BC0024
-  bool onDoneWritingEvent;
-
-  /**
    * @see setConnectMode
    */
   //##ModelId=3C4116C30234

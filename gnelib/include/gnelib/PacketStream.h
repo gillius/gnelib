@@ -30,6 +30,7 @@ namespace GNE {
 class Packet;
 class Connection;
 class RawPacket;
+class PacketFeeder;
 
 /**
  * This class resembles a packet stream through a connection.  This class
@@ -78,6 +79,63 @@ public:
    */
   //##ModelId=3B07538101C4
   int getOutLength(bool reliable) const;
+
+  /**
+   * Sets a new PacketFeeder that this class uses to generate onLowPackets
+   * events to.  This function blocks until the feeder has been changed.
+   * When the PacketStream starts with no packets and a feeder becomes set
+   * the first onLowPackets will be generated, so that your PacketFeeder can
+   * be used even to generate the initial packets after the connection event.
+   *
+   * The onLowPackets event will be flagged to be triggered when this
+   * function is called if conditions are proper, disregarding the timeout
+   * -- meaning if you set a feeder for a connection with no packets in the
+   * outgoing queue, an onLowPackets event will be generated.
+   *
+   * The passed newFeeder may be NULL in which case onLowPackets events will
+   * not be generated.
+   */
+  //##ModelId=3CE60C490079
+  void setFeeder(PacketFeeder* newFeeder);
+
+  /**
+   * When the number of packets in this PacketStream falls below limit, at
+   * least one onLowPackets event is generated.  If this value is 0, then the
+   * event will only be generated when the queue empties entirely.
+   *
+   * The conditions for an onLowPackets event will be reevaluated without
+   * regard to the timeout, and an onLowPacket event will be generated if the
+   * conditions are proper.
+   */
+  //##ModelId=3CE60C490092
+  void setLowPacketThreshold(int limit);
+
+  /**
+   * Returns the current low packet threshold.
+   */
+  //##ModelId=3CE60C4900A6
+  int getLowPacketThreshold() const;
+
+  /**
+   * Sets the feeder timeout in milliseconds.  If the feeder chooses not to
+   * send packets when the threshold is low, then the PacketStream will run
+   * out of packets and go to sleep.  This timeout is an approximate time the
+   * PacketStream will wait before generating a new onLowPackets event if
+   * still no packets are ready for writing.  If this value is 0, then
+   * onLowPackets will never be called again until packets are written from
+   * an external thread.  A value less than 0 is invalid.  There is no
+   * guarantee made about how accurate the callback rate will actually be,
+   * except that one will eventually happen with a non-zero timeout and that
+   * it will likely be called too soon rather than too late.
+   */
+  //##ModelId=3CE60C4900B0
+  void setFeederTimeout(int ms);
+
+  /**
+   * Returns the set feeder timeout.
+   */
+  //##ModelId=3CE60C4900C4
+  int getFeederTimeout() const;
 
   /**
    * Is there at least one packet in the incoming queue?  Note that this does
@@ -255,11 +313,31 @@ private:
   //##ModelId=3C783ACF028C
   void updateRates();
 
+  //These 3 variables syncronized by outQCtrl, and must be since the writer
+  //thread has to wait on conditions of the feeder.
+  //##ModelId=3CE60C490039
+  PacketFeeder* feeder;
+  //##ModelId=3CE60C490044
+  bool onLowPacketsEvent;
+  //##ModelId=3CE60C490056
+  int feederTimeout;
+  //##ModelId=3CE60C490060
+  int lowPacketsThreshold;
+
+  /**
+   * Generates and processes the onLowPackets event immedately if conditions
+   * are appropriate, returning when the event has completed.
+   */
+  //##ModelId=3CE60C4900CF
+  void onLowPackets( int numPackets );
+
   /**
    * These are set to be mutable because of the const functions need
    * non-const access to these objects, but they can still be called const
    * because the object's state is the same before and after the method.
    */
+  //##ModelId=3CE60C490075
+  mutable Mutex feederLock;
   //##ModelId=3B0753810196
   mutable Mutex inQCtrl;
 

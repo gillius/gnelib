@@ -32,9 +32,8 @@ namespace GNE {
 //##ModelId=3C106F0203D4
 EventThread::EventThread(ConnectionListener* listener, Connection* conn)
 : Thread("EventThr", Thread::HIGH_PRI), ourConn(conn), eventListener(listener),
-started(false), onReceiveEvent(false), onDoneWritingEvent(false),
-onTimeoutEvent(false), onDisconnectEvent(false), onExitEvent(false),
-failure(NULL) {
+started(false), onReceiveEvent(false), onTimeoutEvent(false),
+onDisconnectEvent(false), onExitEvent(false), failure(NULL) {
   gnedbgo(5, "created");
 }
 
@@ -148,16 +147,6 @@ void EventThread::onReceive() {
   eventSync.release();
 }
 
-//##ModelId=3C106F0203E2
-void EventThread::onDoneWriting() {
-  gnedbgo(4, "onDoneWriting event triggered.");
-
-  eventSync.acquire();
-  onDoneWritingEvent = true;
-  eventSync.signal();
-  eventSync.release();
-}
-
 //##ModelId=3C106F0203E3
 void EventThread::shutDown() {
   Thread::shutDown();
@@ -184,7 +173,7 @@ void EventThread::run() {
     eventSync.acquire();
     //Wait while we have no listener and/or we have no events.
     while (eventListener == NULL || 
-           (!onReceiveEvent && !onDoneWritingEvent && !failure
+           (!onReceiveEvent && !failure
            && !onDisconnectEvent && eventQueue.empty() && !shutdown
            && !onExitEvent && !onTimeoutEvent) ) {
       //Calculate the time to wait
@@ -230,14 +219,6 @@ void EventThread::run() {
         onReceiveEvent = false;
         listenSync.acquire();
         eventListener->onReceive();
-        listenSync.release();
-
-      } else if (onDoneWritingEvent) {
-        //This is set before in case the packets finish writing during the
-        //onDoneWriting event.
-        onDoneWritingEvent = false;
-        listenSync.acquire();
-        eventListener->onDoneWriting();
         listenSync.release();
 
       } else if (onTimeoutEvent) {
