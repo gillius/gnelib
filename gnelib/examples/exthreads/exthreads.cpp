@@ -103,6 +103,8 @@ int main(int argc, char* argv[]) {
 
   mprintf("System reports sleeping time of %f\n", sysNapTime);
   mprintf("GNE timers report sleeping time of %i microseconds (us)\n", diffTime.getTotaluSec());
+  mprintf("Press a key to continue.\n");
+  getch();
 
   //At this point, all threads that are running will be terminated.  When
   //main exits, everything goes.  Use join if you want to guarantee your
