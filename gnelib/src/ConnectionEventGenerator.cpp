@@ -20,30 +20,62 @@
 #include "gneintern.h"
 #include "ConnectionEventGenerator.h"
 #include "ConnectionEventListener.h"
+#include "ConditionVariable.h"
 #include "Connection.h"
 
 //##ModelId=3AE359220352
-ConnectionEventGenerator::ConnectionEventGenerator() {
+ConnectionEventGenerator::ConnectionEventGenerator() 
+: running(true), group(NL_INVALID) {
+  group = nlGroupCreate();
+  assert(group != NL_INVALID);
+  sockBuf = new NLsocket[NL_MAX_GROUP_SOCKETS];
 }
 
 //##ModelId=3AE359220384
 ConnectionEventGenerator::~ConnectionEventGenerator() {
+  nlGroupDestroy(group);
+  delete[] sockBuf;
 }
 
 //##ModelId=3AE34D7900D2
 void ConnectionEventGenerator::run() {
+  while (running) {
+    mapCtrl.acquire();
+    while (connections.empty() && running) {
+      mapCtrl.wait();
+    }
+    if (running) {
+      int numsockets = nlPollGroup(group, NL_READ_STATUS, sockBuf, NL_MAX_GROUP_SOCKETS);
+      for (numsockets--; numsockets >= 0; numsockets--) {
+        connections[sockBuf[numsockets]]->onReceive();
+      }
+    }
+    mapCtrl.release();
+  }
 }
 
 //##ModelId=3AE4E158023A
 void ConnectionEventGenerator::reg(NLsocket socket, ConnectionEventListener* conn) {
+  mapCtrl.acquire();
+  nlGroupAddSocket(group, socket);
+  connections[socket] = conn;
+  mapCtrl.release();
+  mapCtrl.signal();
 }
 
 //##ModelId=3AE4E17D021C
 void ConnectionEventGenerator::unreg(NLsocket socket) {
+  assert(socket != NL_INVALID);
+  assert(connections.find(socket) != connections.end());
+  mapCtrl.acquire();
+  nlGroupDeleteSocket(group, socket);
+  connections.erase(socket);
+  mapCtrl.release();
 }
-
 
 //##ModelId=3B00A4B703AC
 void ConnectionEventGenerator::shutdown() {
+  mapCtrl.signal();
+  running = false;
 }
 

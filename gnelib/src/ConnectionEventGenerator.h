@@ -21,7 +21,7 @@
  */
 
 #include "gneintern.h"
-#include "Mutex.h"
+#include "ConditionVariable.h"
 #include "Thread.h"
 class ConnectionEventListener;
 
@@ -39,6 +39,9 @@ public:
   //##ModelId=3AE359220384
   virtual ~ConnectionEventGenerator();
 
+  /**
+   * The thread that listens for events.  Do not call this function directly.
+   */
   //##ModelId=3AE34D7900D2
   void run();
 
@@ -65,14 +68,20 @@ public:
   void shutdown();
 
 private:
+  //##ModelId=3B0166F101CC
+  bool running;
+
   //##ModelId=3AE358F701FE
   NLint group;
 
   //##ModelId=3AE35A87032A
   std::map<NLsocket, ConnectionEventListener*> connections;
 
+  //##ModelId=3B0167440348
+  NLsocket* sockBuf;
+
   //##ModelId=3AE4E2E60348
-  Mutex mapCtrl;
+  ConditionVariable mapCtrl;
 };
 
 #endif /* CONNECTIONEVENTGENERATOR_H_INCLUDED_C51B7986 */
