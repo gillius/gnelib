@@ -164,11 +164,11 @@ public:
   void updateGlobalStats() {
     ConnectionStats all = GNE::getGlobalStats();
     mlprintf(gpos.x, gpos.y, "%-18s%15s%15s", "global", "in:tot", "out:tot");
-    mlprintf(gpos.x, gpos.y+1, "%-18s%15d%15d", "bytesin",
+    mlprintf(gpos.x, gpos.y+1, "%-18s%15d%15d", "bytes",
       all.bytesRecv, all.bytesSent);
-    mlprintf(gpos.x, gpos.y+2, "%-18s%15d%15d", "inRate",
+    mlprintf(gpos.x, gpos.y+2, "%-18s%15d%15d", "Rate",
       all.avgBytesRecv, all.avgBytesSent);
-    mlprintf(gpos.x, gpos.y+3, "%-18s%15d%15d", "maxInRate",
+    mlprintf(gpos.x, gpos.y+3, "%-18s%15d%15d", "maxRate",
       all.maxAvgBytesRecv, all.maxAvgBytesSent);
   }
 
