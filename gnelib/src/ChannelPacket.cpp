@@ -26,6 +26,9 @@ namespace GNE {
 
 const int ChannelPacket::ID = 5;
 
+ChannelPacket::ChannelPacket() : channel(0), from(0) {
+}
+
 ChannelPacket::ChannelPacket( int channel, int from, const Packet& packet )
 : WrapperPacket(ID, &packet), channel((guint8)channel), from((guint8)from) {
 }
