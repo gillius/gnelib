@@ -23,17 +23,17 @@
  * class in "hackish" ways.  The standard use of RawPackets is pretty trivial.
  */
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
 using namespace std;
 using namespace GNE;
 using namespace GNE::Console;
 
 int main(int argc, char* argv[]) {
-  initGNE(NL_IP, atexit);
-  initConsole(atexit);
+  initGNE(NO_NET, atexit);
+  initConsole();
   Console::setTitle("GNE RawPacket Test");
 
   gout << " * Now doing endian tests." << endl;
@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
        << e << endl << f << endl;
 
   for (int count=0; count<16; count++) {
-    gout << reinterpret_cast<const char *>(block[count]) << ' ';
+    gout << (const char *)(block[count]) << ' ';
   }
   gout << endl;
   gout << "Data was of length: " << raw2.getPosition() << " (should be as above)" << endl;
