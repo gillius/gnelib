@@ -19,16 +19,26 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/Mutex.h"
+#include "../include/gnelib/MutexData.h"
+#include "../include/gnelib/Thread.h"
 
 namespace GNE {
 
-struct Mutex::MutexData {
+static inline void lowLevelAcquire( MUTEX_PTR t ) {
 #ifdef WIN32
-  CRITICAL_SECTION mutex;
+  EnterCriticalSection(t);
 #else
-  pthread_mutex_t mutex;
+  valassert(pthread_mutex_lock( t ), 0);
 #endif
-};
+}
+
+static inline void lowLevelRelease( MUTEX_PTR t ) {
+#ifdef WIN32
+  LeaveCriticalSection(t);
+#else
+  valassert(pthread_mutex_unlock( t ), 0);
+#endif
+}
 
 Mutex::Mutex() {
   data = new MutexData();
@@ -41,6 +51,16 @@ Mutex::Mutex() {
   valassert(pthread_mutex_init( &data->mutex, &attr ), 0);
   valassert(pthread_mutexattr_destroy(&attr), 0);
 #endif
+
+#ifdef _DEBUG
+  data->lockCount = 0;
+  data->owner = NULL;
+  #ifdef WIN32
+    InitializeCriticalSection(&data->dbgMutex); 
+  #else
+    valassert(pthread_mutex_init( &data->dbgMutex, NULL ), 0);
+  #endif
+#endif
 }
 
 Mutex::~Mutex() {
@@ -49,22 +69,50 @@ Mutex::~Mutex() {
 #else
   valassert(pthread_mutex_destroy( &data->mutex ), 0);
 #endif
+
+#ifdef _DEBUG
+  assert( data->lockCount == 0 );
+  assert( data->owner == NULL );
+  #ifdef WIN32
+    DeleteCriticalSection(&data->dbgMutex);
+  #else
+    valassert(pthread_mutex_destroy( &data->dbgMutex ), 0);
+  #endif
+#endif
 }
 
 void Mutex::acquire() {
-#ifdef WIN32
-  EnterCriticalSection(&data->mutex);
-#else
-  valassert(pthread_mutex_lock( &data->mutex ), 0);
+  lowLevelAcquire( &data->mutex );
+
+#ifdef _DEBUG
+  lowLevelAcquire( &data->dbgMutex );
+  data->lockCount++;
+  //assert( data->lockCount != 1 || data->owner == NULL || data->owner == Thread::currentThread() );
+  data->owner = Thread::currentThread();
+  lowLevelRelease( &data->dbgMutex );
 #endif
 }
 
 void Mutex::release() {
-#ifdef WIN32
-  LeaveCriticalSection(&data->mutex);
-#else
-  valassert(pthread_mutex_unlock( &data->mutex ), 0);
+#ifdef _DEBUG
+  lowLevelAcquire( &data->dbgMutex );
+  assert( data->owner == Thread::currentThread() );
+  assert( data->lockCount > 0 );
+  data->lockCount--;
+  if ( data->lockCount == 0 )
+    data->owner = NULL;
+  lowLevelRelease( &data->dbgMutex );
 #endif
+
+  lowLevelRelease( &data->mutex );
+}
+
+void Mutex::vanillaAcquire() {
+  lowLevelAcquire( &data->mutex );
+}
+
+void Mutex::vanillaRelease() {
+  lowLevelRelease( &data->mutex );
 }
 
 }

@@ -94,7 +94,7 @@ Thread::~Thread() {
 }
 
 Thread* Thread::currentThread() {
-  mapSync.acquire();
+  mapSync.vanillaAcquire();
 #ifdef WIN32
   ID id = GetCurrentThreadId();
 #else
@@ -104,10 +104,10 @@ Thread* Thread::currentThread() {
   std::map< ID, Thread* >::iterator iter = threads.find( id );
   if ( iter != threads.end() ) {
     Thread* ret = (*iter).second;
-    mapSync.release();
+    mapSync.vanillaRelease();
     return ret;
   } else {
-    mapSync.release();
+    mapSync.vanillaRelease();
     return NULL;
   }
 }
@@ -183,26 +183,26 @@ void Thread::detach(bool delThis) {
 #endif
   if (delThis) {
     //Only set deleteThis true if we want to delete ourselves on exit.
-    sync.acquire();
+    sync.vanillaAcquire();
     deleteThis = true;
     if (!running) {       //delete this if we are already stopped.
-      sync.release();
+      sync.vanillaRelease();
       delete this;
     } else                //else all we want to do is mark deleteThis.
-      sync.release();
+      sync.vanillaRelease();
   }
 }
 
 void Thread::end() {
-  sync.acquire();
+  sync.vanillaAcquire();
   running = false;
   Thread::remove(this);
   if (deleteThis) {
     //If we were detached with delThis set, we delete ourselves now.
-    sync.release();
+    sync.vanillaRelease();
     delete this;
   } else
-    sync.release();
+    sync.vanillaRelease();
 }
 
 bool Thread::isRunning() const {
@@ -248,9 +248,9 @@ int Thread::getPriority() const {
 
 void Thread::remove(Thread* thr) {
   assert(!thr->isRunning());
-  mapSync.acquire();
+  mapSync.vanillaAcquire();
   threads.erase(thr->id->thread_id);
-  mapSync.release();
+  mapSync.vanillaRelease();
 }
 
 }

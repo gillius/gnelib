@@ -337,6 +337,10 @@ SOURCE=.\include\gnelib\Mutex.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\gnelib\MutexData.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\gnelib\Packet.h
 # End Source File
 # Begin Source File

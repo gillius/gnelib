@@ -54,6 +54,12 @@ public:
   void release();
 
 private:
+  //These are used by Thread::currentThread to lock and unlock mapsync,
+  //because currentThread is used for debugging in the main methods.
+  friend class Thread;
+  void vanillaAcquire();
+  void vanillaRelease();
+
   struct MutexData;
   MutexData* data;
 

@@ -1,4 +1,11 @@
 GNE 0.55 to current
+  Added a debugging system for mutexes which is active when compiling GNE in
+    debugging mode.  It detects the following cases:
+    * If you try to release a mutex you have not acquired, or if you try to
+      release a mutex that the current thread does not own.
+    * If you try to destroy a mutex that is still locked.
+    The mutex now keeps track of a recursive count, and who owns it, which can
+      be viewed easily when debugging by most debuggers.
   Added the ConsoleBuffer and TextConsole classes, a word-wrapping window
     that supports scrolling, and an arbitrary rendering device.
   Changed header include scheme to get rid of any extra header files I could,

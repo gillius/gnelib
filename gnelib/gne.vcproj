@@ -292,6 +292,9 @@
 				RelativePath=".\include\gnelib\Mutex.h">
 			</File>
 			<File
+				RelativePath="include\gnelib\MutexData.h">
+			</File>
+			<File
 				RelativePath=".\include\gnelib\Packet.h">
 			</File>
 			<File
