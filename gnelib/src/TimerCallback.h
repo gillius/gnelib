@@ -29,6 +29,12 @@
 //##ModelId=3AE868D6019A
 class TimerCallback {
 public:
+  //##ModelId=3AF78B950190
+  TimerCallback();
+
+  //##ModelId=3AF78B9501CC
+  virtual ~TimerCallback();
+
   /**
    * The function that the Timer calls at its firing rate.
    */
@@ -40,5 +46,3 @@ public:
 
 
 #endif /* TIMERCALLBACK_H_INCLUDED_C517B12B */
-
-

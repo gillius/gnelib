@@ -47,7 +47,6 @@ int Time::getuSec() {
 //##ModelId=3AEBA4BE0226
 void Time::setSec(int seconds) {
   sec = seconds;
-  normalize();
 }
 
 //##ModelId=3AEBA4C80032
@@ -63,12 +62,12 @@ Time Time::diff(const Time& rhs) {
 
 //##ModelId=3AEBA4D200A0
 bool Time::operator<(const Time& rhs) {
-  return false;
+  return (sec < rhs.sec || ((sec == rhs.sec) && (microsec < rhs.microsec)));
 }
 
 //##ModelId=3AEBA4E003A2
 bool Time::operator>(const Time& rhs) {
-  return false;
+  return (sec > rhs.sec || ((sec == rhs.sec) && (microsec > rhs.microsec)));
 }
 
 //##ModelId=3AEBA4F9021C
@@ -80,7 +79,6 @@ Time Time::operator+(const Time& rhs) {
 
 //##ModelId=3AECF2860320
 void Time::normalize() {
-  /*
   if (microsec > 999999) {
     sec += (microsec / 1000000);
     microsec = microsec % 1000000;
@@ -88,6 +86,5 @@ void Time::normalize() {
     sec--;
     microsec += 1000000;
   }
-  */
 }
 

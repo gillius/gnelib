@@ -27,7 +27,7 @@ class TimerCallback;
 
 /**
  * The timer class is used to get the current time and to provide callbacks.
- * A timer object calls its listener back every so often based on the time
+ * A timer object calls its listeners back every so often based on the time
  * given.
  */
 //##ModelId=3AE8680C029E
@@ -35,11 +35,12 @@ class Timer : public Thread {
 public:
   /**
    * Initalize a timer callback.
-   * @param listener2 the TimerCallback instance to use for callbacks
+   * @param callback A newly allocated object to perform callbacks on.  This
+   *        object will be deleted when the Timer is destroyed.
    * @param rate the callback rate in milliseconds.
    */
   //##ModelId=3AE868370122
-  Timer(TimerCallback& theListener, int rate);
+  Timer(TimerCallback* callback, int rate);
 
   //##ModelId=3AE8686C00BE
   virtual ~Timer();
@@ -48,7 +49,7 @@ public:
    * Returns the current time from some arbitray point in the past.  This is
    * usually a very high precision timer.  Where possible, the rdtsc
    * instruction is used to get time on x86 platforms.  Anything else the
-   * highest precision timer will be used.
+   * highest precision timer will be used.\n
    * Resolutions:\n
    * Windows/x86: (probably) 1 / CPU clock speed
    */
@@ -72,7 +73,9 @@ public:
   void startTimer();
 
   /**
-   * Stops the timer and stops calling the callback.
+   * Stops the timer and stops calling the callback.  This function blocks
+   * until the timer is stopped, which may last as long as the timer's
+   * callback.
    */
   //##ModelId=3AEB9AB500BE
   void stopTimer();
@@ -92,7 +95,7 @@ public:
 
 private:
   /**
-   * Next time the callback will be activated.
+   * Next time the callbacks will be activated.
    */
   //##ModelId=3AEBA39702C7
   Time nextTime;
@@ -104,7 +107,7 @@ private:
   int callbackRate;
 
   //##ModelId=3AE86968026C
-  TimerCallback& listener;
+  TimerCallback* listener;
 
 };
 

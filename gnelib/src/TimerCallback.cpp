@@ -20,4 +20,10 @@
 #include "gneintern.h"
 #include "TimerCallback.h"
 
+//##ModelId=3AF78B950190
+TimerCallback::TimerCallback() {
+}
 
+//##ModelId=3AF78B9501CC
+TimerCallback::~TimerCallback() {
+}

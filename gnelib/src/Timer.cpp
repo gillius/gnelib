@@ -20,16 +20,22 @@
 #include "gneintern.h"
 #include "Timer.h"
 #include "Time.h"
+#include "TimerCallback.h"
 
 //##ModelId=3AE868370122
-Timer::Timer(TimerCallback& theListener, int rate)
-: running(false), callbackRate(rate), listener(theListener) {
+Timer::Timer(TimerCallback* callback, int rate)
+: running(false), callbackRate(rate), listener(callback) {
 }
 
 //##ModelId=3AE8686C00BE
 Timer::~Timer() {
+  stopTimer();
+  delete(listener);
 }
 
+/**
+ * \todo write UNIX version
+ */
 //##ModelId=3AE86872030C
 Time Timer::getCurrentTime() {
   Time ret;
@@ -37,14 +43,17 @@ Time Timer::getCurrentTime() {
   LARGE_INTEGER t, freq;
   QueryPerformanceFrequency(&freq);
   QueryPerformanceCounter(&t);
-  ret.setuSec(int((t.QuadPart % freq.QuadPart) * 1000000 / freq.QuadPart));
   ret.setSec(int(t.QuadPart / freq.QuadPart));
+  ret.setuSec(int((t.QuadPart % freq.QuadPart) * 1000000 / freq.QuadPart));
 #else
 #error Need to port Timer::getCurrentTime()
 #endif
   return ret;
 }
 
+/**
+ * \todo write UNIX version
+ */
 //##ModelId=3AF4797001CC
 Time Timer::getAbsoluteTime() {
   Time ret;
@@ -61,14 +70,31 @@ Time Timer::getAbsoluteTime() {
 
 //##ModelId=3AEB9AB50050
 void Timer::startTimer() {
+  assert(running == false);
+  nextTime = getCurrentTime();
+  nextTime.setuSec(nextTime.getuSec() + callbackRate * 1000);
+  running = true;
+  start();
 }
 
 //##ModelId=3AEB9AB500BE
 void Timer::stopTimer() {
+  if (running) {
+    running = false;
+    join();
+  }
 }
 
+/**
+ * \todo enable sleeping.
+ */
 //##ModelId=3AE868A30294
 void Timer::run() {
+  while (running) {
+    while (nextTime > getCurrentTime()) {}
+    listener->timerCallback();
+    nextTime.setuSec(nextTime.getuSec() + callbackRate * 1000);
+  }
 }
 
 //##ModelId=3AED05E7029E
