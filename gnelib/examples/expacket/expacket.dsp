@@ -93,6 +93,10 @@ SOURCE=.\expacket.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\expacket.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 
