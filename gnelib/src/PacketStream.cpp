@@ -22,7 +22,7 @@
 #include "../include/gnelib/Packet.h"
 #include "../include/gnelib/PacketFeeder.h"
 #include "../include/gnelib/Connection.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 #include "../include/gnelib/RateAdjustPacket.h"
 #include "../include/gnelib/ExitPacket.h"
 #include "../include/gnelib/PacketParser.h"
@@ -284,14 +284,14 @@ void PacketStream::run() {
       if (outRemain > 0) {
         //Yes, this check will let us dip below 0, but overall we will make
         //up for it by waiting for it to go above 0 again.
-        RawPacket raw;
+        Buffer raw;
         prepareSend( ((reliable) ? outRel : outUnrel), raw);
         raw << PacketParser::END_OF_PACKET;
         outRemain -= raw.getPosition();
 
         //Release the mutex in case rawWrite blocks
         outQCtrl.release();
-        if (owner.sockets.rawWrite(reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
+        if (owner.sockets.rawWrite(reliable, raw) != raw.getPosition()) {
           //We sleep here for a bit because we want to favor onExit if that is going to
           //happen.  Else this failure will occur.  Or we will favor a "real" error
           //more descriptive than a write error.
@@ -315,12 +315,14 @@ void PacketStream::run() {
   //We need a good way to make sure this doesn't block though, but the
   //current solution here of assuming rawWrite won't block will have to do
   //for now.
-  RawPacket raw;
+  Buffer raw;
   ExitPacket temp;
   raw << temp << PacketParser::END_OF_PACKET;
-  int ret = owner.sockets.rawWrite(true, raw.getData(), raw.getPosition());
-  if (ret > 0) {
+  int ret = owner.sockets.rawWrite(true, raw);
+  if (ret > raw.getPosition()) {
     gnedbgo1(4, "ExitPacket sent (%d).", ret);
+  } else if ( ret > 0 ) {
+    gnedbgo1(4, "ExitPackt not completely sent (%d).", ret);
   } else {
     gnedbgo1(4, "ExitPacket not sent (%d).", ret);
   }
@@ -346,12 +348,12 @@ void PacketStream::addIncomingPacket(Packet* packet) {
   }
 }
 
-void PacketStream::prepareSend(std::queue<Packet*>& q, RawPacket& raw) {
+void PacketStream::prepareSend(std::queue<Packet*>& q, Buffer& raw) {
   //outQCtrl must be acquired for this function.
-  //While there are packets left and they won't overflow the RawPacket
+  //While there are packets left and they won't overflow the Buffer
   while (!q.empty() &&
          raw.getPosition() + q.front()->getSize() <
-         RawPacket::RAW_PACKET_LEN - (int)sizeof(PacketParser::END_OF_PACKET)) {
+         Buffer::RAW_PACKET_LEN - (int)sizeof(PacketParser::END_OF_PACKET)) {
 
     q.front()->writePacket(raw);
     delete q.front();

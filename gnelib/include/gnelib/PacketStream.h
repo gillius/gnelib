@@ -31,7 +31,7 @@
 namespace GNE {
 class Packet;
 class Connection;
-class RawPacket;
+class Buffer;
 class PacketFeeder;
 
 /**
@@ -280,7 +280,7 @@ protected:
 
 private:
 
-  void prepareSend(std::queue<Packet*>& q, RawPacket& raw);
+  void prepareSend(std::queue<Packet*>& q, Buffer& raw);
 
   Connection& owner;
 

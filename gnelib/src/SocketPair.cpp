@@ -96,34 +96,29 @@ ConnectionStats SocketPair::getStats(int reliable) const {
   return ret;
 }
 
-int SocketPair::rawRead(bool reliable, const gbyte* buf, int bufSize) const {
+int SocketPair::rawRead(bool reliable, Buffer& buf) const {
   NLsocket act;
   if (reliable)
     act = r;
   else
     act = u;
   assert(act != NL_INVALID);
-  return nlRead(act, (NLvoid*)buf, (NLint)bufSize);
-  /*gnedbgo1(5, "Read %d bytes.", chk);
-  if (chk >= 2) {
-    gnedbgo2(5, "  First two bytes are %d and %d", (int)buf[0], (int)buf[1]);
-  }
-  return chk;*/
+
+  buf.clear();
+  int read = nlRead( act, (NLvoid*)buf.getData(), (NLint)buf.getCapacity() );
+  buf.setLimit( read );
+  return read;
 }
 
-int SocketPair::rawWrite(bool reliable, const gbyte* buf, int bufSize) const {
+int SocketPair::rawWrite(bool reliable, const Buffer& buf) const {
   NLsocket act;
   if (reliable)
     act = r;
   else //if u is invalid, send over r anyways.
     act = (u != NL_INVALID) ? u : r;
   assert(act != NL_INVALID);
-  return nlWrite(act, (NLvoid*)buf, (NLint)bufSize);
-  /*gnedbgo1(1, "Sent %d bytes.", chk);
-  if (chk >= 2) {
-    gnedbgo2(5, "  First two bytes are %d and %d", (int)buf[0], (int)buf[1]);
-  }
-  return chk;*/
+
+  return nlWrite(act, (const NLvoid*)buf.getData(), (NLint)buf.getPosition());
 }
 
 } //Namespace GNE

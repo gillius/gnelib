@@ -19,7 +19,7 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ObjectBrokerPacket.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 
 namespace GNE {
   
@@ -48,15 +48,15 @@ void ObjectBrokerPacket::setObjectId( int newId ) {
 }
 
 int ObjectBrokerPacket::getSize() const {
-  return WrapperPacket::getSize() + RawPacket::getSizeOf( objectId );
+  return WrapperPacket::getSize() + Buffer::getSizeOf( objectId );
 }
 
-void ObjectBrokerPacket::writePacket(RawPacket& raw) const {
+void ObjectBrokerPacket::writePacket(Buffer& raw) const {
   WrapperPacket::writePacket( raw );
   raw << objectId;
 }
 
-void ObjectBrokerPacket::readPacket(RawPacket& raw) {
+void ObjectBrokerPacket::readPacket(Buffer& raw) {
   WrapperPacket::readPacket( raw );
   raw >> objectId;
 }

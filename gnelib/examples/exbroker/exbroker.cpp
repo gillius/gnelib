@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
   //of its copies go out of scope).
   ObjectCreationPacket::sptr p = obs.getCreationPacket( t );
   //This is strictly for testing, it writes the ObjectCreationPacket to a
-  //RawPacket, reads back a new one, and returns a new packet.
+  //Buffer, reads back a new one, and returns a new packet.
   p = doSerializationTest( p );
 
   assert( obc.numObjects() == 0 );
@@ -186,17 +186,22 @@ void failTest( const Packet& packet, ObjectBrokerClient& obc,
 
 ObjectCreationPacket::sptr
 doSerializationTest( const ObjectCreationPacket::sptr& p ) {
-  RawPacket raw;
+  Buffer raw;
 
   p->writePacket( raw );
   raw << PacketParser::END_OF_PACKET;
 
-  raw.reset();
-  bool eop;
-  Packet* newPacket = PacketParser::parseNextPacket( eop, raw );
-  assert( newPacket != NULL );
+  raw.flip();
+  try {
+    Packet* newPacket = PacketParser::parseNextPacket( raw );
+    assert( newPacket != NULL );
 
-  return ObjectCreationPacket::sptr( (ObjectCreationPacket*) newPacket );
+    return ObjectCreationPacket::sptr( (ObjectCreationPacket*) newPacket );
+
+  } catch ( ... ) {
+    assert( false );
+    return ObjectCreationPacket::sptr();
+  }
 }
 
 void registerObjects() {

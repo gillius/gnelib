@@ -20,7 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/WrapperPacket.h"
 #include "../include/gnelib/PacketParser.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 
 namespace GNE {
   
@@ -64,7 +64,7 @@ void WrapperPacket::setData( const Packet* packet ) {
     this->packet = NULL;
 }
 
-void WrapperPacket::writePacket(RawPacket& raw) const {
+void WrapperPacket::writePacket(Buffer& raw) const {
   Packet::writePacket( raw );
   if ( packet != NULL )
     packet->writePacket( raw );
@@ -72,10 +72,9 @@ void WrapperPacket::writePacket(RawPacket& raw) const {
     raw << PacketParser::END_OF_PACKET;
 }
 
-void WrapperPacket::readPacket(RawPacket& raw) {
+void WrapperPacket::readPacket(Buffer& raw) {
   Packet::readPacket( raw );
-  bool dummy;
-  packet = PacketParser::parseNextPacket( dummy, raw );
+  packet = PacketParser::parseNextPacket( raw );
 }
 
 WrapperPacket& WrapperPacket::operator= ( const WrapperPacket& rhs ) {

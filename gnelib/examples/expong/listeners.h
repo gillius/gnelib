@@ -79,7 +79,7 @@ public:
     //accepted.  If not, throw a connection refused error.
     gbool accepted;
     conn >> buf;
-    buf.getData() >> accepted;
+    buf.getBuffer() >> accepted;
     if (!accepted) {
       conn.disconnect();
       throw Error(Error::ConnectionRefused);
@@ -88,12 +88,12 @@ public:
     //If we are accepted, we should be receiving the remote player's name.
     conn >> buf;
     string remoteName;
-    buf.getData() >> remoteName;
+    buf.getBuffer() >> remoteName;
     remotePlayer->setName(remoteName);
 
     //Now we should send our name.
-    buf.reset();
-    buf.getData() << localPlayer->getName();
+    buf.clear();
+    buf.getBuffer() << localPlayer->getName();
     conn << buf;
 
     //Now we are ready to play pong!
@@ -104,18 +104,18 @@ public:
 
     CustomPacket buf;
     //Tell the client that they have been accepted
-    buf.getData() << gTrue;
+    buf.getBuffer() << gTrue;
     conn << buf;
     //and send them our name.
-    buf.reset();
-    buf.getData() << localPlayer->getName();
+    buf.clear();
+    buf.getBuffer() << localPlayer->getName();
     conn << buf;
 
     //Now we wait for the client's name.
     conn >> buf;
 
     string remoteName;
-    buf.getData() >> remoteName;
+    buf.getBuffer() >> remoteName;
     remotePlayer->setName(remoteName);
   }
 
@@ -204,7 +204,7 @@ public:
   void onNewConn(SyncConnection& conn) {
     CustomPacket buf;
     //Tell the client that they have been refused
-    buf.getData() << gFalse;
+    buf.getBuffer() << gFalse;
     conn << buf;
     conn.disconnect();
     throw Error(Error::ConnectionRefused);

@@ -20,7 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ChannelPacket.h"
 #include "../include/gnelib/PacketParser.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 
 namespace GNE {
 
@@ -60,16 +60,16 @@ Packet* ChannelPacket::makeClone() const {
 }
 
 int ChannelPacket::getSize() const {
-  return WrapperPacket::getSize() + RawPacket::getSizeOf( channel ) +
-    RawPacket::getSizeOf( from );
+  return WrapperPacket::getSize() + Buffer::getSizeOf( channel ) +
+    Buffer::getSizeOf( from );
 }
 
-void ChannelPacket::writePacket(RawPacket& raw) const {
+void ChannelPacket::writePacket(Buffer& raw) const {
   WrapperPacket::writePacket( raw );
   raw << channel << from;
 }
 
-void ChannelPacket::readPacket(RawPacket& raw) {
+void ChannelPacket::readPacket(Buffer& raw) {
   WrapperPacket::readPacket( raw );
   raw >> channel >> from;
   assert( getData() != NULL );

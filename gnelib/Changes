@@ -1,4 +1,9 @@
 GNE 0.55 to current
+  Added ErrorCode User for user-inherited Error objects.
+  Throwing exceptions during readPacket and writePacket is now allowed.
+  RawPacket class was retired and replaced by the new safer class Buffer.
+    RawPacket's name was confusing, and did not have strong protection against
+    overflow and underflow.
   Fixed a extremely unlikely condition where a SyncConnection may be waiting
     forever to get its next packet.
   Major reworking of the connecting code, and added a state to Connection to

@@ -19,7 +19,7 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ObjectUpdatePacket.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 
 namespace GNE {
 

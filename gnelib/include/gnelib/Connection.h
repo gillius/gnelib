@@ -267,31 +267,31 @@ protected:
    * A utility function for ServerConnection and ClientConnection to add the
    * standard header onto the connection packets.
    */
-  void addHeader(RawPacket& raw);
+  void addHeader(Buffer& raw);
 
   /**
    * A utility function for ServerConnection and ClientConnection to add the
    * version information to a packet.
    */
-  void addVersions(RawPacket& raw);
+  void addVersions(Buffer& raw);
 
   /**
    * A utility function for ServerConnection and ClientConnection to check to
-   * verify the %GNE header of the connecting packets.  The RawPacket is read
+   * verify the %GNE header of the connecting packets.  The Buffer is read
    * from so this function will move the reading position to the next element
    * after the header.  If it throws an exception, the read position is
    * undefined.
    *
    * @param t the type of ProtocolViolation to throw if it throws one.
-   * @throw ProtocolViolation if the next bytes of the RawPacket is not the
+   * @throw ProtocolViolation if the next bytes of the Buffer is not the
    *                          proper %GNE header.
    */
-  void checkHeader(RawPacket& raw,
+  void checkHeader(Buffer& raw,
     ProtocolViolation::ViolationType t = ProtocolViolation::OtherViolation);
 
   /**
    * A utility function for ServerConnection and ClientConnection to check
-   * the GNE version, game name, and user versions in the RawPacket.  This
+   * the GNE version, game name, and user versions in the Buffer.  This
    * function behaves similarly to checkHeader.
    *
    * @throw Error with a code of Error::GNETheirVersionHigh or
@@ -299,7 +299,7 @@ protected:
    * @throw WrongGame if the game names don't match.
    * @throw UserVersionMismatch if the user version numbers don't match.
    */
-  void checkVersions(RawPacket& raw);
+  void checkVersions(Buffer& raw);
 
   //For information about events, see the ConnectionListener class.
   void onReceive();

@@ -41,16 +41,16 @@ public:
   }
 
   virtual int getSize() const {
-    return Packet::getSize() + RawPacket::getSizeOf( msg ) +
-           RawPacket::getSizeOf( x ) + RawPacket::getSizeOf( y );
+    return Packet::getSize() + Buffer::getSizeOf( msg ) +
+           Buffer::getSizeOf( x ) + Buffer::getSizeOf( y );
   }
 
-  void writePacket( RawPacket& raw ) const {
+  void writePacket( Buffer& raw ) const {
     Packet::writePacket( raw );
     raw << x << y << msg;
   }
 
-  void readPacket( RawPacket& raw ) {
+  void readPacket( Buffer& raw ) {
     Packet::readPacket( raw );
     raw >> x >> y >> msg;
   }
@@ -81,15 +81,15 @@ public:
   }
 
   virtual int getSize() const {
-    return Packet::getSize() +  RawPacket::getSizeOf( x ) + RawPacket::getSizeOf( y );
+    return Packet::getSize() +  Buffer::getSizeOf( x ) + Buffer::getSizeOf( y );
   }
 
-  void writePacket( RawPacket& raw ) const {
+  void writePacket( Buffer& raw ) const {
     Packet::writePacket( raw );
     raw << x << y;
   }
 
-  void readPacket( RawPacket& raw ) {
+  void readPacket( Buffer& raw ) {
     Packet::readPacket( raw );
     raw >> x >> y;
   }
@@ -118,15 +118,15 @@ public:
   }
 
   virtual int getSize() const {
-    return Packet::getSize() + RawPacket::getSizeOf( msg );
+    return Packet::getSize() + Buffer::getSizeOf( msg );
   }
 
-  void writePacket( RawPacket& raw ) const {
+  void writePacket( Buffer& raw ) const {
     Packet::writePacket( raw );
     raw << msg;
   }
 
-  void readPacket( RawPacket& raw ) {
+  void readPacket( Buffer& raw ) {
     Packet::readPacket( raw );
     raw >> msg;
   }

@@ -20,7 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ExitPacket.h"
 #include "../include/gnelib/Packet.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 
 namespace GNE {
 
@@ -36,11 +36,11 @@ int ExitPacket::getSize() const {
   return Packet::getSize();
 }
 
-void ExitPacket::writePacket(RawPacket& raw) const {
+void ExitPacket::writePacket(Buffer& raw) const {
   Packet::writePacket(raw);
 }
 
-void ExitPacket::readPacket(RawPacket& raw) {
+void ExitPacket::readPacket(Buffer& raw) {
   Packet::readPacket(raw);
 }
 

@@ -19,14 +19,14 @@
 
 /**
  * expacket -- Shows how to derive a new type of packet, and create the
- * proper parsing functions interacting with RawPacket to allow GNE to use
+ * proper parsing functions interacting with Buffer to allow GNE to use
  * your packet.
  * This example does NOT show how to use the packet over the network.
  * See exhello for that.
  * Note that like exrawtest, this uses Packets and RawPackets in
  * non-standard ways, so this is not the normal end-user way to use GNE.
  * This example is mainly just for testing purposes of GNE.
- * But if you want to use the PacketParser and RawPacket API to do something
+ * But if you want to use the PacketParser and Buffer API to do something
  * interesting and custom like say "sending" GNE packets to a save file to
  * save your game state, which is not very far-fetched as when clients
  * connect in network games they are loading a saved game state.
@@ -72,18 +72,18 @@ int main(int argc, char* argv[]) {
 void packetTest(const PersonPacket& jason, const PersonPacket& elias) {
   gout << "Creating two PersonPackets" << endl;
 
-  RawPacket raw(NULL);
+  Buffer raw;
   jason.writePacket(raw);
   Packet* temp = elias.makeClone();
   temp->writePacket(raw);
   PacketParser::destroyPacket( temp );
 
-  raw.reset();
+  raw.flip();
 
   PersonPacket t1;
   PersonPacket t2;
 
-  /**
+  /*
    * Read back the packets.  Note that we have to read in the ids, because
    * normally packets aren't used this way.  Normally the packet parser in GNE
    * will real the ID, then create the packet.  The packet needs not to read
@@ -105,45 +105,46 @@ void packetTest(const PersonPacket& jason, const PersonPacket& elias) {
 void parseTest(const Packet& jason, const Packet& elias) {
   gout << "Starting packet tests.  If no \"Unexpected values\" are seen, everything worked." << endl;
   Packet packet1;
-  UnknownPacket packet2;
+  ::UnknownPacket packet2;
 
-  RawPacket raw1;
+  Buffer raw1;
   
   //All packets we intend on parsing must end with END_OF_PACKET.  In normal
   //GNE usage, the library will terminate packets properly on send.
   raw1 << packet1 << packet2 << jason << packet1 << elias << END_OF_PACKET;
 
-  raw1.reset();
+  raw1.flip();
 
-  bool end = false;
-  Packet* next = parseNextPacket(end, raw1);
-  gout << end << ", " << next << ", " << next->getType() << endl;
-  if (end == true || next == NULL || next->getType() != 0)
-    gout << "(1)Unexpected values." << endl;
-  PacketParser::destroyPacket( next );
+  Packet* next;
+  try {
+    next = parseNextPacket( raw1 );
+    if (next == NULL || next->getType() != 0)
+      gout << "(1)Unexpected values." << endl;
+    PacketParser::destroyPacket( next );
+
+  } catch ( Error& e ) {
+    gout << "(1)Unexpected values: Exception thrown: " << e << endl;
+  }
 
   //This one should fail as we did not register UnknownPacket.
-  next = parseNextPacket(end, raw1);
-  gout << end << ", " << next << endl;
-  if (end == true || next != NULL)
-    gout << "(2)Unexpected values." << endl;
+  try {
+    next = parseNextPacket(raw1);
+    gout << "(2)Unexpected values: Exception must occur." << endl;
 
-  raw1.reset();
-  //After we register, we should be able to completely read the RawPacket.
-  defaultRegisterPacket<UnknownPacket>();
-
-  while(!end) {
-    next = parseNextPacket(end, raw1);
-    if (end && next != NULL)
-      gout << "(3)Unexpected values." << endl;
-    if (!end && next == NULL)
-      gout << "(4)Unexpected values." << endl;
-    if (!end) {
-      gout << end << ", " << next << ", " << next->getType() << endl;
-      PacketParser::destroyPacket( next );
-    }
+  } catch ( Error& ) {
   }
-  gout << end << ", " << next << endl;
+
+  raw1.rewind();
+  //After we register, we should be able to completely read the Buffer.
+  defaultRegisterPacket<::UnknownPacket>();
+
+  try {
+    while( next = parseNextPacket(raw1) )
+      PacketParser::destroyPacket( next );
+
+  } catch ( Error& e ) {
+    gout << "(3)Unexpected values: Exception thrown: " << e << endl;
+  }
 }
 
 

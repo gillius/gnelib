@@ -19,9 +19,11 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/PacketParser.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 #include "../include/gnelib/Mutex.h"
 #include "../include/gnelib/Lock.h"
+#include "../include/gnelib/Error.h"
+#include "../include/gnelib/Errors.h"
 
 //Packet type includes used for registration.
 #include "../include/gnelib/Packet.h"
@@ -146,18 +148,14 @@ void destroyPacket( Packet* p ) {
   }
 }
 
-Packet* parseNextPacket(bool& endOfPackets, RawPacket& raw) {
+Packet* parseNextPacket( Buffer& raw ) {
   //Read next packet ID
   guint8 nextId;
   raw >> nextId;
 
   //Check for end of packet, returning if it is the end.
-  if (nextId == END_OF_PACKET) {
-    endOfPackets = true;
+  if (nextId == END_OF_PACKET)
     return NULL;
-  } else {
-    endOfPackets = false;
-  }
 
   //Check for packet registration, parsing if it is registered.
   mapSync.acquire();
@@ -165,21 +163,26 @@ Packet* parseNextPacket(bool& endOfPackets, RawPacket& raw) {
   mapSync.release();
 
   //This section is split off to keep the above critial section small as
-  //many threads will be using this function, so we use this second if to
-  //allow for better concurrency.
-  if (func) {
-    Packet* ret = func();
-    ret->readPacket(raw);
-    return ret;
+  //many threads will be using this function.
+  if (!func) {
+    gnedbg1(1, "Unknown packet type %i received.", (int)nextId);
+    throw UnknownPacket( (int)nextId );
   }
-  gnedbg1(1, "Unknown packet type %i received.  onFailure event should occur.", (int)nextId);
-  return NULL;
+
+  Packet* ret = func();
+  try {
+    ret->readPacket(raw);
+  } catch( Error& ) {
+    destroyPacket( ret );
+    throw;
+  } catch( ... ) {
+    destroyPacket( ret );
+    assert( "readPacket must throw subclasses of Error!" != 0 );
+    return NULL;
+  }
+  return ret;
+
 }
 
 } //namespace PacketParser
 } //namespace GNE
-
-
-
-
-

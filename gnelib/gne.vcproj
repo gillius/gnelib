@@ -112,6 +112,9 @@
 				RelativePath=".\src\Address.cpp">
 			</File>
 			<File
+				RelativePath="src\Buffer.cpp">
+			</File>
+			<File
 				RelativePath="src\ChannelPacket.cpp">
 			</File>
 			<File
@@ -229,9 +232,6 @@
 				RelativePath=".\src\RateAdjustPacket.cpp">
 			</File>
 			<File
-				RelativePath=".\src\RawPacket.cpp">
-			</File>
-			<File
 				RelativePath=".\src\ReceiveEventListener.cpp">
 			</File>
 			<File
@@ -300,6 +300,9 @@
 			Filter="h;hpp;hxx;hm;inl">
 			<File
 				RelativePath=".\include\gnelib\Address.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\Buffer.h">
 			</File>
 			<File
 				RelativePath="include\gnelib\ChannelPacket.h">
@@ -420,9 +423,6 @@
 			</File>
 			<File
 				RelativePath=".\include\gnelib\RateAdjustPacket.h">
-			</File>
-			<File
-				RelativePath=".\include\gnelib\RawPacket.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ReceiveEventListener.h">

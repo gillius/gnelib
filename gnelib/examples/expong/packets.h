@@ -30,8 +30,7 @@
  */
 class PaddleMovement : public Packet {
 public:
-  PaddleMovement(int newLoc = 1)
-    : Packet(ID), newy( (guint8)newLoc ) {
+  PaddleMovement(int newLoc = 1) : Packet(ID), newy( (guint8)newLoc ) {
   }
 
   virtual ~PaddleMovement() {}
@@ -39,15 +38,15 @@ public:
   static const int ID;
 
   int getSize() const {
-    return Packet::getSize() + RawPacket::getSizeOf(newy);
+    return Packet::getSize() + Buffer::getSizeOf(newy);
   }
 
-  void writePacket(RawPacket& raw) const {
+  void writePacket(Buffer& raw) const {
     Packet::writePacket(raw);
     raw << newy;
   }
 
-  void readPacket(RawPacket& raw) {
+  void readPacket(Buffer& raw) {
     Packet::readPacket(raw);
     raw >> newy;
   }
@@ -73,11 +72,11 @@ public:
     return Packet::getSize();
   }
 
-  void writePacket(RawPacket& raw) const {
+  void writePacket(Buffer& raw) const {
     Packet::writePacket(raw);
   }
 
-  void readPacket(RawPacket& raw) {
+  void readPacket(Buffer& raw) {
     Packet::readPacket(raw);
   }
 };

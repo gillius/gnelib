@@ -31,6 +31,15 @@ namespace GNE {
  * a textual description of the error.  Objects of type Error are not thread
  * safe.  This is usually OK since Error objects are not typically shared by
  * threads.
+ *
+ * If you want to define your own classes from Error, feel free to do so.
+ * This may be useful if you want to throw Errors during readPacket or
+ * writePacket.  If you inherit from Error, unless one of the current error
+ * codes apply, you should give the Error a code of User and overload the
+ * toString method to provide your own error description.
+ *
+ * @see Packet#readPacket
+ * @see Packet#writePacket
  */
 class Error {
 public:
@@ -59,8 +68,13 @@ public:
     UnknownObjectId,
     InvalidObjectPacket,
     InvalidCreationPacketType,
+    BufferUnderflow,
+    BufferOverflow,
+    InvalidBufferPosition,
+    InvalidBufferLimit,
     OtherGNELevelError,
-    OtherLowLevelError
+    OtherLowLevelError,
+    User /**< Useful for user-defined classes that inherit from Error */
   };
 
   /**
@@ -93,7 +107,7 @@ public:
   virtual std::string toString() const;
 
   /**
-   * Returns error.getCode() != NoError, a handy shortcut so you can test for
+   * Returns getCode() != NoError, a handy shortcut so you can test for
    * error by if (error).
    */
   operator bool() const;

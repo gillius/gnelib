@@ -45,15 +45,15 @@ public:
   static const int ID;
 
   int getSize() const {
-    return Packet::getSize() + RawPacket::getSizeOf(message);
+    return Packet::getSize() + Buffer::getSizeOf(message);
   }
 
-  void writePacket(RawPacket& raw) const {
+  void writePacket(Buffer& raw) const {
     Packet::writePacket(raw);
     raw << message;
   }
 
-  void readPacket(RawPacket& raw) {
+  void readPacket(Buffer& raw) {
     Packet::readPacket(raw);
     raw >> message;
   }

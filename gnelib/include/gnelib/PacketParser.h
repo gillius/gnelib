@@ -24,7 +24,7 @@
 
 namespace GNE {
 class Packet;
-class RawPacket;
+class Buffer;
 
 /**
  * @ingroup midlevel
@@ -156,19 +156,16 @@ Packet* clonePacket( const Packet* p );
 void destroyPacket( Packet* p );
 
 /**
- * Parses the next packet from the given RawPacket.  Returns NULL on error.
- * if endOfPackets was set to true, then the NULL means no packets were left
- * to parse.  If endOfPackets was set to false, then NULL was due to network
- * packet corruption or a packet that GNE cannot recognize.  In this case,
- * the passed RawPacket is in an invalid and undefined state and should be
- * discarded.
+ * Parses the next packet from the given Buffer.  Returns NULL if no more
+ * packets remain in the Buffer.
+ * 
+ * @throws Error if the next packet's type is unknown, or an error occurs
+ *   during the readPacket method.
  *
- * Calling parseNextPacket after endOfPackets was set to true produces
- * undefined results.
  * @return a newly allocated Packet of the type of the next packet in the
- *         RawPacket, else NULL on error or end of RawPacket.
+ *         Buffer, else NULL on end of Buffer.
  */
-Packet* parseNextPacket(bool& endOfPackets, RawPacket& raw);
+Packet* parseNextPacket( Buffer& raw );
 
 } //namespace PacketParser
 } //namespace GNE

@@ -32,6 +32,28 @@ namespace GNE {
 /**
  * @ingroup midlevel
  *
+ * A simple error class with a default ErrorCode of User for quick error
+ * messages.  This class is not used by %GNE, but you are welcome to use it to
+ * throw your own exceptions, perhaps from Packet::readPacket.
+ */
+class UserError : public Error {
+public:
+  UserError( const std::string& msg ) : Error( User ), msg( msg ) {}
+
+  virtual ~UserError() {}
+
+  /**
+   * Returns the message set in the constructor.
+   */
+  virtual std::string toString() const { return msg; }
+
+private:
+  std::string msg;
+};
+
+/**
+ * @ingroup midlevel
+ *
  * Adds low level HawkNL and possibly system error information to any other
  * error.
  */
@@ -84,6 +106,28 @@ private:
 };
 
 /**
+ * @ingroup midlevel
+ *
+ * An Error when a Packet is received from the network that has an ID that is
+ * not registered with the PacketParser.
+ */
+class UnknownPacket : public Error {
+public:
+  UnknownPacket( int type ) : type( type ) {}
+
+  virtual ~UnknownPacket() {}
+
+  int getUnknownType() { return type; }
+
+  virtual std::string toString() const;
+
+private:
+  int type;
+};
+
+/**
+ * @ingroup midlevel
+ *
  * An error thrown by SyncConnection when you get a packet other than the one
  * you are trying to receive.
  */
@@ -154,6 +198,21 @@ public:
 
 private:
   ViolationType t;
+};
+
+/**
+ * @ingroup midlevel
+ *
+ * An error that occurs during an operation on Buffer.
+ *
+ * @see Buffer
+ */
+class BufferError : public Error {
+public:
+  BufferError( ErrorCode code ) : Error( code ) {
+  }
+
+  virtual ~BufferError() {}
 };
 
 }

@@ -19,14 +19,14 @@ exhello -- Everyone knows the "Hello World" program.  Perhaps it's been coded
   should be compatable client and server with exsynchello.
 
 expacket -- Shows how to derive a new type of packet, and create the proper
-  parsing functions interacting with RawPacket to allow GNE to use your packet.
+  parsing functions interacting with Buffer to allow GNE to use your packet.
   This example does NOT show how to use the packet over the network.
   See exhello for that.
 
-exrawtest -- Basically a test of the RawPacket class.  Does show usage of the
-  RawPacket class, but the usage in this case because this is a test uses the
-  class is "hackish" ways.  The standard use of RawPackets is pretty trivial.
-
+exrawtest -- Basically a test of the Buffer class.  Does show usage of the
+  Buffer class, but the usage in this case because this is a test uses the
+  class is "hackish" ways.
+  
 exaddr -- A small test for the Address class that also shows its usage.
 
 exsynchello -- Same as exhello, but uses only SyncConnections.  exsynchello

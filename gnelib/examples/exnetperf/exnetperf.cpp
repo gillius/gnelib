@@ -154,7 +154,7 @@ public:
     //Create a packet with random data
     CustomPacket temp;
     for (int c = 0; c < packetSize; c++)
-      temp.getData() << rng.getNum();
+      temp.getBuffer() << rng.getNum();
 
     ps.writePacket(temp, true);
     packetsOut++;

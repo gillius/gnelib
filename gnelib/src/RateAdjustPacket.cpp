@@ -20,7 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/RateAdjustPacket.h"
 #include "../include/gnelib/Packet.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 
 namespace GNE {
 
@@ -33,15 +33,15 @@ RateAdjustPacket::~RateAdjustPacket() {
 }
 
 int RateAdjustPacket::getSize() const {
-  return Packet::getSize() + RawPacket::getSizeOf(rate);
+  return Packet::getSize() + Buffer::getSizeOf(rate);
 }
 
-void RateAdjustPacket::writePacket(RawPacket& raw) const {
+void RateAdjustPacket::writePacket(Buffer& raw) const {
   Packet::writePacket(raw);
   raw << rate;
 }
 
-void RateAdjustPacket::readPacket(RawPacket& raw) {
+void RateAdjustPacket::readPacket(Buffer& raw) {
   Packet::readPacket(raw);
   raw >> rate;
 }

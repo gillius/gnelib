@@ -21,7 +21,7 @@
 #include "../include/gnelib/Connection.h"
 #include "../include/gnelib/ConnectionStats.h"
 #include "../include/gnelib/ConnectionListener.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 #include "../include/gnelib/Packet.h"
 #include "../include/gnelib/ExitPacket.h"
 #include "../include/gnelib/PacketParser.h"
@@ -159,11 +159,11 @@ void Connection::setThisPointer( const wptr& weakThis ) {
   eventThread = EventThread::create( weakThis.lock() );
 }
 
-void Connection::addHeader(RawPacket& raw) {
+void Connection::addHeader(Buffer& raw) {
   raw << (gbyte)'G' << (gbyte)'N' << (gbyte)'E';
 }
 
-void Connection::addVersions(RawPacket& raw) {
+void Connection::addVersions(Buffer& raw) {
   GNEProtocolVersionNumber us = GNE::getGNEProtocolVersion();
   //Write the GNE version numbers.
   raw << us.version << us.subVersion << us.build;
@@ -175,7 +175,7 @@ void Connection::addVersions(RawPacket& raw) {
   raw << GNE::getUserVersion();
 }
 
-void Connection::checkHeader(RawPacket& raw,
+void Connection::checkHeader(Buffer& raw,
                              ProtocolViolation::ViolationType t) {
   gbyte headerG, headerN, headerE;
   raw >> headerG >> headerN >> headerE;
@@ -184,7 +184,7 @@ void Connection::checkHeader(RawPacket& raw,
     throw ProtocolViolation(t);
 }
 
-void Connection::checkVersions(RawPacket& raw) {
+void Connection::checkVersions(Buffer& raw) {
   //Get the version numbers
   GNEProtocolVersionNumber them;
   raw >> them.version >> them.subVersion >> them.build;
@@ -239,23 +239,8 @@ void Connection::finishedConnecting() {
     state = Connected;
 }
 
-template <typename T>
-class ArrayDeleter {
-public:
-  ArrayDeleter( T* ptr ) : ptr(ptr) {}
-
-  ~ArrayDeleter() {
-    delete[] ptr;
-  }
-
-private:
-  T* ptr;
-};
-
 void Connection::onReceive(bool reliable) {
-  //TODO: move this to RAII somehow.
-  gbyte* buf = new gbyte[RawPacket::RAW_PACKET_LEN];
-  ArrayDeleter<gbyte> deleter( buf );
+  Buffer buf;
   int temp = 0;
 
   //We have to assert that the connection is still active, since we can be
@@ -263,7 +248,7 @@ void Connection::onReceive(bool reliable) {
   {
     LockMutex lock( sync );
     if ( state == Connected || state == Connecting )
-      temp = sockets.rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
+      temp = sockets.rawRead(reliable, buf);
     else
       return; //ignore the event.
   }
@@ -288,33 +273,32 @@ void Connection::onReceive(bool reliable) {
 
   } else {
     //Stream read success
-    RawPacket raw(buf);
-    
     //parse the packets and add them to the PacketStream
-    bool errorCheck;
-    Packet* next = NULL;
-    while ((next = PacketParser::parseNextPacket(errorCheck, raw)) != NULL) {
-      //We want to intercept ExitPackets, else we just add it.
-      if (next->getType() == ExitPacket::ID) {
-        //All further errors will be ignored after we call onExit, this replaces
-        //the old "exiting" flag.
-        LockMutex lock( sync ); //protect on eventThread
-        if( eventThread )       //have we not disconnected?
-          eventThread->onExit();
+    try {
+      Packet* next = NULL;
+      while ((next = PacketParser::parseNextPacket(buf)) != NULL) {
+        //We want to intercept ExitPackets, else we just add it.
+        if (next->getType() == ExitPacket::ID) {
+          //All further errors will be ignored after we call onExit, due to
+          //contract of EventThread.
+          {
+            LockMutex lock( sync ); //protect on eventThread
+            if( eventThread )       //have we not disconnected?
+              eventThread->onExit();
+          }
 
-        PacketParser::destroyPacket( next );
+          PacketParser::destroyPacket( next );
 
-      } else
-        ps->addIncomingPacket(next);
-    }
-    
-    //Start the event
-    if (errorCheck == false) {
-      //These are level 4 since the explicit event log is generated in onFailure
-      gnedbgo1(4, "Unknown packet encountered in a message that has %i bytes", temp);
-      processError(Error::UnknownPacket);
-    } else {
+        } else
+          ps->addIncomingPacket(next);
+      }
+
+      //Notify that packets were received.
       onReceive();
+
+    } catch ( Error& err ) {
+      //if PacketParser fails or readPacket fails.
+      processError( err );
     }
   }
 }

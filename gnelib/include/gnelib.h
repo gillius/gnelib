@@ -30,6 +30,7 @@
 #endif
 
 #include "gnelib/Address.h"
+#include "gnelib/Buffer.h"
 #include "gnelib/ClientConnection.h"
 #include "gnelib/ConnectionListener.h"
 #include "gnelib/ConditionVariable.h"
@@ -62,7 +63,6 @@
 #include "gnelib/PacketStream.h"
 #include "gnelib/PacketParser.h"
 #include "gnelib/PingPacket.h"
-#include "gnelib/RawPacket.h"
 #include "gnelib/ReceiveEventListener.h"
 #include "gnelib/ServerConnectionListener.h"
 #include "gnelib/SmartPtr.h"

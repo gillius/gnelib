@@ -27,7 +27,7 @@
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/SyncConnection.h"
 #include "../include/gnelib/EventThread.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 #include "../include/gnelib/PacketParser.h"
 
 namespace GNE {
@@ -220,13 +220,13 @@ void ClientConnection::doHandshake() {
 }
 
 void ClientConnection::sendCRP() {
-  RawPacket crp;
+  Buffer crp;
   addHeader(crp);
   addVersions(crp);
   crp << (guint32)params->cp.getInRate();
   crp << ((params->cp.getUnrel()) ? gTrue : gFalse);
 
-  int check = sockets.rawWrite(true, crp.getData(), crp.getPosition());
+  int check = sockets.rawWrite(true, crp);
   //The write should succeed and have sent all of our data.
   if (check != crp.getPosition())
     throw LowLevelError(Error::Write);
@@ -237,8 +237,8 @@ const int REFLEN = 44;
 const int CAPLEN = 12;
 
 Address ClientConnection::getCAP() {
-  gbyte capBuf[64];
-  int check = sockets.rawRead(true, capBuf, 64);
+  Buffer cap( 64 );
+  int check = sockets.rawRead(true, cap);
   if (check == NL_INVALID)
     throw LowLevelError(Error::Read);
 
@@ -250,7 +250,6 @@ Address ClientConnection::getCAP() {
   }
 
   //Now parse the CAP (or refusal packet)
-  RawPacket cap(capBuf);
   checkHeader(cap, ProtocolViolation::InvalidCAP);
 
   gbool isCAP;
@@ -326,15 +325,15 @@ void ClientConnection::setupUnreliable(const Address& dest) {
   //up any possible firewalls or gateways.
   int check = 0;
 
-  RawPacket resp;
+  Buffer resp;
   resp << sockets.getLocalAddress(false).getPort();
-  check = sockets.rawWrite(true, resp.getData(), resp.getPosition());
+  check = sockets.rawWrite(true, resp);
   if (check != resp.getPosition() || check != sizeof(gint32))
     throw LowLevelError(Error::Write);
 
-  resp.reset();
+  resp.clear();
   resp << PacketParser::END_OF_PACKET;
-  check = sockets.rawWrite(false, resp.getData(), resp.getPosition());
+  check = sockets.rawWrite(false, resp);
   if (check != resp.getPosition() || check != sizeof(PacketParser::END_OF_PACKET))
     throw LowLevelError(Error::Write);
 }

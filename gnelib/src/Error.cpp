@@ -53,8 +53,13 @@ std::ostream& operator << (std::ostream& o, const GNE::Error& err) {
     UnknownObjectId,
     InvalidObjectPacket,
     InvalidCreationPacketType,
+    BufferUnderflow,
+    BufferOverflow,
+    InvalidBufferPosition,
+    InvalidBufferLimit,
     OtherGNELevelError,
-    OtherLowLevelError
+    OtherLowLevelError,
+    User
   };
 */
 
@@ -76,14 +81,19 @@ const std::string ErrorStrings[] = {
   "The remote end sent a connection close notice.",
   "Network error when trying to read from connection.",
   "Network error when trying to write to connection.",
-  "Unknown packet type encountered or corrupted data received -- possible additional data loss.",
+  "Unknown packet type encountered -- possible additional data loss.",
   "Packet type received does not match next packet type expected.",
   "An object with the given ID already exists.",
   "The given object ID does not match a known object.",
   "A packet of the wrong type was passed to the ObjectBroker.",
   "The packet ID is not registered as a valid object creation packet.",
+  "Buffer underflow error (attempt to read more bytes than available).",
+  "Buffer overflow error (attempt to write more bytes than the buffer can hold).",
+  "An invalid value for position was given to Buffer::setPosition",
+  "An invalid value for limit was given to Buffer::setLimit",
   "Other GNE (not a low-level network) error.",
-  "Low-level HawkNL error:"
+  "Low-level HawkNL error:",
+  "User-defined Error"
 };
 
 Error::Error(ErrorCode ec) : code(ec) {

@@ -21,9 +21,9 @@
  */
 
 #include "Packet.h"
+#include "Buffer.h"
 
 namespace GNE {
-class RawPacket;
 
 /**
  * @ingroup midlevel
@@ -33,14 +33,14 @@ class RawPacket;
  * once.  It may not make sense to create a completely new packet type just
  * to send a few things one time.  This packet type will allow you to send
  * whatever you want.  Basically, CustomPacket is just a packet that contains
- * a RawPacket.  You can use the RawPacket to put in data and pull it out.
- * Remember RawPacket does endian and processor-type conversions for you.
+ * a Buffer.  You can use the Buffer to put in data and pull it out.
+ * Remember Buffer does endian and processor-type conversions for you.
+ *
+ * The maximum amount of data that can be stored in the CustomPacket is
+ * defined by its Buffer's capacity, which at the current time is 3 bytes
+ * smaller than Buffer::RAW_PACKET_LEN.
  *
  * See the documentation for Packet for more info on some of these functions.
- *
- * \bug unfortunately it is only possible to makeClone a CustomPacket that was
- *      was used for writing.  RawPacket doesn't know how much data it contains
- *      on reading -- this needs to be fixed someday.
  */
 class CustomPacket : public Packet {
 public: //typedefs
@@ -55,24 +55,37 @@ public:
   virtual ~CustomPacket();
 
   /**
+   * Returns the capacity of Buffers created by CustomPacket made for writing.
+   */
+  static int getMaxUserDataSize();
+
+  /**
    * The ID for this type of packet.
    */
   static const int ID;
 
   /**
-   * Returns the RawPacket for reading or writing.  If a RawPacket already
-   * exists through a call to getData or by a readPacket call, this method
-   * will create a new RawPacket ready for writing.\n
-   * This RawPacket will last until this object is destroyed or readPacket
-   * is called.
+   * Returns the Buffer for reading or writing.  You should not keep the
+   * returned reference longer than the packet's destruction, or a reset or
+   * readPacket call.
+   *
+   * When writing data to the buffer, do not call "flip" after writing data.
+   * The position should be left at the point after your last write call.
+   *
+   * After a CustomPacket has been read, and you are pulling data out of it,
+   * the position and the limit will be the number of bytes stored in this
+   * CustomPacket.  You need to call rewind or flip (at this point, both are
+   * equivalent) on the buffer before pulling data from it, or a buffer
+   * overflow exception will result.
    */
-  RawPacket& getData();
+  Buffer& getBuffer();
 
   /**
-   * This method resets the underlying data, and prepares it for write
-   * access.  Essentially, this method "recreates" the CustomPacket instance.
+   * If you want to reuse a CustomPacket after using it for reading or
+   * writing, you should call clear which will reset this object as if it were
+   * newly constructed with the default constructor.
    */
-  void reset();
+  void clear();
 
   /**
    * @see Packet::getSize()
@@ -80,46 +93,24 @@ public:
   virtual int getSize() const;
 
   /**
-   * Returns the maximum possible size of the user's data in this packet. Use
-   * this value rather than RawPacket::RAW_PACKET_LEN.  The value returned is
-   * the maximum size the hosted RawPacket can be.
+   * Writes a CustomPacket to the given Buffer.  Flip will be called on the
+   * Buffer then it will be written to the passed Buffer, so the final result
+   * will be an unchanged position, but limit == position.
    */
-  static int getMaxUserDataSize();
+  virtual void writePacket( Buffer& raw ) const;
 
   /**
-   * Writes the packet to the given RawPacket.  The RawPacket data should
-   * only have been used for writing since its creation or its last reset,
-   * since the length of the RawPacket is needed, and this is only known to
-   * RawPackets used for writing only.
+   * Reads a CustomPacket from the given Buffer.  The data in this packet
+   * will be erased and replaced by the new data.  Then flip is called on the
+   * Buffer, so position is 0 and the bytes this CustomPacket contains is the
+   * Buffer's limit.
    */
-  virtual void writePacket(RawPacket& raw) const;
-
-  /**
-   * Reads this packet from the given RawPacket.  The data in this packet
-   * will be destroyed and replaced by the new data.
-   */
-  virtual void readPacket(RawPacket& raw);
+  virtual void readPacket( Buffer& raw );
 
 private:
-  /**
-   * Deletes the RawPacket and our buffer, if needed.
-   */
-  void destroyData();
-
-  RawPacket* data;
-
-  /**
-   * If this is non-null, then the current RawPacket is using a buffer that
-   * we allocated, and we need to delete it.
-   */
-  gbyte* ourBuf;
-
-  /**
-   * We have to be copyable to work with SyncConnection.  When we are read in
-   * we know our contentLength at least until getData is called.  When this
-   * variable is -1 we do not know the size of the CustomPacket.
-   */
-  int contentLen;
+  //This may be changed to a Buffer* to conserve memory like the old CustomPacket
+  //did when it was using RawPacket.
+  mutable Buffer buf;
 };
 
 } //namespace GNE

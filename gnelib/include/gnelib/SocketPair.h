@@ -23,6 +23,7 @@
 #include "ConnectionStats.h"
 #include <nl.h>
 #include "gnetypes.h"
+#include "Buffer.h"
 
 namespace GNE {
 class Address;
@@ -72,22 +73,42 @@ public:
   ConnectionStats getStats(int reliable) const;
 
   /**
-   * Performs a low-level read on a socket.
+   * Performs a low-level read on a socket.  First, clear is called on the
+   * Buffer.  Then the read is performed.  The number of bytes read is set to
+   * be the new limit, and this number is returned.  The position is set to 0.
+   * Up get getCapacity bytes will be read.
+   *
+   * I do know that this is undeseriable functionality but these are the
+   * semantics that were used with the old RawPacket, and since SocketPair is
+   * an internal %GNE class, I kept the semantics.  Preferably, the rawRead
+   * and rawWrite functions should work based on getRemaining on the Buffer
+   * and act as if they are reading or writing bytes from the Buffers, so that
+   * their positions change.
+   *
    * @param reliable select which socket to perform read on.
    * @param buf data arrives in this buffer.
-   * @param bufSize the size of buf.
+   * @return number of bytes read, and the new limit for buf
    */
-  int rawRead(bool reliable, const gbyte* buf, int bufSize) const;
+  int rawRead(bool reliable, Buffer& buf) const;
 
   /**
-   * Performs a low-level wrote on a socket.
+   * Performs a low-level write on a socket.
+   *
+   * I do know that this is undeseriable functionality but these are the
+   * semantics that were used with the old RawPacket, and since SocketPair is
+   * an internal %GNE class, I kept the semantics.  Preferably, the rawRead
+   * and rawWrite functions should work based on getRemaining on the Buffer
+   * and act as if they are reading or writing bytes from the Buffers, so that
+   * their positions change.
+   *
    * @param reliable select which socket to perform the write on.  If their
    *                 is no unreliable socket, it is sent on the reliable one
    *                 instead.
-   * @param buf data to be sent.
-   * @param bufSize the size of data to be sent.
+   * @param buf data to be sent.  The data from the Buffer's 0 position to the
+   *  Buffer's current position is sent.
+   * @return number of bytes read.
    */
-  int rawWrite(bool reliable, const gbyte* buf, int bufSize) const;
+  int rawWrite(bool reliable, const Buffer& buf) const;
 
   /**
    * The reliable socket.

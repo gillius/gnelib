@@ -18,9 +18,13 @@
  */
 
 /**
- * exrawtest -- Basically a test of the RawPacket class.  Does show usage of the
- * RawPacket class, but the usage in this case because this is a test uses the
- * class in "hackish" ways.  The standard use of RawPackets is pretty trivial.
+ * exrawtest -- Basically a test of the Buffer class.  Does show usage of the
+ * Buffer class, but the usage in this case because this is a test uses the
+ * class in "hackish" ways.
+ *
+ * This is called rawtest because it used to test an old class called
+ * RawPacket (may it rest in peace), but now tests its superior child, Buffer,
+ * which is much safer to use and guards against buffer under and overflows.
  */
 
 #include <gnelib.h>
@@ -31,32 +35,32 @@ using namespace std;
 using namespace GNE;
 using namespace GNE::Console;
 
-int main(int argc, char* argv[]) {
-  initGNE(NO_NET, atexit);
-  initConsole();
-  Console::setTitle("GNE RawPacket Test");
-
+void endianTest() {
   gout << " * Now doing endian tests." << endl;
-  //Note: This code has nothing to do with the proper usage of RawPacket.
-  //It is meant ONLY as a test to make sure RawPacket is properly converting
+  //Note: This code has nothing to do with the proper usage of Buffer.
+  //It is meant ONLY as a test to make sure Buffer is properly converting
   //the the right endian format, and to discover this system's endian format.
   int x = 15;
   gout << "This system is little-endian: " << (((char*)&x)[0] == 15) << endl;
   gout << "This system is big-endian: " << (((char*)&x)[3] == 15) << endl;
-  //Now test to make sure RawPacket converts from the system to little.
-  RawPacket endianTest;
+
+  //Now test to make sure Buffer converts from the system to little.
+  Buffer endianTest;
   endianTest << x;
-  endianTest.reset();
+  endianTest.flip();
   gbyte t[4];
+
   //Read the integer we just wrote into a raw byte array.
   endianTest.readRaw(t, 4);
-  gout << "RawPacket must be in little-endian format." << endl;
-  gout << "RawPacket is in little-endian format: " << (t[0] == 15) << endl;
-  gout << "RawPacket is in big-endian format: " << (t[3] == 15) << endl;
+  gout << "Buffer must be in little-endian format." << endl;
+  gout << "Buffer is in little-endian format: " << (t[0] == 15) << endl;
+  gout << "Buffer is in big-endian format: " << (t[3] == 15) << endl;
   assert(t[0] == 15);
   gout << endl;
+}
 
-  gout << " * Now writing a RawPacket..." << endl;
+void multiTest() {
+  gout << " * Now writing a Buffer..." << endl;
 
   //Create some binary and string data.
   gbyte block[16] = {'a', 'b', 'a', 'a', 'c', 'a', 'd', 'a', 'e', '1', 'a',
@@ -64,19 +68,27 @@ int main(int argc, char* argv[]) {
   char nulls[10] = {'n', 'u', 'l', 'l', '\0', '\0', 't', 'e', 's', 't'};
   string nullsStr(nulls, 10);
 
-  RawPacket raw(NULL); //same as RawPacket raw().
+  Buffer raw;
   raw << (gint32)56 << "superlala" << (guint8)124 << (gint16)26
       << (gsingle)12.5 << (gdouble)123.4 << nullsStr;
   raw.writeRaw(block, 16);
   
-  gout << "Raw length: " << raw.getPosition() << endl;
-  gout << " should be: " << (sizeof(int) + 10 + sizeof(NLubyte) +
-                             sizeof(short) + sizeof(float) +
-                             sizeof(double) + nullsStr.size() + 1 + 16) << endl;
+  int shouldBeSize = (sizeof(int) + 10 + sizeof(NLubyte) +
+    sizeof(short) + sizeof(float) +
+    sizeof(double) + nullsStr.size() + 1 + 16);
 
-  gbyte* buffer = new gbyte[raw.getPosition()];
-  memcpy(buffer, raw.getData(), raw.getPosition());
-  RawPacket raw2(buffer);
+  gout << "Raw length: " << raw.getPosition() << endl;
+  gout << " should be: " << shouldBeSize << endl;
+  assert ( raw.getPosition() == shouldBeSize );
+
+  raw.flip();
+  assert ( raw.getPosition() == 0 );
+
+  Buffer raw2( raw ); //make a copy, just to test.
+  assert ( raw2.getPosition() == raw.getPosition() ||
+           raw2.getCapacity() == raw.getCapacity() ||
+           raw2.getLimit() == raw.getLimit() );
+
   gout << "Now reading from the same data..." << endl;
 
   //Create variables to read into that match those above.
@@ -103,6 +115,113 @@ int main(int argc, char* argv[]) {
   gout << "Data was of length: " << raw2.getPosition() << " (should be as above)" << endl;
   gout << "String1 length: " << b.length() << " (should be 9)" << endl;
   gout << "String2 length: " << g.length() << " (should be " << nullsStr.length() << ")" << endl;
+}
+
+void failTests() {
+  gout << " * Now testing fail cases..." << endl;
+  gout << " Tests passed: ";
+  //Let's make Buffer fail!
+
+  try {
+    Buffer tooSmall( 0 );
+    tooSmall << (guint32)15;
+  } catch ( Error& e ) {
+    assert ( e.getCode() == Error::BufferOverflow );
+    gout << "1 ";
+  }
+  try {
+    Buffer tooSmall( 1 );
+    tooSmall << (guint32)15;
+  } catch ( Error& e ) {
+    assert ( e.getCode() == Error::BufferOverflow );
+    gout << "2 ";
+  }
+  try {
+    Buffer tooSmall( 2 );
+    tooSmall << (guint32)15;
+  } catch ( Error& e ) {
+    assert ( e.getCode() == Error::BufferOverflow );
+    gout << "3 ";
+  }
+
+  Buffer justRight( 4 );
+  justRight << (guint32)15;
+  gout << "4 ";
+
+  justRight.flip();
+  guint32 temp;
+  justRight >> temp;
+  gout << "5 ";
+
+  try {
+    justRight >> temp;
+  } catch ( Error& e ) {
+    assert ( e.getCode() == Error::BufferUnderflow );
+    gout << "6 ";
+  }
+
+  Buffer limitTest;
+  limitTest.setLimit( 0 );
+  gout << "7a ";
+  try {
+    limitTest.setLimit( limitTest.getCapacity() + 1 );
+  } catch ( Error& e ) {
+    assert ( e.getCode() == Error::InvalidBufferLimit );
+    gout << "7b ";
+  }
+
+  try {
+    limitTest << "hello";
+  } catch ( Error& e ) {
+    assert ( e.getCode() == Error::BufferOverflow );
+    gout << "8 ";
+  }
+
+  limitTest.clear();
+  limitTest << "Hello";
+  assert( limitTest.getPosition() == Buffer::getSizeOf( "Hello" ) );
+  gout << "9a ";
+  try {
+    limitTest.setLimit( 3 );
+  } catch ( Error& e ) {
+    assert ( e.getCode() == Error::InvalidBufferLimit );
+    gout << "9b ";
+  }
+
+  Buffer posTest( 15 );
+  posTest.setPosition( 15 );
+  try {
+    posTest.setPosition( 16 );
+  } catch ( Error& e ) {
+    assert ( e.getCode() == Error::InvalidBufferPosition );
+    gout << "10 ";
+  }
+}
+
+int main(int argc, char* argv[]) {
+  initGNE(NO_NET, atexit);
+  initConsole();
+  Console::setTitle("GNE Buffer Test");
+
+  string during;
+  try {
+    during = "endianTest";
+    endianTest();
+
+    during = "multiTest";
+    multiTest();
+
+    during = "failTests";
+    failTests();
+
+  } catch ( Error& e ) {
+    gout << "UNCAUGHT EXCEPTION: " << e << endl;
+    gout << "  during: " << during << endl;
+
+  } catch ( ... ) {
+    gout << "UNCAUGHT EXCEPTION" << endl;
+    gout << "  during: " << during << endl;
+  }
   
   gout << "Press a key to continue: " << endl;
   getch();

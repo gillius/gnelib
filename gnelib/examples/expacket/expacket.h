@@ -33,18 +33,18 @@ public:
   static const int ID;
 
   int getSize() const {
-    return Packet::getSize() + RawPacket::getSizeOf(age) +
-      RawPacket::getSizeOf(firstName) + RawPacket::getSizeOf(lastName);
+    return Packet::getSize() + Buffer::getSizeOf(age) +
+      Buffer::getSizeOf(firstName) + Buffer::getSizeOf(lastName);
   }
 
-  void writePacket(RawPacket& raw) const {
+  void writePacket(Buffer& raw) const {
     assert(firstName.length() + 1 <= 10);
     assert(lastName.length() + 1 <= 20);
     Packet::writePacket(raw);
     raw << age << firstName << lastName;
   }
 
-  void readPacket(RawPacket& raw) {
+  void readPacket(Buffer& raw) {
     Packet::readPacket(raw);
     raw >> age >> firstName >> lastName;
   }
@@ -72,16 +72,16 @@ public:
     return Packet::getSize();
   }
 
-  void writePacket(RawPacket& raw) const {
+  void writePacket(Buffer& raw) const {
     Packet::writePacket(raw);
   }
 
-  void readPacket(RawPacket& raw) {
+  void readPacket(Buffer& raw) {
     Packet::readPacket(raw);
   }
 };
 
-const int UnknownPacket::ID = MIN_USER_ID + 1;
+const int ::UnknownPacket::ID = MIN_USER_ID + 1;
 
 void packetTest(const PersonPacket&, const PersonPacket&);
 void parseTest(const Packet&, const Packet&);

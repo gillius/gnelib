@@ -28,7 +28,7 @@
 #include "../include/gnelib/PacketStream.h"
 #include "../include/gnelib/ConnectionListener.h"
 #include "../include/gnelib/Packet.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 #include "../include/gnelib/Lock.h"
 
 namespace GNE {
@@ -205,9 +205,9 @@ SyncConnection& SyncConnection::operator >> (Packet& packet) {
   //fact that you can't copy the children to children w/o another operator.
   //This should be optimized in the future.  This new method will be easier
   //to optimize later to allow better optimizations.
-  RawPacket temp;
+  Buffer temp;
   recv->writePacket(temp);
-  temp.reset();
+  temp.flip();
   NLubyte dummy;
   temp >> dummy; //Skip the ID code.
   packet.readPacket(temp);

@@ -26,7 +26,7 @@
 #include "../include/gnelib/ServerConnectionListener.h"
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/EventThread.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 #include "../include/gnelib/Error.h"
 #include "../include/gnelib/Errors.h"
 #include "../include/gnelib/SocketPair.h"
@@ -193,8 +193,9 @@ void ServerConnection::doHandshake() {
 const int CRPLEN = 48;
 
 void ServerConnection::getCRP() {
-  gbyte crpBuf[64];
-  int check = sockets.rawRead(true, crpBuf, 64);
+  Buffer crp( 64 );
+
+  int check = sockets.rawRead(true, crp);
   if (check != CRPLEN) {
     if (check == NL_INVALID) {
       gnedbgo(1, "nlRead error when trying to get CRP.");
@@ -207,7 +208,6 @@ void ServerConnection::getCRP() {
   }
 
   //Now parse the CRP
-  RawPacket crp(crpBuf);
 
   //Check the header and versions.  These will throw exceptions if there is
   //a problem.
@@ -227,12 +227,12 @@ void ServerConnection::getCRP() {
 }
 
 void ServerConnection::sendRefusal() {
-  RawPacket ref;
+  Buffer ref;
   addHeader(ref);
   ref << gFalse;
   addVersions(ref);
 
-  int check = sockets.rawWrite(true, ref.getData(), (NLint)ref.getPosition());
+  int check = sockets.rawWrite(true, ref);
   //We don't check for error because if there we don't really care since we
   //are refusing the connection there is nothing else we can do, but we will
   //do it just for the logs.
@@ -243,7 +243,7 @@ void ServerConnection::sendRefusal() {
 }
 
 void ServerConnection::sendCAP() {
-  RawPacket cap;
+  Buffer cap;
   addHeader(cap);
   cap << gTrue;
   cap << params->cp.getInRate();
@@ -257,7 +257,7 @@ void ServerConnection::sendCAP() {
     cap << (gint32)-1;
   }
 
-  int check = sockets.rawWrite(true, cap.getData(), (NLint)cap.getPosition());
+  int check = sockets.rawWrite(true, cap);
   gnedbgo1(5, "Sent a CAP with %d bytes.", check);
   //The write should succeed and have sent all of our data.
   if (check != cap.getPosition())
@@ -265,10 +265,10 @@ void ServerConnection::sendCAP() {
 }
 
 void ServerConnection::getUnreliableInfo() {
-  gbyte* buf = new gbyte[64];
-  int check = sockets.rawRead(true, buf, 64);
+  Buffer raw( 64 );
+
+  int check = sockets.rawRead(true, raw);
   if (check != sizeof(gint32)) {
-    delete[] buf;
     if (check == NL_INVALID) {
       gnedbgo(1, "nlRead error when trying to get unreliable info.");
       throw LowLevelError(Error::Read);
@@ -279,7 +279,6 @@ void ServerConnection::getUnreliableInfo() {
     }
   }
 
-  RawPacket raw(buf);
   gint32 portNum;
   raw >> portNum;
   if (portNum < 0 || portNum > 65535) {
@@ -291,8 +290,6 @@ void ServerConnection::getUnreliableInfo() {
   uDest.setPort((int)portNum);
   NLaddress temp = uDest.getAddress();
   nlSetRemoteAddr(sockets.u, &temp);
-
-  delete[] buf;
 }
 
 void ServerConnection::doFailure( const SmartPtr< ServerConnectionListener >& l,

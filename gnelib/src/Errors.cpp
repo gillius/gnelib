@@ -65,7 +65,15 @@ std::string WrongGame::getWrongGame() const {
 }
 
 std::string WrongGame::toString() const {
-  return Error::toString() + " Their game name is " + gameName;
+  return Error::toString() + " Their game name is " + gameName + '.';
+}
+
+/*** UnknownPacket Implementation ***/
+
+std::string UnknownPacket::toString() const {
+  std::ostringstream ret;
+  ret << Error::toString() << " Unknown packet ID is " << type << '.';
+  return ret.str();
 }
 
 /*** ProtocolViolation Implementation ***/

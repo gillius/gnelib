@@ -24,20 +24,20 @@
 #include "WeakPtr.h"
 
 namespace GNE {
-class RawPacket;
+class Buffer;
 
 /**
  * @ingroup midlevel
  *
  * The base packet class, used for dealing with all types of packets at a
  * fundamental level.  All types of packets must inherit from this class to
- * be recognized by GNE.  GNE already implmenets some types of packets.
+ * be recognized by %GNE.  %GNE already implmenets some types of packets.
  *
  * When you create a new packet you MUST define your own versions of all
  * virtual functions or the program will fail.
  *
  * See the example expacket on how to properly derive from a Packet class, or
- * look at the code for the other GNE packets.
+ * look at the code for the other %GNE packets.
  */
 class Packet {
 public: //typedefs
@@ -52,8 +52,10 @@ public:
    * as a end-of-data marker or for sending some message that requires no
    * data, it is suggested that you simply derive a class from Packet that
    * adds no data, but has a unique ID so it can be "recognized" easier.
-   * @param id a number from PacketParser::MIN_USER_ID to 255.  GNE packet
-   *        id's are from 0 to MIN_USER_ID-1, inclusive.
+   *
+   * @param id a number from PacketParser::MIN_USER_ID to
+   *   PacketParser::MAX_USER_ID, inclusive.  %GNE packet id's are less than
+   *   MIN_USER_ID.
    */
   explicit Packet(int id = 0);
 
@@ -87,7 +89,7 @@ public:
    * Returns the current size of this packet in bytes.  When overloading this
    * function, call getSize on the parent class then add the sizes of your
    * additional variables.  If the size cannot be determined, then getSize
-   * should return a value <= RawPacket::RAW_PACKET_LEN but >= its possible
+   * should return a value <= Buffer::RAW_PACKET_LEN but >= its possible
    * size -- so in other words if the size cannot be determined, it should
    * return the largest possible size that given packet could be.  This is
    * discouraged as much as possible since GNE allocates packets in the data
@@ -96,25 +98,31 @@ public:
   virtual int getSize() const;
 
   /**
-   * Writes the packet to the given RawPacket.  You can continue writing more
-   * packets to the RawPacket after this method.  You must make sure there
-   * is enough space in the RawPacket to fit this new packet.  When
+   * Writes the packet to the given Buffer.  You can continue writing more
+   * packets to the Buffer after this method.  You must make sure there
+   * is enough space in the Buffer to fit this new packet.  When
    * overloading this function, call writePacket on the parent class then
    * write your own variables.
+   *
+   * No more than getSize() bytes may be written to the Buffer.
+   *
+   * This method is allowed to throw any subclass of Error.  Typically this
+   * only happens if accesses to Packet case a buffer overflow.
    */
-  virtual void writePacket(RawPacket& raw) const;
+  virtual void writePacket(Buffer& raw) const;
 
   /**
-   * Reads this packet from the given RawPacket.  When overloading this
+   * Reads this packet from the given Buffer.  When overloading this
    * function, call readPacket on the parent class then read your own
    * variables.
    *
-   * Note that the parser has already read the packet type from raw so it can
-   * create this packet, so it should not be re-read.  This object already
-   * knows its type from creation.  This is only relevant to the implemenation
-   * of the actual Packet class, and has no signifiance to derived classes.
+   * This method is allowed to throw any subclass of Error.  This can happen
+   * if accessing the Packet causes a buffer underflow, but an error might
+   * occur in the format or consistancy of the data for the user's derived
+   * class.  If you cannot construct a proper Packet of your type from the
+   * data in raw, then you should throw a subclass of Error.
    */
-  virtual void readPacket(RawPacket& raw);
+  virtual void readPacket(Buffer& raw);
 
   /**
    * Copy operator you can use to help you in creating your own.

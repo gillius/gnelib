@@ -20,7 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/Packet.h"
 #include "../include/gnelib/PacketParser.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 
 namespace GNE {
 
@@ -44,14 +44,15 @@ int Packet::getType() const {
 }
 
 int Packet::getSize() const {
-  return RawPacket::getSizeOf(type);
+  return Buffer::getSizeOf(type);
 }
 
-void Packet::writePacket(RawPacket& raw) const {
+void Packet::writePacket(Buffer& raw) const {
   raw << type;
 }
 
-void Packet::readPacket(RawPacket& raw) {
+void Packet::readPacket(Buffer& raw) {
+  //don't read type here, because our parser does this.
 }
 
 Packet& Packet::operator = (const Packet& rhs) {

@@ -20,7 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/PingPacket.h"
 #include "../include/gnelib/Packet.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 #include "../include/gnelib/Mutex.h"
 #include "../include/gnelib/Time.h"
 #include "../include/gnelib/Timer.h"
@@ -103,16 +103,16 @@ int PingPacket::reqsPending() {
 }
 
 int PingPacket::getSize() const {
-  return Packet::getSize() + RawPacket::getSizeOf(reqId) +
-    RawPacket::getSizeOf(T2) + RawPacket::getSizeOf(T3);
+  return Packet::getSize() + Buffer::getSizeOf(reqId) +
+    Buffer::getSizeOf(T2) + Buffer::getSizeOf(T3);
 }
 
-void PingPacket::writePacket(RawPacket& raw) const {
+void PingPacket::writePacket(Buffer& raw) const {
   Packet::writePacket(raw);
   raw << reqId << T2 << T3;
 }
 
-void PingPacket::readPacket(RawPacket& raw) {
+void PingPacket::readPacket(Buffer& raw) {
   Packet::readPacket(raw);
   raw >> reqId >> T2 >> T3;
 }

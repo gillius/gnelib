@@ -72,14 +72,14 @@ public:
   void setData( const Packet* packet );
 
   /**
-   * Writes the packet to the given RawPacket. 
+   * Writes the packet to the given Buffer. 
    */
-  virtual void writePacket(RawPacket& raw) const;
+  virtual void writePacket(Buffer& raw) const;
 
   /**
-   * Reads this packet from the given RawPacket.
+   * Reads this packet from the given Buffer.
    */
-  virtual void readPacket(RawPacket& raw);
+  virtual void readPacket(Buffer& raw);
 
   /**
    * Copies the given WrapperPacket into this one.  Calls Packet::operator=(

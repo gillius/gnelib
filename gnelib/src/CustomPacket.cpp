@@ -19,83 +19,60 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/CustomPacket.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Buffer.h"
 #include "../include/gnelib/Packet.h"
 
 namespace GNE {
 
 const int CustomPacket::ID = 1;
 
-CustomPacket::CustomPacket()
-: Packet(ID), data(NULL), ourBuf(NULL), contentLen(-1) {
+CustomPacket::CustomPacket() : Packet(ID), buf( getMaxUserDataSize() ) {
 }
 
-CustomPacket::CustomPacket( const CustomPacket& o )
-: Packet(ID), data(NULL), ourBuf(NULL), contentLen(-1) {
-  assert(o.data != NULL);
-  assert(o.data->getPosition() > 0 && o.data->getPosition() <= o.getMaxUserDataSize());
-
-  getData().writeRaw( o.data->getData(), o.data->getPosition() );
+CustomPacket::CustomPacket( const CustomPacket& o ) : Packet(ID), buf( o.buf ) {
 }
 
 CustomPacket::~CustomPacket() {
-  destroyData();
-}
-
-RawPacket& CustomPacket::getData() {
-  if (data == NULL) {
-    //create a new RawPacket for writing
-    data = new RawPacket();
-  }
-  //Once we let the user access the data, we are unsure of its length.
-  contentLen = -1;
-  return *data;
-}
-
-void CustomPacket::reset() {
-  destroyData();
-}
-
-int CustomPacket::getSize() const {
-  return Packet::getSize() + RawPacket::getSizeOf(guint16(0)) +
-    data->getPosition();
 }
 
 int CustomPacket::getMaxUserDataSize() {
   Packet packet;
-  return RawPacket::RAW_PACKET_LEN - packet.getSize() - sizeof(guint16);
+  return Buffer::RAW_PACKET_LEN - packet.getSize() - Buffer::getSizeOf( guint16(0) );
 }
 
-void CustomPacket::writePacket(RawPacket& raw) const {
-  assert(data != NULL);
-  //We might have a cached contentLen which we kept only to be 
-  int pos = (contentLen >= 0) ? contentLen : data->getPosition();
+Buffer& CustomPacket::getBuffer() {
+  return buf;
+}
+
+void CustomPacket::clear() {
+  buf.clear();
+}
+
+int CustomPacket::getSize() const {
+  return Packet::getSize() + Buffer::getSizeOf( guint16(0) ) + buf.getPosition();
+}
+
+void CustomPacket::writePacket( Buffer& raw ) const {
+  buf.flip();
+  int pos = buf.getRemaining();
+
   assert(pos > 0 && pos <= getMaxUserDataSize());
 
   Packet::writePacket(raw);
   raw << (guint16)pos;
-  raw.writeRaw(data->getData(), pos);
+
+  raw.writeBuffer( buf );
 }
 
-void CustomPacket::readPacket(RawPacket& raw) {
+void CustomPacket::readPacket( Buffer& raw ) {
   Packet::readPacket(raw);
-  destroyData();
+  buf.clear();
   
   guint16 temp;
   raw >> temp;
-  contentLen = (int)temp;
 
-  ourBuf = new gbyte[contentLen];
-  raw.readRaw(ourBuf, contentLen);
-  data = new RawPacket(ourBuf);
-}
-
-void CustomPacket::destroyData() {
-  delete[] ourBuf;
-  delete data;
-  ourBuf = NULL;
-  data = NULL;
-  contentLen = -1;
+  buf.writeBuffer( raw, (int)temp );
+  buf.setLimit( temp );
 }
 
 } //namespace GNE
