@@ -117,6 +117,10 @@ SOURCE=.\src\GNE.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\GNEDebug.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\ListServerConnection.cpp
 # End Source File
 # Begin Source File
@@ -213,6 +217,10 @@ SOURCE=.\src\GNE.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\GNEDebug.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\gneintern.h
 # End Source File
 # Begin Source File
@@ -299,6 +307,10 @@ SOURCE=.\Readme
 # Begin Source File
 
 SOURCE=.\readme.vc
+# End Source File
+# Begin Source File
+
+SOURCE=.\status.txt
 # End Source File
 # End Target
 # End Project
