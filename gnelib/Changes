@@ -1,3 +1,7 @@
+GNE 0.45 to current
+  Fixed a bug with an assert being outside of a guarded section and actually
+    causing errors it was supposed to fix.
+
 GNE 0.4 to 0.45
   Fixed a threading bug in the Connection class that needed mutexes that
     caused problems on shutdown and startup.

@@ -114,7 +114,7 @@ class ConnectionEventGenerator;
    * A string representation of the name of the library and the current
    * version.
    */
-  const std::string VER_STR = "GNE v0.45 alpha CVS";
+  const std::string VER_STR = "GNE v0.46 alpha CVS";
 
   /**
    * The low-level header size of a UDP header, which is used with the HawkNL

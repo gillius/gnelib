@@ -90,6 +90,7 @@ void ConnectionEventGenerator::run() {
 
 //##ModelId=3B07538100BD
 void ConnectionEventGenerator::reg(NLsocket socket, ReceiveEventListener* conn) {
+  assert(socket != NL_INVALID);
   mapCtrl.acquire();
   nlGroupAddSocket(group, socket);
   connections[socket] = conn;
@@ -101,8 +102,8 @@ void ConnectionEventGenerator::reg(NLsocket socket, ReceiveEventListener* conn) 
 //##ModelId=3B07538100DD
 void ConnectionEventGenerator::unreg(NLsocket socket) {
   assert(socket != NL_INVALID);
-  assert(connections.find(socket) != connections.end());
   mapCtrl.acquire();
+  assert(connections.find(socket) != connections.end());
   nlGroupDeleteSocket(group, socket);
   connections.erase(socket);
   mapCtrl.release();
