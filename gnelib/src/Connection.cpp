@@ -81,121 +81,121 @@ bool Connection::isConnected() const {
 
 //##ModelId=3B0753810083
 void Connection::disconnect() {
-	sync.acquire();
-	if (connecting || connected) {
-		//This is nessacary because we can't join on ps if it has already been
-		//  shutdown and/or never started
-		unreg(true, true);
-		gnedbgo2(2, "disconnecting r: %i, u: %i", sockets.r, sockets.u);
-		ps->shutDown();
-		ps->join();
-		onDisconnect();
-		sockets.disconnect();
-		connected = connecting = false;
-	}
-	sync.release();
+  sync.acquire();
+  if (connecting || connected) {
+    //This is nessacary because we can't join on ps if it has already been
+    //  shutdown and/or never started
+    unreg(true, true);
+    gnedbgo2(2, "disconnecting r: %i, u: %i", sockets.r, sockets.u);
+    ps->shutDown();
+    ps->join();
+    onDisconnect();
+    sockets.disconnect();
+    connected = connecting = false;
+  }
+  sync.release();
 }
 
 //##ModelId=3B0753810084
 void Connection::disconnectSendAll() {
-	if (connected) {
-		ps->waitToSendAll();
-		disconnect();
-	}
+  if (connected) {
+    ps->waitToSendAll();
+    disconnect();
+  }
 }
 
 //##ModelId=3BB4208C0104
 void Connection::onDisconnect() {
-	assert(eventListener != NULL);
-	eventListener->onDisconnect();
+  assert(eventListener != NULL);
+  eventListener->onDisconnect();
 }
 
 //##ModelId=3B0753810085
 void Connection::onFailure(const Error& error) {
-	assert(eventListener != NULL);
-	eventListener->onFailure(error);
+  assert(eventListener != NULL);
+  eventListener->onFailure(error);
 }
 
 //##ModelId=3BB4208C01E0
 void Connection::onError(const Error& error) {
-	assert(eventListener != NULL);
-	eventListener->onError(error);
+  assert(eventListener != NULL);
+  eventListener->onError(error);
 }
 
 //##ModelId=3B07538100AC
 void Connection::onReceive() {
-	assert(eventListener != NULL);
-	eventListener->onReceive();
+  assert(eventListener != NULL);
+  eventListener->onReceive();
 }
 
 //##ModelId=3B07538100AE
 void Connection::onDoneWriting() {
-	assert(eventListener != NULL);
-	eventListener->onDoneWriting();
+  assert(eventListener != NULL);
+  eventListener->onDoneWriting();
 }
 
 //##ModelId=3B07538100B0
 void Connection::onReceive(bool reliable) {
-	//Create buffer into a RawPacket
-	NLbyte* buf = new NLbyte[RawPacket::RAW_PACKET_LEN];
-	int temp = sockets.rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
-	if (temp == NL_INVALID) {
-		NLint error = nlGetError();
-		if (error == NL_MESSAGE_END) {
-			//in HawkNL 1.4b4 and later, this means that the connection was
-			//closed on the network-level because the client disconnected or
-			//has dropped.  Since we didn't get an "exit" packet, it's an error.
-			processError(Error::ConnectionDropped);
-		} else {
-			//This is some other bad error that we need to report
-			processError(Error::createLowLevelError().setCode(Error::Read));
-		}
-	} else if (temp == 0) {
-		//In HawkNL 1.4b3 and earlier, this _USED_ to mean that...
-		//This means the connection was closed on the network-level because
-		//remote computer has purposely closed or has dropped.
-		processError(Error::ConnectionDropped);
-	} else {
-		RawPacket raw(buf);
+  //Create buffer into a RawPacket
+  NLbyte* buf = new NLbyte[RawPacket::RAW_PACKET_LEN];
+  int temp = sockets.rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
+  if (temp == NL_INVALID) {
+    NLint error = nlGetError();
+    if (error == NL_MESSAGE_END) {
+      //in HawkNL 1.4b4 and later, this means that the connection was
+      //closed on the network-level because the client disconnected or
+      //has dropped.  Since we didn't get an "exit" packet, it's an error.
+      processError(Error::ConnectionDropped);
+    } else {
+      //This is some other bad error that we need to report
+      processError(Error::createLowLevelError().setCode(Error::Read));
+    }
+  } else if (temp == 0) {
+    //In HawkNL 1.4b3 and earlier, this _USED_ to mean that...
+    //This means the connection was closed on the network-level because
+    //remote computer has purposely closed or has dropped.
+    processError(Error::ConnectionDropped);
+  } else {
+    RawPacket raw(buf);
 		
 		//parse the packets and add them to the PacketStream
-		bool errorCheck;
-		Packet* next = NULL;
-		while ((next = PacketParser::parseNextPacket(errorCheck, raw)) != NULL) {
-			ps->addIncomingPacket(next);
-		}
-		delete[] buf;
+    bool errorCheck;
+    Packet* next = NULL;
+    while ((next = PacketParser::parseNextPacket(errorCheck, raw)) != NULL) {
+      ps->addIncomingPacket(next);
+    }
+    delete[] buf;
 		
 		//Start the event
-		if (errorCheck == false) {
-			//These are level 4 since the explicit event log is generated in onFailure
-			gnedbgo1(4, "Unknown packet encountered in a message that has %i bytes", temp);
-			processError(Error::UnknownPacket);
-		} else {
-			gnedbgo1(4, "onReceive event triggered, %i bytes recv", temp);
-			onReceive();
-		}
-	}
+    if (errorCheck == false) {
+      //These are level 4 since the explicit event log is generated in onFailure
+      gnedbgo1(4, "Unknown packet encountered in a message that has %i bytes", temp);
+      processError(Error::UnknownPacket);
+    } else {
+      gnedbgo1(4, "onReceive event triggered, %i bytes recv", temp);
+      onReceive();
+    }
+  }
 }
 
 //##ModelId=3BB4208C0280
 void Connection::processError(const Error& error) {
-	switch(error.getCode()) {
-		case Error::UnknownPacket:
-		case Error::Write:
-			gnedbgo1(1, "onError Event: %s", error.toString().c_str());
-			errorSync.acquire();
-			onError(error);
-			errorSync.release();
-			break;
-		default:
-			gnedbgo1(1, "onFailure Event: %s", error.toString().c_str());
-			errorSync.acquire();
-			onFailure(error);
-			errorSync.release();
-			disconnect();
-			break;
-	}
+  switch(error.getCode()) {
+  case Error::UnknownPacket:
+  case Error::Write:
+    gnedbgo1(1, "onError Event: %s", error.toString().c_str());
+    errorSync.acquire();
+    onError(error);
+    errorSync.release();
+    break;
+  default:
+    gnedbgo1(1, "onFailure Event: %s", error.toString().c_str());
+    errorSync.acquire();
+    onFailure(error);
+    errorSync.release();
+    disconnect();
+    break;
+  }
 }
 
 //##ModelId=3B075381004E
@@ -214,39 +214,34 @@ void Connection::Listener::onReceive() {
 
 //##ModelId=3B6E14AC0104
 void Connection::reg(bool reliable, bool unreliable) {
-	if (reliable && rlistener == NULL) {
-		assert(sockets.r != NL_INVALID);
-		rlistener = new Listener(*this, true);
-		eGen->reg(sockets.r, rlistener);
-		gnedbgo1(3, "Registered reliable socket %i", sockets.r);
-	}
-	if (unreliable && ulistener == NULL) {
-		assert(sockets.u != NL_INVALID);
-		ulistener = new Listener(*this, false);
-		eGen->reg(sockets.u, ulistener);
-		gnedbgo1(3, "Registered unreliable socket %i", sockets.u);
-	}
+  if (reliable && rlistener == NULL) {
+    assert(sockets.r != NL_INVALID);
+    rlistener = new Listener(*this, true);
+    eGen->reg(sockets.r, rlistener);
+    gnedbgo1(3, "Registered reliable socket %i", sockets.r);
+  }
+  if (unreliable && ulistener == NULL) {
+    assert(sockets.u != NL_INVALID);
+    ulistener = new Listener(*this, false);
+    eGen->reg(sockets.u, ulistener);
+    gnedbgo1(3, "Registered unreliable socket %i", sockets.u);
+  }
 }
 
 //##ModelId=3B6E14AC01D6
 void Connection::unreg(bool reliable, bool unreliable) {
-	if (reliable && rlistener != NULL) {
-		eGen->unreg(sockets.r);
-		delete rlistener;
-		rlistener = NULL;
-		gnedbgo1(3, "Unregistered reliable socket %i", sockets.r);
-	}
-	if (unreliable && ulistener != NULL) {
-		eGen->unreg(sockets.u);
-		delete ulistener;
-		ulistener = NULL;
-		gnedbgo1(3, "Unregistered unreliable socket %i", sockets.u);
-	}
+  if (reliable && rlistener != NULL) {
+    eGen->unreg(sockets.r);
+    delete rlistener;
+    rlistener = NULL;
+    gnedbgo1(3, "Unregistered reliable socket %i", sockets.r);
+  }
+  if (unreliable && ulistener != NULL) {
+    eGen->unreg(sockets.u);
+    delete ulistener;
+    ulistener = NULL;
+    gnedbgo1(3, "Unregistered unreliable socket %i", sockets.u);
+  }
 }
 
 } //Namespace GNE
-
-
-
-
-
