@@ -123,6 +123,9 @@ void ServerConnection::run() {
     gnedbgo2(2, "Starting onNewConn r: %i, u: %i", sockets.r, sockets.u);
     getListener()->onNewConn(sConn); //SyncConnection will relay this
     onNewConnFinished = true;
+
+    params->creator->onListenSuccess(origListener);
+
     finishedConnecting();
 
     //Start bringing connection to normal state.  SyncConnection will make
@@ -134,7 +137,9 @@ void ServerConnection::run() {
       try {
         sConn.endConnect(false);
       } catch (Error e) {
-        //The error might be re-reported, so we ignore it.
+        //The error might be re-reported, or at least we might get
+        //SyncConnectionReleased if the connection was refused, so we ignore
+        //this error.
       }
       params->creator->onListenFailure(e, rAddr, origListener);
       //We delete ourselves when we terminate since we were never seen by the

@@ -151,11 +151,19 @@ void ClientConnection::run() {
 
     } catch (Error e) {
       if (!onConnectFinished) {
-        if (ourSConn)
-          sConn.endConnect(false);
+        if (ourSConn) {
+          try {
+            sConn.endConnect(false);
+          } catch (Error e) {
+          }
+        }
         
         origListener->onConnectFailure(e);
       }
+
+      if (e.getCode() == Error::ConnectionRefused)
+        sConn.disconnect();
+
       if (ourSConn)
         delete params->sConnPtr;
 

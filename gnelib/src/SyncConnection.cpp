@@ -78,7 +78,6 @@ void SyncConnection::connect() throw (Error) {
 
 //##ModelId=3BC3CD6E02BD
 void SyncConnection::disconnect() throw (Error) {
-  assert(!isReleased());
   release();
   conn->disconnectSendAll();
 }
