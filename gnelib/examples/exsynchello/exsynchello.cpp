@@ -40,13 +40,16 @@ public:
   }
 
   virtual ~OurServer() {
-    gout << "ServerConnection instance killed" << endl << release;
+    gout << acquire << "ServerConnection instance killed" << endl << release;
   }
 
   void onDisconnect() { 
-    gout << acquire << "ServerConnection just disconnected." << endl;
+    gout << acquire;
+    gout << "ServerConnection just disconnected." << endl;
     if (!received)
-      gout << "  No message received." << endl << release;
+      gout << "  No message received." << endl;
+    gout << release;
+
     delete ourConn;
     delete this;
   }
@@ -55,20 +58,22 @@ public:
     ourConn = conn.getConnection();
     gout << acquire << "Connection received from "
          << conn.getConnection()->getRemoteAddress(true)
-         << "; waiting for message..." << endl;
+         << "; waiting for message..." << endl << release;
 
     try {
       HelloPacket message;
       conn >> message;
       received = true;
-      gout << "Got message: \"" << message.getMessage() << "\"" << endl;
+      gout << acquire << "Got message: \"" << message.getMessage() << "\""
+           << endl << release;
       
       HelloPacket response("Hello, client!  I'm the syncronous server!");
       conn << response;
-      gout << release;
     } catch (Error e) {
+      gout << acquire;
       gout << "An error occured during communications." << endl;
-      gout << "  The error was: " << e << endl << release;
+      gout << "  The error was: " << e << endl;
+      gout << release;
       throw;
     }
   }
@@ -104,29 +109,38 @@ void doClient(int outRate, int inRate, int port) {
     errorExit("Invalid address.");
   gout << "Connecting to: " << address << endl;
 
-  ClientConnection clientConn(ConnectionListener::getNullListener());
-  SyncConnection client(&clientConn);
-  try {
-    //Since only one client can exist, acquire and release is not needed on
-    //gout.
-    gout << "Opening client socket." << endl;
-    client.open(address);
-    gout << "Attempting to connect." << endl;
-    client.connect();
-    
-    gout << "Connection completed, sending message to server." << endl;
-    HelloPacket message("Hello, server!  I'm the syncronous client!");
-    client << message;
-
-    gout << "Waiting for message from server." << endl;
-    client >> message;
-    gout << "Received \"" << message.getMessage() << "\" from the server." << endl;
-    
-    gout << "Disconnecting." << endl;
-    client.disconnect();
-  } catch (Error e) {
-    gout << "An error occured while trying to communicate." << endl;
-    gout << "  The error was: " << e << endl;
+  //Uncomment the loop for a stress test.
+  for (int i=0; i<100; ++i) {
+    //We use pointers and new here only to allow the possibility for a for
+    //loop.  Without the loop there is no reason why these cannot be on the
+    //stack (auto variables).
+    ClientConnection* clientConn
+      = new ClientConnection(ConnectionListener::getNullListener());
+    SyncConnection& client = *(new SyncConnection(clientConn));
+    try {
+      //Since only one client can exist, acquire and release is not needed on
+      //gout.
+      gout << "Opening client socket." << endl;
+      client.open(address);
+      gout << "Attempting to connect." << endl;
+      client.connect();
+      
+      gout << "Connection completed, sending message to server." << endl;
+      HelloPacket message("Hello, server!  I'm the syncronous client!");
+      client << message;
+      
+      gout << "Waiting for message from server." << endl;
+      client >> message;
+      gout << "Received \"" << message.getMessage() << "\" from the server." << endl;
+      
+      gout << "Disconnecting." << endl;
+      client.disconnect();
+    } catch (Error e) {
+      gout << "An error occured while trying to communicate." << endl;
+      gout << "  The error was: " << e << endl;
+    }
+    delete &client;
+    delete clientConn;
   }
 }
 

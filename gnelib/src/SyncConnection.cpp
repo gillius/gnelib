@@ -125,7 +125,6 @@ void SyncConnection::doRelease() throw (Error) {
   if (!isReleased() && !connectMode) {
     //If we are not already released and we are not holding events
     gnedbgo1(2, "Releasing Connection %x", conn);
-    conn->setListener(oldListener);
     released = true;
     
     //Notify any receivers there was an error, and set release error if there
@@ -138,6 +137,7 @@ void SyncConnection::doRelease() throw (Error) {
     } else {
       recvNotify.broadcast(); //Let people waiting for data get the error.
       recvNotify.release();
+      conn->setListener(oldListener);
       throw currError;
     }
 
@@ -147,6 +147,12 @@ void SyncConnection::doRelease() throw (Error) {
       conn->onReceive();
     if (onDoneWritingEvent)
       conn->onDoneWriting();
+
+    //Then we can start the events up again knowing that if there was a
+    //failure that onDisconnect will go to the original listener.
+    conn->setListener(oldListener);
+    //From this point we cannot access conn as once onDisconnect is called
+    //conn could be deleted at any time.
   }
 }
 
@@ -250,18 +256,11 @@ void SyncConnection::onError(const Error& error) {
   onFailure(error);
 }
 
-/**
- * \bug This basically polls at the moment in the error thread and this is
- *      unacceptable.  Probably would need a ConditionVariable and a boolean
- *      flag to fix this.
- */
 //##ModelId=3BDB10A601FE
 void SyncConnection::onFailure(const Error& error) {
   setError(error);
-  //Pass on the onFailure event.  If release just happened, then the current
-  //listener will be the old one and will receive this event.
-  //We wait and pass on the failure this way in case we are in connectMode
-  conn->onFailure(error);
+  //Stop the event thread until release properly restarts it.
+  conn->setListener(NULL);
 }
 
 //##ModelId=3BDB10A6029E

@@ -47,6 +47,7 @@ public:
   ServerConnectionListener* creator;
   //##ModelId=3C5CED0502F2
   bool unrel;
+  //##ModelId=3C7059BF0112
   bool doJoin;
 };
 

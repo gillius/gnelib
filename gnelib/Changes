@@ -1,4 +1,6 @@
 GNE 0.45 to current
+  Fixed an event syncronization bug in SyncConnection that caused an assert
+    to fail in onDisconnect.
   Now if a listener for a Connection is NULL the event thread is halted
     until a listener is set.  Before, it was an error to have a NULL listener
     but now you can set a NULL listener to temporarily hold events.

@@ -69,7 +69,6 @@ void EventThread::setListener(ConnectionListener* listener) {
 
 //##ModelId=3C106F0203DC
 void EventThread::onDisconnect() {
-  assert(eventListener != NULL);
   gnedbgo(1, "onDisconnect Event triggered.");
   onDisconnectEvent = true;
   //We acquire the mutex to avoid the possiblity of a deadlock between the
@@ -81,7 +80,6 @@ void EventThread::onDisconnect() {
 
 //##ModelId=3C106F0203DD
 void EventThread::onFailure(const Error& error) {
-  assert(eventListener != NULL);
   gnedbgo1(1, "onFailure Event: %s", error.toString().c_str());
 
   eventSync.acquire();
@@ -92,7 +90,6 @@ void EventThread::onFailure(const Error& error) {
 
 //##ModelId=3C106F0203DF
 void EventThread::onError(const Error& error) {
-  assert(eventListener != NULL);
   gnedbgo1(1, "onError Event: %s", error.toString().c_str());
 
   eventSync.acquire();
@@ -103,7 +100,6 @@ void EventThread::onError(const Error& error) {
 
 //##ModelId=3C106F0203E1
 void EventThread::onReceive() {
-  assert(eventListener != NULL);
   gnedbgo(4, "onReceive event triggered.");
   onReceiveEvent = true;
 
@@ -114,7 +110,6 @@ void EventThread::onReceive() {
 
 //##ModelId=3C106F0203E2
 void EventThread::onDoneWriting() {
-  assert(eventListener != NULL);
   gnedbgo(4, "onDoneWriting event triggered.");
   onDoneWritingEvent = true;
 
