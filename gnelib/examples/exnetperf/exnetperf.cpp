@@ -56,44 +56,44 @@ const Pos& getNextPos() {
 //The PerfTester class works on both the client and the server side.
 class PerfTester : public ConnectionListener {
 public:
-	PerfTester(const Pos& ourPos2) : ourPos(ourPos2), conn(NULL) {}
+  PerfTester(const Pos& ourPos2) : ourPos(ourPos2), conn(NULL) {}
   ~PerfTester() {}
 
-	void onDisconnect() { 
-		delete this;
-	}
+  void onDisconnect() { 
+    delete this;
+  }
 
   void onConnect(SyncConnection& conn2) {
     mlprintf(ourPos.x, ourPos.y, "Connection accepted");
-		conn = conn2.getConnection();
+    conn = conn2.getConnection();
     writePackets(); //Send an initial batch of data.
   }
 
   void onNewConn(SyncConnection& conn2) {
     mlprintf(ourPos.x, ourPos.y, "Connection accepted");
-		conn = conn2.getConnection();
+    conn = conn2.getConnection();
     writePackets();
   }
 
-	void onReceive() {
-		delete conn->stream().getNextPacket();
+  void onReceive() {
+    delete conn->stream().getNextPacket();
     //We don't need to do anything to the data we are being sent.  The low-
     //level routines will keep track of the stats for us.
-	}
+  }
 
-	void onFailure(const Error& error) {
-		mlprintf(0, 0, "Socket failure: %s   ", error.toString().c_str());
+  void onFailure(const Error& error) {
+    mlprintf(0, 0, "Socket failure: %s   ", error.toString().c_str());
     //No need to disconnect, this has already happened on a failure.
-	}
+  }
 
-	void onError(const Error& error) {
-		mlprintf(0, 0, "Socket error: %s   ", error.toString().c_str());
-		conn->disconnect();//For simplicity we treat even normal errors as fatal.
-	}
+  void onError(const Error& error) {
+    mlprintf(0, 0, "Socket error: %s   ", error.toString().c_str());
+    conn->disconnect();//For simplicity we treat even normal errors as fatal.
+  }
 
   void onConnectFailure(const Error& error) {
     mprintf(0, 0, "Connection to server failed.   ");
-		mprintf(0, 1, "  GNE reported error: %s   ", error.toString().c_str());
+    mprintf(0, 1, "  GNE reported error: %s   ", error.toString().c_str());
   }
 
   void onDoneWriting() {
@@ -105,7 +105,7 @@ public:
   }
 private:
   Pos ourPos;
-	Connection* conn;
+  Connection* conn;
 };
 
 class OurListener : public ServerConnectionListener {
@@ -200,20 +200,20 @@ void doServer(int outRate, int inRate, int port) {
 
 void doClient(int outRate, int inRate, int port) {
 #ifdef _DEBUG
-	initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "client.log");
+  initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "client.log");
 #endif
   string host;
   gout << "Enter hostname or IP address: ";
   gin >> host;
 
-	Address address(host);
-	address.setPort(port);
-	if (!address)
-		errorExit("Invalid address.");
+  Address address(host);
+  address.setPort(port);
+  if (!address)
+    errorExit("Invalid address.");
   gout << "Connecting to: " << address << endl;
   gout << "Press a key to stop the testing. " << endl;
 
-	ClientConnection client(outRate, inRate, new PerfTester(getNextPos()));
+  ClientConnection client(outRate, inRate, new PerfTester(getNextPos()));
   if (client.open(address, 0)) //localPort = 0, for any local port.
     errorExit("Cannot open client socket.");
 
