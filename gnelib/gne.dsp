@@ -374,6 +374,10 @@ SOURCE=.\docs\gnereq.doc
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\mainpage
+# End Source File
+# Begin Source File
+
 SOURCE=.\Readme
 # End Source File
 # Begin Source File
