@@ -28,6 +28,7 @@ SocketPair::SocketPair(NLsocket reliable, NLsocket unreliable)
 }
 
 SocketPair::~SocketPair() {
+  disconnect();
 }
 
 void SocketPair::disconnect() {
