@@ -1,16 +1,14 @@
 # mingw specific makefile
 
-# check if MINGDIR has been set
-# under DOS/WIN, there's no easy way to figure the compiler dir out otherwise
-
-ifeq ($(MINGDIR),)
-patherror:
-   @echo Please specify your mingw32 directory via set MINGDIR=*
-endif
-
 # set up all the variables used in the main makefile
 
 CPP                  = g++
+CC                   = gcc
+
+CP                   = cp
+RM                   = rm -f
+MKDIR                = mkdir
+RMDIR                = rm -rf
 
 AR                   = ar
 
@@ -19,6 +17,7 @@ EXAMPLE_LIBS         = $(LIB_STATIC) -lNL -lwsock32 -lpthreadGC
 LDFLAGS              = -mthreads
 
 CPPFLAGS             = -Wall -O3 -s
+CFLAGS               = -Wall -O3 -s
 
 EXAMPLE_CPP          = $(wildcard examples/*/*.cpp)
 
@@ -29,9 +28,19 @@ EXE_MASK             = examples/%.exe
 EXAMPLE_EXE          = $(addprefix examples/,$(notdir $(EXAMPLE_O:.o=.exe)))
 
 LIB_CPP              = $(wildcard src/*.cpp)
+LIB_C                = $(wildcard src/*.c)
 
-LIB_O                = $(LIB_CPP:.cpp=.o)
+LIB_CPP_O            = $(LIB_CPP:.cpp=.o)
+LIB_C_O              = $(LIB_C:.c=.o)
+LIB_O                = $(LIB_CPP_O) $(LIB_C_O)
 
-LIB_STATIC           = src/libgnelib.a
+DEPENDENCIES         = $(LIB_O:.o=.d)
+
+LIB_STATIC_NAME      = libgnelib.a
+LIB_STATIC           = lib/mingw/$(LIB_STATIC_NAME)
 
 VPATH                = $(dir $(EXAMPLE_CPP))
+
+LIBDIR               = $(MINGDIR)/lib/
+
+INCDIR               = $(MINGDIR)/include/
