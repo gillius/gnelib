@@ -34,13 +34,13 @@ std::ostream& operator << (std::ostream& o, const GNE::Error& err) {
     UserHostVersionHigh,
     CouldNotOpenSocket,
     ConnectionTimeOut,
-		ConnectionDropped,
-		SyncConnectionReleased,
-		Read,
-		Write,
-		UnknownPacket,
-		PacketTypeMismatch,
-		OtherGNELevelError,
+    ConnectionDropped,
+    SyncConnectionReleased,
+    Read,
+    Write,
+    UnknownPacket,
+    PacketTypeMismatch,
+    OtherGNELevelError,
     OtherLowLevelError
   };
 */
@@ -55,13 +55,13 @@ const std::string ErrorStrings[] = {
   "The host has a later version of this game.",
   "Could not open a network connection, check to make sure you are connected to the network.",
   "Could not contact the host due to connection timeout.",
-	"Remote computer suddenly disconnected without warning, or dropped (TCP) (in pre-alpha GNE, this is expected for now...)",
-	"The operation was canceled because the SyncConnection is released.",
-	"Network error when trying to read from connection.",
-	"Network error when trying to write to connection.",
-	"Unknown packet type encountered or corrupted data received -- possible additional data loss.",
-	"Packet type received does not match next packet type expected.",
-	"Other GNE (not a low-level network) error.",
+  "Remote computer suddenly disconnected without warning, or dropped (TCP) (in pre-alpha GNE, this is expected for now...)",
+  "The operation was canceled because the SyncConnection is released.",
+  "Network error when trying to read from connection.",
+  "Network error when trying to write to connection.",
+  "Unknown packet type encountered or corrupted data received -- possible additional data loss.",
+  "Packet type received does not match next packet type expected.",
+  "Other GNE (not a low-level network) error.",
   "Low-level HawkNL error:"
 };
 
@@ -75,50 +75,45 @@ Error::~Error() {
 
 //##ModelId=3BAEC1A30053
 Error::ErrorCode Error::getCode() const {
-	return code;
+  return code;
 }
 
 //##ModelId=3BBA9D6E01E1
 const Error& Error::setCode(Error::ErrorCode newCode) {
-	code = newCode;
-	return *this;
+  code = newCode;
+  return *this;
 }
 
 //##ModelId=3BAEC1DF014A
 std::string Error::toString() const {
-	std::stringstream ret;
-	ret << ErrorStrings[code];
-	if (hawkError != NL_NO_ERROR && hawkError != NL_SOCKET_ERROR)
-		ret << " HawkNL error " << hawkError << ": " << nlGetErrorStr(hawkError);
-	if (sysError != 0)
-		ret << " System error " << sysError << ": " << nlGetSystemErrorStr(sysError);
-	return ret.str();
+  std::stringstream ret;
+  ret << ErrorStrings[code];
+  if (hawkError != NL_NO_ERROR && hawkError != NL_SOCKET_ERROR)
+    ret << " HawkNL error " << hawkError << ": " << nlGetErrorStr(hawkError);
+  if (sysError != 0)
+    ret << " System error " << sysError << ": " << nlGetSystemErrorStr(sysError);
+  return ret.str();
 }
 
 //##ModelId=3BAEC39201C2
 Error::operator bool() const {
-	return (code == NoError);
+  return (code == NoError);
 }
 
 //##ModelId=3BAEC74F0168
 bool Error::operator == (const ErrorCode& rhs) const {
-	return (code == rhs);
+  return (code == rhs);
 }
 
 //##ModelId=3BBA9D6E02BC
 Error Error::createLowLevelError() {
-	Error ret(Error::OtherLowLevelError);
-	NLenum error = nlGetError();
-	if (error == NL_SOCKET_ERROR || error == NL_SOCK_DISCONNECT)
-		ret.sysError = nlGetSystemError();
-	else
-		ret.hawkError = error;
-	return ret;
+  Error ret(Error::OtherLowLevelError);
+  NLenum error = nlGetError();
+  if (error == NL_SOCKET_ERROR || error == NL_SOCK_DISCONNECT)
+    ret.sysError = nlGetSystemError();
+  else
+    ret.hawkError = error;
+  return ret;
 }
 
 }
-
-
-
-
-
