@@ -1,4 +1,4 @@
-Examples for GNE
+Examples for GNE, in order of implementation, oldest first
 
 exthreads -- shows the basics of creating, starting, and syncronizing with
   threads.
@@ -10,3 +10,9 @@ exuptime -- Very small example using Timer::getCurrentTime, which uses the
 extimer -- Shows usage of the Timer class.
 
 exinput -- Shows usage of the Console class, also uses timers.
+
+exhello -- Everyone knows the "Hello World" program.  Perhaps it's been coded
+  too many times.  However, the GNE coders just plain don't care ;).
+  This is an example to show the minimum code needed to connect and send
+  data, in this case, "Hello Server (or Client)!" to the other end of the
+  connection.
