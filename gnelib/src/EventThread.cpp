@@ -82,7 +82,7 @@ void EventThread::setTimeout(int ms) {
   if (ms > INT_MAX / 1000)
     microsec = INT_MAX / 1000;
   else
-    microsec *= 1000;
+    microsec = ms * 1000;
 
   {
     LockMutex lock( timeSync );
