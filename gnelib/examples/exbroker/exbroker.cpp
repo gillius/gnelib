@@ -24,10 +24,10 @@
  * show and track the state of the ObjectBrokers while they interact.
  */
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 #include <string>
 #include <sstream>
-#include <assert.h>
+#include <cassert>
 
 using namespace std;
 
@@ -44,8 +44,8 @@ void successTest( const Packet& packet, ObjectBrokerClient& obc,
 void failTest( const Packet& packet, ObjectBrokerClient& obc,
                TextConsole& out );
 
-ObjectCreationPacket::pointer
-doSerializationTest( ObjectCreationPacket::pointer p );
+ObjectCreationPacket::sptr
+doSerializationTest( const ObjectCreationPacket::sptr& p );
 
 void registerObjects();
 void registerPackets();
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
   if (initGNE(NL_IP, atexit)) {
     exit(1);
   }
-  initConsole(atexit);
+  initConsole();
   setTitle("GNE ObjectBrokers Test/Example");
   registerPackets();
 
@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
   //should be destroyed.  You can treat p like a pointer, and it will handle
   //when the packet should be destroyed (specifically when the pointer and any
   //of its copies go out of scope).
-  ObjectCreationPacket::pointer p = obs.getCreationPacket( t );
+  ObjectCreationPacket::sptr p = obs.getCreationPacket( t );
   //This is strictly for testing, it writes the ObjectCreationPacket to a
   //RawPacket, reads back a new one, and returns a new packet.
   p = doSerializationTest( p );
@@ -88,12 +88,12 @@ int main(int argc, char* argv[]) {
   //test for errors later.
   t.setText( "Updated message." );
   bool updateText = true;
-  ObjectUpdatePacket::pointer updatePacket =
+  ObjectUpdatePacket::sptr updatePacket =
     obs.getUpdatePacket( t, (void*)&updateText );
 
   t.setPos( 20, 22 );
   updateText = false;
-  ObjectUpdatePacket::pointer updatePacket2 =
+  ObjectUpdatePacket::sptr updatePacket2 =
     obs.getUpdatePacket( t, (void*)&updateText );
 
   out << "Giving creation packet BEFORE registering that object type." << endl;
@@ -134,7 +134,7 @@ int main(int argc, char* argv[]) {
 
   out << "Now we will create a death packet from the object and process it, ";
   out << "which will destroy the object created earlier." << endl;
-  ObjectDeathPacket::pointer deathPacket = obs.getDeathPacket( t );
+  ObjectDeathPacket::sptr deathPacket = obs.getDeathPacket( t );
   obs.deregisterObject( t );
   assert( obc.numObjects() == 1 );
   assert( obs.numObjects() == 0 );
@@ -185,8 +185,8 @@ void failTest( const Packet& packet, ObjectBrokerClient& obc,
     out << "***** TEST FAILED! *****" << endl;
 }
 
-ObjectCreationPacket::pointer
-doSerializationTest( ObjectCreationPacket::pointer p ) {
+ObjectCreationPacket::sptr
+doSerializationTest( const ObjectCreationPacket::sptr& p ) {
   RawPacket raw;
 
   p->writePacket( raw );
@@ -197,7 +197,7 @@ doSerializationTest( ObjectCreationPacket::pointer p ) {
   Packet* newPacket = PacketParser::parseNextPacket( eop, raw );
   assert( newPacket != NULL );
 
-  return ObjectCreationPacket::pointer(
+  return ObjectCreationPacket::sptr(
     reinterpret_cast<ObjectCreationPacket*>( newPacket ) );
 }
 
@@ -207,10 +207,7 @@ void registerObjects() {
 }
 
 void registerPackets() {
-  PacketParser::registerPacket( (guint8)PositionedTextPacket::ID,
-    PositionedTextPacket::create );
-  PacketParser::registerPacket( (guint8)PositionedTextPositionUpdatePacket::ID,
-    PositionedTextPositionUpdatePacket::create );
-  PacketParser::registerPacket( (guint8)PositionedTextTextUpdatePacket::ID,
-    PositionedTextTextUpdatePacket::create );
+  defaultRegisterPacket< PositionedTextPacket               >();
+  defaultRegisterPacket< PositionedTextPositionUpdatePacket >();
+  defaultRegisterPacket< PositionedTextTextUpdatePacket     >();
 }

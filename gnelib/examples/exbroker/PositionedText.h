@@ -40,12 +40,9 @@ public:
   virtual ~PositionedTextPacket() {
   }
 
-  Packet* makeClone() const {
-    return new PositionedTextPacket( *this );
-  }
-
-  static Packet* create() {
-    return new PositionedTextPacket();
+  virtual int getSize() const {
+    return Packet::getSize() + RawPacket::getSizeOf( msg ) +
+           RawPacket::getSizeOf( x ) + RawPacket::getSizeOf( y );
   }
 
   void writePacket( RawPacket& raw ) const {
@@ -83,12 +80,8 @@ public:
   virtual ~PositionedTextPositionUpdatePacket() {
   }
 
-  Packet* makeClone() const {
-    return new PositionedTextPositionUpdatePacket( *this );
-  }
-
-  static Packet* create() {
-    return new PositionedTextPositionUpdatePacket();
+  virtual int getSize() const {
+    return Packet::getSize() +  RawPacket::getSizeOf( x ) + RawPacket::getSizeOf( y );
   }
 
   void writePacket( RawPacket& raw ) const {
@@ -124,12 +117,8 @@ public:
   virtual ~PositionedTextTextUpdatePacket() {
   }
 
-  Packet* makeClone() const {
-    return new PositionedTextTextUpdatePacket( *this );
-  }
-
-  static Packet* create() {
-    return new PositionedTextTextUpdatePacket();
+  virtual int getSize() const {
+    return Packet::getSize() + RawPacket::getSizeOf( msg );
   }
 
   void writePacket( RawPacket& raw ) const {
@@ -237,7 +226,7 @@ public:
   }
 
   virtual Packet* createDeathPacket() {
-    dead = true;
+    //server side only call
     return NULL;
   }
 
@@ -272,7 +261,8 @@ public:
 
   virtual void incomingDeathPacket( const Packet* packet ) {
     //Work for the object "dying" can be done in either this method, in the
-    //onDeregistration event, or some in both places.
+    //onDeregistration event, or some in both places.  This happens only for
+    //the client side.
   }
 
 private:
