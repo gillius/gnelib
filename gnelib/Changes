@@ -1,4 +1,6 @@
 GNE 0.003 to 0.4
+  Cleaned up exhello example.
+  Improved functions dealing with NLaddress, added GNE::addressToString.
   Fixed C callback in Thread so that Thread::run is now protected rather than
     public as it should be, and Thread::end is now private rather than
     public, as it very definately should be.

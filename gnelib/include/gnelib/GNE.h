@@ -53,9 +53,16 @@ class ConnectionEventGenerator;
 
   /**
    * Use this function to get the address of the default networking device on
-   * this system, if possible.
+   * this system, if possible.  The port in the resulting address will be
+	 * zero.
    */
   NLaddress getLocalAddress();
+
+	/**
+	 * Use this function to return a human-readable form of the given address.
+	 * The form will be xxx.xxx.xxx.xxx:ppppp for IP format addresses.
+	 */
+	std::string addressToString(NLaddress addr);
 
   /**
    * Exits from your main() function.  This should be used if you want any

@@ -42,8 +42,6 @@ using namespace GNE::PacketParser;
 
 void errorExit(const char* error);
 int getPort(const char* prompt);
-void displayAddress();
-string getAddressString(NLaddress addr);
 void doServer(int outRate, int inRate, int port);
 void doClient(int outRate, int inRate, int port);
 
@@ -121,7 +119,7 @@ public:
 	}
 
   void onNewConn() {
-    mprintf("Connection received from %s; waiting for message...\n", getAddressString(getRemoteAddress(true)).c_str());
+    mprintf("Connection received from %s; waiting for message...\n", addressToString(getRemoteAddress(true)).c_str());
 		quit.acquire();
 		quit.timedWait(5000);
 		quit.release();
@@ -190,7 +188,7 @@ int main(int argc, char* argv[]) {
   //It's okay to use iostreams instead of the Console functions when we are
   //only accessing the console from one thread.
 	cout << "GNE Basic Connections Example for " << GNE::VER_STR << endl;
-  displayAddress();
+  cout << "Local address: " << addressToString(getLocalAddress()) << endl;
   cout << "Should we act as the server, or the client?" << endl;
   cout << "Type 1 for client, 2 for server: ";
   int type;
@@ -227,24 +225,9 @@ int getPort(const char* prompt) {
   return port;
 }
 
-void displayAddress() {
-  NLaddress ourAddr = getLocalAddress();
-  char buf[NL_MAX_STRING_LENGTH];
-  nlAddrToString(&ourAddr, (NLbyte*)buf);
-  char* temp = strchr(buf, ':');
-  if (temp)
-    *temp = '\0';
-  cout << "Local address: " << buf << endl;
-}
-
-string getAddressString(NLaddress addr) {
-  char buf[NL_MAX_STRING_LENGTH];
-  nlAddrToString(&addr, (NLbyte*)buf);
-  return string(buf);
-}
-
 void doServer(int outRate, int inRate, int port) {
 #ifdef _DEBUG
+	//Generate debugging logs to server.log if in debug mode.
 	initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "server.log");
 #endif
   OurListener server(outRate, inRate);
@@ -253,7 +236,7 @@ void doServer(int outRate, int inRate, int port) {
   if (server.listen())
     errorExit("Cannot listen on server socket.");
 
-  cout << "Server is listening on: " << getAddressString(server.getLocalAddress()) << endl;
+  cout << "Server is listening on: " << addressToString(server.getLocalAddress()) << endl;
   cout << "Press a key to shutdown server." << endl;
   getch();
   //When the server class is destructed, it will stop listening and shutdown.
@@ -269,7 +252,7 @@ void doClient(int outRate, int inRate, int port) {
 
 	NLaddress temp;
 	nlGetAddrFromName((NLbyte*)host.c_str(), &temp);
-  cout << "Connecting to: " << getAddressString(temp) << ':' << port << endl;
+  cout << "Connecting to: " << addressToString(temp) << ':' << port << endl;
 
   OurClient client(outRate, inRate);
   if (client.open(host, port)) //let localPort take 0 default, for any local port.

@@ -76,7 +76,14 @@ NLaddress getLocalAddress() {
   NLsocket temp = nlOpen(0, NL_RELIABLE);
   nlGetLocalAddr(temp, &ret);
   nlClose(temp);
+	nlSetAddrPort(&ret, 0);
   return ret;
+}
+
+std::string addressToString(NLaddress addr) {
+  char buf[NL_MAX_STRING_LENGTH];
+  nlAddrToString(&addr, (NLbyte*)buf);
+  return std::string(buf);
 }
 
 int getBytesRead() {
