@@ -68,6 +68,7 @@ bool Connection::isConnected() const {
 
 //##ModelId=3B0753810083
 void Connection::disconnect() {
+	sync.acquire();
 	if (connected) {
 		//This is nessacary because we can't join on ps if it has already been
 		//  shutdown and/or never started
@@ -79,6 +80,7 @@ void Connection::disconnect() {
 		sockets.disconnect();
 		connected = false;
 	}
+	sync.release();
 }
 
 //##ModelId=3B0753810084
@@ -116,7 +118,7 @@ void Connection::onReceive(bool reliable) {
 	int temp = sockets.rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
 	if (temp == NL_INVALID) {
 		NLint error = nlGetError();
-		if (error == NL_MESSAGE_END || error == NL_SOCK_DISCONNECT) {
+		if (error == NL_MESSAGE_END) {
 			//in HawkNL 1.4b4 and later, this means that the connection was
 			//closed on the network-level because the client disconnected or
 			//has dropped.  Since we didn't get an "exit" packet, it's an error.
@@ -160,11 +162,15 @@ void Connection::processError(const Error& error) {
 		case Error::UnknownPacket:
 		case Error::Write:
 			gnedbgo1(1, "onError Event: %s", error.toString().c_str());
+			errorSync.acquire();
 			onError(error);
+			errorSync.release();
 			break;
 		default:
 			gnedbgo1(1, "onFailure Event: %s", error.toString().c_str());
+			errorSync.acquire();
 			onFailure(error);
+			errorSync.release();
 			disconnect();
 			break;
 	}

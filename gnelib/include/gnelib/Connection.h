@@ -272,6 +272,13 @@ private:
     bool reliable;
 
   };
+
+	/**
+	 * Used to keep some functions thread-safe.
+	 */
+	Mutex sync;
+	Mutex errorSync;
+
 	/**
 	 * Make ConnectionListener a friend so it can call our onRecieve(bool)
 	 * event, which will properly parse the packets.
