@@ -139,7 +139,7 @@ GNEProtocolVersionNumber getGNEProtocolVersion() {
   GNEProtocolVersionNumber ret;
   ret.version = 0;
   ret.subVersion = 0;
-  ret.build = 5;
+  ret.build = 6;
 
   return ret;
 }
