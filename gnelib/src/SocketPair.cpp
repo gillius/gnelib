@@ -117,8 +117,8 @@ int SocketPair::rawWrite(bool reliable, const gbyte* buf, int bufSize) const {
   NLsocket act;
   if (reliable)
     act = r;
-  else
-    act = u;
+  else //if u is invalid, send over r anyways.
+    act = (u != NL_INVALID) ? u : r;
   assert(act != NL_INVALID);
   return int(nlWrite(act, (NLvoid*)buf, (NLint)bufSize));
 }

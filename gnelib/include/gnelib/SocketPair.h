@@ -52,7 +52,7 @@ public:
 
   /**
    * Calls a low-level disconnect (nlClose) on both sockets, if they are not
-   * NL_INVALID.
+   * NL_INVALID, and then sets them to NL_INVALID.
    */
   //##ModelId=3BB2351603A2
   void disconnect();
@@ -96,7 +96,9 @@ public:
 
   /**
    * Performs a low-level wrote on a socket.
-   * @param reliable select which socket to perform read on.
+   * @param reliable select which socket to perform the write on.  If their
+   *                 is no unreliable socket, it is sent on the reliable one
+   *                 instead.
    * @param buf data to be sent.
    * @param bufSize the size of data to be sent.
    */
