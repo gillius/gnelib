@@ -74,14 +74,20 @@ void EventThread::setListener( const ConnectionListener::sptr& listener) {
 }
 
 int EventThread::getTimeout() const {
-  return (timeout.getuSec() / 1000);
+  return timeout.getTotalmSec();
 }
 
 void EventThread::setTimeout(int ms) {
+  int microsec;
+  if (ms > INT_MAX / 1000)
+    microsec = INT_MAX / 1000;
+  else
+    microsec *= 1000;
+
   {
     LockMutex lock( timeSync );
     if (ms != 0) {
-      timeout = Time(0, ms * 1000);
+      timeout = Time(0, microsec);
       nextTimeout = Timer::getAbsoluteTime() + timeout;
     } else {
       nextTimeout = timeout = Time();
