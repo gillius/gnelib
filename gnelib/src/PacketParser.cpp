@@ -87,7 +87,7 @@ Packet* parseNextPacket(bool& endOfPackets, RawPacket& raw) {
     ret->readPacket(raw);
     return ret;
   }
-	gnedbg1(1, "Unknown packet type %i received.  onFailure event should occur.", (int)nextId);
+  gnedbg1(1, "Unknown packet type %i received.  onFailure event should occur.", (int)nextId);
   return NULL;
 }
 

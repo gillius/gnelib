@@ -34,8 +34,8 @@ class OurServer;
 
 class HelloPacket : public Packet {
 public:
-	HelloPacket() : Packet(MIN_USER_ID) {}
-	HelloPacket(string message2) : Packet(MIN_USER_ID), message(message2) {}
+  HelloPacket() : Packet(MIN_USER_ID) {}
+  HelloPacket(string message2) : Packet(MIN_USER_ID), message(message2) {}
   virtual ~HelloPacket() {}
 
   Packet* makeClone() const {

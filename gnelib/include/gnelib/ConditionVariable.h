@@ -52,7 +52,7 @@ public:
   //##ModelId=3B07538003D0
   virtual ~ConditionVariable();
 
-	/**
+  /**
    * Locks the associated mutex for this condition variable.
    * @see Mutex#acquire()
    */

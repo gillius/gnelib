@@ -16,8 +16,8 @@ EXAMPLE_LIBS         = $(LIB_STATIC) -lNL -lwsock32 -lpthreadGC
 
 LDFLAGS              = -mthreads
 
-DEBUGFLAGS           = -g -D_DEBUG -W -Wall
-OPTIMIZEFLAGS        = -W -Wall -O3 -s
+DEBUGFLAGS           = -g -D_DEBUG -Wall
+OPTIMIZEFLAGS        = -Wall -O3 -s
 
 ifdef DEBUGMODE
 CPPFLAGS             = $(DEBUGFLAGS)

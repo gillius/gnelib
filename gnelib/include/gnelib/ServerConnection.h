@@ -39,13 +39,13 @@ public:
   /**
    * Intializes this class.
    * @see Connection#Connection(int, int, ConnectionListener*)
-	 * @param rsocket2 the reliable socket received from the accept command.
-	 * @param creator the ServerConnectionListener that created us, so that we
-	 *                may call its onListenFailure event.
+   * @param rsocket2 the reliable socket received from the accept command.
+   * @param creator the ServerConnectionListener that created us, so that we
+   *                may call its onListenFailure event.
    */
   //##ModelId=3B075381027A
   ServerConnection(int outRate, int inRate, ConnectionListener* listener, 
-		               NLsocket rsocket2, ServerConnectionListener* creator);
+                   NLsocket rsocket2, ServerConnectionListener* creator);
 
   //##ModelId=3B075381027E
   virtual ~ServerConnection();
@@ -53,21 +53,21 @@ public:
 protected:
   /**
    * This thread performs the connection process.  The thread will have
-	 * finished before onNewConn is called.  If the connection was successful,
-	 * detach(false) is called, else on failure detach(true) is called to
-	 * delete this object once ServerConnectionListener::onListenFailure
-	 * completes.
+   * finished before onNewConn is called.  If the connection was successful,
+   * detach(false) is called, else on failure detach(true) is called to
+   * delete this object once ServerConnectionListener::onListenFailure
+   * completes.
    */
   //##ModelId=3B0753810280
   void run();
 
 private:
-	/**
-	 * Used only while connecting to transmit an error if necessary.
-	 * @see run
-	 */
+  /**
+   * Used only while connecting to transmit an error if necessary.
+   * @see run
+   */
   //##ModelId=3BCFAE590227
-	ServerConnectionListener* ourCreator;
+  ServerConnectionListener* ourCreator;
 };
 
 }

@@ -78,7 +78,7 @@ private:
   int randSeed; 
 };
 
-const int NUM_STARS = 90;
+const int NUM_STARS = 80;
 Star* stars[NUM_STARS];
 
 int main(int argc, char* argv[]) {
@@ -104,6 +104,8 @@ int main(int argc, char* argv[]) {
 
   mlprintf(0, height-2, "Presumed width: %i and height %i.  Please press a key.", width, height);
 
+  //Normally this is a bad idea, because we cause 100% CPU usage in a busy
+  //wait loop, but exinput is also a test of the console I/O functions.
   while (!kbhit()) {}
   int ch = getch();
   

@@ -37,102 +37,102 @@ namespace GNE {
 //##ModelId=3BB927EB0186
 class Address {
 public:
-	/**
-	 * Creates a new Address, resolving the name in address if necessary.  The
-	 * format is the same as HawkNL's nlGetAddrFromName, for IP this format is
-	 * xxx.xxx.xxx.xxx:ppppp where ppppp is the optional port and
-	 * xxx.xxx.xxx.xxx can be a hostname, i.e.: n
-	 * localhost:1678\n
-	 * 129.21.138.180:5555\n
-	 * www.mozilla.com:80
-	 * www.hawksoft.com  (when port is empty, resulting port will be 0).\n
-	 * If no string is supplied, the default is 0.0.0.0:0.  Note that the name
-	 * resolution may take some time and this constructor will block.  If the
-	 * resolution failed, then the Address is not valid (!isValid()).
-	 * @see isValid()
-	 */
+  /**
+   * Creates a new Address, resolving the name in address if necessary.  The
+   * format is the same as HawkNL's nlGetAddrFromName, for IP this format is
+   * xxx.xxx.xxx.xxx:ppppp where ppppp is the optional port and
+   * xxx.xxx.xxx.xxx can be a hostname, i.e.: n
+   * localhost:1678\n
+   * 129.21.138.180:5555\n
+   * www.mozilla.com:80
+   * www.hawksoft.com  (when port is empty, resulting port will be 0).\n
+   * If no string is supplied, the default is 0.0.0.0:0.  Note that the name
+   * resolution may take some time and this constructor will block.  If the
+   * resolution failed, then the Address is not valid (!isValid()).
+   * @see isValid()
+   */
   //##ModelId=3BB933C4010E
   Address(std::string address);
 
-	/**
-	 * Alternate version for better implicit conversion
-	 */
+  /**
+   * Alternate version for better implicit conversion
+   */
   //##ModelId=3BB94B190168
   Address(const char* address = "0.0.0.0:0");
 
-	/**
-	 * Creates a new Address with the HawkNL NLaddress.
-	 */
+  /**
+   * Creates a new Address with the HawkNL NLaddress.
+   */
   //##ModelId=3BB974B402E4
-	Address(NLaddress address);
+  Address(NLaddress address);
 
   //##ModelId=3BB9282B0334
   ~Address();
 
-	/**
-	 * Does the same work as the constructor.
-	 */
+  /**
+   * Does the same work as the constructor.
+   */
   //##ModelId=3BB974B40384
-	void setAddressByName(std::string address);
+  void setAddressByName(std::string address);
 
-	/**
-	 * Returns the reverse DNS lookup based on this address.  This method will
-	 * block.  If the name doesn't exist, the IP address will be returned.
-	 * The port from this address will not be part of the name in either case.
-	 */
+  /**
+   * Returns the reverse DNS lookup based on this address.  This method will
+   * block.  If the name doesn't exist, the IP address will be returned.
+   * The port from this address will not be part of the name in either case.
+   */
   //##ModelId=3BBA41220208
-	std::string getNameByAddress() const;
+  std::string getNameByAddress() const;
 
-	/** 
-	 * Returns a copy of the actual HawkNL address struct.
-	 */
+  /** 
+   * Returns a copy of the actual HawkNL address struct.
+   */
   //##ModelId=3BB9282B0336
   NLaddress getAddress() const;
 
-	/**
-	 * Sets the address based on the given HawkNL address.
-	 */
+  /**
+   * Sets the address based on the given HawkNL address.
+   */
   //##ModelId=3BB9282B0371
   void setAddress(NLaddress address);
 
-	/**
-	 * Returns a string representation of this address in the format
-	 * xxx.xxx.xxx.xxx:ppppp, but if the port is 0, the colon and port number
-	 * are empty.
-	 */
+  /**
+   * Returns a string representation of this address in the format
+   * xxx.xxx.xxx.xxx:ppppp, but if the port is 0, the colon and port number
+   * are empty.
+   */
   //##ModelId=3BB92893038E
   std::string toString() const;
 
-	/**
-	 * Returns the port for this address.
-	 */
+  /**
+   * Returns the port for this address.
+   */
   //##ModelId=3BB94B1901D6
   int getPort() const;
 
-	/**
-	 * Sets the port for this address.  This is a number 0..65535.
-	 */
+  /**
+   * Sets the port for this address.  This is a number 0..65535.
+   */
   //##ModelId=3BB932340050
   void setPort(int port);
 
-	/**
-	 * Returns if this address is in a valid state.  And address will become
-	 * invalid if a name could not be resolved, or a port sent was out of range.
-	 */
+  /**
+   * Returns if this address is in a valid state.  And address will become
+   * invalid if a name could not be resolved, or a port sent was out of range.
+   */
   //##ModelId=3BB934B4015E
   bool isValid() const;
 
-	/**
-	 * Another method for testing isValid().
-	 * @see isValid()
-	 */
+  /**
+   * Another method for testing isValid().
+   * @see isValid()
+   */
   //##ModelId=3BB934C5010E
   operator bool() const;
 
-	/**
-	 * Tests if two addresses are equal based on the HawkNL function
-	 * nlCompareAddr.  This does not take validity into consideration.
-	 */
+  /**
+   * Tests if two addresses are equal based on the HawkNL function
+   * nlCompareAddr.  This does not take validity into consideration.
+   */
   //##ModelId=3BB934CC00BE
   bool operator ==(const Address& rhs) const;
 

@@ -89,19 +89,15 @@ int main(int argc, char* argv[]) {
   joe->detach(true); //But even if we detach after a thread ends it will
                      //still destroy itself.
 
-  //Sleep, measuring our sleep time two ways
-  clock_t start = clock();
+  //Sleep, measuring our sleep time
   Time lastTime = Timer::getCurrentTime();
 
   mprintf("Sleeping for 2459 milliseconds.\n");
   Thread::sleep(2459);
 
   Time diffTime = Timer::getCurrentTime();
-  clock_t finish = clock();
-  float sysNapTime = (float)(finish - start) / CLOCKS_PER_SEC;
   diffTime = diffTime - lastTime;
 
-  mprintf("System reports sleeping time of %f\n", sysNapTime);
   mprintf("GNE timers report sleeping time of %i microseconds (us)\n", diffTime.getTotaluSec());
   mprintf("Press a key to continue.\n");
   getch();

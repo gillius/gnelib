@@ -43,116 +43,116 @@ using namespace GNE::PacketParser;
 
 class OurClient : public ConnectionListener {
 public:
-	OurClient() : conn(NULL) {
-		mprintf("Client listener created.\n");
-	}
+  OurClient() : conn(NULL) {
+    mprintf("Client listener created.\n");
+  }
 
-	~OurClient() {
-		mprintf("Client listener destroyed.\n");
-	}
+  ~OurClient() {
+    mprintf("Client listener destroyed.\n");
+  }
 
-	void onDisconnect() { 
-		mprintf("Client just disconnected.\n");
+  void onDisconnect() { 
+    mprintf("Client just disconnected.\n");
     //This is an iffy practice.  If we do this, we have to be careful to
     //always note that each new connection we use this listener with gets
     //its own new copy which we don't destroy later.
-		delete this;
-	}
+    delete this;
+  }
 
-  void onConnect(SyncConnection& conn2) {
-		conn = conn2.getConnection();
+  void onConnect(SyncConnection& conn2) throw (Error) {
+    conn = conn2.getConnection();
     mprintf("Connection to server successful.\n");
   }
 
-	void onReceive() {
-		Packet* message = conn->stream().getNextPacket();
-		if (message->getType() == MIN_USER_ID) {
-			HelloPacket* helloMessage = (HelloPacket*)message;
-			mprintf("got message: \"");
-			mprintf(helloMessage->getMessage().c_str());
-			mprintf("\"\n");
-		} else
-			mprintf("got bad packet.\n");
-		delete message;
-	}
+  void onReceive() {
+    Packet* message = conn->stream().getNextPacket();
+    if (message->getType() == MIN_USER_ID) {
+      HelloPacket* helloMessage = (HelloPacket*)message;
+      mprintf("got message: \"");
+      mprintf(helloMessage->getMessage().c_str());
+      mprintf("\"\n");
+    } else
+      mprintf("got bad packet.\n");
+    delete message;
+  }
 
-	void onFailure(const Error& error) {
-		mprintf("Socket failure: %s\n", error.toString().c_str());
+  void onFailure(const Error& error) {
+    mprintf("Socket failure: %s\n", error.toString().c_str());
     //No need to disconnect, this has already happened on a failure.
-	}
+  }
 
-	void onError(const Error& error) {
-		mprintf("Socket error: %s\n", error.toString().c_str());
-		conn->disconnect();//For simplicity we treat even normal errors as fatal.
-	}
+  void onError(const Error& error) {
+    mprintf("Socket error: %s\n", error.toString().c_str());
+    conn->disconnect();//For simplicity we treat even normal errors as fatal.
+  }
 
   void onConnectFailure(const Error& error) {
     mprintf("Connection to server failed.\n");
-		mprintf("GNE reported error: %s\n", error.toString().c_str());
+    mprintf("GNE reported error: %s\n", error.toString().c_str());
   }
 private:
-	Connection* conn;
+  Connection* conn;
 };
 
 class OurServer : public ConnectionListener {
 public:
   OurServer() : conn(NULL), received(false) {
-		mprintf("Server listener created\n");
-	}
+    mprintf("Server listener created\n");
+  }
 
   virtual ~OurServer() {
-		mprintf("Server listener killed\n");
-	}
+    mprintf("Server listener killed\n");
+  }
 
-	void onDisconnect() { 
-		mprintf("ServerConnection just disconnected.\n");
-		if (!received)
-			mprintf("No message received.\n");
+  void onDisconnect() { 
+    mprintf("ServerConnection just disconnected.\n");
+    if (!received)
+      mprintf("No message received.\n");
     delete conn;
-		delete this;
-	}
+    delete this;
+  }
 
-  void onNewConn(SyncConnection& conn2) {
-		conn = conn2.getConnection();
+  void onNewConn(SyncConnection& conn2) throw (Error) {
+    conn = conn2.getConnection();
     mprintf("Connection received from %s; waiting for message...\n", conn->getRemoteAddress(true).toString().c_str());
   }
 
-	void onReceive() {
-		Packet* message = conn->stream().getNextPacket();
-		if (message->getType() == MIN_USER_ID) {
-			HelloPacket* helloMessage = (HelloPacket*)message;
-			mprintf("got message: \"");
-			mprintf(helloMessage->getMessage().c_str());
-			mprintf("\"\n");
-			received = true;
+  void onReceive() {
+    Packet* message = conn->stream().getNextPacket();
+    if (message->getType() == MIN_USER_ID) {
+      HelloPacket* helloMessage = (HelloPacket*)message;
+      mprintf("got message: \"");
+      mprintf(helloMessage->getMessage().c_str());
+      mprintf("\"\n");
+      received = true;
 
-			//Send Response
-			mprintf("  Sending Response...\n");
-			HelloPacket response("Hello, client!  I'm the event-driven server!");
-			conn->stream().writePacket(response, true);
-		} else
-			mprintf("got bad packet.\n");
-		delete message;
-	}
+      //Send Response
+      mprintf("  Sending Response...\n");
+      HelloPacket response("Hello, client!  I'm the event-driven server!");
+      conn->stream().writePacket(response, true);
+    } else
+      mprintf("got bad packet.\n");
+    delete message;
+  }
 
-	void onFailure(const Error& error) {
-		mprintf("Socket failure: %s\n", error.toString().c_str());
-	}
+  void onFailure(const Error& error) {
+    mprintf("Socket failure: %s\n", error.toString().c_str());
+  }
 
-	void onError(const Error& error) {
-		mprintf("Socket error: %s\n", error.toString().c_str());
-		conn->disconnect();
-	}
+  void onError(const Error& error) {
+    mprintf("Socket error: %s\n", error.toString().c_str());
+    conn->disconnect();
+  }
 
 private:
-	Connection* conn;
-	bool received;
+  Connection* conn;
+  bool received;
 };
 
 void OurListener::getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
-		inRate = 3200;
-    outRate = 3200;
-    listener = new OurServer();
+  inRate = 3200;
+  outRate = 3200;
+  listener = new OurServer();
 }
 
 int main(int argc, char* argv[]) {
@@ -162,19 +162,19 @@ int main(int argc, char* argv[]) {
 
 void doClient(int outRate, int inRate, int port) {
 #ifdef _DEBUG
-	initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "client.log");
+  initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "client.log");
 #endif
   string host;
   gout << "Enter hostname or IP address: ";
   gin >> host;
 
-	Address address(host);
-	address.setPort(port);
-	if (!address)
-		errorExit("Invalid address.");
+  Address address(host);
+  address.setPort(port);
+  if (!address)
+    errorExit("Invalid address.");
   gout << "Connecting to: " << address << endl;
 
-	ClientConnection client(outRate, inRate, new OurClient());
+  ClientConnection client(outRate, inRate, new OurClient());
   if (client.open(address, 0)) //localPort = 0, for any local port.
     errorExit("Cannot open client socket.");
 
@@ -183,15 +183,15 @@ void doClient(int outRate, int inRate, int port) {
   //if we did not call join, we would have called client.detach(false)
   //instead for true async connections.
 
-	//Check if our connection was successful.
-	if (client.isConnected()) {
-		
-		//Send our information
-		HelloPacket message("Hello, server!  I'm the event-driven client!");
-		client.stream().writePacket(message, true);
-		client.stream().waitToSendAll();
-		
-	}
+  //Check if our connection was successful.
+  if (client.isConnected()) {
+    
+    //Send our information
+    HelloPacket message("Hello, server!  I'm the event-driven client!");
+    client.stream().writePacket(message, true);
+    client.stream().waitToSendAll();
+    
+  }
 }
 
 

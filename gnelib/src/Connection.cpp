@@ -179,15 +179,15 @@ void Connection::onReceive(bool reliable) {
     processError(Error::ConnectionDropped);
   } else {
     RawPacket raw(buf);
-		
-		//parse the packets and add them to the PacketStream
+    
+    //parse the packets and add them to the PacketStream
     bool errorCheck;
     Packet* next = NULL;
     while ((next = PacketParser::parseNextPacket(errorCheck, raw)) != NULL) {
       ps->addIncomingPacket(next);
     }
     delete[] buf;
-		
+    
     //Start the event
     if (errorCheck == false) {
       //These are level 4 since the explicit event log is generated in onFailure

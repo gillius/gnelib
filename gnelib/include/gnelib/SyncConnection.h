@@ -61,64 +61,64 @@ class Packet;
 //##ModelId=3BC3C5B200BE
 class SyncConnection : public ConnectionListener {
 public:
-	/**
-	 * Creates a new SyncConnection.  Pass in the Connection that you want to
-	 * wrap.  See the details above for more information.
-	 */
+  /**
+   * Creates a new SyncConnection.  Pass in the Connection that you want to
+   * wrap.  See the details above for more information.
+   */
   //##ModelId=3BC3CB1703B6
-	SyncConnection(Connection* target);
+  SyncConnection(Connection* target);
 
-	/**
-	 * Destructs this SyncConnection, calling release() if necessary.  This
-	 * function is declared as being able to throw an Error object, but this
-	 * guaranteed not to fail if the SyncConnection is released already, since
-	 * the only error that can occur is one given by release.
-	 * @see release()
-	 */
+  /**
+   * Destructs this SyncConnection, calling release() if necessary.  This
+   * function is declared as being able to throw an Error object, but this
+   * guaranteed not to fail if the SyncConnection is released already, since
+   * the only error that can occur is one given by release.
+   * @see release()
+   */
   //##ModelId=3BC3CB1703B7
-	virtual ~SyncConnection() throw (Error);
+  virtual ~SyncConnection() throw (Error);
 
-	/**
-	 * Returns the underlying Connection.
-	 */
+  /**
+   * Returns the underlying Connection.
+   */
   //##ModelId=3BDB10A502A8
-	Connection* getConnection() const;
-
-	/**
-	 * Just like ClientConnection::open, this will open the port, ready for
-	 * connection.  If the open failed, an Error is thrown.
-	 * \nIt is important that the wrapped Connection is a ClientConnection, 
-	 * otherwise undefined behavior (likely a crash) will result.
-	 */
+  Connection* getConnection() const;
+  
+  /**
+   * Just like ClientConnection::open, this will open the port, ready for
+   * connection.  If the open failed, an Error is thrown.
+   * \nIt is important that the wrapped Connection is a ClientConnection, 
+   * otherwise undefined behavior (likely a crash) will result.
+   */
   //##ModelId=3BC3CD0902E4
-	void open(const Address& dest, int localPort = 0) throw (Error);
-
-	/**
-	 * Attempts to connect to the remote side, and waits for the connection to
-	 * complete, throwing an Error if it was unsuccessful.  Your event listener
-	 * will receive the onConnect event resulting from this -- it is not
-	 * repressed just like onDisconnect is not repressed.  Many times though,
+  void open(const Address& dest, int localPort = 0) throw (Error);
+  
+  /**
+   * Attempts to connect to the remote side, and waits for the connection to
+   * complete, throwing an Error if it was unsuccessful.  Your event listener
+   * will receive the onConnect event resulting from this -- it is not
+   * repressed just like onDisconnect is not repressed.  Many times though,
    * when using this method you won't have a need for onConnect, but if you
    * do create one, connect will wait until onConnect is finished.
-	 * \nIt is important that the wrapped Connection is a ClientConnection, 
-	 * otherwise undefined behavior (likely a crash) will result.
-	 */
+   * \nIt is important that the wrapped Connection is a ClientConnection, 
+   * otherwise undefined behavior (likely a crash) will result.
+   */
   //##ModelId=3BC3CD090320
-	void connect() throw (Error);
-
-	/**
-	 * Disconnects the underlying Connection.  It is best to use this function
-	 * instead of getConnection()->disconnect() because this will make sure
-	 * any pending writes will have completed through a call to release().
-	 */
+  void connect() throw (Error);
+  
+  /**
+   * Disconnects the underlying Connection.  It is best to use this function
+   * instead of getConnection()->disconnect() because this will make sure
+   * any pending writes will have completed through a call to release().
+   */
   //##ModelId=3BC3CD6E02BD
-	void disconnect() throw (Error);
-
-	/**
-	 * Releases this SyncConnection, returning the underlying Connection to its
-	 * previous event handler.  Once a SyncConnection has been released, then
-	 * it is essentially in an invalid state and should not be used anymore
-	 * (with the exception of the dtor, getConnection(), isReleased(), and
+  void disconnect() throw (Error);
+  
+  /**
+   * Releases this SyncConnection, returning the underlying Connection to its
+   * previous event handler.  Once a SyncConnection has been released, then
+   * it is essentially in an invalid state and should not be used anymore
+   * (with the exception of the dtor, getConnection(), isReleased(), and
    * this function).  This function throws an Error if some underlying
    * pending operations failed since the last call on this SyncConnection.\n
    * If release is called when the SyncConnection is already released, no
@@ -126,111 +126,111 @@ public:
    * onReceive will be called in the original listener after release if
    * necessary, and onDoneWriting will be called after release if any data
    * since writing packets 
-	 */
+   */
   //##ModelId=3BDB10A50316
-	void release() throw (Error);
-
-	/**
-	 * Returns true if release() has been called on this SyncConnection, and it
-	 * is not a valid object to use anymore.
-	 */
+  void release() throw (Error);
+  
+  /**
+   * Returns true if release() has been called on this SyncConnection, and it
+   * is not a valid object to use anymore.
+   */
   //##ModelId=3BDB10A50317
-	bool isReleased() const;
-
-	/**
-	 * Reads a packet from the connection.  You should provide an already
-	 * allocated packet whose Packet::readPacket function will be called.
-	 * There will be type checking performed before this call to make sure the
-	 * right packet is being read.  If there is a mismatch, an Error is thrown.
-	 * The passed packet is untouched, and the connection remains connected;
-	 * however, the data just received (the incorrect packet) is lost.
-	 * The connection will remain connected in this case.\n
-	 * An error is also thrown if a socket failure or error occurs since the
-	 * last interaction with this object.
-	 */
+  bool isReleased() const;
+  
+  /**
+   * Reads a packet from the connection.  You should provide an already
+   * allocated packet whose Packet::readPacket function will be called.
+   * There will be type checking performed before this call to make sure the
+   * right packet is being read.  If there is a mismatch, an Error is thrown.
+   * The passed packet is untouched, and the connection remains connected;
+   * however, the data just received (the incorrect packet) is lost.
+   * The connection will remain connected in this case.\n
+   * An error is also thrown if a socket failure or error occurs since the
+   * last interaction with this object.
+   */
   //##ModelId=3BC3CFE50014
   SyncConnection& operator >> (Packet& packet) throw (Error);
-
-	/**
-	 * Writes a Packet to the connection by placing it in the outgoing queue.
-	 * This method actually doesn't block like every other SyncConnection
-	 * method, but on a write there is no reason to block, since it will not
-	 * effect the logic of the code.  This allows for packet caching to improve
-	 * network performance, and allows you to perform reads while the
-	 * connection is still writing.  All of this is transparent to your logic,
-	 * though.  release() will block until all writes are completed, and the
-	 * destructor and disconnect() function call release() if needed.\n
-	 * An error is thrown if a socket failure or error occurs since the
-	 * last interaction with this object, or during this interaction.
-	 */
+  
+  /**
+   * Writes a Packet to the connection by placing it in the outgoing queue.
+   * This method actually doesn't block like every other SyncConnection
+   * method, but on a write there is no reason to block, since it will not
+   * effect the logic of the code.  This allows for packet caching to improve
+   * network performance, and allows you to perform reads while the
+   * connection is still writing.  All of this is transparent to your logic,
+   * though.  release() will block until all writes are completed, and the
+   * destructor and disconnect() function call release() if needed.\n
+   * An error is thrown if a socket failure or error occurs since the
+   * last interaction with this object, or during this interaction.
+   */
   //##ModelId=3BC3DBB000AA
   SyncConnection& operator << (const Packet& packet) throw (Error);
-
+  
 private:
-	/**
-	 * The event listeners for SyncConnection that will override the current
-	 * listener our connection has.
-	 */
+  /**
+   * The event listeners for SyncConnection that will override the current
+   * listener our connection has.
+   */
   //##ModelId=3BDB10A50353
-	void onNewConn(SyncConnection& newConn);
+  void onNewConn(SyncConnection& newConn) throw (Error);
   //##ModelId=3BDB10A6000A
-	void onConnect(SyncConnection& conn);
+  void onConnect(SyncConnection& conn) throw (Error);
   //##ModelId=3BDB10A60078
-	void onConnectFailure(const Error& error);
+  void onConnectFailure(const Error& error);
   //##ModelId=3BDB10A60122
-	void onDisconnect();
+  void onDisconnect();
   //##ModelId=3BDB10A60154
-	void onError(const Error& error);
+  void onError(const Error& error);
   //##ModelId=3BDB10A601FE
-	void onFailure(const Error& error);
+  void onFailure(const Error& error);
   //##ModelId=3BDB10A6029E
-	void onReceive();
+  void onReceive();
   //##ModelId=3C1081BC015B
   void onDoneWriting();
 
-	/**
-	 * A ConditionVariable we can wait on to wait for incoming data.
-	 */
+  /**
+   * A ConditionVariable we can wait on to wait for incoming data.
+   */
   //##ModelId=3BDB10A501CE
-	ConditionVariable recvNotify;
+  ConditionVariable recvNotify;
 
-	/**
-	 * Checks to see if an Error has occured, and if so, throws it.
-	 */
+  /**
+   * Checks to see if an Error has occured, and if so, throws it.
+   */
   //##ModelId=3BDB10A6029F
-	void checkError() throw (Error);
+  void checkError() throw (Error);
 
-	/**
-	 * Sets the error.
-	 */
+  /**
+   * Sets the error.
+   */
   //##ModelId=3BDB10A602DA
-	void setError(const Error& error);
+  void setError(const Error& error);
 
-	/**
-	 * Syncronization for the Error object and release.
-	 */
+  /**
+   * Syncronization for the Error object and release.
+   */
   //##ModelId=3BDB10A501D3
-	Mutex sync;
+  Mutex sync;
 
-	/**
-	 * The current error state of this connection.  Error::NoError if there is
-	 * no error.
-	 */
+  /**
+   * The current error state of this connection.  Error::NoError if there is
+   * no error.
+   */
   //##ModelId=3BDB10A501D8
-	Error currError;
+  Error currError;
 
-	/**
-	 * The underlying Connection.
-	 */
+  /**
+   * The underlying Connection.
+   */
   //##ModelId=3BDB10A50209
-	Connection* conn;
+  Connection* conn;
 
-	/**
-	 * The old listener for asyncronous communications that the Connection just
-	 * had.  If this is NULL, then this object has been released.
-	 */
+  /**
+   * The old listener for asyncronous communications that the Connection just
+   * had.  If this is NULL, then this object has been released.
+   */
   //##ModelId=3BDB10A5020E
-	ConnectionListener* oldListener;
+  ConnectionListener* oldListener;
 
   /**
    * If this is true, we have an outstanding unexplained onDoneWriting event
@@ -243,5 +243,3 @@ private:
 } // namespace GNE
 
 #endif /* SYNCCONNECTION_H_INCLUDED_C43C0621 */
-
-

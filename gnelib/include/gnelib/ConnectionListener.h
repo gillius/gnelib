@@ -62,13 +62,13 @@ public:
 
   /**
    * Event triggered after there is a successful connection.  The connection
-	 * process will not be considered complete until this function completes.
+   * process will not be considered complete until this function completes.
    * \nIf an error occurs then the connection needs to be killed, so conn can
    * throw its Error outside your function.  Catch it if you need to clean up
    * anything you were doing, but remember to rethrow it.
-	 * \nNote: Only ClientConnection generates this event.  The SyncConnection
-	 * is currently wrapped around a ClientConnection, and you should use
-	 * SyncConnection::getConnection to get the ClientConnection.
+   * \nNote: Only ClientConnection generates this event.  The SyncConnection
+   * is currently wrapped around a ClientConnection, and you should use
+   * SyncConnection::getConnection to get the ClientConnection.
    * \nYou should not release the SyncConnection.  You can still interact
    * with the PacketStream directly, though, but the events will be delayed
    * until this function completes.
@@ -79,12 +79,12 @@ public:
 
   /**
    * Event triggered when a connection failed.\n
-	 * After a connection failure, the connection is as if disconnect() was
-	 * called, therefore you cannot reconnect this connection instance.\n
-	 * Note that for this case, the event onDisconnect IS NOT CALLED, since
-	 * the Connection was never in a connected state.
-	 * \nNote: Only ClientConnection generates this event.
-	 * @see Connection::disconnect()
+   * After a connection failure, the connection is as if disconnect() was
+   * called, therefore you cannot reconnect this connection instance.\n
+   * Note that for this case, the event onDisconnect IS NOT CALLED, since
+   * the Connection was never in a connected state.
+   * \nNote: Only ClientConnection generates this event.
+   * @see Connection::disconnect()
    */
    //##ModelId=3BCA83920262
   virtual void onConnectFailure(const Error& error);
@@ -98,12 +98,12 @@ public:
    * \nIf an error occurs then the connection needs to be killed, so conn can
    * throw its Error outside your function.  Catch it if you need to clean up
    * anything you were doing, but remember to rethrow it.\n
-	 * Note: Only ServerConnection generates this function.  The SyncConnection
-	 * is currently wrapped around a ServerConnection, and you should use
-	 * SyncConnection::getConnection to get the ServerConnection.\n
+   * Note: Only ServerConnection generates this function.  The SyncConnection
+   * is currently wrapped around a ServerConnection, and you should use
+   * SyncConnection::getConnection to get the ServerConnection.\n
    * If the connection failed, though, the function
-	 * ServerConnectionListener::onListenFailure instead of this function is
-	 * called.
+   * ServerConnectionListener::onListenFailure instead of this function is
+   * called.
    * \nYou should not release the SyncConnection.  You can still interact
    * with the PacketStream directly, though, but the events will be delayed
    * until this function completes.
@@ -112,48 +112,48 @@ public:
   //##ModelId=3BCFAE5900AA
   virtual void onNewConn(SyncConnection& newConn) throw (Error);
 
-	/**
-	 * An event triggered when a socket is closing for any reason.  This event
-	 * is always called once and only once if a socket was connected.  At the
-	 * time this event is called, the sockets are still connected, so you can
-	 * get their address (for logging and/or reporting reasons), but you cannot
-	 * send any more data or receive any from this event.\n
-	 * onDisconnect will always be the last event called on this listener, so
-	 * you can destroy this object after onDisconnect is called and it is not
-	 * listening for any other connections.
-	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread per connection.  Therefore, no other
+  /**
+   * An event triggered when a socket is closing for any reason.  This event
+   * is always called once and only once if a socket was connected.  At the
+   * time this event is called, the sockets are still connected, so you can
+   * get their address (for logging and/or reporting reasons), but you cannot
+   * send any more data or receive any from this event.\n
+   * onDisconnect will always be the last event called on this listener, so
+   * you can destroy this object after onDisconnect is called and it is not
+   * listening for any other connections.
+   * \nThis event must be "non-blocking" -- like most GNE events -- as there
+   * is only a single event thread per connection.  Therefore, no other
    * events will be called until this function completes for this connection.
-	 * @see ~Connection()
-	 */
+   * @see ~Connection()
+   */
   //##ModelId=3BCA83BA02F8
   virtual void onDisconnect();
 
-	/**
-	 * This event is triggered when a non-fatal error occurs in a connection
-	 * that does not force the connection to close, for example an unknown
-	 * packet encounted is an error, but the connection can still proceed.\n
-	 * After this event is processed, connections resume normally.
-	 * Connection::disconnect() may also be called at this point if you wish
-	 * to terminate the connection anyways.
-	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread per connection.  Therefore, no other
+  /**
+   * This event is triggered when a non-fatal error occurs in a connection
+   * that does not force the connection to close, for example an unknown
+   * packet encounted is an error, but the connection can still proceed.\n
+   * After this event is processed, connections resume normally.
+   * Connection::disconnect() may also be called at this point if you wish
+   * to terminate the connection anyways.
+   * \nThis event must be "non-blocking" -- like most GNE events -- as there
+   * is only a single event thread per connection.  Therefore, no other
    * events will be called until this function completes for this connection.
-	 * @see onFailure()
-	 * @see disconnect()
+   * @see onFailure()
+   * @see disconnect()
    */
   //##ModelId=3BCA83C600B4
   virtual void onError(const Error& error);
 
   /**
    * This event is triggered when a fatal error occurs in a connection.
-	 * When a fatal error occurs, communications cannot contiune and the
-	 * socket will be disconnected.  An onDisconnect() event will occur
-	 * immediately after this event completes.  Most errors in GNE are fatal.
-	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread per connection.  Therefore, no other
+   * When a fatal error occurs, communications cannot contiune and the
+   * socket will be disconnected.  An onDisconnect() event will occur
+   * immediately after this event completes.  Most errors in GNE are fatal.
+   * \nThis event must be "non-blocking" -- like most GNE events -- as there
+   * is only a single event thread per connection.  Therefore, no other
    * events will be called until this function completes for this connection.
-	 * @see onError()
+   * @see onError()
    */
   //##ModelId=3BCA83C803A2
   virtual void onFailure(const Error& error);
@@ -164,8 +164,8 @@ public:
    * arrive during this event, it will be called again, so you don't have to
    * make sure they have all been processed (there is no sure way to do
    * that.).
-	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread per connection.  Therefore, no other
+   * \nThis event must be "non-blocking" -- like most GNE events -- as there
+   * is only a single event thread per connection.  Therefore, no other
    * events will be called until this function completes for this connection.
    */
   //##ModelId=3BCA83CF0208
@@ -175,8 +175,8 @@ public:
    * Event triggered when the write buffer was filled and is now empty.
    * Note that this does not mean that data is immediately ready to be sent
    * again -- there could still be a flow control delay.\n
-	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
-	 * is only a single event thread per connection.  Therefore, no other
+   * \nThis event must be "non-blocking" -- like most GNE events -- as there
+   * is only a single event thread per connection.  Therefore, no other
    * events will be called until this function completes for this connection.
    */
   //##ModelId=3BCA83D101F4
@@ -185,7 +185,5 @@ public:
 };
 
 } // namespace GNE
-
-
 
 #endif /* CONNECTIONLISTENER_H_INCLUDED_C43554C0 */

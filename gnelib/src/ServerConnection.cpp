@@ -29,18 +29,18 @@ namespace GNE {
 
 //##ModelId=3B075381027A
 ServerConnection::ServerConnection(int outRate, int inRate, 
-																	 ConnectionListener* listener, 
-																	 NLsocket rsocket2, 
-																	 ServerConnectionListener* creator)
+                                   ConnectionListener* listener, 
+                                   NLsocket rsocket2, 
+                                   ServerConnectionListener* creator)
 : Connection(outRate, inRate, listener), Thread("SrvrConn"),
 ourCreator(creator) {
-	gnedbgo(5, "created");
+  gnedbgo(5, "created");
   sockets.r = rsocket2;
 }
 
 //##ModelId=3B075381027E
 ServerConnection::~ServerConnection() {
-	gnedbgo(5, "destroyed");
+  gnedbgo(5, "destroyed");
 }
 
 /**
@@ -49,22 +49,22 @@ ServerConnection::~ServerConnection() {
 //##ModelId=3B0753810280
 void ServerConnection::run() {
   assert(sockets.r != NL_INVALID);
-	gnedbgo2(2, "connection r: %i, u: %i", sockets.r, sockets.u);
+  gnedbgo2(2, "connection r: %i, u: %i", sockets.r, sockets.u);
 
-	assert(eventListener != NULL);
-	connecting = true;
-	try {
-		SyncConnection sync(this);
+  assert(eventListener != NULL);
+  connecting = true;
+  try {
+    SyncConnection sync(this);
     eventListener->start();
-		reg(true, false);
-		ps->start();
-		//Do connection negotiaion here
-		getListener()->onNewConn(sync); //SyncConnection will relay this
-		sync.release();
+    reg(true, false);
+    ps->start();
+    //Do connection negotiaion here
+    getListener()->onNewConn(sync); //SyncConnection will relay this
+    sync.release();
     finishedConnecting();
-	} catch (Error e) {
-		ourCreator->onListenFailure(e, getRemoteAddress(true), getListener());
-	}
+  } catch (Error e) {
+    ourCreator->onListenFailure(e, getRemoteAddress(true), getListener());
+  }
 }
 
 }

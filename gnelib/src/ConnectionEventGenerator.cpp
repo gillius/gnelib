@@ -31,14 +31,14 @@ ConnectionEventGenerator::ConnectionEventGenerator()
   group = nlGroupCreate();
   assert(group != NL_INVALID);
   sockBuf = new NLsocket[NL_MAX_GROUP_SOCKETS];
-	gnedbgo(5, "created");
+  gnedbgo(5, "created");
 }
 
 //##ModelId=3B07538100BA
 ConnectionEventGenerator::~ConnectionEventGenerator() {
   nlGroupDestroy(group);
   delete[] sockBuf;
-	gnedbgo(5, "destroyed");
+  gnedbgo(5, "destroyed");
 }
 
 /**
@@ -56,30 +56,30 @@ void ConnectionEventGenerator::run() {
     while (connections.empty() && !shutdown) {
       mapCtrl.wait();
     }
-		mapCtrl.release();
+    mapCtrl.release();
     if (!shutdown) {
       int numsockets = nlPollGroup(group, NL_READ_STATUS, sockBuf, NL_MAX_GROUP_SOCKETS, 250);
-			if (numsockets != NL_INVALID) {
-				numsockets--;
-				for (; numsockets >= 0; numsockets--) {
-					mapCtrl.acquire();
-					std::map<NLsocket, ReceiveEventListener*>::iterator iter = connections.find(sockBuf[numsockets]);
-					//Check to make sure the listener didn't unregister while we were waiting.
-					if (iter != connections.end()) {
-						mapCtrl.release();
-						iter->second->onReceive();
-					} else
-						mapCtrl.release();
-				}
-			} else {
-				if (!(nlGetError() == NL_SOCKET_ERROR && nlGetSystemError() == 10004)) {
-					gnedbgo1(1, "%s", Error::createLowLevelError().toString().c_str());
-					assert(false);
-				} else
-					gnedbgo(1, "nlPollGroup call canceled (perhaps to do low-level socket close).  Trying again.");
-					//Else the call was canceled.  This is a bug in HawkNL I think, since cancellation
-				  //is different from an error.
-			}
+      if (numsockets != NL_INVALID) {
+        numsockets--;
+        for (; numsockets >= 0; numsockets--) {
+          mapCtrl.acquire();
+          std::map<NLsocket, ReceiveEventListener*>::iterator iter = connections.find(sockBuf[numsockets]);
+          //Check to make sure the listener didn't unregister while we were waiting.
+          if (iter != connections.end()) {
+            mapCtrl.release();
+            iter->second->onReceive();
+          } else
+            mapCtrl.release();
+        }
+      } else {
+        if (!(nlGetError() == NL_SOCKET_ERROR && nlGetSystemError() == 10004)) {
+          gnedbgo1(1, "%s", Error::createLowLevelError().toString().c_str());
+          assert(false);
+        } else
+          gnedbgo(1, "nlPollGroup call canceled (perhaps to do low-level socket close).  Trying again.");
+          //Else the call was canceled.  This is a bug in HawkNL I think, since cancellation
+          //is different from an error.
+      }
     }
   }
 }
@@ -91,7 +91,7 @@ void ConnectionEventGenerator::reg(NLsocket socket, ReceiveEventListener* conn) 
   connections[socket] = conn;
   mapCtrl.release();
   mapCtrl.signal(); //This will wake up the daemon thread if this is the first
-	                  // registered, and it is sleeping.
+                    // registered, and it is sleeping.
 }
 
 //##ModelId=3B07538100DD

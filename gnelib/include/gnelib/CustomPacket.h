@@ -90,9 +90,9 @@ public:
   //##ModelId=3C0B257E03CF
   virtual void readPacket(RawPacket& raw);
 
-	/**
-	 * Returns a new instance of this class.
-	 */
+  /**
+   * Returns a new instance of this class.
+   */
   //##ModelId=3C0B257E03D2
   static Packet* create();
 

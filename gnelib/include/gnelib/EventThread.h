@@ -62,23 +62,23 @@ public:
   //##ModelId=3C106F0203D6
   virtual ~EventThread();
 
-	/**
-	 * Returns the currently registered event Listener.  This can be useful to
-	 * delete your registered user right after disconnection, so you won't have
-	 * to keep track of the pointer after you allocate it.
-	 */
+  /**
+   * Returns the currently registered event Listener.  This can be useful to
+   * delete your registered user right after disconnection, so you won't have
+   * to keep track of the pointer after you allocate it.
+   */
   //##ModelId=3C106F0203D8
-	ConnectionListener* getListener() const;
-
-	/**
-	 * Sets a new event listener.  All new events will be sent to the new
-	 * listener.  If events are still being processed by the old listener, this
-	 * change will not affect those running events, however, depending on the
-	 * event it could block events for the new listener until it completes.
-	 * The passed listener cannot be NULL.
-	 */
+  ConnectionListener* getListener() const;
+  
+  /**
+   * Sets a new event listener.  All new events will be sent to the new
+   * listener.  If events are still being processed by the old listener, this
+   * change will not affect those running events, however, depending on the
+   * event it could block events for the new listener until it completes.
+   * The passed listener cannot be NULL.
+   */
   //##ModelId=3C106F0203DA
-	void setListener(ConnectionListener* listener);
+  void setListener(ConnectionListener* listener);
 
   /**
    * For more information about these events, see ConnectionListener.  The
@@ -86,7 +86,7 @@ public:
    * will essentially stop when onDisconnect completes.
    */
   //##ModelId=3C106F0203DC
-	void onDisconnect();
+  void onDisconnect();
 
   /**
    * For more information about these events, see ConnectionListener.
@@ -98,7 +98,7 @@ public:
    * For more information about these events, see ConnectionListener.
    */
   //##ModelId=3C106F0203DF
-	void onError(const Error& error);
+  void onError(const Error& error);
 
   /**
    * For more information about these events, see ConnectionListener.
@@ -112,13 +112,13 @@ public:
   //##ModelId=3C106F0203E2
   void onDoneWriting();
 
-	/**
-	 * Overrides Thread::shutDown so that the daemon thread will
-	 * be woken up since it might be waiting on a ConditionVariable.  Once it
+  /**
+   * Overrides Thread::shutDown so that the daemon thread will
+   * be woken up since it might be waiting on a ConditionVariable.  Once it
    * shuts down it should not be activated again.
-	 */
+   */
   //##ModelId=3C106F0203E3
-	void shutDown();
+  void shutDown();
 
   /**
    * Returns true if this EventThread was ever started at least once.
@@ -140,10 +140,10 @@ protected:
   void run();
 
 private:
-	//The listener for our events.  All on* events go here.  This is protected
-	//so ClientConnection can send events as well.
+  //The listener for our events.  All on* events go here.  This is protected
+  //so ClientConnection can send events as well.
   //##ModelId=3C106F1903BE
-	ConnectionListener* eventListener;
+  ConnectionListener* eventListener;
 
   //##ModelId=3C106F1903C3
   ConditionVariable eventSync;

@@ -43,89 +43,89 @@ public:
     UserHostVersionHigh,
     CouldNotOpenSocket,
     ConnectionTimeOut,
-		ConnectionDropped,
-		SyncConnectionReleased,
-		Read,
-		Write,
-		UnknownPacket,
-		PacketTypeMismatch,
-		OtherGNELevelError,
+    ConnectionDropped,
+    SyncConnectionReleased,
+    Read,
+    Write,
+    UnknownPacket,
+    PacketTypeMismatch,
+    OtherGNELevelError,
     OtherLowLevelError
   };
 
-	/**
-	 * Create a new object representing a certain error, given by the passed
-	 * ErrorCode.  If no error code is passed, NoError is assumed.
-	 */
+  /**
+   * Create a new object representing a certain error, given by the passed
+   * ErrorCode.  If no error code is passed, NoError is assumed.
+   */
   //##ModelId=3BAEC1A30050
   Error(ErrorCode ec = NoError);
 
   //##ModelId=3BAEC1A30051
   ~Error();
 
-	/**
-	 * Returns the error code for this error.
-	 */
+  /**
+   * Returns the error code for this error.
+   */
   //##ModelId=3BAEC1A30053
   ErrorCode getCode() const;
 
-	/**
-	 * Sets the error code for this error, useful after a call to
-	 * createLowLevelError() to specify a more appropriate high-level error
-	 * code.  The Error object still retains the low-level specific error
-	 * information.
-	 */
+  /**
+   * Sets the error code for this error, useful after a call to
+   * createLowLevelError() to specify a more appropriate high-level error
+   * code.  The Error object still retains the low-level specific error
+   * information.
+   */
   //##ModelId=3BBA9D6E01E1
-	const void setCode(ErrorCode newCode);
+  const void setCode(ErrorCode newCode);
 
-	/**
-	 * Returns a string description of this error.  When possible, the string
-	 * is "programmer-friendly," so you will probably want to only use this to
-	 * write a debug message or out to a log, and tell the user more about the
-	 * error.
-	 */
+  /**
+   * Returns a string description of this error.  When possible, the string
+   * is "programmer-friendly," so you will probably want to only use this to
+   * write a debug message or out to a log, and tell the user more about the
+   * error.
+   */
   //##ModelId=3BAEC1DF014A
   std::string toString() const;
 
-	/**
-	 * Returns error.getCode() != NoError, a handy shortcut so you can test for
-	 * error by if (error).
-	 */
+  /**
+   * Returns error.getCode() != NoError, a handy shortcut so you can test for
+   * error by if (error).
+   */
   //##ModelId=3BAEC39201C2
   operator bool() const;
 
-	/**
-	 * A handy shortcut for (error.getCode() == rhs).
-	 * @param rhs an errorCode to test with.
-	 */
+  /**
+   * A handy shortcut for (error.getCode() == rhs).
+   * @param rhs an errorCode to test with.
+   */
   //##ModelId=3BAEC74F0168
   bool operator == (const ErrorCode& rhs) const;
 
-	/**
-	 * Returns an error object with the error code OtherLowLevelError, but
-	 * retains specific error information from the HawkNL/winsock/sockets/etc
-	 * low-level library that was at the time this function was called.  The
-	 * additional information will be displayed along with the normal error
-	 * message given by toString().
-	 * @see setCode()
-	 */
+  /**
+   * Returns an error object with the error code OtherLowLevelError, but
+   * retains specific error information from the HawkNL/winsock/sockets/etc
+   * low-level library that was at the time this function was called.  The
+   * additional information will be displayed along with the normal error
+   * message given by toString().
+   * @see setCode()
+   */
   //##ModelId=3BBA9D6E02BC
-	static Error createLowLevelError(ErrorCode newCode = OtherLowLevelError);
+  static Error createLowLevelError(ErrorCode newCode = OtherLowLevelError);
 
 private:
   //##ModelId=3BAEC9C101CD
   ErrorCode code;
 
-	/**
-	 * A possible error code for HawkNL.
-	 */
-	NLint hawkError;
+  /**
+   * A possible error code for HawkNL.
+   */
+  NLint hawkError;
 
-	/**
-	 * A possible error code for the system given by HawkNL.
-	 */
+  /**
+   * A possible error code for the system given by HawkNL.
+   */
   //##ModelId=3BBA9D6E01E0
-	int sysError;
+  int sysError;
 };
 
 } // namespace GNE

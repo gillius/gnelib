@@ -1,4 +1,5 @@
 GNE 0.4 to Current
+  getch() doesn't busy-wait and cause 100% CPU usage under UNIX anymore.
   Fixed obscure and ironically small race condition while setting the
     connecting flags which could cause recursive deletions and onDisconnects.
     Ironic because out of all of the code, the condition only can occur

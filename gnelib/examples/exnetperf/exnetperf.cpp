@@ -58,8 +58,8 @@ const Pos& getNextPos() {
 //The PerfTester class works on both the client and the server side.
 class PerfTester : public ConnectionListener {
 public:
-  PerfTester(const Pos& ourPos2) : packetsIn(0), ourPos(ourPos2),
-    packetsOut(0), conn(NULL) {}
+  PerfTester(const Pos& ourPos2) : packetsIn(0),  packetsOut(0),
+                                   ourPos(ourPos2), conn(NULL) {}
   ~PerfTester() {}
 
   void onDisconnect() {
@@ -70,13 +70,13 @@ public:
     delete this;
   }
 
-  void onConnect(SyncConnection& conn2) {
+  void onConnect(SyncConnection& conn2) throw (Error) {
     serverSide = false;
     conn = conn2.getConnection();
     writePackets(); //Send an initial batch of data.
   }
 
-  void onNewConn(SyncConnection& conn2) {
+  void onNewConn(SyncConnection& conn2) throw (Error) {
     serverSide = true;
     conn = conn2.getConnection();
     conn2.release();

@@ -34,29 +34,29 @@ SocketPair::~SocketPair() {
 
 //##ModelId=3BB2351603A2
 void SocketPair::disconnect() {
-	if (r != NL_INVALID) {
-		nlClose(r);
-		r = NL_INVALID;
-	}
-	if (u != NL_INVALID) {
-		nlClose(u);
-		u = NL_INVALID;
-	}
+  if (r != NL_INVALID) {
+    nlClose(r);
+    r = NL_INVALID;
+  }
+  if (u != NL_INVALID) {
+    nlClose(u);
+    u = NL_INVALID;
+  }
 }
 
 //##ModelId=3BB2CB41030C
 Address SocketPair::getLocalAddress(bool reliable) const {
   NLaddress ret;
   if (reliable) {
-		if (r != NL_INVALID)
-			nlGetLocalAddr(r, &ret);
-		else
-			ret.valid = NL_FALSE;
+    if (r != NL_INVALID)
+      nlGetLocalAddr(r, &ret);
+    else
+      ret.valid = NL_FALSE;
   } else {
-		if (u != NL_INVALID)
-			nlGetLocalAddr(u, &ret);
-		else
-			ret.valid = NL_FALSE;
+    if (u != NL_INVALID)
+      nlGetLocalAddr(u, &ret);
+    else
+      ret.valid = NL_FALSE;
   }
   return Address(ret);
 }
@@ -65,15 +65,15 @@ Address SocketPair::getLocalAddress(bool reliable) const {
 Address SocketPair::getRemoteAddress(bool reliable) const {
   NLaddress ret;
   if (reliable) {
-		if (r != NL_INVALID)
-			nlGetRemoteAddr(r, &ret);
-		else
-			ret.valid = NL_FALSE;
+    if (r != NL_INVALID)
+      nlGetRemoteAddr(r, &ret);
+    else
+      ret.valid = NL_FALSE;
   } else {
-		if (u != NL_INVALID)
-			nlGetRemoteAddr(u, &ret);
-		else
-			ret.valid = NL_FALSE;
+    if (u != NL_INVALID)
+      nlGetRemoteAddr(u, &ret);
+    else
+      ret.valid = NL_FALSE;
   }
   return Address(ret);
 }
@@ -108,7 +108,7 @@ int SocketPair::rawRead(bool reliable, const NLbyte* buf, int bufSize) const {
     act = r;
   else
     act = u;
-	assert(act != NL_INVALID);
+  assert(act != NL_INVALID);
   return int(nlRead(act, (NLvoid*)buf, (NLint)bufSize));
 }
 
@@ -119,7 +119,7 @@ int SocketPair::rawWrite(bool reliable, const NLbyte* buf, int bufSize) const {
     act = r;
   else
     act = u;
-	assert(act != NL_INVALID);
+  assert(act != NL_INVALID);
   return int(nlWrite(act, (NLvoid*)buf, (NLint)bufSize));
 }
 

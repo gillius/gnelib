@@ -36,22 +36,22 @@ using namespace GNE::PacketParser;
 class OurServer : public ConnectionListener {
 public:
   OurServer() : received(false) {
-		gout << acquire << "Server instance created" << endl << release;
-	}
+    gout << acquire << "Server instance created" << endl << release;
+  }
 
   virtual ~OurServer() {
-		gout << "ServerConnection instance killed" << endl << release;
-	}
+    gout << "ServerConnection instance killed" << endl << release;
+  }
 
-	void onDisconnect() { 
-		gout << acquire << "ServerConnection just disconnected." << endl;
-		if (!received)
-			gout << "  No message received." << endl << release;
+  void onDisconnect() { 
+    gout << acquire << "ServerConnection just disconnected." << endl;
+    if (!received)
+      gout << "  No message received." << endl << release;
     delete ourConn;
-		delete this;
-	}
+    delete this;
+  }
 
-  void onNewConn(SyncConnection& conn) {
+  void onNewConn(SyncConnection& conn) throw (Error) {
     ourConn = conn.getConnection();
     gout << acquire << "Connection received from "
          << conn.getConnection()->getRemoteAddress(true)
@@ -75,11 +75,11 @@ public:
 private:
   //This is used only to delete the connection when it is disconnected.
   Connection* ourConn;
-	bool received;
+  bool received;
 };
 
 void OurListener::getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
-		inRate = 3200;
+    inRate = 3200;
     outRate = 3200;
     listener = new OurServer();
 }
@@ -91,16 +91,16 @@ int main(int argc, char* argv[]) {
 
 void doClient(int outRate, int inRate, int port) {
 #ifdef _DEBUG
-	initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "client.log");
+  initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "client.log");
 #endif
   string host;
   gout << "Enter hostname or IP address: ";
   gin >> host;
 
-	Address address(host);
-	address.setPort(port);
-	if (!address)
-		errorExit("Invalid address.");
+  Address address(host);
+  address.setPort(port);
+  if (!address)
+    errorExit("Invalid address.");
   gout << "Connecting to: " << address << endl;
 
   ClientConnection clientConn(outRate, inRate, ConnectionListener::getNullListener());

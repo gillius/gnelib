@@ -93,8 +93,10 @@ int conio_kbhit () {
 }
 
 int conio_getch () {
-  while (cached == 0) {
-    conio_kbhit();
+  if (cached == 0) {
+    nodelay (stdscr, FALSE); //turn getch into a blocking call
+    cached_value = getch();
+    nodelay (stdscr, TRUE);  //return to original mode
   }
   cached = 0;
   //We need to do conversions when KEY_ENTER and KEY_BACKSPACE don't work

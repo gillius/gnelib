@@ -104,12 +104,12 @@ public:
   //##ModelId=3B07538101F9
   void waitToSendAll();
 
-	/**
-	 * Overrides Thread::shutDown so that the PacketStream daemon thread will
-	 * be woken up since it might be waiting on a ConditionVariable.
-	 */
+  /**
+   * Overrides Thread::shutDown so that the PacketStream daemon thread will
+   * be woken up since it might be waiting on a ConditionVariable.
+   */
   //##ModelId=3B8DC5D10096
-	void shutDown();
+  void shutDown();
 
   /**
    * Add the given packet to the incoming queue.  This is normalled used

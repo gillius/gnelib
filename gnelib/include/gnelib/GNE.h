@@ -36,7 +36,7 @@ class ConnectionEventGenerator;
    * Initalizes GNE and HawkNL.  Call this before using any HawkNL or GNE
    * functions.  Pass it the atexit function so shutdown will be called on
    * exit.  A call to any other GNE function before this function succeeds
-	 * is undefined.
+   * is undefined.
    * @param networkType a HawkNL network driver, such as NL_IP or NL_IPX
    * @return true if GNE or HawkNL could not be initalized.
    */
@@ -56,7 +56,7 @@ class ConnectionEventGenerator;
   /**
    * Use this function to get the address of the default networking device on
    * this system, if possible.  The port in the resulting address will be
-	 * zero.  The returned address is invalid if an error occured.
+   * zero.  The returned address is invalid if an error occured.
    */
   Address getLocalAddress();
 

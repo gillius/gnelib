@@ -46,15 +46,15 @@ public:
   //##ModelId=3B075381014C
   virtual ~Mutex();
 
-	/**
+  /**
    * Acquire the lock on a mutex, blocking if necessary.
    * 1. If the mutex is unlocked, lock it, and proceed.\n
-	 * 2. If the mutex is locked, wait for it to become unlocked,
+   * 2. If the mutex is locked, wait for it to become unlocked,
    *    then go to step 1.
-	 * Note that the Mutex class does not work recursively -- if a thread
-	 * tries to lock the same mutex twice, undefined results may occur if
-	 * the current platform does not support recursive mutexes.  Some platforms
-	 * such as the pthreads_win32 do support recursive mutexes, though.
+   * Note that the Mutex class does not work recursively -- if a thread
+   * tries to lock the same mutex twice, undefined results may occur if
+   * the current platform does not support recursive mutexes.  Some platforms
+   * such as the pthreads_win32 do support recursive mutexes, though.
    */
   //##ModelId=3B075381014E
   void acquire();

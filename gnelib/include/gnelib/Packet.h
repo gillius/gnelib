@@ -94,25 +94,25 @@ public:
   //##ModelId=3B075381015E
   virtual void readPacket(RawPacket& raw);
 
-	/**
-	 * Returns a new instance of this class.  This is used by the
-	 * PacketParser::registerPacket function as a callback to make new packets
-	 * to parse the data into.  If you derive a new packet type, you'll probably
-	 * want to register it, so you should create a create function of your own.
-	 */
+  /**
+   * Returns a new instance of this class.  This is used by the
+   * PacketParser::registerPacket function as a callback to make new packets
+   * to parse the data into.  If you derive a new packet type, you'll probably
+   * want to register it, so you should create a create function of your own.
+   */
   //##ModelId=3B089AE802BC
   static Packet* create();
 
-	/**
-	 * Copy operator you can use to help you in creating your own.
-	 * There is a debug assert in this function that checks to make sure the
-	 * types match.  Call this operator first from your copy operator.  Many
+  /**
+   * Copy operator you can use to help you in creating your own.
+   * There is a debug assert in this function that checks to make sure the
+   * types match.  Call this operator first from your copy operator.  Many
    * GNE packets may not support this operation, so check the documentation
    * first -- if no operator = exists, then assume you cannot copy packets
    * this way, unless the documentation says otherwise.
-	 */
+   */
   //##ModelId=3BDB10A500BE
-	Packet& operator = (const Packet& rhs);
+  Packet& operator = (const Packet& rhs);
 
   /**
    * The 32-bit timestamp for this packet.  You may use any system for

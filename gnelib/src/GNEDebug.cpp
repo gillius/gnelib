@@ -34,43 +34,43 @@ static Mutex* sync = NULL;
 static char* buf = NULL;
 
 bool initDebug(int levelMask, const char* fileName) {
-	dbgLevelMask = levelMask;
-	sync = new Mutex();
+  dbgLevelMask = levelMask;
+  sync = new Mutex();
 
-	buf = new char[512];
-	if (fileName == NULL) {
-		time_t now = time(NULL);
-		struct tm *t = localtime (&now);
-		strftime (buf, 100, "gne%H'%M'%S.log", t);
-	} else
-		strcpy(buf, fileName);
+  buf = new char[512];
+  if (fileName == NULL) {
+    time_t now = time(NULL);
+    struct tm *t = localtime (&now);
+    strftime (buf, 100, "gne%H'%M'%S.log", t);
+  } else
+    strcpy(buf, fileName);
 
-	logFile = fopen(buf, "wt");
-	if (!logFile)
-		return true;
-	else
-		return false;
+  logFile = fopen(buf, "wt");
+  if (!logFile)
+    return true;
+  else
+    return false;
 }
 
 void killDebug() {
-	if (logFile != NULL)
-		fclose(logFile);
-	delete[] buf;
-	delete sync;
+  if (logFile != NULL)
+    fclose(logFile);
+  delete[] buf;
+  delete sync;
 
-	logFile = NULL;
-	buf = NULL;
-	sync = NULL;
+  logFile = NULL;
+  buf = NULL;
+  sync = NULL;
 }
 
 void doTrace(int level, const char* fn, int lineno, const char* msg, ...) {
-	if (((dbgLevelMask & DLEVEL1) && level == 1) ||
-		  ((dbgLevelMask & DLEVEL2) && level == 2) ||
-			((dbgLevelMask & DLEVEL3) && level == 3) ||
-			((dbgLevelMask & DLEVEL4) && level == 4) ||
-			((dbgLevelMask & DLEVEL5) && level == 5)) {
-		va_list arg;  
-		va_start(arg, msg);
+  if (((dbgLevelMask & DLEVEL1) && level == 1) ||
+      ((dbgLevelMask & DLEVEL2) && level == 2) ||
+      ((dbgLevelMask & DLEVEL3) && level == 3) ||
+      ((dbgLevelMask & DLEVEL4) && level == 4) ||
+      ((dbgLevelMask & DLEVEL5) && level == 5)) {
+    va_list arg;  
+    va_start(arg, msg);
 
     //Get the current thread's name:
     Thread* currThr = Thread::currentThread();
@@ -82,26 +82,26 @@ void doTrace(int level, const char* fn, int lineno, const char* msg, ...) {
       thrName = "main";
     }
 
-		sync->acquire();
-		vsprintf(buf, msg, arg);
+    sync->acquire();
+    vsprintf(buf, msg, arg);
 
-		//Remove the path to the file, to conserve line width.
-		char* temp = strrchr(fn, '\\'); //Try Microsoft style path
-		if (temp == NULL) {
-			temp = strrchr(fn, '/');      //Try UNIX style path
-			if (temp == NULL)
-				temp = buf;                 //If all else fails...
-			else
-				temp++;
-		} else
-			temp++;
-		fprintf(logFile, "%30s, line %4i, thrd %8s: %s\n",
+    //Remove the path to the file, to conserve line width.
+    char* temp = strrchr(fn, '\\'); //Try Microsoft style path
+    if (temp == NULL) {
+      temp = strrchr(fn, '/');      //Try UNIX style path
+      if (temp == NULL)
+        temp = buf;                 //If all else fails...
+      else
+        temp++;
+    } else
+      temp++;
+    fprintf(logFile, "%30s, line %4i, thrd %8s: %s\n",
             temp, lineno, thrName.c_str(), buf);
-		fflush(logFile); //Try to be resiliant to errors.
-		sync->release();
+    fflush(logFile); //Try to be resiliant to errors.
+    sync->release();
 
-		va_end(arg);
-	}
+    va_end(arg);
+  }
 }
 
 }

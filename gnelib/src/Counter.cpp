@@ -39,7 +39,7 @@ void Counter::timerCallback() {
 
 //##ModelId=3B0753810118
 int Counter::getCount() {
-	return count;
+  return count;
 }
 
 //##ModelId=3B0753810119

@@ -36,12 +36,12 @@ const std::string Thread::DEF_NAME = "Thread";
 
 //##ModelId=3BB805C60186
 void* Thread::threadStart( void* thread ) {
-	Thread* thr = ( ( Thread* )( thread ) );
-	mapSync.acquire(); //This is to make sure the map is updated before we
-	mapSync.release(); //start running
-	thr->run();
-	thr->end();
-	return NULL;
+  Thread* thr = ( ( Thread* )( thread ) );
+  mapSync.acquire(); //This is to make sure the map is updated before we
+  mapSync.release(); //start running
+  thr->run();
+  thr->end();
+  return NULL;
 }
 
 //##ModelId=3B0753810376
@@ -123,9 +123,9 @@ void Thread::end() {
     sync.release();
     delete this;
   } else {
-		running = false;
+    running = false;
     sync.release();
-	}
+  }
 }
 
 //##ModelId=3B0753810388

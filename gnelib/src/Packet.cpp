@@ -25,7 +25,7 @@ namespace GNE {
 
 //##ModelId=3B0753810151
 Packet::Packet(int id) : type((NLubyte)id) {
-	timestamp = 0;
+  timestamp = 0;
 }
 
 //##ModelId=3B0753810153
@@ -64,10 +64,10 @@ Packet* Packet::create() {
 
 //##ModelId=3BDB10A500BE
 Packet& Packet::operator = (const Packet& rhs) {
-	//The type should already by the same
-	assert(type == rhs.type);
-	timestamp = rhs.timestamp;
-	return *this;
+  //The type should already by the same
+  assert(type == rhs.type);
+  timestamp = rhs.timestamp;
+  return *this;
 }
 
 }

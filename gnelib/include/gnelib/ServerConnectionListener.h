@@ -76,7 +76,7 @@ public:
 
   /**
    * Returns the address of the listening socket.  The socket must be opened
-	 * when this function is called, but does not have to be listening.
+   * when this function is called, but does not have to be listening.
    */
   //##ModelId=3B075381030D
   Address getLocalAddress() const;
@@ -87,43 +87,43 @@ protected:
    * called when the actual low-level listen fails (that error is returned
    * from listen), but instead high-level errors while connecting such as a
    * version mismatch are sent here.\n
-	 * This function may be called from multiple threads at the same time, and
-	 * may block if it wishes; it does not have the "non-blocking" restriction
-	 * most GNE events have.\n
-	 * If the connection failed very early, the address and listener parameters
-	 * will be NULL (this happens if the low-level accept() call fails).
+   * This function may be called from multiple threads at the same time, and
+   * may block if it wishes; it does not have the "non-blocking" restriction
+   * most GNE events have.\n
+   * If the connection failed very early, the address and listener parameters
+   * will be NULL (this happens if the low-level accept() call fails).
    * @param error the type of error
-	 * @param from the remote address the failed attempt came from
-	 * @param listener the unused ConnectionListener that was obtained from
-	 *                 getNewConnectionParams.  If it is NULL, then
-	 *                 getNewConnectionParams was never called.
+   * @param from the remote address the failed attempt came from
+   * @param listener the unused ConnectionListener that was obtained from
+   *                 getNewConnectionParams.  If it is NULL, then
+   *                 getNewConnectionParams was never called.
    */
   //##ModelId=3B075381030A
   virtual void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) = 0;
 
-	/**
-	 * A new connection is starting, and now we want the parameters for this
-	 * new connection.  The three parameters passed should be modified to give
-	 * the new connection's flow control parameters and listener.\n
-	 * The third parameter should be set to the initial event listener for the
-	 * ServerConnection that is being created.  This could be an entirely new
-	 * ConnectionListener or an already existing one, it doesn't matter.  The
-	 * returned listener cannot be NULL, since onNewConn must be called or a
-	 * memory leak will occur.\n
-	 * This pointer will be returned to you through the socket failure event
-	 * (in this case it was never used, but it is returned in case you need to
-	 * delete it).  If the connection is successful you can get your pointer
-	 * back through the resulting ServerConnection class by using
-	 * Connection::getListener.\n
-	 * This function can be called from multiple threads at the same time.\n
+  /**
+   * A new connection is starting, and now we want the parameters for this
+   * new connection.  The three parameters passed should be modified to give
+   * the new connection's flow control parameters and listener.\n
+   * The third parameter should be set to the initial event listener for the
+   * ServerConnection that is being created.  This could be an entirely new
+   * ConnectionListener or an already existing one, it doesn't matter.  The
+   * returned listener cannot be NULL, since onNewConn must be called or a
+   * memory leak will occur.\n
+   * This pointer will be returned to you through the socket failure event
+   * (in this case it was never used, but it is returned in case you need to
+   * delete it).  If the connection is successful you can get your pointer
+   * back through the resulting ServerConnection class by using
+   * Connection::getListener.\n
+   * This function can be called from multiple threads at the same time.\n
    * See Connection::Connection for more info about inRate and outRate.
-	 */
+   */
   //##ModelId=3BCFAE5A0064
-	virtual void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) = 0;
+  virtual void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) = 0;
 
 private:
-	//This is simply so that ServerConnection can call onListenFailure when it fails.
-	friend class ServerConnection;
+  //This is simply so that ServerConnection can call onListenFailure when it fails.
+  friend class ServerConnection;
 
   //##ModelId=3B075380034A
   class ServerListener : public ReceiveEventListener {

@@ -37,7 +37,7 @@ ServerConnectionListener::ServerConnectionListener()
 //##ModelId=3B0753810303
 ServerConnectionListener::~ServerConnectionListener() {
   if (listening) {
-		gnedbgo1(3, "Unregistering listen socket %i", socket);
+    gnedbgo1(3, "Unregistering listen socket %i", socket);
     GNE::eGen->unreg(socket);
     nlClose(socket);
   }
@@ -54,7 +54,7 @@ bool ServerConnectionListener::open(int port) {
 bool ServerConnectionListener::listen() {
   NLboolean ret = nlListen(socket);
   if (ret == NL_TRUE) {
-		gnedbgo1(3, "Registering listen socket %i", socket);
+    gnedbgo1(3, "Registering listen socket %i", socket);
     GNE::eGen->reg(socket, listener);
     listening = true;
     return false;
@@ -71,18 +71,18 @@ bool ServerConnectionListener::isListening() const {
 void ServerConnectionListener::onReceive() {
   NLsocket sock = nlAcceptConnection(socket);
   if (sock != NL_INVALID) {
-		int inRate, outRate;
-		ConnectionListener* listener;
-		getNewConnectionParams(inRate, outRate, listener);
+    int inRate, outRate;
+    ConnectionListener* listener;
+    getNewConnectionParams(inRate, outRate, listener);
 
-		ServerConnection* newConn = new ServerConnection(outRate, inRate, listener, sock, this);
-		gnedbgo2(4, "Spawning a new ServerConnection %x on socket %i", newConn, sock);
-		newConn->start();
-	} else {
-		Error err = Error::createLowLevelError();
-		gnedbgo1(1, "Listening failure (accept failed): %s", err.toString().c_str());
-		onListenFailure(err, NULL, NULL);
-	}
+    ServerConnection* newConn = new ServerConnection(outRate, inRate, listener, sock, this);
+    gnedbgo2(4, "Spawning a new ServerConnection %x on socket %i", newConn, sock);
+    newConn->start();
+  } else {
+    Error err = Error::createLowLevelError();
+    gnedbgo1(1, "Listening failure (accept failed): %s", err.toString().c_str());
+    onListenFailure(err, NULL, NULL);
+  }
 }
 
 //##ModelId=3B075381030D

@@ -81,8 +81,8 @@ public:
    * This function is virtual if the thread needs any additional actions to
    * notify itself to shutdown, for example if it is waiting for some event on
    * a ConditionVariable.\n
-	 * You will want to call this function from the override to make sure that
-	 * shutdown is set to true.\n
+   * You will want to call this function from the override to make sure that
+   * shutdown is set to true.\n
    * This function is safe to call multiple times, but you cannot undo a
    * shutdown once it call this once.
    */
@@ -188,12 +188,12 @@ protected:
   virtual void run() = 0;
 
 private:
-	/**
-	 * Internal Thread function for the pthread_start callback to start a new
-	 * thread and call run().
-	 */
+  /**
+   * Internal Thread function for the pthread_start callback to start a new
+   * thread and call run().
+   */
   //##ModelId=3BB805C60186
-	static void* threadStart(void* thread);
+  static void* threadStart(void* thread);
 
   /**
    * This function is called internally and automatically after run ends and
@@ -224,9 +224,9 @@ private:
   //##ModelId=3AE11D5F023A
   static std::map<pthread_t, Thread*> threads;
 
-	/**
-	 * Mutex for syncronizing threads
-	 */
+  /**
+   * Mutex for syncronizing threads
+   */
   //##ModelId=3BB805C6014B
   static Mutex mapSync;
 

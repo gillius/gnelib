@@ -35,31 +35,31 @@ class Address;
 //##ModelId=3BB2341D01FE
 class SocketPair {
 public:
-	/**
-	 * Initializes this object, with optional initial values for the sockets.\n
-	 * The value NL_INVALID should always be used for sockets that are not
-	 * active.
-	 */
+  /**
+   * Initializes this object, with optional initial values for the sockets.\n
+   * The value NL_INVALID should always be used for sockets that are not
+   * active.
+   */
   //##ModelId=3BB2348D0348
   SocketPair(NLsocket reliable = NL_INVALID, NLsocket unreliable = NL_INVALID);
 
-	/**
-	 * Since this is just a class to contain the sockets, the sockets are not
-	 * disconnected on exit.
-	 */
+  /**
+   * Since this is just a class to contain the sockets, the sockets are not
+   * disconnected on exit.
+   */
   //##ModelId=3BB2349B015E
   ~SocketPair();
 
-	/**
-	 * Calls a low-level disconnect (nlClose) on both sockets, if they are not
-	 * NL_INVALID.
-	 */
+  /**
+   * Calls a low-level disconnect (nlClose) on both sockets, if they are not
+   * NL_INVALID.
+   */
   //##ModelId=3BB2351603A2
   void disconnect();
 
   /**
    * Returns the local address of this connection.  If the requested socket
-	 * has not been opened, an Address is returned which is marked invalid.
+   * has not been opened, an Address is returned which is marked invalid.
    * @param reliable socket select
    */
   //##ModelId=3BB2CB41030C
@@ -67,7 +67,7 @@ public:
 
   /**
    * Returns the remote address of this connection, if it is connected,
-	 * otherwise, an Address is returned which is marked invalid.
+   * otherwise, an Address is returned which is marked invalid.
    * @param reliable socket select
    */
   //##ModelId=3BB2CB41037A
@@ -80,38 +80,38 @@ public:
    *                 If less than 0, returns cumulative stats for both.
    * @return various connection stats.
    * @see ConnectionStats
-	 * @see GNE::enableStats
+   * @see GNE::enableStats
    */
   //##ModelId=3C106F030036
   ConnectionStats getStats(int reliable) const;
 
-	/**
-	 * Performs a low-level read on a socket.
-	 * @param reliable select which socket to perform read on.
-	 * @param buf data arrives in this buffer.
-	 * @param bufSize the size of buf.
-	 */
+  /**
+   * Performs a low-level read on a socket.
+   * @param reliable select which socket to perform read on.
+   * @param buf data arrives in this buffer.
+   * @param bufSize the size of buf.
+   */
   //##ModelId=3B6B302400CA
   int rawRead(bool reliable, const NLbyte* buf, int bufSize) const;
 
-	/**
-	 * Performs a low-level wrote on a socket.
-	 * @param reliable select which socket to perform read on.
-	 * @param buf data to be sent.
-	 * @param bufSize the size of data to be sent.
-	 */
+  /**
+   * Performs a low-level wrote on a socket.
+   * @param reliable select which socket to perform read on.
+   * @param buf data to be sent.
+   * @param bufSize the size of data to be sent.
+   */
   //##ModelId=3B6B302401D6
   int rawWrite(bool reliable, const NLbyte* buf, int bufSize) const;
 
-	/**
-	 * The reliable socket.
-	 */
+  /**
+   * The reliable socket.
+   */
   //##ModelId=3BB2346A0208
   NLsocket r;
 
-	/**
-	 * The unreliable socket.
-	 */
+  /**
+   * The unreliable socket.
+   */
   //##ModelId=3BB234640280
   NLsocket u;
 };

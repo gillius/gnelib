@@ -69,11 +69,11 @@ public:
 
   /**
    * Returns the position in the buffer from 0.  If you are writing to this
-	 * RawPacket, this will give the next writing position -- which will also
-	 * be the length of the data written thus far.  If you are reading, this
-	 * will be the position of the next byte to be read -- the amount of data
-	 * read thus far.  This way you can tell how much was written or how much
-	 * was read back in bytes.
+   * RawPacket, this will give the next writing position -- which will also
+   * be the length of the data written thus far.  If you are reading, this
+   * will be the position of the next byte to be read -- the amount of data
+   * read thus far.  This way you can tell how much was written or how much
+   * was read back in bytes.
    */
   //##ModelId=3B0753810230
   int getPosition() const;

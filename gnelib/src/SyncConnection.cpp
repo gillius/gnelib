@@ -141,7 +141,7 @@ SyncConnection& SyncConnection::operator >> (Packet& packet) throw (Error) {
   assert(recv != NULL);  //There had better be some data!
   if (recv->getType() != packet.getType()) {
     gnedbgo2(1, "Packet type mismatch.  Got %d, expected %d.",
-	     recv->getType(), packet.getType());
+       recv->getType(), packet.getType());
     throw Error(Error::PacketTypeMismatch);
   }
 
@@ -173,7 +173,7 @@ SyncConnection& SyncConnection::operator << (const Packet& packet) throw (Error)
 }
 
 //##ModelId=3BDB10A50353
-void SyncConnection::onNewConn(SyncConnection& newConn) {
+void SyncConnection::onNewConn(SyncConnection& newConn) throw (Error) {
   //newConn doesn't HAVE to be this, if there was a doubly-wrapped
   //SyncConnection, which can happen if we wrap then call connect (since
   //connect makes a new SyncConnection).
@@ -182,7 +182,7 @@ void SyncConnection::onNewConn(SyncConnection& newConn) {
 }
 
 //##ModelId=3BDB10A6000A
-void SyncConnection::onConnect(SyncConnection& conn) {
+void SyncConnection::onConnect(SyncConnection& conn) throw (Error) {
   assert(!isReleased());
   oldListener->onConnect(conn);
 }
