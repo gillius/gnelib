@@ -1,0 +1,27 @@
+# linux specific makefile
+
+# set up all the variables used in the main makefile
+
+GCC				= g++
+
+AR				= ar
+
+EXAMPLE_LIBS			= $(LIB_STATIC) -lNL
+
+LINKER_OPTIONS			=
+
+COMPILER_OPTIONS		= -Wall -O3 -s
+
+EXAMPLE_CPP			= $(wildcard examples/*/*.cpp)
+
+EXAMPLE_O			= $(EXAMPLE_CPP:.cpp=.o)
+
+EXAMPLE_EXE			= $(addprefix examples/,$(notdir $(EXAMPLE_O:.o=.exe)))
+
+LIB_CPP				= $(wildcard src/*.cpp)
+
+LIB_O				= $(LIB_CPP:.cpp=.o)
+
+LIB_STATIC			= src/libgnelib.a
+
+VPATH				= $(dir $(EXAMPLE_CPP))
