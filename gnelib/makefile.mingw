@@ -16,12 +16,8 @@ EXAMPLE_LIBS         = $(LIB_STATIC) -lNL
 LDFLAGS              = -mthreads
 
 ifdef DEBUGMODE
-CPPFLAGS             = $(DEBUGFLAGS)
-CFLAGS               = $(DEBUGFLAGS)
 LIB_STATIC_NAME      = libgned.a
 else
-CPPFLAGS             = $(OPTIMIZEFLAGS)
-CFLAGS               = $(OPTIMIZEFLAGS)
 LDFLAGS             += -s
 LIB_STATIC_NAME      = libgne.a
 endif

@@ -11,14 +11,6 @@ RMDIR                = rm -rf
 
 EXAMPLE_LIBS         = $(LIB_STATIC) -lNL -lncurses -lpthread
 
-ifdef DEBUGMODE
-CPPFLAGS             = $(DEBUGFLAGS)
-CFLAGS               = $(DEBUGFLAGS)
-else
-CPPFLAGS             = $(OPTIMIZEFLAGS)
-CFLAGS               = $(OPTIMIZEFLAGS)
-endif
-
 CPPFLAGS            += -D_XOPEN_SOURCE=500
 
 EXE_MASK             = examples/bin/%

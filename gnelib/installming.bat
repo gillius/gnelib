@@ -23,7 +23,7 @@ echo I have found an installation of HawkNL. The version is:
 find "NL_VERSION_STRING" "%MINGDIR%\include\nl.h" | find "NL_VERSION_STRING"
 if errorlevel 1 goto othererr
 echo.
-echo GNE requires HawkNL version 1.5, 1.6 beta 4, 1.6 or later.  A GNE
+echo GNE requires HawkNL version 1.6 or later.  A GNE
 echo distribution comes with a precompiled binary version of HawkNL.  Would you
 echo like to see more info about the precompiled version?
 yesno
@@ -127,7 +127,7 @@ copy /-Y hawk_bin\nl.h "%MINGDIR%\include"
 @echo off
 if errorlevel 1 goto copyerr
 @echo on
-copy /-Y hawk_bin\mingw\libNL.a "%MINGDIR%\lib"
+copy /-Y hawk_bin\mingw1\libNL.a "%MINGDIR%\lib"
 @echo off
 if errorlevel 1 goto copyerr
 echo.
@@ -145,7 +145,7 @@ goto hawkcont
 :insthawkdll
 if "%windir%"=="" goto windirerr
 @echo on
-copy /-Y "hawk_bin\mingw\NL.dll" "%windir%\system"
+copy /-Y "hawk_bin\mingw1\NL.dll" "%windir%\system"
 @echo off
 if errorlevel 1 goto copyerr
 goto dllinstret
