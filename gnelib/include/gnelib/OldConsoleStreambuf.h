@@ -1,3 +1,6 @@
+#ifndef _OLDCONSOLESTREAMBUF_H_
+#define _OLDCONSOLESTREAMBUF_H_
+
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
  * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
@@ -17,35 +20,48 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../../include/gnelib.h"
-#ifdef OLD_CPP
-#include <ostream.h>
-#else
-#include <ostream> //for endl
-#endif
+//This header is a version of the Console streams to work with the old GNU
+//libstdc++ that most people are using now with gcc 2.9x.  MSVC, Sun CC, and
+//the newest gcc 3 and libstdc++ can compile the normal code.
 
-using namespace std; //for endl
-using namespace GNE;
-using namespace GNE::Console;
+#include <streambuf.h>
 
-int main() {
-  initGNE(NO_NET, atexit);
-  initConsole(atexit);
-  setTitle("GNE Timer Example");
-  
-  gout << "The time in seconds, is:" << endl;
-  gout << "Time is from some arbitrary point in the past." << endl;
-  gout << "In Windows, this is actually the system uptime, as it uses the rdtsc" << endl
-       << "  instruction." << endl;
-  while (!kbhit()) {
-    Time t = Timer::getCurrentTime();
-    //The move operation will be "executed" when the stream is next flushed,
-    //and gout is line-buffered so it flushes on endl as well as the usual
-    //methods.
-    gout << moveTo(25, 0) << t.getSec() << '.' << t.getuSec() << "   " << endl;
-  }
+namespace GNE {
+namespace Console {
 
-  return 0;
+class ginbuf : public std::streambuf {
+public:
+  ginbuf();
+  ~ginbuf();
+
+protected:
+  int underflow();
+
+private:
+  char* buf;
+};
+
+class goutbuf : public std::streambuf {
+public:
+  goutbuf();
+  ~goutbuf();
+
+  void setNextWriteLoc(int x, int y);
+
+protected:
+  int sync();
+  void flush_output();
+  int overflow(int meta = EOF);
+  std::streamsize xsputn(const char *ptr, std::streamsize count);
+
+private:
+  char* buf;
+
+  int x;
+  int y;
+};
+
+}
 }
 
-
+#endif //#ifndef _OLDCONSOLESTREAMBUF_H_

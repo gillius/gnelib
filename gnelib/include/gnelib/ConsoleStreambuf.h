@@ -21,6 +21,9 @@
  */
 
 #include "gneintern.h"
+#ifdef OLD_CPP
+#include "OldConsoleStreambuf.h"
+#else
 #include <streambuf>
 
 namespace GNE {
@@ -93,4 +96,5 @@ private:
 }
 }
 
+#endif //#ifdef OLD_CPP #else
 #endif //#ifndef _CONSOLESTREAMBUF_H_

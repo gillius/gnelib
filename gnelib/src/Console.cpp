@@ -22,8 +22,12 @@
 #include "../include/gnelib/ConsoleStreambuf.h"
 #include "../include/gnelib/ConsoleStream.h"
 #include "../include/gnelib/Mutex.h"
+#ifndef OLD_CPP
 #include <ostream>
 #include <istream>
+#else //fix for old libstdc++ used traditionally with gcc 2.9x
+#include <iostream>
+#endif
 
 #include "../include/gnelib/conioport.h"
 

@@ -17,13 +17,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/ConsoleStreambuf.h"
+#include "../include/gnelib/OldConsoleStreambuf.h"
 #include "../include/gnelib/Console.h"
-#ifdef OLD_CPP
-#include "OldConsoleStreambuf.cpp"
-#else
-#include <streambuf>
+#include <streambuf.h>
 
 namespace GNE {
 namespace Console {
@@ -35,22 +31,19 @@ namespace Console {
 //--------------------------------
 const int IBUF_LEN = 128;
 
-//##ModelId=3BF8444503C9
 ginbuf::ginbuf() {
   buf = new char[IBUF_LEN];
   setg(buf, buf + IBUF_LEN, buf + IBUF_LEN);
 }
 
-//##ModelId=3BF8444503CA
 ginbuf::~ginbuf() {
   delete[] buf;
 }
 
-//##ModelId=3BF8444503CB
-ginbuf::int_type ginbuf::underflow() {
+int ginbuf::underflow() {
   //If there is data still in the input buffer, return it.
   if (gptr() < egptr())
-    return traits_type::to_int_type(*gptr());
+    return (int)(*gptr());
   
   //else get some more data, and leave room for '\n'
   GNE::Console::getString(buf, IBUF_LEN-2);
@@ -67,7 +60,7 @@ ginbuf::int_type ginbuf::underflow() {
   setg(buf, buf, buf + x);
   
   //Return the next character ready to be read.
-  return traits_type::to_int_type(*buf);
+  return (int)(*buf);
 }
 
 //--------------------------------
@@ -77,7 +70,6 @@ ginbuf::int_type ginbuf::underflow() {
 //--------------------------------
 const int OBUF_LEN = 256;
 
-//##ModelId=3BF8444503CD
 goutbuf::goutbuf() : x(-1), y(-1) {
   buf = new char[OBUF_LEN];
   setp(buf, buf + OBUF_LEN - 1);
@@ -85,7 +77,6 @@ goutbuf::goutbuf() : x(-1), y(-1) {
   //terminate the string during a flush to output a whole string at a time.
 }
 
-//##ModelId=3BF8444503CE
 goutbuf::~goutbuf() {
   //Actually we don't want to flush, because when this dtor is called we can't
   //output.
@@ -93,19 +84,16 @@ goutbuf::~goutbuf() {
   delete[] buf;
 }
 
-//##ModelId=3BF8BBF902E6
 void goutbuf::setNextWriteLoc(int xLoc, int yLoc) {
   x = xLoc;
   y = yLoc;
 }
 
-//##ModelId=3BF8444503CF
 int goutbuf::sync() {
   flush_output();
   return 0;
 }
 
-//##ModelId=3BF8444503D0
 void goutbuf::flush_output() {
   //We always have a space for the null pointer because we reserved an
   //extra position when we called setp, and we do so again at the end of
@@ -122,17 +110,15 @@ void goutbuf::flush_output() {
   }
 }
 
-//##ModelId=3BF8444503D1
-goutbuf::int_type goutbuf::overflow(int_type meta) {
-  if (meta != traits_type::eof()) {
+int goutbuf::overflow(int meta) {
+  if (meta != EOF) {
     flush_output();
-    Console::mputchar(traits_type::to_char_type(meta));
+    Console::mputchar((unsigned char)meta);
   }
-  return traits_type::not_eof(meta);
+  return 0;
 }
   
-//##ModelId=3BF8444503D3
-std::streamsize goutbuf::xsputn(const char_type *ptr, std::streamsize count) {
+std::streamsize goutbuf::xsputn(const char *ptr, std::streamsize count) {
   for (int i=0; i<count; i++) {
     sputc(ptr[i]);
     if (ptr[i] == '\n')
@@ -143,5 +129,3 @@ std::streamsize goutbuf::xsputn(const char_type *ptr, std::streamsize count) {
   
 } //namespace Console
 } //namespace GNE
-
-#endif //#ifdef OLD_CPP #else
