@@ -28,11 +28,19 @@ const int Packet::ID = 0;
 Packet::Packet(int id) : type((guint8)id) {
 }
 
+Packet::Packet( const Packet& o ) : type(o.type) {
+}
+
 Packet::~Packet() {
 }
 
 Packet* Packet::makeClone() const {
-  return new Packet(*this);
+  Packet* ret = new Packet(*this);
+  //We do this, in case they forgot to derive a makeClone method, then we will
+  //have a Packet object of type Packet but with an INCORRECT ID which will
+  //eventually lead to a miscast!
+  ret->type = ID;
+  return ret;
 }
 
 int Packet::getType() const {

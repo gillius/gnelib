@@ -67,6 +67,8 @@ void registerGNEPackets() {
 
 void registerPacket(guint8 id, Packet* (*createFunc)()) {
   assert(id >= MIN_USER_ID && id <= MAX_USER_ID);
+  assert( createFunc != Packet::create );
+
   mapSync.acquire();
   assert(packets[id] == NULL);
   packets[id] = createFunc;
