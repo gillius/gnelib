@@ -19,9 +19,12 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/PacketParser.h"
-#include "../include/gnelib/Packet.h"
 #include "../include/gnelib/RawPacket.h"
 #include "../include/gnelib/Mutex.h"
+
+//Packet type includes used for registration.
+#include "../include/gnelib/Packet.h"
+#include "../include/gnelib/CustomPacket.h"
 
 namespace GNE {
 namespace PacketParser {
@@ -45,6 +48,7 @@ void registerGNEPackets() {
     packets[c] = NULL;
   }
   packets[0] = Packet::create;
+  packets[1] = CustomPacket::create;
 }
 
 void registerPacket(NLubyte id, Packet* (*createFunc)()) {
