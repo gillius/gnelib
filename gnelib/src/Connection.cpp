@@ -94,9 +94,9 @@ void Connection::disconnect() {
     ps->shutDown();
     ps->join();
     onDisconnect();
-    eventListener->shutDown();
-    //We will join on it when we are destructing, in case disconnect was
-    //called from an event.
+    //This will also shutdown the EventThread, and we will join on it in the
+    //destructor (because this could be our EventThread, and you can't join
+    //on yourself).
     sockets.disconnect();
     connected = connecting = false;
   }
