@@ -119,6 +119,7 @@ void ChannelProvider::sendToChannel( ChannelPacket& packet, Connection* exclude,
     ChannelIterator iter = channels[chan]->conns.begin();
     while ( iter != channels[chan]->conns.end() ) {
       (*iter)->stream().writePacket( packet, reliable );
+      ++iter;
     }
   }
   sync.release();
