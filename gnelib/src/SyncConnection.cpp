@@ -59,7 +59,13 @@ Connection* SyncConnection::getConnection() const {
 //##ModelId=3BC3CD0902E4
 void SyncConnection::open(const Address& dest, const ConnectionParams& params) {
   assert(!isReleased());
-  if (((ClientConnection*)conn)->open(dest, params))
+  //We want to "pirate" the caller's listener change request so that we remain
+  //charge as we are wrapped around the ClientConnection.
+  oldListener = params.getListener();
+  ConnectionParams p(params);
+  p.setListener(this);
+  //Perform the actual open
+  if (((ClientConnection*)conn)->open(dest, p))
     throw Error(Error::CouldNotOpenSocket);
 }
 
