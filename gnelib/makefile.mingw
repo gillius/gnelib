@@ -41,6 +41,6 @@ LIB_STATIC           = lib/mingw/$(LIB_STATIC_NAME)
 
 VPATH                = $(dir $(EXAMPLE_CPP))
 
-LIBDIR               = $(MINGDIR)/lib/
+LIBDIR               = $(MINGDIR)/lib
 
-INCDIR               = $(MINGDIR)/include/
+INCDIR               = $(MINGDIR)/include
