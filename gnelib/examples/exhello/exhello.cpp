@@ -65,15 +65,17 @@ public:
   }
 
   void onReceive() {
-    Packet* message = conn->stream().getNextPacket();
-    if (message->getType() == MIN_USER_ID) {
-      HelloPacket* helloMessage = (HelloPacket*)message;
-      mprintf("got message: \"");
-      mprintf(helloMessage->getMessage().c_str());
-      mprintf("\"\n");
-    } else
-      mprintf("got bad packet.\n");
-    delete message;
+    Packet* message = NULL;
+    while (message = conn->stream().getNextPacket()) {
+      if (message->getType() == MIN_USER_ID) {
+        HelloPacket* helloMessage = (HelloPacket*)message;
+        mprintf("got message: \"");
+        mprintf(helloMessage->getMessage().c_str());
+        mprintf("\"\n");
+      } else
+        mprintf("got bad packet.\n");
+      delete message;
+    }
   }
 
   void onFailure(const Error& error) {
@@ -125,20 +127,21 @@ public:
   }
 
   void onReceive() {
-    Packet* message = conn->stream().getNextPacket();
-    if (message->getType() == MIN_USER_ID) {
-      HelloPacket* helloMessage = (HelloPacket*)message;
-      mprintf("got message: \"%s\"\n", helloMessage->getMessage().c_str());
-      mprintf("\"\n");
-      received = true;
-
-      //Send Response
-      mprintf("  Sending Response...\n");
-      HelloPacket response("Hello, client!  I'm the event-driven server!");
-      conn->stream().writePacket(response, true);
-    } else
-      mprintf("got bad packet.\n");
-    delete message;
+    Packet* message = NULL;
+    while (message = conn->stream().getNextPacket()) {
+      if (message->getType() == MIN_USER_ID) {
+        HelloPacket* helloMessage = (HelloPacket*)message;
+        mprintf("got message: \"%s\"\n", helloMessage->getMessage().c_str());
+        received = true;
+        
+        //Send Response
+        mprintf("  Sending Response...\n");
+        HelloPacket response("Hello, client!  I'm the event-driven server!");
+        conn->stream().writePacket(response, true);
+      } else
+        mprintf("got bad packet.\n");
+      delete message;
+    }
   }
 
   void onFailure(const Error& error) {
@@ -180,24 +183,31 @@ void doClient(int outRate, int inRate, int port) {
     errorExit("Invalid address.");
   gout << "Connecting to: " << address << endl;
 
-  ClientConnection client(outRate, inRate, new OurClient());
-  if (client.open(address, 0)) //localPort = 0, for any local port.
-    errorExit("Cannot open client socket.");
-
-  client.connect();
-  client.join();     //join on the connection thread
-  //if we did not call join, we would have called client.detach(false)
-  //instead for true async connections.
-
-  //Check if our connection was successful.
-  if (client.isConnected()) {
+  //for (int i=0; i <500; i++) {
+    ClientConnection* client = new ClientConnection(new OurClient());
+    if (client->open(address)) {
+      delete client;
+      errorExit("Cannot open client socket.");
+    }
     
-    //Send our information
-    HelloPacket message("Hello, server!  I'm the event-driven client!");
-    client.stream().writePacket(message, true);
-    client.stream().waitToSendAll();
+    client->connect();
+    client->join();     //join on the connection thread
+    //if we did not call join, we would have called client.detach(false)
+    //instead for true async connections.
     
-  }
+    //Check if our connection was successful.
+    if (client->isConnected()) {
+      
+      //Send our information
+      HelloPacket message("Hello, server!  I'm the event-driven client!");
+      client->stream().writePacket(message, true);
+      client->stream().writePacket(message, false);
+      client->stream().waitToSendAll();
+      
+    }
+    
+    delete client;
+  //}
 }
 
 
