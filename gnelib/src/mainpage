@@ -1,7 +1,5 @@
-/** \file mainpage
- * This file only contains the information useful for the main page of the
- * documentation - There is no code here.
- */
+//This file only contains the information useful for the main page of the
+//documentation - There is no code here.
 
 /** \mainpage %GNE -- Game Networking Engine
 
