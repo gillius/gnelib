@@ -191,11 +191,13 @@ public:
    * operations like loading and saving files or something so it does not
    * interfer with the user interface (be it a GUI or a game or whatever).
    */
+  //##ModelId=3CBD09C8004F
   static const int LOW_PRI;
 
   /**
    * A lower priority for a thread than LOW_PRI.
    */
+  //##ModelId=3CBD09C8006D
   static const int LOWER_PRI;
 
   /**
@@ -210,6 +212,7 @@ public:
    * Even higher priority thread than HIGH_PRI.  Used typically for the timer
    * threads.
    */
+  //##ModelId=3CBD09C80081
   static const int HIGHER_PRI;
 
 protected:
@@ -234,7 +237,9 @@ protected:
 
 private:
 #ifdef WIN32
+  //##ModelId=3CBD09C702D8
   typedef DWORD ID;
+  //##ModelId=3CBD09C70301
   typedef unsigned RETCODE;
 #define THREAD_CALLTYPE __stdcall
 #else
@@ -267,7 +272,7 @@ private:
   //##ModelId=3AE11D30014A
   std::string name;
 
-  //##ModelId=3AE11D540136
+  //##ModelId=3CBD09C800A0
   ID thread_id;
 
 #ifdef WIN32

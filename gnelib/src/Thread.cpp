@@ -33,10 +33,13 @@ std::map<Thread::ID, Thread*> Thread::threads;
 Mutex Thread::mapSync;
 //##ModelId=3B0753810334
 const int Thread::DEF_PRI = 0;
+//##ModelId=3CBD09C8004F
 const int Thread::LOW_PRI = -1;
+//##ModelId=3CBD09C8006D
 const int Thread::LOWER_PRI = -2;
 //##ModelId=3B0753810335
 const int Thread::HIGH_PRI = 1;
+//##ModelId=3CBD09C80081
 const int Thread::HIGHER_PRI = 2;
 //##ModelId=3AE1F1CA00DC
 const std::string Thread::DEF_NAME = "Thread";
