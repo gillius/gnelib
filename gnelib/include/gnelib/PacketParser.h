@@ -56,7 +56,8 @@ const guint8 END_OF_PACKET = 255;
  * Registers a new type of packet, so GNE can recognize it.  In order for GNE
  * to recognize, create, and parse your packets derived from the Packet
  * class, you should register it here, preferably right after initalizing
- * GNE.\n
+ * GNE.
+ *
  * You can only register packets from MIN_USER_ID to MAX_USER_ID,
  * inclusive.  You may not register a packet multiple times.  As in other
  * parts of GNE, there are asserts to make this does not happen, but when
@@ -70,7 +71,8 @@ void registerPacket(guint8 id, Packet* (*createFunc)());
  * to parse.  If endOfPackets was set to false, then NULL was due to network
  * packet corruption or a packet that GNE cannot recognize.  In this case,
  * the passed RawPacket is in an invalid and undefined state and should be
- * discarded.\n
+ * discarded.
+ *
  * Calling parseNextPacket after endOfPackets was set to true produces
  * undefined results.
  * @return a newly allocated Packet of the type of the next packet in the
@@ -78,7 +80,7 @@ void registerPacket(guint8 id, Packet* (*createFunc)());
  */
 Packet* parseNextPacket(bool& endOfPackets, RawPacket& raw);
 
-}
-}
+} //namespace PacketParser
+} //namespace GNE
 
 #endif
