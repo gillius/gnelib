@@ -53,7 +53,11 @@ public:
   }
 
   virtual ~CounterWatcher() {
-    timer.stopTimer();
+    //Setting true here causes stopTimer to wait until the callbacks are
+    //done, whereas setting false will not wait.  But at this point the value
+    //passed is irrelevant since when timer is destroyed in this function it
+    //would block regardless.  See the Timer documentation for more details.
+    timer.stopTimer(true);
   }
 
   void timerCallback() {
@@ -103,10 +107,16 @@ int main() {
   getch(); //Wait for a keypress.
 
   mlprintf(0, 14, "Shutting down timers, please wait...");
-  t1.stopTimer();
-  t2.stopTimer();
-  t3.stopTimer();
-  t4.stopTimer();
+  //Passing false will cause stopTimer to request a shutdown but not wait for
+  //the callbacks to finish.  But when t1-t4 are destroyed, they must wait
+  //if the calls had not finished, so the shutdown will take as long as the
+  //longest timer.  Were we to pass true, the shutdown would take t1+t2+t3+t4
+  //amount of time to shutdown, because the request for t2 to shutdown
+  //wouldn't start until after t1 had completely finished its final callback.
+  t1.stopTimer(false);
+  t2.stopTimer(false);
+  t3.stopTimer(false);
+  t4.stopTimer(false);
 
   return 0;
 }
