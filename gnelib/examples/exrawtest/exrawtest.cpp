@@ -36,39 +36,52 @@ int main(int argc, char* argv[]) {
   Console::setTitle("GNE RawPacket Test");
 
   gout << "Now writing a RawPacket..." << endl;
-  char block[16] = {'a', 'b', 'a', 'a', 'c', 'a', 'd', 'a', 'e', '1', 'a',
+
+  //Create some binary and string data.
+  gbyte block[16] = {'a', 'b', 'a', 'a', 'c', 'a', 'd', 'a', 'e', '1', 'a',
     'a', 'a', '4', 'a', 'a'};
+  char nulls[10] = {'n', 'u', 'l', 'l', '\0', '\0', 't', 'e', 's', 't'};
+  string nullsStr(nulls, 10);
+
   RawPacket raw(NULL); //same as RawPacket raw().
-  raw << (int)56 << "superlala" << (NLubyte)124 << (short)26 << (float)12.5 << (double)123.4;
+  raw << (gint32)56 << "superlala" << (guint8)124 << (gint16)26
+      << (gsingle)12.5 << (gdouble)123.4 << nullsStr;
   raw.writeRaw(block, 16);
   
   gout << "Raw length: " << raw.getPosition() << endl;
-  gout << " should be: " << (sizeof(int) + 10 + sizeof(NLubyte) + sizeof(short) +
-                             sizeof(float) + sizeof(double) + 16) << endl;
+  gout << " should be: " << (sizeof(int) + 10 + sizeof(NLubyte) +
+                             sizeof(short) + sizeof(float) +
+                             sizeof(double) + nullsStr.size() + 1 + 16) << endl;
 
-  NLbyte* buffer = new NLbyte[raw.getPosition()];
+  gbyte* buffer = new gbyte[raw.getPosition()];
   memcpy(buffer, raw.getData(), raw.getPosition());
   RawPacket raw2(buffer);
   gout << "Now reading from the same data..." << endl;
 
-  int a;
+  //Create variables to read into that match those above.
+  gint32 a;
   string b;
-  NLubyte c;
-  short d;
-  float e;
-  double f;
+  guint8 c;
+  gint16 d;
+  gsingle e;
+  gdouble f;
+  string g;
   memset(block, 0, 16);
 
-  raw2 >> a >> b >> c >> d >> e >> f;
+  //Read back.
+  raw2 >> a >> b >> c >> d >> e >> f >> g;
   raw2.readRaw(block, 16);
 
-  gout << a << endl << b << endl << (int)c << endl << d << endl << e << endl << f << endl;
+  gout << a << endl << b << endl << (int)c << endl << d << endl
+       << e << endl << f << endl;
+
   for (int count=0; count<16; count++) {
     gout << block[count] << ' ';
   }
   gout << endl;
   gout << "Data was of length: " << raw2.getPosition() << " (should be as above)" << endl;
-  gout << "String length: " << b.length() << " (should be 9)" << endl;
+  gout << "String1 length: " << b.length() << " (should be 9)" << endl;
+  gout << "String2 length: " << g.length() << " (should be " << nullsStr.length() << ")" << endl;
   
   gout << "Press a key to continue: " << endl;
   getch();

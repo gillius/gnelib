@@ -118,7 +118,7 @@ private:
    * If this is non-null, then the current RawPacket is using a buffer that
    * we allocated, and we need to delete it.
    */
-  NLbyte* ourBuf;
+  gbyte* ourBuf;
 };
 
 } //namespace GNE

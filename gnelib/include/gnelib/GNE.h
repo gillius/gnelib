@@ -30,8 +30,9 @@
  */
 //##ModelId=3AE26ED703DE
 namespace GNE {
-class Address;
-class ConnectionEventGenerator;
+  class Address;
+  class ConnectionEventGenerator;
+
   /**
    * Initalizes GNE and HawkNL.  Call this before using any HawkNL or GNE
    * functions.  Pass it the atexit function so shutdown will be called on

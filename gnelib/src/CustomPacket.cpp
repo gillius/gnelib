@@ -43,7 +43,9 @@ RawPacket& CustomPacket::getData() {
 
 //##ModelId=3C0B257E03C8
 Packet* CustomPacket::makeClone() const {
-  assert (data != NULL);
+  assert(data != NULL);
+  assert(data->getPosition() > 0 && data->getPosition() <= getMaxUserDataSize());
+
   CustomPacket* ret = new CustomPacket;
   ret->getData().writeRaw(data->getData(), data->getPosition());
   return ret;
@@ -51,20 +53,22 @@ Packet* CustomPacket::makeClone() const {
 
 //##ModelId=3C0B257E03CA
 int CustomPacket::getSize() const {
-  return Packet::getSize() + sizeof(NLshort) + data->getPosition();
+  return Packet::getSize() + sizeof(guint16) + data->getPosition();
 }
 
 //##ModelId=3C30EFBD0226
 int CustomPacket::getMaxUserDataSize() {
   Packet packet;
-  return RawPacket::RAW_PACKET_LEN - packet.getSize() - sizeof(NLshort);
+  return RawPacket::RAW_PACKET_LEN - packet.getSize() - sizeof(guint16);
 }
 
 //##ModelId=3C0B257E03CC
 void CustomPacket::writePacket(RawPacket& raw) const {
-  assert (data != NULL);
+  assert(data != NULL);
+  assert(data->getPosition() > 0 && data->getPosition() <= getMaxUserDataSize());
+
   Packet::writePacket(raw);
-  raw << data->getPosition();
+  raw << (guint16)data->getPosition();
   raw.writeRaw(data->getData(), data->getPosition());
 }
 
@@ -73,10 +77,10 @@ void CustomPacket::readPacket(RawPacket& raw) {
   Packet::readPacket(raw);
   destroyData();
   
-  int contentLen;
+  guint16 contentLen;
   raw >> contentLen;
 
-  ourBuf = new NLbyte[contentLen];
+  ourBuf = new gbyte[contentLen];
   raw.readRaw(ourBuf, contentLen);
   data = new RawPacket(ourBuf);
 }

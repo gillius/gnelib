@@ -27,12 +27,12 @@ namespace GNE {
 int RawPacket::RAW_PACKET_LEN = 512;
 
 //##ModelId=3B075381022A
-RawPacket::RawPacket(NLbyte* buffer) : currLoc(0) {
+RawPacket::RawPacket(gbyte* buffer) : currLoc(0) {
   if (buffer) {
     data = buffer;
     ourBuffer = false;
   } else {
-    data = new NLbyte[RAW_PACKET_LEN + 1]; //last byte for END_OF_PACKET
+    data = new gbyte[RAW_PACKET_LEN + 1]; //last byte for END_OF_PACKET
     ourBuffer = true;
   }
 }
@@ -44,7 +44,7 @@ RawPacket::~RawPacket() {
 }
 
 //##ModelId=3B075381022E
-const NLbyte* RawPacket::getData() const {
+const gbyte* RawPacket::getData() const {
   return data;
 }
 
@@ -59,13 +59,13 @@ void RawPacket::reset() {
 }
 
 //##ModelId=3B0753810233
-void RawPacket::writeRaw(const NLbyte* block, int length) {
+void RawPacket::writeRaw(const gbyte* block, int length) {
   writeBlock(data, currLoc, block, length);
   assert(currLoc <= RAW_PACKET_LEN);
 }
 
 //##ModelId=3B0753810236
-void RawPacket::readRaw(NLbyte* block, int length) {
+void RawPacket::readRaw(gbyte* block, int length) {
   readBlock(data, currLoc, block, length);
   assert(currLoc <= RAW_PACKET_LEN);
 }
@@ -73,56 +73,56 @@ void RawPacket::readRaw(NLbyte* block, int length) {
 //START OF WRITING OPERATORS
 
 //##ModelId=3B0753810239
-RawPacket& RawPacket::operator << (signed char x) {
+RawPacket& RawPacket::operator << (gint8 x) {
   writeByte(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
 //##ModelId=3B075381023B
-RawPacket& RawPacket::operator << (NLubyte x) {
+RawPacket& RawPacket::operator << (guint8 x) {
   writeByte(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
 //##ModelId=3B075381023D
-RawPacket& RawPacket::operator << (NLshort x) {
+RawPacket& RawPacket::operator << (gint16 x) {
   writeShort(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
 //##ModelId=3B075381023F
-RawPacket& RawPacket::operator << (NLushort x) {
+RawPacket& RawPacket::operator << (guint16 x) {
   writeShort(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
 //##ModelId=3B0753810241
-RawPacket& RawPacket::operator << (NLint x) {
+RawPacket& RawPacket::operator << (gint32 x) {
   writeLong(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
 //##ModelId=3B0753810243
-RawPacket& RawPacket::operator << (NLuint x) {
+RawPacket& RawPacket::operator << (guint32 x) {
   writeLong(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
 //##ModelId=3B0753810245
-RawPacket& RawPacket::operator << (NLfloat x) {
+RawPacket& RawPacket::operator << (gsingle x) {
   writeFloat(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
 //##ModelId=3B0753810262
-RawPacket& RawPacket::operator << (NLdouble x) {
+RawPacket& RawPacket::operator << (gdouble x) {
   writeDouble(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
@@ -130,7 +130,19 @@ RawPacket& RawPacket::operator << (NLdouble x) {
 
 //##ModelId=3B0753810264
 RawPacket& RawPacket::operator << (const std::string& x) {
-  writeString(data, currLoc, x.c_str());
+  assert(x.size() <= 255);
+  guint8 length = (guint8)x.size();
+
+  //Write the length byte
+  *this << length;
+
+  if (length) {
+    //If the string contains data, copy it raw into the data buffer
+    gbyte* start = &data[currLoc];
+    memcpy((void*)start, (const void*)x.data(), length);
+    currLoc += (int)length;
+  }
+
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
@@ -143,57 +155,66 @@ RawPacket& RawPacket::operator << (const Packet& x) {
 
 //START OF READING OPERATORS
 
-RawPacket& RawPacket::operator >> (signed char& x) {
+RawPacket& RawPacket::operator >> (gint8& x) {
   readByte(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-RawPacket& RawPacket::operator >> (NLubyte& x) {
+RawPacket& RawPacket::operator >> (guint8& x) {
   readByte(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-RawPacket& RawPacket::operator >> (NLshort& x) {
+RawPacket& RawPacket::operator >> (gint16& x) {
   readShort(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-RawPacket& RawPacket::operator >> (NLushort& x) {
+RawPacket& RawPacket::operator >> (guint16& x) {
   readShort(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-RawPacket& RawPacket::operator >> (NLint& x) {
+RawPacket& RawPacket::operator >> (gint32& x) {
   readLong(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-RawPacket& RawPacket::operator >> (NLuint& x) {
+RawPacket& RawPacket::operator >> (guint32& x) {
   readLong(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-RawPacket& RawPacket::operator >> (NLfloat& x) {
+RawPacket& RawPacket::operator >> (gsingle& x) {
   readFloat(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
-RawPacket& RawPacket::operator >> (NLdouble& x) {
+RawPacket& RawPacket::operator >> (gdouble& x) {
   readDouble(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
 
 RawPacket& RawPacket::operator >> (std::string& x) {
-  x = (char*)&data[currLoc];
-  currLoc += x.length() + 1;
+  //Get the length byte of the string.
+  guint8 length;
+  *this >> length;
+
+  if (length) {
+    //If the string has a non-zero length, create a new string.
+    std::string temp((char*)&data[currLoc], (int)length);
+    x = temp;
+    currLoc += (int)length;
+  }
+
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
 }
@@ -204,8 +225,3 @@ RawPacket& RawPacket::operator >> (Packet& x) {
 }
 
 }
-
-
-
-
-

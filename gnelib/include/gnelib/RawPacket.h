@@ -50,7 +50,7 @@ public:
    *               has been destroyed.
    */
   //##ModelId=3B075381022A
-  RawPacket(NLbyte* buffer = NULL);
+  RawPacket(gbyte* buffer = NULL);
 
   /**
    * Destroys this object.  The data buffer will be destroyed at this point,
@@ -65,7 +65,7 @@ public:
    * data that will actually be sent out to the socket.
    */
   //##ModelId=3B075381022E
-  const NLbyte* getData() const;
+  const gbyte* getData() const;
 
   /**
    * Returns the position in the buffer from 0.  If you are writing to this
@@ -91,35 +91,35 @@ public:
    * the memcpy command.
    */
   //##ModelId=3B0753810233
-  void writeRaw(const NLbyte* block, int length);
+  void writeRaw(const gbyte* block, int length);
 
   /**
    * Like writeBlock, but just the other way around now :).
    * @see writeBlock
    */
   //##ModelId=3B0753810236
-  void readRaw(NLbyte* block, int length);
+  void readRaw(gbyte* block, int length);
 
   /**
    * Stream operators for writing to this RawPacket.  All data is converted
-   * when appropriate into big endian format.
+   * when appropriate into little endian format.
    */
   //##ModelId=3B0753810239
-  RawPacket& operator << (signed char x);
+  RawPacket& operator << (gint8 x);
   //##ModelId=3B075381023B
-  RawPacket& operator << (NLubyte x);
+  RawPacket& operator << (guint8 x);
   //##ModelId=3B075381023D
-  RawPacket& operator << (NLshort x);
+  RawPacket& operator << (gint16 x);
   //##ModelId=3B075381023F
-  RawPacket& operator << (NLushort x);
+  RawPacket& operator << (guint16 x);
   //##ModelId=3B0753810241
-  RawPacket& operator << (NLint x);
+  RawPacket& operator << (gint32 x);
   //##ModelId=3B0753810243
-  RawPacket& operator << (NLuint x);
+  RawPacket& operator << (guint32 x);
   //##ModelId=3B0753810245
-  RawPacket& operator << (NLfloat x);
+  RawPacket& operator << (gsingle x);
   //##ModelId=3B0753810262
-  RawPacket& operator << (NLdouble x);
+  RawPacket& operator << (gdouble x);
   //##ModelId=3B0753810264
   RawPacket& operator << (const std::string& x);
 
@@ -136,21 +136,21 @@ public:
    * when appropriate from big endian format.
    */
   //##ModelId=3B0753810266
-  RawPacket& operator >> (signed char& x);
+  RawPacket& operator >> (gint8& x);
   //##ModelId=3B0753810268
-  RawPacket& operator >> (NLubyte& x);
+  RawPacket& operator >> (guint8& x);
   //##ModelId=3B075381026A
-  RawPacket& operator >> (NLshort& x);
+  RawPacket& operator >> (gint16& x);
   //##ModelId=3B075381026C
-  RawPacket& operator >> (NLushort& x);
+  RawPacket& operator >> (guint16& x);
   //##ModelId=3B075381026E
-  RawPacket& operator >> (NLint& x);
+  RawPacket& operator >> (gint32& x);
   //##ModelId=3B0753810270
-  RawPacket& operator >> (NLuint& x);
+  RawPacket& operator >> (guint32& x);
   //##ModelId=3B0753810272
-  RawPacket& operator >> (NLfloat& x);
+  RawPacket& operator >> (gsingle& x);
   //##ModelId=3B0753810274
-  RawPacket& operator >> (NLdouble& x);
+  RawPacket& operator >> (gdouble& x);
   //##ModelId=3B0753810276
   RawPacket& operator >> (std::string& x);
 
@@ -165,8 +165,8 @@ public:
   RawPacket& operator >> (Packet& packet);
 
   /**
-   * The length of a RawPacket.  The internal buffer for a RawPacket used for
-   * writing will always have a buffer of this size.
+   * The max length of a RawPacket.  The internal buffer for a RawPacket
+   * used for writing will always have a buffer of this size.
    */
   //##ModelId=3B0753810226
   static int RAW_PACKET_LEN;
@@ -176,7 +176,7 @@ private:
   bool ourBuffer;
 
   //##ModelId=3AE4D1ED0014
-  NLbyte* data;
+  gbyte* data;
 
   /**
    * The current location of the next data read/write.

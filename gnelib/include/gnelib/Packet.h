@@ -131,7 +131,7 @@ public:
 
 private:
   //##ModelId=3B089B520140
-  NLubyte type;
+  guint8 type;
 
 };
 

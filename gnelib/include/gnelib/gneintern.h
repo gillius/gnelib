@@ -70,6 +70,34 @@
 #define valassert(CALL, VAL)        CALL
 #endif
 
+//Typdefs shared across all of GNE.
+namespace GNE {
+  /**
+   * Typedefs for the variable types that are common to all GNE
+   * implementations (as defined in the GNE protocol document).
+   * "u" type variables denote unsigned versions.
+   */
+  typedef signed   char  gint8;
+  typedef unsigned char  guint8;
+  typedef guint8         gbyte;
+  typedef guint8         gbool;
+  
+  typedef signed   short gint16;
+  typedef unsigned short guint16;
+  
+  typedef signed   int   gint32;
+  typedef unsigned int   guint32;
+  
+  /**
+   * A single precision 32-bit IEEE 754 floating point variable.
+   */
+  typedef float          gsingle;
+  /**
+   * A double precision 64-bit IEEE 754 floating point variable.
+   */
+  typedef double         gdouble;
+};
+
 //Define debugging functions
 #ifdef _DEBUG
 #include "GNEDebug.h"
