@@ -70,7 +70,7 @@ int Console::mprintf(char* format, ...) {
   
   va_start(arg, format);
   outSync.acquire();
-  int ret = vfprintf(stderr, format, arg);
+  int ret = vprintf(format, arg);
   outSync.release();
   va_end(arg);
 
@@ -84,7 +84,7 @@ int Console::mlprintf(int x, int y, char* format, ...) {
   va_start(arg, format);
   outSync.acquire();
   conio_gotoxy(x, y);
-  int ret = vfprintf(stderr, format, arg);
+  int ret = vprintf(format, arg);
   outSync.release();
   va_end(arg);
 
