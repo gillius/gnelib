@@ -18,27 +18,27 @@ lib: $(LIB_STATIC)
 examples: lib $(EXAMPLE_EXE)
 
 $(LIB_STATIC): $(LIB_O)
-	$(AR) rs $@ $^	
+	$(AR) rs $@ $^
 
-$(LIB_O): %.o: %.cpp	
-	$(GCC) -Iinclude/gnelib -c -o $@ $(COMPILER_OPTIONS) $<	
+$(LIB_O): %.o: %.cpp
+	$(CPP) -Iinclude/gnelib -c -o $@ $(CPPFLAGS) $<
 
 $(EXAMPLE_EXE): examples/%.exe: %.o
-	$(GCC) -o $@ $(LINKER_OPTIONS) $< $(EXAMPLE_LIBS)
-	
-$(EXAMPLE_O): %.o: %.cpp	
-	$(GCC) -c -o $@ $(COMPILER_OPTIONS) $<
-	
+	$(CPP) -o $@ $(LDFLAGS) $< $(EXAMPLE_LIBS)
+
+$(EXAMPLE_O): %.o: %.cpp
+	$(CPP) -c -o $@ $(CPPFLAGS) $<
+
 clean:
-	rm -f $(EXAMPLE_O) $(EXAMPLE_EXE) $(LIB_O) $(LIB_STATIC)
-	
+	$(RM) -f $(EXAMPLE_O) $(EXAMPLE_EXE) $(LIB_O) $(LIB_STATIC)
+
 veryclean: clean
-	rm makefile.os	
-	
+	$(RM) makefile.os
+
 install: $(LIB_STATIC)
-	cp $< $(MINGDIR)/lib
-	cp src/gnelib.h $(MINGDIR)/include	
-	
+	$(CP) $< $(LIBDIR)
+	$(CP) src/gnelib.h $(INCDIR)
+
 uninstall:
-	rm -f $(MINGDIR)/lib/$(LIB_STATIC)
-	rm -f $(MINGDIR)/include/gnelib.h
+	$(RM) -f $(LIBDIR)$(LIB_STATIC)
+	$(RM) -f $(INCDIR)gnelib.h
