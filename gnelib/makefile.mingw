@@ -14,11 +14,11 @@ GCC						= g++
 
 AR							= ar
 
-EXAMPLE_LIBS			= $(LIB_STATIC) -lNL -lwsock32 -lpthreadw32
+EXAMPLE_LIBS			= $(LIB_STATIC) -lNL -lwsock32 -lpthreadGC
 
 LINKER_OPTIONS			= -mthreads
 
-COMPILER_OPTIONS		= -O3 -s
+COMPILER_OPTIONS		= -Wall -O3 -s
 
 EXAMPLE_CPP				= $(wildcard examples/*/*.cpp)
 
