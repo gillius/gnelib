@@ -1,8 +1,16 @@
 GNE 0.001 to 0.002
+  Removed GNE::exit(), when it was discovered that atexit and destructors are
+    not called.  Now you must join all threads that might be running, for them
+    to terminate properly.
+  GNE and the Console portion shutdown automatically on exit now.  This was
+    neccessary because the main thread might not be able to shutdown GNE if
+    it exits before the other threads.
+  Added the Console class, a file for basic cross-platform console functions
+    used for the examples and for console-only based servers.  Examples have
+    been updated to use this class.
   Added exuptime example.
   Added extimer example.
-  Implemented some functions in Timer class.
-  Added coniox.h, a file for basic cross-platform funcs used in the examples.
+  Implemented Timer class.
   Added a buildall project for building the lib and all examples.
 
 GNE 0.001 -- Initial Release
