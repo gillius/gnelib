@@ -141,6 +141,10 @@ SOURCE=.\src\EventThread.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\ExitPacket.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\GNE.cpp
 # End Source File
 # Begin Source File
@@ -274,6 +278,10 @@ SOURCE=.\include\gnelib\Error.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\EventThread.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ExitPacket.h
 # End Source File
 # Begin Source File
 
