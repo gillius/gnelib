@@ -72,6 +72,8 @@ public:
   void deregisterObject( NetworkObject& obj );
 
 protected:
+  ObjectBroker() {}
+
   /**
    * Returns true if the object ID given exists.  The mutex sync must be locked
    * when this method is called.
