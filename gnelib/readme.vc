@@ -25,6 +25,11 @@ installer will check your work.  If you did not successfully generate any
 .lib files, it will ask you to compile again.  If you can't get GNE to
 compile, press ctrl-C in the installer and seek help at the GNE site.
 
+If you have the doxygen program, and it is in your path (so that you can run
+it simply by typing "doxygen") then the installer can generate documentation
+for you using it.  You can find more info about doxygen in the main Readme
+file.
+
 ------------------------------------------------------------------------------
 MANUAL INSTALLATION INSTRUCTIONS:
 
