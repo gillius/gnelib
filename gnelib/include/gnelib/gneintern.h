@@ -35,7 +35,9 @@
 //Include system headers
 #ifdef WIN32
 #include <sys/timeb.h>
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <process.h>
 #endif
 
 //Standard C includes -- for Console class and debugging functions
@@ -58,10 +60,10 @@
 #include <assert.h>
 
 //Include pthreads, disabling the catch warning.
-#define PtW32NoCatchWarn
+#ifndef WIN32
 #include <pthread.h>
 #include <sched.h>
-#undef PtW32NoCatchWarn
+#endif
 
 //Define a custom "assert" macro
 #ifdef _DEBUG

@@ -24,26 +24,42 @@ namespace GNE {
 
 //##ModelId=3B075381014B
 Mutex::Mutex() {
+#ifdef WIN32
+  InitializeCriticalSection(&mutex);
+#else
   pthread_mutexattr_t attr;
   valassert(pthread_mutexattr_init(&attr), 0);
   valassert(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE), 0);
   valassert(pthread_mutex_init( &mutex, &attr ), 0);
   valassert(pthread_mutexattr_destroy(&attr), 0);
+#endif
 }
 
 //##ModelId=3B075381014C
 Mutex::~Mutex() {
+#ifdef WIN32
+  DeleteCriticalSection(&mutex);
+#else
   valassert(pthread_mutex_destroy( &mutex ), 0);
+#endif
 }
 
 //##ModelId=3B075381014E
 void Mutex::acquire() {
+#ifdef WIN32
+  EnterCriticalSection(&mutex);
+#else
   valassert(pthread_mutex_lock( &mutex ), 0);
+#endif
 }
 
 //##ModelId=3B075381014F
 void Mutex::release() {
+#ifdef WIN32
+  LeaveCriticalSection(&mutex);
+#else
   valassert(pthread_mutex_unlock( &mutex ), 0);
+#endif
 }
 
 }

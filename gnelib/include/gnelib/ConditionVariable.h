@@ -26,10 +26,23 @@ namespace GNE {
 class Mutex;
 
 /**
- * A class for a conditional variable.
- * This class is a wrapper for pthreads, so please read man pages or other
- * documentation for the equivalent pthreads functions if you need to
- * understand the specifics on the semantics of these functions.
+ * A class for a conditional variable.  This is to be used when a thread needs
+ * to wait for a condition that another thread will trigger.  The most common
+ * usage of ConditionVariables:
+ *
+ * <pre>
+ * cv.lock();
+ * while (!condition) {
+ *   cv.wait();
+ * }
+ * //do stuff
+ * cv.unlock();
+ * </pre>
+ *
+ * When cv.wait is called, the thread atomically releases the associated
+ * mutex and waits for another thread to call signal or broadcast on the cv
+ * object.  When this thread reawakens, it waits to lock the associated mutex
+ * then exits the wait call.
  */
 //##ModelId=3B0753800271
 class ConditionVariable {
@@ -78,7 +91,7 @@ public:
   /**
    * This method works identical to wait, except the thread will wake up
    * anyways if not woken up before the timeout.  The mutex will still be
-   * acquired.
+   * reacquired.
    * @param timeout the time to wait in milliseconds
    */
   //##ModelId=3B0753810003
@@ -98,8 +111,24 @@ public:
   void broadcast();
 
 private:
+#ifdef WIN32
+  //The Windows implementation of condition variables comes from the Boost
+  //C++ library.
+  void initBoostCode();
+  void enter_wait();
+
+  HANDLE m_gate;
+  HANDLE m_queue;
+  HANDLE m_mutex;
+  unsigned m_gone; // # threads that timed out and never made it to the m_queue
+  unsigned long m_blocked; // # threads m_blocked m_waiting for the condition
+  unsigned m_waiting; // # threads m_waiting no longer m_waiting for the condition but still
+                      //   m_waiting to be removed from the m_queue
+#else
+  //Try POSIX threading
   //##ModelId=3AE20D83001E
   pthread_cond_t cond;
+#endif
 
   /**
    * is the mutex pointer we have our mutex we should delete?

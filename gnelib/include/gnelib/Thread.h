@@ -31,10 +31,6 @@ namespace GNE {
  * Execution begins in the run method.  All methods of this class are thread-
  * safe.
  *
- * This class is a wrapper for pthreads, so please read man pages or other
- * documentation for the equivalent pthreads functions if you need to
- * understand the specifics on the semantics of these functions.
- *
  * NOTE: All threads must either be detached or joined.  If you choose to
  * detach a thread you may not access that Thread object again.  If you need
  * to access it at a later time, keep a pointer, then at a later time call
@@ -219,18 +215,22 @@ protected:
   virtual void run() = 0;
 
 private:
-  /**
-   * Returns the underlying pthread_t for this thread.
-   */
-  //##ModelId=3B07538103A8
-  pthread_t getID() const;
+#ifdef WIN32
+  typedef DWORD ID;
+  typedef unsigned RETCODE;
+#define THREAD_CALLTYPE __stdcall
+#else
+  typedef pthread_t ID;
+  typedef void* RETCODE;
+#define THREAD_CALLTYPE
+#endif
 
   /**
    * Internal Thread function for the pthread_start callback to start a new
    * thread and call run().
    */
   //##ModelId=3BB805C60186
-  static void* threadStart(void* thread);
+  static RETCODE THREAD_CALLTYPE threadStart(void* thread);
 
   /**
    * This function is called internally and automatically after run ends and
@@ -250,7 +250,11 @@ private:
   std::string name;
 
   //##ModelId=3AE11D540136
-  pthread_t thread_id;
+  ID thread_id;
+
+#ifdef WIN32
+  HANDLE hThread;
+#endif
 
   //##ModelId=3B0753810336
   bool running;
@@ -259,7 +263,7 @@ private:
   bool deleteThis;
 
   //##ModelId=3AE11D5F023A
-  static std::map<pthread_t, Thread*> threads;
+  static std::map<ID, Thread*> threads;
 
   /**
    * Mutex for syncronizing threads

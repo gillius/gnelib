@@ -28,7 +28,7 @@
 namespace GNE {
 
 //##ModelId=3AE11D5F023A
-std::map<pthread_t, Thread*> Thread::threads;
+std::map<Thread::ID, Thread*> Thread::threads;
 //##ModelId=3BB805C6014B
 Mutex Thread::mapSync;
 //##ModelId=3B0753810334
@@ -39,11 +39,13 @@ const int Thread::HIGH_PRI = 1;
 const std::string Thread::DEF_NAME = "Thread";
 
 //##ModelId=3BB805C60186
-void* Thread::threadStart( void* thread ) {
+Thread::RETCODE THREAD_CALLTYPE Thread::threadStart( void* thread ) {
+  Thread* thr = ( ( Thread* )( thread ) );
+  //Makes sure the map has been updated before we start.
+  mapSync.acquire();
+  mapSync.release();
+
   try {
-    Thread* thr = ( ( Thread* )( thread ) );
-    mapSync.acquire(); //This is to make sure the map is updated before we
-    mapSync.release(); //start running
     thr->run();
     thr->end();
   } catch (Error& e) {
@@ -53,23 +55,36 @@ void* Thread::threadStart( void* thread ) {
   //We don't do a catch all because interestingly enough, the MSVC debugger
   //is started by throwing an exception, and placing a catch all here will
   //keep the debugger from starting.
-  return NULL;
+
+  return 0;
 }
 
 //##ModelId=3B0753810376
 Thread::Thread(std::string name2, int priority2) : shutdown(false), name(name2),
 thread_id(0), running(false), deleteThis(false), priority(priority2) {
+#ifdef WIN32
+  hThread = 0;
+#endif
 }
 
 //##ModelId=3B0753810379
 Thread::~Thread() {
   assert(!isRunning());
+#ifdef WIN32
+  CloseHandle( hThread );
+#endif
 }
 
 //##ModelId=3B075381037B
 Thread* Thread::currentThread() {
   mapSync.acquire();
-  std::map< pthread_t, Thread* >::iterator iter = threads.find( pthread_self() );
+#ifdef WIN32
+  ID id = GetCurrentThreadId();
+#else
+  ID id = pthread_self();
+#endif
+
+  std::map< ID, Thread* >::iterator iter = threads.find( id );
   if ( iter != threads.end() ) {
     Thread* ret = (*iter).second;
     mapSync.release();
@@ -130,13 +145,20 @@ void Thread::shutDown() {
 //##ModelId=3B0753810382
 void Thread::join() {
   assert( !deleteThis );
+#ifdef WIN32
+  valassert(WaitForSingleObject( hThread, INFINITE ), WAIT_OBJECT_0);
+#else
   valassert(pthread_join( thread_id, NULL ), 0);
+#endif
 }
 
 //##ModelId=3B0753810383
 void Thread::detach(bool delThis) {
   assert( !deleteThis );
+#ifndef WIN32
+  //We only need to detach on POSIX systems
   valassert(pthread_detach( thread_id ), 0);
+#endif
   if (delThis) {
     //Only set deleteThis true if we want to delete ourselves on exit.
     sync.acquire();
@@ -172,7 +194,14 @@ void Thread::start() {
   shutdown = false;
   running = true;
   mapSync.acquire();
+
+#ifdef WIN32
+  hThread = (HANDLE)_beginthreadex( NULL, 0, &threadStart, (void*)this, 0,
+                                    reinterpret_cast<unsigned*>(&thread_id) );
+#else
   pthread_create( &thread_id, NULL, Thread::threadStart, this );
+#endif
+
   threads[ thread_id ] = this;
   mapSync.release();
 }
@@ -182,16 +211,11 @@ int Thread::getPriority() const {
   return priority;
 }
 
-//##ModelId=3B07538103A8
-pthread_t Thread::getID() const {
-  return thread_id;
-}
-
 //##ModelId=3B07538103AA
 void Thread::remove(Thread* thr) {
   assert(!thr->isRunning());
   mapSync.acquire();
-  threads.erase(thr->getID());
+  threads.erase(thr->thread_id);
   mapSync.release();
 }
 

@@ -33,6 +33,7 @@
 #include "rndalgor.h"
 #include <iostream>
 #include <cstdio>
+#include <ctime>
 #include "StatsDisplay.h" //Our helper class for displaying the stats.
 
 using namespace std;

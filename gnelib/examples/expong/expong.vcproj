@@ -37,7 +37,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="HawkNL.lib pthreadVCE.lib ../../lib/msvc/gne.lib"
+				AdditionalDependencies="HawkNL.lib"
 				OutputFile="../expong.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -88,7 +88,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="pthreadVCE.lib HawkNL.lib ../../lib/msvc/gned.lib"
+				AdditionalDependencies="HawkNL.lib"
 				OutputFile="../expongd.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"

@@ -43,7 +43,6 @@ static bool initialized = false;
 bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
   if (!initialized) {
     gnedbg(1, "GNE initalized");
-    atexit_ptr(shutdownGNE);
     PacketParser::registerGNEPackets();
     if (networkType != NO_NET) {
       if (nlInit() == NL_FALSE)
@@ -59,6 +58,7 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
       eGen->start();
       initialized = true; //We need only to set this to true if we are using HawkNL
     }
+    atexit_ptr(shutdownGNE);
     return false;
   }
   return false;

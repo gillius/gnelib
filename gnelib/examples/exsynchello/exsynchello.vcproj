@@ -36,7 +36,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="HawkNL.lib pthreadVCE.lib ../../lib/msvc/gne.lib"
+				AdditionalDependencies="HawkNL.lib"
 				OutputFile="../exsynchello.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -86,7 +86,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="HawkNL.lib pthreadVCE.lib ../../lib/msvc/gned.lib"
+				AdditionalDependencies="HawkNL.lib"
 				OutputFile="../exsynchellod.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"

@@ -17,6 +17,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifdef WIN32
+//We have a special version of the threading API for Win32
+#include "ConditionVariableWin32.cpp"
+#else
+
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ConditionVariable.h"
 #include "../include/gnelib/Mutex.h"
@@ -82,9 +87,4 @@ void ConditionVariable::broadcast() {
 }
 
 }
-
-
-
-
-
-
+#endif
