@@ -79,9 +79,8 @@ Error::ErrorCode Error::getCode() const {
 }
 
 //##ModelId=3BBA9D6E01E1
-const Error& Error::setCode(Error::ErrorCode newCode) {
+const void Error::setCode(Error::ErrorCode newCode) {
   code = newCode;
-  return *this;
 }
 
 //##ModelId=3BAEC1DF014A
@@ -106,8 +105,8 @@ bool Error::operator == (const ErrorCode& rhs) const {
 }
 
 //##ModelId=3BBA9D6E02BC
-Error Error::createLowLevelError() {
-  Error ret(Error::OtherLowLevelError);
+Error Error::createLowLevelError(Error::ErrorCode newCode) {
+  Error ret(newCode);
   NLenum error = nlGetError();
   if (error == NL_SOCKET_ERROR || error == NL_SOCK_DISCONNECT)
     ret.sysError = nlGetSystemError();
@@ -116,4 +115,4 @@ Error Error::createLowLevelError() {
   return ret;
 }
 
-}
+} //namespace GNE

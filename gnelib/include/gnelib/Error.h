@@ -74,11 +74,9 @@ public:
 	 * createLowLevelError() to specify a more appropriate high-level error
 	 * code.  The Error object still retains the low-level specific error
 	 * information.
-	 * @returns a constant reference to this object, a nice way so you can do:\n
-	 *          function( Error::createLowLevelError().setCode(Error::Read) );
 	 */
   //##ModelId=3BBA9D6E01E1
-	const Error& setCode(ErrorCode newCode);
+	const void setCode(ErrorCode newCode);
 
 	/**
 	 * Returns a string description of this error.  When possible, the string
@@ -112,7 +110,7 @@ public:
 	 * @see setCode()
 	 */
   //##ModelId=3BBA9D6E02BC
-	static Error createLowLevelError();
+	static Error createLowLevelError(ErrorCode newCode = OtherLowLevelError);
 
 private:
   //##ModelId=3BAEC9C101CD
