@@ -44,6 +44,8 @@ public:
   ~PingTest() {}
 
   void onDisconnect() {
+    //Get any packets that are left and shut down.
+    receivePackets();
     delete conn;
     delete this;
   }
@@ -57,18 +59,7 @@ public:
   }
 
   void onReceive() {
-    //We check for PingPackets.  Anything else we get is an error though.
-    Packet* next = conn->stream().getNextPacket();
-    while (next != NULL) {
-      if (next->getType() == PingPacket::ID) {
-        gout << "Ping response: " << ((PingPacket*)next)->getPing() << endl;
-      } else {
-        gout << "We got a packet type (" << next->getType() <<
-          ") that we aren't expecting!" << endl;
-      }
-      delete next;
-      next = conn->stream().getNextPacket();
-    }
+    receivePackets();
   }
 
   void onFailure(const Error& error) {
@@ -84,6 +75,27 @@ public:
   void onConnectFailure(const Error& error) {
     gout << "Connection to server failed.   " << endl;
     gout << "  GNE reported error: " << error << endl;
+  }
+
+  void receivePackets() {
+    //We check for PingPackets.  Anything else we get is an error though.
+    Packet* next = conn->stream().getNextPacket();
+    while (next != NULL) {
+      if (next->getType() == PingPacket::ID) {
+        PingPacket* ping = (PingPacket*)next;
+        if (ping->isRequest()) {
+          ping->makeReply();
+          conn->stream().writePacket(*ping, true);
+        } else {
+          gout << "Ping response: " << ((PingPacket*)next)->getPing() << endl;
+        }
+      } else {
+        gout << "We got a packet type (" << next->getType() <<
+          ") that we aren't expecting!" << endl;
+      }
+      delete next;
+      next = conn->stream().getNextPacket();
+    }
   }
 
 private:
@@ -205,7 +217,18 @@ void doClient(int outRate, int inRate, int port) {
   client->connect();
   client->join();
 
-  getch(); //Wait for user keypress
+  if (client->isConnected()) {
+    gout << "Press s to send a ping and q to quit." << endl;
+    int ch = 0;
+    while (ch != (int)'q') {
+      ch = getch();
+      if (ch == (int)'s') {
+        PingPacket req;
+        client->stream().writePacket(req, true);
+      }
+    }
+  }
+  //else the onFailure event will report the error and we will quit.
 
   client->disconnectSendAll();
 }
@@ -234,6 +257,7 @@ void doLocalTest() {
 
   gout << "Creating 3 PingPackets which we will let be 'late'" << endl;
   PingPacket l1, l2, l3;
+  l1.makeReply(); //Make l1 a reply... We will try to use it later...
   assert(PingPacket::reqsPending() == 3);
 
   gout << "Creating another PingPacket." << endl;
