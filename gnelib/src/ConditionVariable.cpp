@@ -59,19 +59,14 @@ void ConditionVariable::wait() {
   valassert(pthread_cond_wait(&cond, &mutex->mutex), 0);
 }
 
-#include <stdio.h>
-#include <sys/timeb.h>
-
 //##ModelId=3AEEF7660032
 void ConditionVariable::timedWait(int ms) {
-  Time t = Timer::getCurrentTime();
+  Time t = Timer::getAbsoluteTime();
   Time t2(0, ms*1000);
   t = t + t2;
   timespec tv;
   tv.tv_sec = t.getSec();
   tv.tv_nsec = t.getuSec() * 1000;
-  _timeb currT;
-  _ftime(&currT);
   mutex->acquire();
   pthread_cond_timedwait(&cond, &(mutex->mutex), &tv);
   mutex->release();
