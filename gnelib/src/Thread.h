@@ -92,25 +92,23 @@ public:
   /**
    * Detaches a running thread.  A thread must always either
    * be joined or detached if system resources are to be recovered.  A
-   * thread may not be joined after being detached.  After detaching a thread,
+   * thread may not be joined after being detached.  After detaching a
+   * thread, with deleteThis set to true,
    * it is undefined to access it any longer outside of its own actual thread.
    * In other words, at any moment after detach the Thread instance could be
    * be deleted because the thread terminated (or has already terminated).
    * But, of course a running thread could still access itself as it clearly
    * has not stopped and is still running.\n
    * If you care about reading the data from a thread after its completion,
-   * do not use detach and instead use join.
+   * do not use detach and instead use join, or use detach with deleteThis
+   * set to false.  It is useful to do this if you want to release OS thread
+   * resources and still keep the class running (as in the Connection classes).
+   * @param deleteThis true if the thread should delete itself when it
+   *                   finishes executing.
    * @see join
    */
   //##ModelId=3AEE3C5D00BE
-  void detach();
-
-  /**
-   * Returns the detached state of this thread.  Detached threads delete
-   * themselves when they die.
-   */
-  //##ModelId=3AEE3C5D0168
-  bool isDetached() const;
+  void detach(bool deleteThis);
 
   /**
    * This function is the starting point for this thread.

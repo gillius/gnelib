@@ -96,24 +96,22 @@ void Thread::join() {
 }
 
 //##ModelId=3AEE3C5D00BE
-void Thread::detach() {
+void Thread::detach(bool deleteThis) {
   assert( started );
   assert( !detached );
   valassert(pthread_detach( thread_id ), 0);
-  sync.acquire();
-  detached = true;
-  if (ended) {
-    detached = false; //this is just to fix a possible race condition with
-                      //Thread::end.
-    sync.release();
-    delete this;
-  } else
-    sync.release();
-}
-
-//##ModelId=3AEE3C5D0168
-bool Thread::isDetached() const {
-  return detached;
+  if (deleteThis) {
+    //Only set detached true if we want to delete ourselves on exit.
+    sync.acquire();
+    detached = true;
+    if (ended) {
+      detached = false; //this is just to fix a possible race condition with
+                        //Thread::end.
+      sync.release();
+      delete this;
+    } else
+      sync.release();
+  }
 }
 
 //##ModelId=3AEE3C5D02E4
