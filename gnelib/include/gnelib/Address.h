@@ -28,11 +28,6 @@ namespace GNE {
 /**
  * A wrapper class for the HawkNL NLaddress.  This class is used many times
  * around GNE and is made for ease of use and cleaner code.
- * \bug bugs in the HawkNL library for not allowing reliable access for its
- *      error codes, lack of return error codes for important functions, and
- *      incorrect side effects on setting valid to false even when the result
- *      is successful keeps this class from working properly.  This will be
- *      broken until the release of HawkNL > 1.4b4.
  */
 //##ModelId=3BB927EB0186
 class Address {
