@@ -16,3 +16,6 @@ exhello -- Everyone knows the "Hello World" program.  Perhaps it's been coded
   This is an example to show the minimum code needed to connect and send
   data, in this case, "Hello Server (or Client)!" to the other end of the
   connection.
+
+expacket -- Shows how to derive a new type of packet, and create the proper
+  parsing functions interacting with RawPacket to allow GNE to use your packet.
