@@ -32,12 +32,14 @@ class GNE {
 public:
   /**
    * Initalizes GNE and HawkNL.  Call this before using any HawkNL or GNE
-   * functions.
+   * functions.  Pass it the atexit function so shutdown will be called on
+   * exit.  This is so the main thread can exit before the threads it
+   * created.
    * @param networkType a HawkNL network driver, such as NL_IP or NL_IPX
    * @return true if GNE or HawkNL could not be initalized.
    */
   //##ModelId=3AE270BF0078
-  static bool init(NLenum networkType);
+  static bool init(NLenum networkType, int (*atexit_ptr)(void (*func)(void)));
 
   /**
    * Shutsdown GNE and HawkNL.  This function should be called only after all
@@ -58,7 +60,7 @@ public:
    * @param status the return code
    */
   //##ModelId=3AEDEDE100AA
-  static void exit(int status);
+  //static void exit(int status);
 
   /**
    * Returns how many total bytes GNE has read on all sockets.
@@ -108,6 +110,9 @@ public:
   static const int UDP_HEADER_SIZE;
 
 private:
+  //##ModelId=3AF8D89F00E6
+  static bool initialized;
+
   //##ModelId=3AE34D930316
   ConnectionEventGenerator *eGen;
 };

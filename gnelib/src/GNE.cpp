@@ -23,25 +23,38 @@
 //##ModelId=3AE26F6A035C
 const double GNE::VER = 0.1;
 
+//##ModelId=3AF8D89F00E6
+bool GNE::initialized = false;
+
+//##ModelId=3AE4DF7A03AC
+const int GNE::UDP_HEADER_SIZE = 28;
+
 //##ModelId=3AE26FC000A0
 const std::string GNE::VER_STR = "GNE v0.1 pre-alpha";
 
 //##ModelId=3AE270BF0078
-bool GNE::init(NLenum networkType) {
-  return true;
+bool GNE::init(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
+  if (!initialized) {
+    atexit_ptr(shutdown);
+    initialized = true;
+    return false;
+  }
+  return false;
 }
 
 //##ModelId=3AE270CE033E
 void GNE::shutdown() {
+  if (initialized) {
+    initialized = false;
+  }
 }
 
 //##ModelId=3AEDEDE100AA
+/*
 void GNE::exit(int status) {
   pthread_exit(&status);
 }
-
-//##ModelId=3AE4DF7A03AC
-const int GNE::UDP_HEADER_SIZE = 28;
+*/
 
 //##ModelId=3AE4C97C0244
 int GNE::getBytesRead() {
