@@ -64,10 +64,10 @@ protected:
     srand(randSeed); //See above on why I do this.
     while (running) {
       mlputchar(x, y, star);
-      Thread::sleep(rand() % 4000 + 1000);
+      Thread::sleep(rand() % 3500 + 1000);
       mlputchar(x, y, ' ');
       if (running)
-        Thread::sleep(rand() % 1000);
+        Thread::sleep(rand() % 500);
     }
   }
 
@@ -78,7 +78,7 @@ private:
   int randSeed; 
 };
 
-const int NUM_STARS = 45;
+const int NUM_STARS = 90;
 Star* stars[NUM_STARS];
 
 int main(int argc, char* argv[]) {
