@@ -1,4 +1,6 @@
 GNE 0.49 to current
+  Now features an interactive and intelligent batch file installation script.
+    Run installmsvc.bat to use it.  Let me know if you have problems.
   Calling getNameByAddress on an invalid address no longer makes an attempt
     to resolve it when it knows it will fail.  Before the lookup would take
     some time and return "Bad address" but now it returns "invalid address"
