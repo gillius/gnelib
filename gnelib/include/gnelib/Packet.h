@@ -97,6 +97,12 @@ public:
   //##ModelId=3B075381015E
   virtual void readPacket(RawPacket& raw);
 
+	/**
+	 * Returns a new instance of this class.  This is used by the
+	 * PacketParser::registerPacket function as a callback to make new packets
+	 * to parse the data into.  If you derive a new packet type, you'll probably
+	 * want to register it, so you should create a create function of your own.
+	 */
   //##ModelId=3B089AE802BC
   static Packet* create();
 
