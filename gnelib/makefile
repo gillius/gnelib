@@ -21,7 +21,7 @@ $(LIB_STATIC): $(LIB_O)
 	$(AR) rs $@ $^	
 
 $(LIB_O): %.o: %.cpp	
-	$(GCC) -c -o $@ $(COMPILER_OPTIONS) $<	
+	$(GCC) -Iinclude/gnelib -c -o $@ $(COMPILER_OPTIONS) $<	
 
 $(EXAMPLE_EXE): examples/%.exe: %.o
 	$(GCC) -o $@ $(LINKER_OPTIONS) $< $(EXAMPLE_LIBS)
