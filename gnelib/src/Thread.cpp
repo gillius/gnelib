@@ -103,13 +103,25 @@ Thread* Thread::currentThread() {
 
 //##ModelId=3B075381037D
 void Thread::sleep(int ms) {
+  assert(ms > 0);
+  if (ms > 0) {
 #ifdef WIN32
-  Sleep(ms);
+    Sleep(ms);
 #else
-  ConditionVariable sleeper;
-  sleeper.acquire();
-  sleeper.timedWait(ms);
-  sleeper.release();
+    ConditionVariable sleeper;
+    sleeper.acquire();
+    sleeper.timedWait(ms);
+    sleeper.release();
+#endif
+  }
+}
+
+//##ModelId=3D1F80610065
+void Thread::yield() {
+#ifdef WIN32
+  Sleep(0);
+#else
+  sched_yield();
 #endif
 }
 

@@ -67,6 +67,23 @@ public:
   static void sleep(int ms);
 
   /**
+   * Makes a request to the operating system to give up the remainder of this
+   * thread's timeslice to another appropriate thread.  This function does
+   * nothing if the operating system does not support the call.  Note that
+   * even if the OS supports the call, it may choose not to end your
+   * timeslice.
+   *
+   * There are certain few cases where yielding may improve performance or
+   * response, but most of the time you are likely wanting to use a
+   * ConditionVariable to wait for an event or a Timer.  You should never use
+   * yielding as mitigation for a busy-wait, because you will still use 100%
+   * CPU and essentially you will perform a busy-wait and just lower the
+   * scheduling priority of your thread/process.
+   */
+  //##ModelId=3D1F80610065
+  static void yield();
+
+  /**
    * This method will wait for all threads that the user can control or see
    * to end.  All of the threads created implicitly have a deterministic end
    * so that when you destruct objects the threads associated with them are
