@@ -224,17 +224,17 @@ int main(int argc, char* argv[]) {
 
   //It's okay to use iostreams instead of the Console functions when we are
   //only accessing the console from one thread.
-	cout << "GNE Basic Connections Example for " << GNE::VER_STR << endl;
-  cout << "Local address: " << getLocalAddress() << endl;
-  cout << "Should we act as the server, or the client?" << endl;
-  cout << "Type 1 for client, 2 for server: ";
+	gout << "GNE Basic Connections Example for " << GNE::VER_STR << endl;
+  gout << "Local address: " << getLocalAddress() << endl;
+  gout << "Should we act as the server, or the client?" << endl;
+  gout << "Type 1 for client, 2 for server: ";
   int type;
-  cin >> type;
+  gin >> type;
 
   int port;
   if (type == 2) {
     setTitle("GNE Basic Connections Example -- Server");
-    cout << "Reminder: ports <= 1024 on UNIX can only be used by the superuser." << endl;
+    gout << "Reminder: ports <= 1024 on UNIX can only be used by the superuser." << endl;
     port = getPort("listen on");
     doServer(3000, 3000, port);
   } else {
@@ -247,17 +247,17 @@ int main(int argc, char* argv[]) {
 }
 
 void errorExit(const char* error) {
-  cout << "Error: " << error << endl;
+  gout << "Error: " << error << endl;
   exit(1);
 }
 
 int getPort(const char* prompt) {
   int port;
-  cout << "Which port should we " << prompt << ": ";
-  cin >> port;
+  gout << "Which port should we " << prompt << ": ";
+  gin >> port;
   while ((port < 1) || (port > 65535)) {
-    cout << "Ports range from 1 to 65535, please select one in this range: ";
-    cin >> port;
+    gout << "Ports range from 1 to 65535, please select one in this range: ";
+    gin >> port;
   }
   return port;
 }
@@ -273,8 +273,8 @@ void doServer(int outRate, int inRate, int port) {
   if (server.listen())
     errorExit("Cannot listen on server socket.");
 
-  cout << "Server is listening on: " << server.getLocalAddress() << endl;
-  cout << "Press a key to shutdown server." << endl;
+  gout << "Server is listening on: " << server.getLocalAddress() << endl;
+  gout << "Press a key to shutdown server." << endl;
   getch();
   //When the server class is destructed, it will stop listening and shutdown.
 }
@@ -284,14 +284,14 @@ void doClient(int outRate, int inRate, int port) {
 	initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "client.log");
 #endif
   string host;
-  cout << "Enter hostname or IP address: ";
-  cin >> host;
+  gout << "Enter hostname or IP address: ";
+  gin >> host;
 
 	Address address(host);
 	address.setPort(port);
 	if (!address)
 		errorExit("Invalid address.");
-  cout << "Connecting to: " << address << endl;
+  gout << "Connecting to: " << address << endl;
 
 	ClientConnection client(outRate, inRate, new OurClient());
   if (client.open(address, 0)) //localPort = 0, for any local port.
