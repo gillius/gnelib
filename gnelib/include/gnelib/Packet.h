@@ -46,7 +46,7 @@ public:
    * @param id a number from PacketParser::MIN_USER_ID to 255.  GNE packet
    *        id's are from 0 to MIN_USER_ID-1, inclusive.
    */
-  Packet(int id = 0);
+  explicit Packet(int id = 0);
 
   virtual ~Packet();
 
