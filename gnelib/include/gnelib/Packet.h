@@ -67,24 +67,6 @@ public:
   int getType() const;
 
   /**
-   * Returns the channel this packet is meant to be sent to, or came in from,
-   * depending on the context.  A channel of 0 means "no channel."  In the
-   * high-level GNE API, the channel has meaning.  In the mid-level API, the
-   * channel is just another number sent with the packet that you may treat
-   * specially if desired.
-   */
-  int getChannel() const;
-
-  /**
-   * Sets the channel this Packet is meant for.  If the channel number given
-   * is out of range, this method has no effect, but in the debugging version
-   * of the library, an assert will be triggered.
-   *
-   * @param chan the channel number in the range of [0..255]
-   */
-  void setChannel( int chan );
-
-  /**
    * Returns the current size of this packet in bytes.  When overloading this
    * function, call getSize on the parent class then add the sizes of your
    * additional variables.  If the size cannot be determined, then getSize
@@ -143,12 +125,6 @@ private:
    * The type ID for this Packet.
    */
   guint8 type;
-
-  /**
-   * The channel number for this Packet.
-   */
-  guint8 chan;
-
 };
 
 }

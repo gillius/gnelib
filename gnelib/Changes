@@ -1,4 +1,6 @@
 GNE 0.55 to current
+  Added ChannelProvider and ChannelPacket to add in channel functionality into
+    GNE.
   Added clock synchronization capability into the PingPacket class.
   Added copy constructor and operator= to Time class.
   Modified exisiting packet classes and examples to use RawPacket::getSizeOf.
