@@ -109,7 +109,10 @@ public:
 	/**
 	 * Copy operator you can use to help you in creating your own.
 	 * There is a debug assert in this function that checks to make sure the
-	 * types match.  Call this operator first from your copy operator.
+	 * types match.  Call this operator first from your copy operator.  Many
+   * GNE packets may not support this operation, so check the documentation
+   * first -- if no operator = exists, then assume you cannot copy packets
+   * this way, unless the documentation says otherwise.
 	 */
   //##ModelId=3BDB10A500BE
 	Packet& operator = (const Packet& rhs);
