@@ -32,6 +32,12 @@
 #pragma warning( disable : 4786)
 #endif
 
+//Include system headers
+#ifdef WIN32
+#include <sys/timeb.h>
+#include <windows.h>
+#endif
+
 //Include the HawkNL library
 #include <nl.h>
 
