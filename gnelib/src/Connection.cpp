@@ -42,10 +42,22 @@ Connection::Connection(int outRate, int inRate, ConnectionListener* listener)
 //##ModelId=3B0753810076
 Connection::~Connection() {
   disconnect();
-  if (eventListener)
-    eventListener->join();
   delete ps;
-  delete eventListener;
+  if (eventListener->hasStarted()) {
+    //disconnect calls onDisconnect, which should shut down the EventThread,
+    //and allow detach and join to work as we expect.
+    if (Thread::currentThread() == eventListener) {
+      //This section of code allows the ConnectionListeners to delete their
+      //associated Connections.
+      eventListener->detach(true);
+    } else {
+      eventListener->join();
+      delete eventListener;
+    }
+  } else {
+    //If it was never started, we just delete it.
+    delete eventListener;
+  }
 }
 
 //##ModelId=3BCE75A80280

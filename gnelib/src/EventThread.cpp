@@ -149,8 +149,8 @@ void EventThread::run() {
 
       } else if (onDisconnectEvent) {
         eventListener->onDisconnect();
-        onDisconnectEvent = false;
-        shutDown(); //Make sure NO other events are called.
+        return;  //terminate this thread since there are no other events to
+                 //process -- onDisconnect HAS to be the last.
 
       } else if (onReceiveEvent) {
         //This is set to false before in case we get more packets during the

@@ -1,4 +1,7 @@
 GNE 0.4 to Current
+  You can now delete the connection associated with a ConnectionListener in
+    onDisconnect (previously you could never do this).  You can still delete
+    it from any thread other than the EventThread at any time.
   Bugfixes related to Win32 Console I/O.  Now properly detects size in Win 2k
     and clears the screen on exit (to be consistant with curses, and to not
     clobber the command prompt if it exists).
