@@ -55,18 +55,15 @@ public:
   ~PongClient() {}
 
   Connection::sptr getConnection() {
-    return conn;
+    return ourConn;
   }
 
-  void onDisconnect() {
-  }
-
-  void onExit() {
+  void onExit( Connection& conn ) {
     mlprintf(0, 24, "Remote player quit.  Press q to exit.");
   }
 
-  void onConnect(SyncConnection& conn2) {
-    conn = conn2.getConnection();
+  void onConnect(SyncConnection& conn) {
+    ourConn = conn.getConnection();
 
     //Do connection negotiation here.  If it fails, onConnectFailure will be
     //called.  Any interaction we have will conn2 can throw an exception.
@@ -81,15 +78,15 @@ public:
     //First, read from the server if there is a player slot open and we are
     //accepted.  If not, throw a connection refused error.
     gbool accepted;
-    conn2 >> buf;
+    conn >> buf;
     buf.getData() >> accepted;
     if (!accepted) {
-      conn2.disconnect();
+      conn.disconnect();
       throw Error(Error::ConnectionRefused);
     }
 
     //If we are accepted, we should be receiving the remote player's name.
-    conn2 >> buf;
+    conn >> buf;
     string remoteName;
     buf.getData() >> remoteName;
     remotePlayer->setName(remoteName);
@@ -97,33 +94,33 @@ public:
     //Now we should send our name.
     buf.reset();
     buf.getData() << localPlayer->getName();
-    conn2 << buf;
+    conn << buf;
 
     //Now we are ready to play pong!
   }
 
-  void onNewConn(SyncConnection& conn2) {
-    conn = conn2.getConnection();
+  void onNewConn(SyncConnection& conn) {
+    ourConn = conn.getConnection();
 
     CustomPacket buf;
     //Tell the client that they have been accepted
     buf.getData() << gTrue;
-    conn2 << buf;
+    conn << buf;
     //and send them our name.
     buf.reset();
     buf.getData() << localPlayer->getName();
-    conn2 << buf;
+    conn << buf;
 
     //Now we wait for the client's name.
-    conn2 >> buf;
+    conn >> buf;
 
     string remoteName;
     buf.getData() >> remoteName;
     remotePlayer->setName(remoteName);
   }
 
-  void onReceive() {
-    Packet* next = conn->stream().getNextPacket();
+  void onReceive( Connection& conn ) {
+    Packet* next = conn.stream().getNextPacket();
     while (next != NULL) {
       int type = next->getType();
       if (type == PaddleMovement::ID) {
@@ -138,7 +135,7 @@ public:
         PingPacket& ping = *((PingPacket*)next);
         if (ping.isRequest()) {
           ping.makeReply();
-          conn->stream().writePacket(ping, true);
+          conn.stream().writePacket(ping, true);
         } else {
           mlprintf(63, 24, "Ping: %ss",
             ping.getPingInformation().pingTime.toString().c_str());
@@ -149,7 +146,7 @@ public:
       }
 
       delete next;
-      next = conn->stream().getNextPacket();
+      next = conn.stream().getNextPacket();
     }
   }
 
@@ -159,32 +156,32 @@ public:
     //The paddle has moved.  Now let's tell the other side about that.
     PaddleMovement packet;
     packet.newy = newy;
-    conn->stream().writePacket(packet, true);
+    ourConn->stream().writePacket(packet, true);
   }
 
   void ballMissed() {
     //We missed the ball.  Now let's tell the other side about that.
     BallMissed packet;
-    conn->stream().writePacket(packet, true);
+    ourConn->stream().writePacket(packet, true);
   }
 
-  void onFailure(const Error& error) {
+  void onFailure( Connection& conn, const Error& error ) {
     mlprintf(0, 24, "Socket failure: %s   ", error.toString().c_str());
     //No need to disconnect, this has already happened on a failure.
   }
 
-  void onError(const Error& error) {
+  void onError( Connection& conn, const Error& error ) {
     mlprintf(0, 24, "Socket error: %s   ", error.toString().c_str());
-    conn->disconnect();//For simplicity we treat even normal errors as fatal.
+    conn.disconnect();//For simplicity we treat even normal errors as fatal.
   }
 
-  void onConnectFailure(const Error& error) {
+  void onConnectFailure( Connection& conn, const Error& error ) {
     gout << "Connection to server failed." << endl;
     gout << "  GNE reported error: " << error << endl;
   }
 
 private:
-  Connection::sptr conn;
+  Connection::sptr ourConn;
 
   Player* remotePlayer;
   Player* localPlayer;
@@ -204,12 +201,12 @@ public:
     return sptr( new RefuseClient() );
   }
 
-  void onNewConn(SyncConnection& conn2) {
+  void onNewConn(SyncConnection& conn) {
     CustomPacket buf;
     //Tell the client that they have been refused
     buf.getData() << gFalse;
-    conn2 << buf;
-    conn2.disconnect();
+    conn << buf;
+    conn.disconnect();
     throw Error(Error::ConnectionRefused);
   }
 private:

@@ -56,24 +56,16 @@ public:
 
   ~PingTest() {}
 
-  void onDisconnect() {
+  void onDisconnect( Connection& conn ) {
     //Get any packets that are left and shut down.
-    receivePackets();
+    receivePackets( conn );
   }
 
-  void onConnect(SyncConnection& conn2) {
-    conn = conn2.getConnection();
+  void onReceive( Connection& conn ) {
+    receivePackets( conn );
   }
 
-  void onNewConn(SyncConnection& conn2) {
-    conn = conn2.getConnection();
-  }
-
-  void onReceive() {
-    receivePackets();
-  }
-
-  void onTimeout() {
+  void onTimeout( Connection& conn ) {
     LockObject lock( gout );
     //The timeout is called when nothing has been received for our specified
     //timeout, or since the last onTimeout event.
@@ -81,29 +73,29 @@ public:
          << "the last " << TIMEOUT << " ms." << endl;
   }
 
-  void onFailure(const Error& error) {
+  void onFailure( Connection& conn, const Error& error ) {
     LockObject lock( gout );
     gout << "Socket failure: " << error << endl;
     //No need to disconnect, this has already happened on a failure.
   }
 
-  void onError(const Error& error) {
+  void onError( Connection& conn, const Error& error ) {
     {
       LockObject lock( gout );
       gout << "Socket error: " << error << endl;
     }
-    conn->disconnect();//For simplicity we treat even normal errors as fatal.
+    conn.disconnect();//For simplicity we treat even normal errors as fatal.
   }
 
-  void onConnectFailure(const Error& error) {
+  void onConnectFailure( Connection& conn, const Error& error ) {
     LockObject lock( gout );
     gout << "Connection to server failed.   " << endl;
     gout << "  GNE reported error: " << error << endl;
   }
 
-  void receivePackets() {
+  void receivePackets( Connection& conn ) {
     //We check for PingPackets.  Anything else we get is an error though.
-    Packet* next = conn->stream().getNextPacket();
+    Packet* next = conn.stream().getNextPacket();
 
     while (next != NULL) {
 
@@ -112,7 +104,7 @@ public:
 
         if (ping->isRequest()) {
           ping->makeReply();
-          conn->stream().writePacket(*ping, true);
+          conn.stream().writePacket(*ping, true);
 
         } else {
           PingInformation info = ((PingPacket*)next)->getPingInformation();
@@ -128,12 +120,9 @@ public:
       }
 
       delete next;
-      next = conn->stream().getNextPacket();
+      next = conn.stream().getNextPacket();
     }
   }
-
-private:
-  Connection::sptr conn;
 };
 
 class OurListener : public ServerConnectionListener {

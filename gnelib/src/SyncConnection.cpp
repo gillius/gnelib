@@ -178,8 +178,9 @@ bool SyncConnection::isReleased() const {
 SyncConnection& SyncConnection::operator >> (Packet& packet) {
   //We have to acquire the mutex now so that an error cannot occur between
   //checkError and our wait.
-  recvNotify.acquire();
-  try {
+  {
+    LockCV lock( recvNotify );
+
     checkError();
     assert(!isReleased());
     while (!conn->stream().isNextPacket()) {
@@ -187,11 +188,7 @@ SyncConnection& SyncConnection::operator >> (Packet& packet) {
       //Check if we were woken up due to an error.
       checkError();
     }
-  } catch (...) {
-    recvNotify.release();
-    throw;
   }
-  recvNotify.release();
 
   //Now that we have some data, do the actual receiving.
   Packet* recv = conn->stream().getNextPacket();
@@ -234,42 +231,52 @@ void SyncConnection::onNewConn(SyncConnection& newConn) {
   oldListener->onNewConn(newConn);
 }
 
-void SyncConnection::onConnect(SyncConnection& conn) {
+void SyncConnection::onConnect(SyncConnection& newConn) {
+  //newConn should be this object.  We don't do any double wrapping.
+  assert(this == &newConn);
   assert(!isReleased());
-  oldListener->onConnect(conn);
+  oldListener->onConnect(newConn);
 }
 
-void SyncConnection::onConnectFailure(const Error& error) {
+void SyncConnection::onConnectFailure( Connection& conn2, const Error& error ) {
+  assert( conn.get() == &conn2 );
   setError(error);
 }
 
-void SyncConnection::onDisconnect() {
+void SyncConnection::onDisconnect( Connection& conn2 ) {
+  assert( conn.get() == &conn2 );
   //This should never happen.  An error should occur first, and at that time
   //we are released, and the onDisconnect event should be sent to the
   //original listener.
   assert(false);
 }
 
-void SyncConnection::onError(const Error& error) {
-  conn->disconnect();
+void SyncConnection::onError( Connection& conn2, const Error& error ) {
+  assert( conn.get() == &conn2 );
+  conn2.disconnect();
   //Turn errors on a SyncConnection into a failure.
-  onFailure(error);
+  onFailure( conn2, error);
 }
 
-void SyncConnection::onFailure(const Error& error) {
+void SyncConnection::onFailure( Connection& conn2, const Error& error ) {
+  assert( conn.get() == &conn2 );
   setError(error);
   //Stop the event thread until release properly restarts it.
-  conn->setListener( ConnectionListener::sptr() );
+  conn2.setListener( ConnectionListener::sptr() );
 }
 
-void SyncConnection::onExit() {
+void SyncConnection::onExit( Connection& conn2 ) {
+  assert( conn.get() == &conn2 );
   setError( Error(Error::ExitNoticeReceived) );
   //Stop the event thread until release properly restarts it.
-  conn->setListener( ConnectionListener::sptr() );
+  conn2.setListener( ConnectionListener::sptr() );
 }
 
-void SyncConnection::onReceive() {
+void SyncConnection::onReceive( Connection& conn2 ) {
+  assert( conn.get() == &conn2 );
+
   //Notify anyone who is waiting for data to come in (namely operator <<).
+  LockCV lock( recvNotify );
   recvNotify.signal();
 }
 
@@ -288,7 +295,7 @@ void SyncConnection::checkError() {
   }
 }
 
-void SyncConnection::setError(const Error& error) {
+void SyncConnection::setError( const Error& error ) {
   //We don't need to lock sync here because events can't occur while release
   //is setting its "released" error since setListener blocks.  We couldn't
   //lock it anyways for the same reason as well.

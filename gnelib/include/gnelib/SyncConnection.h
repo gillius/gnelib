@@ -243,15 +243,14 @@ private:
    * The event listeners for SyncConnection that will override the current
    * listener our connection has.
    */
-  void onNewConn(SyncConnection& newConn);
-  void onConnect(SyncConnection& conn);
-  void onConnectFailure(const Error& error);
-  void onDisconnect();
-  void onError(const Error& error);
-  void onFailure(const Error& error);
-  void onExit();
-  void onReceive();
-  void onDoneWriting();
+  virtual void onConnect(SyncConnection&);
+  virtual void onConnectFailure(Connection&, const Error&);
+  virtual void onNewConn(SyncConnection&);
+  virtual void onDisconnect( Connection& );
+  virtual void onExit( Connection& );
+  virtual void onError( Connection&, const Error&);
+  virtual void onFailure( Connection&, const Error&);
+  virtual void onReceive( Connection& );
 
   /**
    * A ConditionVariable we can wait on to wait for incoming data.

@@ -85,49 +85,49 @@ public:
 
   ~PerfTester() {}
 
-  void onDisconnect() {
-    sDisplay->delConn(conn);
+  void onDisconnect( Connection& conn ) {
+    sDisplay->delConn(ourConn);
   }
 
-  void onConnect(SyncConnection& conn2) {
-    conn = conn2.getConnection();
-    sDisplay->addConn(conn, &packetsIn, &packetsOut);
+  void onConnect(SyncConnection& conn) {
+    ourConn = conn.getConnection();
+    sDisplay->addConn(ourConn, &packetsIn, &packetsOut);
   }
 
-  void onNewConn(SyncConnection& conn2) {
-    conn = conn2.getConnection();
-    sDisplay->addConn(conn, &packetsIn, &packetsOut);
+  void onNewConn(SyncConnection& conn) {
+    ourConn = conn.getConnection();
+    sDisplay->addConn(ourConn, &packetsIn, &packetsOut);
   }
 
-  void onReceive() {
+  void onReceive( Connection& conn ) {
     //We don't need to do anything to the data we are being sent.  The low-
     //level routines will keep track of the stats for us, so we just delete
     //the packets we get.
-    Packet* next = conn->stream().getNextPacket();
+    Packet* next = conn.stream().getNextPacket();
     while (next != NULL) {
       delete next;
       packetsIn++;
-      next = conn->stream().getNextPacket();
+      next = conn.stream().getNextPacket();
     }
   }
 
-  void onFailure(const Error& error) {
+  void onFailure( Connection& conn, const Error& error ) {
     mlprintf(0, 0, "Socket failure: %s   ", error.toString().c_str());
     //No need to disconnect, this has already happened on a failure.
   }
 
-  void onError(const Error& error) {
+  void onError( Connection& conn, const Error& error ) {
     mlprintf(0, 0, "Socket error: %s   ", error.toString().c_str());
-    conn->disconnect();//For simplicity we treat even normal errors as fatal.
+    conn.disconnect();//For simplicity we treat even normal errors as fatal.
   }
 
-  void onConnectFailure(const Error& error) {
+  void onConnectFailure( Connection& conn, const Error& error ) {
     mprintf("Connection to server failed.   ");
     mprintf("  GNE reported error: %s   ", error.toString().c_str());
   }
 
   //The implementation of the only PacketFeeder interface method
-  void onLowPackets(PacketStream& ps) {
+  void onLowPackets( PacketStream& ps ) {
     //  Note that while only one event from a connection through its
     //ConnectionListener will be processed at a time, the PacketFeeder does
     //not follow this rule, so any of the events plus onLowPackets may be
@@ -136,11 +136,11 @@ public:
     //no packets to send yet.
 
     //We don't need to use ps because we store the connection pointer.
-    writePackets();
+    writePackets( ps );
   }
 
   //Try to send out some more packets of random size with random databytes.
-  void writePackets() {
+  void writePackets( PacketStream& ps ) {
     //Find packetsize in 32-bit words
     //We pick a range of 2 to 100 because that is the typical GNE packet
     //size in game.  GNE is meant to combine the packets to optimize
@@ -156,14 +156,14 @@ public:
     for (int c = 0; c < packetSize; c++)
       temp.getData() << rng.getNum();
 
-    conn->stream().writePacket(temp, true);
+    ps.writePacket(temp, true);
     packetsOut++;
   }
 
 private:
   int packetsIn;
   int packetsOut;
-  Connection::sptr conn;
+  Connection::sptr ourConn;
 };
 
 class OurListener : public ServerConnectionListener {

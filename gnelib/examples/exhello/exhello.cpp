@@ -66,34 +66,34 @@ public:
     mprintf("Client listener destroyed.\n");
   }
 
-  void onDisconnect() { 
+  void onDisconnect( Connection& conn ) { 
     mprintf("Client just disconnected.\n");
   }
 
-  void onExit() {
+  void onExit( Connection& conn ) {
     mprintf("Server gracefully disconnected.\n");
   }
 
   void onConnect(SyncConnection& conn2) {
-    conn = conn2.getConnection();
+    Connection& conn = *conn2.getConnection();
     mprintf("Connection to server successful.\n");
     mprintf("  From us at %s/TCP to server at %s/TCP.\n",
-      conn->getLocalAddress(true).toString().c_str(),
-      conn->getRemoteAddress(true).toString().c_str());
+      conn.getLocalAddress(true).toString().c_str(),
+      conn.getRemoteAddress(true).toString().c_str());
     //Test to see if we have an unreliable local address, and if so, report
     //what the addresses are.
-    if (conn->getLocalAddress(false)) {
+    if (conn.getLocalAddress(false)) {
       mprintf("  From us at %s/UDP to server at %s/UDP.\n",
-        conn->getLocalAddress(false).toString().c_str(),
-        conn->getRemoteAddress(false).toString().c_str());
+        conn.getLocalAddress(false).toString().c_str(),
+        conn.getRemoteAddress(false).toString().c_str());
     } else {
       mprintf("  Unreliable connection refused by server.\n");
     }
   }
 
-  void onReceive() {
+  void onReceive( Connection& conn ) {
     Packet* message = NULL;
-    while ( (message = conn->stream().getNextPacket()) != NULL ) {
+    while ( (message = conn.stream().getNextPacket()) != NULL ) {
       if ( message->getType() == HelloPacket::ID ) {
         HelloPacket* helloMessage = (HelloPacket*)message;
         LockObject lock( gout );
@@ -105,17 +105,17 @@ public:
     }
   }
 
-  void onFailure(const Error& error) {
+  void onFailure( Connection& conn, const Error& error ) {
     mprintf("Socket failure: %s\n", error.toString().c_str());
     //No need to disconnect, this has already happened on a failure.
   }
 
-  void onError(const Error& error) {
+  void onError( Connection& conn, const Error& error ) {
     mprintf("Socket error: %s\n", error.toString().c_str());
-    conn->disconnect();//For simplicity we treat even normal errors as fatal.
+    conn.disconnect();//For simplicity we treat even normal errors as fatal.
   }
 
-  void onConnectFailure(const Error& error) {
+  void onConnectFailure( Connection& conn, const Error& error) {
     //Since we are using join in our client connecting code, this event is
     //not really needed, but we can display the error message here or in the
     //doClient function when it finds out the connection failed.  Either way
@@ -123,8 +123,6 @@ public:
     mprintf("Connection to server failed.\n");
     mprintf("GNE reported error: %s\n", error.toString().c_str());
   }
-private:
-  Connection::sptr conn;
 };
 
 class OurServer : public ConnectionListener {
@@ -146,48 +144,48 @@ public:
     mprintf("Server listener killed\n");
   }
 
-  void onDisconnect() { 
+  void onDisconnect( Connection& conn ) { 
     //Call receivePackets one last time to make sure we got all data.
     //It is VERY possible for data still left unread if we get this event,
     //even though we read all data from onReceive.
-    receivePackets();
+    receivePackets( conn );
     mprintf("ServerConnection just disconnected.\n");
     if (!received)
       mprintf("No message received.\n");
   }
 
-  void onExit() {
+  void onExit( Connection& conn ) {
     mprintf("Client gracefully disconnected.\n");
   }
 
-  void onNewConn(SyncConnection& conn2) {
-    conn = conn2.getConnection();
+  void onNewConn( SyncConnection& conn2) {
+    Connection& conn = *conn2.getConnection();
     mprintf("Connection received; waiting for message...\n");
     mprintf("  From us at %s/TCP to client at %s/TCP.\n",
-      conn->getLocalAddress(true).toString().c_str(),
-      conn->getRemoteAddress(true).toString().c_str());
+      conn.getLocalAddress(true).toString().c_str(),
+      conn.getRemoteAddress(true).toString().c_str());
     //Test to see if we have an unreliable local address, and if so, report
     //what the addresses are.
-    if (conn->getLocalAddress(false)) {
+    if (conn.getLocalAddress(false)) {
       mprintf("  From us at %s/UDP to client at %s/UDP.\n",
-        conn->getLocalAddress(false).toString().c_str(),
-        conn->getRemoteAddress(false).toString().c_str());
+        conn.getLocalAddress(false).toString().c_str(),
+        conn.getRemoteAddress(false).toString().c_str());
     } else {
       mprintf("  Unreliable connection refused by client.\n");
     }
   }
 
-  void onReceive() {
-    receivePackets();
+  void onReceive( Connection& conn ) {
+    receivePackets( conn );
   }
 
-  void onFailure(const Error& error) {
+  void onFailure( Connection& conn, const Error& error ) {
     mprintf("Socket failure: %s\n", error.toString().c_str());
   }
 
-  void onError(const Error& error) {
+  void onError( Connection& conn, const Error& error ) {
     mprintf("Socket error: %s\n", error.toString().c_str());
-    conn->disconnect();
+    conn.disconnect();
   }
 
   //Tries to receive and process packets.
@@ -195,11 +193,11 @@ public:
   //onDisconnect and it is perfectly valid to send data from onDisconnect --
   //it just won't ever be sent ;), but there is no reason to pass in a param
   //and check for disconnection just so we don't send the data.
-  void receivePackets() {
+  void receivePackets( Connection& conn ) {
     //This time we use the SmartPtr version of getNextPacket, to show both
     //ways.  Using the SP version we don't need to call destroyPacket.
     Packet::sptr message;
-    while ( (message = conn->stream().getNextPacketSp() ) ) {
+    while ( (message = conn.stream().getNextPacketSp() ) ) {
       if ( message->getType() == HelloPacket::ID ) {
         HelloPacket::sptr helloMessage = static_pointer_cast<HelloPacket>( message );
         mprintf("got message: \"%s\"\n", helloMessage->getMessage().c_str());
@@ -208,14 +206,13 @@ public:
         //Send Response
         mprintf("  Sending Response...\n");
         HelloPacket response("Hello, client!  I'm the event-driven server!");
-        conn->stream().writePacket(response, true);
+        conn.stream().writePacket(response, true);
       } else
         mprintf("got bad packet.\n");
     }
   }
 
 private:
-  Connection::sptr conn;
   bool received;
 };
 

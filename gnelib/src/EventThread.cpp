@@ -193,20 +193,20 @@ void EventThread::run() {
 
     //Check for events, processing them if events are pending
     if (onExitEvent) {
-      listener->onExit();
+      listener->onExit( *ourConn );
       ourConn->disconnect();
       onExitEvent = false; //set this after onDisconnectEvent is set
       //we want to reevaluate listener (because of SyncConnection), so we don't
       //directly call onDisconnect here.
 
     } else if (failure) {
-      listener->onFailure(*failure);
+      listener->onFailure( *ourConn, *failure );
       ourConn->disconnect();
       delete failure;
       failure = NULL; //set this after onDisconnectEvent is set
 
     } else if (onDisconnectEvent) {
-      listener->onDisconnect();
+      listener->onDisconnect( *ourConn );
       return;  //terminate this thread since there are no other events to
       //process -- onDisconnect HAS to be the last.
 
@@ -214,11 +214,11 @@ void EventThread::run() {
       //This is set to false before in case we get more packets during the
       //onReceive event.
       onReceiveEvent = false;
-      listener->onReceive();
+      listener->onReceive( *ourConn );
 
     } else if (onTimeoutEvent) {
       onTimeoutEvent = false;
-      listener->onTimeout();
+      listener->onTimeout( *ourConn );
 
     } else {
       LockCVEx lock( eventSync );
@@ -228,7 +228,7 @@ void EventThread::run() {
       lock.release();
 
       //When we get here this is the only reason left why we were woken up!
-      listener->onError(*e);
+      listener->onError( *ourConn, *e );
       delete e;
     }
   }

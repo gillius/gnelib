@@ -120,7 +120,7 @@ public:
    * Note: Only ClientConnection generates this event.
    * @see Connection::disconnect()
    */
-  virtual void onConnectFailure(const Error& error);
+  virtual void onConnectFailure(Connection& conn, const Error& error);
 
   /**
    * Event triggered when a new connection has been negotiated and error
@@ -185,7 +185,7 @@ public:
    * generated.  After onNewConn or onConnect completes, then and only then
    * might a onDisconnect event be generated.
    */
-  virtual void onDisconnect();
+  virtual void onDisconnect( Connection& conn );
 
   /**
    * This event is triggered when the remote end has gracefully closed the
@@ -197,7 +197,7 @@ public:
    * is only a single event thread per connection.  Therefore, no other
    * events will be called until this function completes for this connection.
    */
-  virtual void onExit();
+  virtual void onExit( Connection& conn );
 
   /**
    * An onTimeout event occurs ms milliseconds after the last onReceive event,
@@ -218,7 +218,7 @@ public:
    * keep onTimeout events from occuring, you have to send them yourself and
    * respond to them yourself as well.
    */
-  virtual void onTimeout();
+  virtual void onTimeout( Connection& conn );
 
   /**
    * This event is triggered when a non-fatal error occurs in a connection
@@ -236,7 +236,7 @@ public:
    * @see onFailure()
    * @see disconnect()
    */
-  virtual void onError(const Error& error);
+  virtual void onError( Connection& conn, const Error& error);
 
   /**
    * This event is triggered when a fatal error occurs in a connection.
@@ -250,7 +250,7 @@ public:
    *
    * @see onError()
    */
-  virtual void onFailure(const Error& error);
+  virtual void onFailure( Connection& conn, const Error& error);
 
   /**
    * Event triggered when one or more packets have been recieved.  It is
@@ -263,7 +263,7 @@ public:
    * is only a single event thread per connection.  Therefore, no other
    * events will be called until this function completes for this connection.
    */
-  virtual void onReceive();
+  virtual void onReceive( Connection& conn );
 
 };
 

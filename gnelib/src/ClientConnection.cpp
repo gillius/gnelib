@@ -342,11 +342,11 @@ void ClientConnection::setupUnreliable(const Address& dest) {
 void ClientConnection::doFailure( const SmartPtr< ConnectionListener >& l, const Error& e ) {
   if ( shutdown ) {
     Error err( Error::ConnectionAborted );
-    l->onConnectFailure( err );
+    l->onConnectFailure( *this, err );
     connError = err;
 
   } else { 
-    l->onConnectFailure( e );
+    l->onConnectFailure( *this, e );
     connError = e;
   }
 }

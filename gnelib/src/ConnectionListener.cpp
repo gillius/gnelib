@@ -34,28 +34,28 @@ ConnectionListener::sptr ConnectionListener::getNullListener() {
 void ConnectionListener::onConnect(SyncConnection& conn) {
 }
 
-void ConnectionListener::onConnectFailure(const Error& error) {
+void ConnectionListener::onConnectFailure( Connection& conn, const Error& error ) {
 }
 
 void ConnectionListener::onNewConn(SyncConnection& newConn) {
 }
 
-void ConnectionListener::onDisconnect() {
+void ConnectionListener::onDisconnect( Connection& conn ) {
 }
 
-void ConnectionListener::onExit() {
+void ConnectionListener::onExit( Connection& conn ) {
 }
 
-void ConnectionListener::onTimeout() {
+void ConnectionListener::onTimeout( Connection& conn ) {
 }
 
-void ConnectionListener::onError(const Error& error) {
+void ConnectionListener::onError( Connection& conn, const Error& error ) {
 }
 
-void ConnectionListener::onFailure(const Error& error) {
+void ConnectionListener::onFailure( Connection& conn, const Error& error ) {
 }
 
-void ConnectionListener::onReceive() {
+void ConnectionListener::onReceive( Connection& conn ) {
 }
 
 } //namespace GNE

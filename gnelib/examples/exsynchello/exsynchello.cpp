@@ -56,7 +56,7 @@ public:
     gout << "ServerConnection instance killed" << endl;
   }
 
-  void onDisconnect() { 
+  void onDisconnect( Connection& conn ) { 
     LockObject lock( gout );
     gout << "ServerConnection just disconnected." << endl;
     if (!received)
@@ -163,5 +163,3 @@ void doClient(int outRate, int inRate, int port) {
     }
   //}
 }
-
-
