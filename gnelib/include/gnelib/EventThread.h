@@ -176,16 +176,16 @@ private:
   Time timeout;
   Time nextTimeout;
 
-  bool onReceiveEvent;
-  bool onTimeoutEvent;
+  volatile bool onReceiveEvent;
+  volatile bool onTimeoutEvent;
 
   //If this is true, we should not receive any more events.  It should be the
   //next event called, and everything else should stop.
-  bool onDisconnectEvent;
+  volatile bool onDisconnectEvent;
 
   //If this is true, an graceful exit notice was received, and the next event
   //is an onDisconnectEvent.
-  bool onExitEvent;
+  volatile bool onExitEvent;
 
   //Wish we could combine error events and report the last error, but this
   //really isn't what the API specifies, so we should keep track of every
