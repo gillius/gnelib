@@ -21,6 +21,9 @@
 #include "../include/gnelib/Thread.h"
 #include "../include/gnelib/ConditionVariable.h"
 #include "../include/gnelib/Error.h"
+#include "../include/gnelib/Timer.h"
+#include "../include/gnelib/Time.h"
+#include "../include/gnelib/GNE.h"
 
 namespace GNE {
 
@@ -87,6 +90,31 @@ void Thread::sleep(int ms) {
   sleeper.timedWait(ms);
   sleeper.release();
 #endif
+}
+
+//##ModelId=3C885B3800E8
+bool Thread::waitForAllThreads(int ms) {
+  if (ms > INT_MAX / 1000)
+    ms = INT_MAX / 1000;
+
+  Time t = Timer::getCurrentTime();
+  t += ms * 1000;
+
+  bool ret = false;
+  bool timeout = false;
+  while (!ret) {
+    ret = timeout = (Timer::getCurrentTime() < t);
+    if (!timeout) {
+      mapSync.acquire();
+      //Take into accout the CEG thread.
+      ret = (threads.size() <= ((GNE::eGen) ? 1 : 0) );
+      mapSync.release();
+    }
+    if (!ret)
+      sleep(20);
+  }
+
+  return timeout;
 }
 
 //##ModelId=3B0753810380

@@ -29,14 +29,17 @@ namespace GNE {
  * A class resembling a thread.
  * Derive your own classes from this class that implement the run function.
  * Execution begins in the run method.  All methods of this class are thread-
- * safe.\n
+ * safe.
+ *
  * This class is a wrapper for pthreads, so please read man pages or other
  * documentation for the equivalent pthreads functions if you need to
- * understand the specifics on the semantics of these functions.\n
+ * understand the specifics on the semantics of these functions.
+ *
  * NOTE: All threads must either be detached or joined.  If you choose to
  * detach a thread you may not access that Thread object again.  If you need
  * to access it at a later time, keep a pointer, then at a later time call
  * join on this pointer, then delete at some later time.
+ *
  * \todo Priorities are not yet implemented.
  */
 //##ModelId=3B075380034B
@@ -68,6 +71,33 @@ public:
   static void sleep(int ms);
 
   /**
+   * This method will wait for all threads that the user can control or see
+   * to end.  All of the threads created implicitly have a deterministic end
+   * so that when you destruct objects the threads associated with them are
+   * deleted.  Therefore only threads that you have directly created and
+   * detached (rather than joined) might still be running.  You can use this
+   * static method to wait for and therefore verify their completion, since
+   * when main exits, your threads will be terminated forcefully if they are
+   * running.
+   *
+   * The implementation of this method is simple and therefore not intended
+   * to be used to create a program where you create detached threads and
+   * then use the main thread to sit in this function until the "real"
+   * program completes.  It is meant solely as a method of definitvely
+   * verifying the completion of detached threads, and waiting short times
+   * for these threads to finish if needed.  If you need to wait a long time,
+   * use join on the threads you've made, as this method is more efficient.
+   *
+   * @param ms the amount of time to wait for the threads before giving up.
+   *           This is used so a stalled or crashed thread will still allow
+   *           you to terminate the program.
+   * @return true if all threads have completed, or false if there are still
+   *              some threads running and the method timed out.
+   */
+  //##ModelId=3C885B3800E8
+  static bool waitForAllThreads(int ms);
+
+  /**
    * Returns the name of this thread.
    */
   //##ModelId=3B0753810380
@@ -77,12 +107,15 @@ public:
    * Tells this thread to shutdown, if it is in an infinite loop.  You will
    * probably want to call join right after calling this to wait for the
    * shutdown to complete which is dependant on the thread you are shutting
-   * down.\n
+   * down.
+   *
    * This function is virtual if the thread needs any additional actions to
    * notify itself to shutdown, for example if it is waiting for some event on
-   * a ConditionVariable.\n
+   * a ConditionVariable.
+   *
    * You will want to call this function from the override to make sure that
-   * shutdown is set to true.\n
+   * shutdown is set to true.
+   *
    * This function is safe to call multiple times, but you cannot undo a
    * shutdown once it has been called.
    */
@@ -108,14 +141,17 @@ public:
    * In other words, at any moment after detach the Thread instance could be
    * be deleted because the thread terminated (or has already terminated).
    * But, of course a running thread could still access itself as it clearly
-   * has not stopped and is still running.\n
+   * has not stopped and is still running.
+   *
    * If you care about reading the data from a thread after its completion,
    * do not use detach and instead use join.  It is useful to do this if you
    * want to release OS thread resources
-   * and still keep the class running (as in the Connection classes).\n
+   * and still keep the class running (as in the Connection classes).
+   *
    * Pass false if the the thread should not auto-destruct when it ends --
    * this is useful when you declared a thread on the stack, or you want to
    * poll for completion.
+   *
    * @param delThis true if the thread should delete itself when it
    *                finishes executing.
    * @see join

@@ -1,4 +1,7 @@
 GNE 0.45 to current
+  Added Thread::waitForAllThreads to verify the completion of detached
+    threads, and updated the exthreads example to test/show this new method.
+  Added a += operator to the Time class: operator+=(const Time& rhs)
   Exception scheme changed.  Exception specifiers were removed because it was
     found that they can be problematic with some compilers and cause
     undesired behavior with intermediate functions if they are changed.

@@ -78,6 +78,13 @@ private:
   Mutex& testMutex;
 };
 
+class WaitingThread : public Thread {
+protected:
+  void run() {
+    sleep(1000);
+  }
+};
+
 int main(int argc, char* argv[]) {
   initGNE(NO_NET, atexit);
   initConsole(atexit);
@@ -152,12 +159,32 @@ int main(int argc, char* argv[]) {
   diffTime = diffTime - lastTime;
 
   mprintf("GNE timers report sleeping time of %i microseconds (us)\n", diffTime.getTotaluSec());
+  
+  mprintf("Now testing Thread::waitForAllThreads.\n");
+  WaitingThread waiter;
+  waiter.start();
+  waiter.detach(false);
+  //this should timeout as the waiter thread waits for 1000 ms.
+  bool timeout = Thread::waitForAllThreads(150);
+  if (timeout)
+    mprintf("Thread::waitForAllThreads timed out properly.\n");
+  else
+    mprintf("Thread::waitForAllThreads method failed.\n");
+
+  //The waiter thread should definitely finish during this call.
+  timeout = Thread::waitForAllThreads(INT_MAX);
+  if (timeout)
+    mprintf("Thread::waitForAllThreads method failed.\n");
+  else
+    mprintf("Thread::waitForAllThreads 2nd call completed successfully.\n");
+  
   mprintf("Press a key to continue.\n");
   getch();
 
   //At this point, all threads that are running will be terminated.  When
   //main exits, everything goes.  Use join if you want to guarantee your
-  //threads have exited
+  //threads have exited, or use waitForAllThreads to definitively verify that
+  //detached threads have ended.
   return 0;
 }
 
