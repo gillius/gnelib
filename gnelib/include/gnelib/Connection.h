@@ -144,10 +144,12 @@ public:
    * disconnect, except that all data waiting to be sent will be sent if
    * possible.  If the connection is already disconnected, this function does
    * nothing.
+   * @param waitTime the max amount of time in ms to wait for the outgoing
+   *        packet queue to clear.
    * @see #disconnect()
    */
   //##ModelId=3B0753810084
-  void disconnectSendAll();
+  void disconnectSendAll(int waitTime = 10000);
 
 protected:
   EventThread* eventListener;

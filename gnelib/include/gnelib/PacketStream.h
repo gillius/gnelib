@@ -112,9 +112,11 @@ public:
 
   /**
    * Blocks on this PacketStream until all packets have been sent.
+   * @param waitTime the max amount of time in ms to wait for the outgoing
+   *        packet queue to clear.
    */
   //##ModelId=3B07538101F9
-  void waitToSendAll();
+  void waitToSendAll(int waitTime = 10000);
 
   /**
    * Overrides Thread::shutDown so that the PacketStream daemon thread will

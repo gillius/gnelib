@@ -119,9 +119,9 @@ void Connection::disconnect() {
 }
 
 //##ModelId=3B0753810084
-void Connection::disconnectSendAll() {
+void Connection::disconnectSendAll(int waitTime) {
   if (connected) {
-    ps->waitToSendAll();
+    ps->waitToSendAll(waitTime);
     disconnect();
   }
 }

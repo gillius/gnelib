@@ -183,6 +183,7 @@ void doClient(int outRate, int inRate, int port) {
     errorExit("Invalid address.");
   gout << "Connecting to: " << address << endl;
 
+  //uncomment the loop to perform a stress test.
   //for (int i=0; i <500; i++) {
     ClientConnection* client = new ClientConnection(new OurClient());
     if (client->open(address)) {
@@ -202,6 +203,8 @@ void doClient(int outRate, int inRate, int port) {
       HelloPacket message("Hello, server!  I'm the event-driven client!");
       client->stream().writePacket(message, true);
       client->stream().writePacket(message, false);
+      //Wait a little for any responses.
+      Thread::sleep(500);
       client->stream().waitToSendAll();
       
     }

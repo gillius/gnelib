@@ -23,6 +23,8 @@
 #include "../include/gnelib/Connection.h"
 #include "../include/gnelib/RawPacket.h"
 #include "../include/gnelib/PacketParser.h"
+#include "../include/gnelib/Time.h"
+#include "../include/gnelib/Timer.h"
 
 const int BUF_LEN = 1024;
 
@@ -125,15 +127,27 @@ int PacketStream::getOutRate() const {
   return outRate;
 }
 
-/**
- * \todo write this function for real.
- */
 //##ModelId=3B07538101F9
-void PacketStream::waitToSendAll() {
-  //Only temporary for now
-  //When we write this function for real, make sure that if the PacketSteam
-  //is shutting down that we properly exit from this function.
-  Thread::sleep(2000);
+void PacketStream::waitToSendAll(int waitTime) {
+  assert(waitTime < (INT_MAX / 1000));
+  assert(waitTime > 0);
+
+  Time t = Timer::getCurrentTime();
+  Time waitUntil = t + (waitTime * 1000);
+  bool timeOut = (waitTime <= 0);
+  int ms = waitTime;
+
+  outQCtrl.acquire();
+  while (!out.empty() && !shutdown && !timeOut) {
+    outQCtrl.timedWait(ms);
+
+    t = Timer::getCurrentTime();
+    timeOut = (t < waitUntil);
+
+    if (timeOut)
+      ms = (t - waitUntil).getTotaluSec() / 1000;
+  }
+  outQCtrl.release();
 }
 
 //##ModelId=3B8DC5D10096
@@ -142,7 +156,7 @@ void PacketStream::shutDown() {
   //We acquire the mutex to avoid the possiblity of a deadlock between the
   // test for the shutdown variable and the wait.
   outQCtrl.acquire();
-  outQCtrl.signal();
+  outQCtrl.broadcast();
   outQCtrl.release();
 }
 
@@ -173,13 +187,13 @@ void PacketStream::run() {
       
       //Discover if we are really done writing, and if so, queue the
       //onDoneWriting event.
-      bool done = false;
       outQCtrl.acquire();
-      if (out.empty())
-        done = true;
-      outQCtrl.release();
-      if (done)
+      if (out.empty()) {
+        //Broadcast a wakeup in case someone is waiting in waitToSendAll.
+        outQCtrl.broadcast();
         owner.onDoneWriting();
+      }
+      outQCtrl.release();
     }
   }
   //We want to try to send the required ExitPacket, if possible, over the
