@@ -18,10 +18,57 @@
  */
 
 #include "../../src/gnelib.h"
-#include "../coniox.h"
+
+class TimeClass : public TimerCallback {
+public:
+  TimeClass(int x2, int y2, std::string ourName)
+    : lasttime(clock()), callNum(0), x(x2), y(y2), name(ourName) {}
+
+  virtual ~TimeClass() {}
+
+  void timerCallback() {
+    clock_t finish = clock();
+    float napTime = (float)(finish - lasttime) / CLOCKS_PER_SEC;
+    lasttime = finish;
+    Console::mlprintf(x, y, "(%i)Hello, I'm %s! change: %f", callNum, name.c_str(), napTime);
+    callNum++;
+  }
+
+private:
+  clock_t lasttime;
+  int callNum;
+  int x, y;
+  std::string name;
+};
 
 int main() {
-  GNE::init(NL_IP);
-  GNE::exit(0);
+  GNE::init(NL_IP, atexit);
+  Console::init(atexit);
+
+  Time t(0, 1000000);
+  Console::mprintf("%is, %ius\n", t.getSec(), t.getuSec());
+  t.setuSec(1000000);
+  Console::mprintf("%is, %ius\n", t.getSec(), t.getuSec());
+  t.setSec(5);
+  Console::mprintf("%is, %ius\n", t.getSec(), t.getuSec());
+  t = t + Time(3, 5500000);
+  Console::mprintf("%is, %ius\n", t.getSec(), t.getuSec());
+
+  Timer t1(new TimeClass(3, 8, "Bob"), 1000);
+  Timer t2(new TimeClass(5, 10, "Sally"), 1250);
+  Timer t3(new TimeClass(1, 12, "Joe"), 200);
+
+  t1.startTimer();
+  assert(t1.isRunning());
+  t2.startTimer();
+  assert(t2.isRunning());
+  t3.startTimer();
+  assert(t3.isRunning());
+
+  Thread::sleep(4000);
+  t1.stopTimer();
+  t2.stopTimer();
+  t3.stopTimer();
+
   return 0;
 }
