@@ -113,6 +113,10 @@ SOURCE=.\src\ConnectionListener.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\ConnectionParams.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Console.cpp
 # End Source File
 # Begin Source File
@@ -254,6 +258,10 @@ SOURCE=.\include\gnelib\ConnectionEventGenerator.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\ConnectionListener.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\ConnectionParams.h
 # End Source File
 # Begin Source File
 
