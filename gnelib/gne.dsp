@@ -177,6 +177,10 @@ SOURCE=.\src\PingPacket.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\RateAdjustPacket.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\RawPacket.cpp
 # End Source File
 # Begin Source File
@@ -318,6 +322,10 @@ SOURCE=.\include\gnelib\PacketStream.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\PingPacket.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\RateAdjustPacket.h
 # End Source File
 # Begin Source File
 
