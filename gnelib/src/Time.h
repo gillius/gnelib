@@ -58,6 +58,16 @@ public:
   int getuSec();
 
   /**
+   * Returns the total time in microseconds.  This function can be useful
+   * for displaying the time represented by this object in a custom format
+   * (such as xxxxx ms or xxxxx us, rather than xxx.xxx seconds).  Since an
+   * int is returned, 2147.483648 seconds is the maximum amount of time that
+   * can be represented in a 32-bit integer in microseconds.
+   */
+  //##ModelId=3AF9D5750082
+  int getTotaluSec();
+
+  /**
    * Sets seconds.
    */
   //##ModelId=3AEBA4BE0226
@@ -91,10 +101,30 @@ public:
   bool operator>(const Time& rhs);
 
   /**
-   * Time addition that works as expected.
+   * Time addition, adding microseconds of time.
    */
   //##ModelId=3AEBA4F9021C
+  Time operator+(int rhs);
+
+  /**
+   * Time addition, adding microseconds of time to this object.
+   */
+  //##ModelId=3AF9D5750122
+  void operator+=(int rhs);
+
+  /**
+   * Time addition that works as expected.
+   */
+  //##ModelId=3AF9D57503B6
   Time operator+(const Time& rhs);
+
+  /**
+   * Time subtraction that works as expected.  You might get negative values
+   * out of this.  Sometimes Time::diff will be what you want, instead.
+   * @see diff
+   */
+  //##ModelId=3AF9D57601F4
+  Time operator-(const Time& rhs);
 
 protected:
   /**

@@ -44,6 +44,11 @@ int Time::getuSec() {
   return microsec;
 }
 
+//##ModelId=3AF9D5750082
+int Time::getTotaluSec() {
+  return (sec * 1000000 + microsec);
+}
+
 //##ModelId=3AEBA4BE0226
 void Time::setSec(int seconds) {
   sec = seconds;
@@ -57,7 +62,9 @@ void Time::setuSec(int microseconds) {
 
 //##ModelId=3AEBA53B00AA
 Time Time::diff(const Time& rhs) {
-  return Time();
+  Time ret = operator-(rhs);
+  ret.sec = labs(ret.sec);
+  return ret;
 }
 
 //##ModelId=3AEBA4D200A0
@@ -71,8 +78,28 @@ bool Time::operator>(const Time& rhs) {
 }
 
 //##ModelId=3AEBA4F9021C
+Time Time::operator+(int rhs) {
+  Time ret(*this);
+  ret.microsec += rhs;
+  ret.normalize();
+  return ret;
+}
+
+//##ModelId=3AF9D5750122
+void Time::operator+=(int rhs) {
+  microsec += rhs;
+  normalize();
+}
+
+//##ModelId=3AF9D57503B6
 Time Time::operator+(const Time& rhs) {
   Time t(sec + rhs.sec, microsec + rhs.microsec);
+  t.normalize();
+  return t;
+}
+
+Time Time::operator -(const Time& rhs) {
+  Time t(sec - rhs.sec, microsec - rhs.microsec);
   t.normalize();
   return t;
 }
