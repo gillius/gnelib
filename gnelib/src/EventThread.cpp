@@ -31,7 +31,7 @@ namespace GNE {
 EventThread::EventThread(ConnectionListener* listener, Connection* conn)
 : Thread("EventThr"), ourConn(conn), eventListener(listener),
 started(false), onReceiveEvent(false), onDoneWritingEvent(false),
-onExitEvent(false), onDisconnectEvent(false), failure(NULL) {
+onDisconnectEvent(false), onExitEvent(false), failure(NULL) {
   gnedbgo(5, "created");
 }
 

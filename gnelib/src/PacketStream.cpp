@@ -40,8 +40,8 @@ namespace GNE {
 
 //##ModelId=3B07538101BD
 PacketStream::PacketStream(int reqOutRate2, int maxOutRate2, Connection& ourOwner)
-: Thread("PktStrm"), owner(ourOwner), reqOutRate(reqOutRate2),
-maxOutRate(maxOutRate2) {
+: Thread("PktStrm"), owner(ourOwner), maxOutRate(maxOutRate2),
+reqOutRate(reqOutRate2) {
   assert(reqOutRate2 >= 0);
   assert(maxOutRate2 >= 0);
 
@@ -281,7 +281,7 @@ void PacketStream::prepareSend(std::queue<Packet*>& q, RawPacket& raw) {
   //While there are packets left and they won't overflow the RawPacket
   while (!q.empty() &&
          raw.getPosition() + q.front()->getSize() <
-         RawPacket::RAW_PACKET_LEN - sizeof(PacketParser::END_OF_PACKET)) {
+         RawPacket::RAW_PACKET_LEN - (int)sizeof(PacketParser::END_OF_PACKET)) {
 
     q.front()->writePacket(raw);
     delete q.front();

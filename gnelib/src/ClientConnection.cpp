@@ -222,7 +222,7 @@ Address ClientConnection::getCAP() throw (Error) {
 
   //The packet must be at least as large to check if it is a CAP or a
   //refusal packet.
-  if (check < sizeof(gbool)) {
+  if (check < (int)sizeof(gbool)) {
     delete[] capBuf;
     throw new Error(Error::ProtocolViolation);
   }
@@ -236,7 +236,7 @@ Address ClientConnection::getCAP() throw (Error) {
     //Check to make sure packet sizes match.
     //The size should be CAPLEN if we are not expecting the unreliable info.
     //but if we are expecting it we'll get another guint16.
-    if (check != ((params->unrel) ? (CAPLEN + sizeof(guint16)) : CAPLEN)) {
+    if (check != ((params->unrel) ? (CAPLEN + (int)sizeof(guint16)) : CAPLEN)){
       delete[] capBuf;
       throw new Error(Error::ProtocolViolation);
     }
@@ -295,7 +295,8 @@ void ClientConnection::setupUnreliable(const Address& dest) throw (Error) {
   sockets.u = nlOpen(0, NL_UNRELIABLE);
   if (sockets.u == NL_INVALID)
     throw Error::createLowLevelError(Error::CouldNotOpenSocket);
-  nlSetRemoteAddr(sockets.u, &dest.getAddress());
+  NLaddress temp = dest.getAddress();
+  nlSetRemoteAddr(sockets.u, &temp);
 
   //Now send back our local info, and send a dummy packet out first to open
   //up any possible firewalls or gateways.
