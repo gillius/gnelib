@@ -58,29 +58,19 @@ public:
   void disconnect();
 
   /**
-   * Returns the local address of this connection.  If the requested socket
-   * has not been opened, an Address is returned which is marked invalid.
-   * @param reliable socket select
+   * @see GNE::Connection::getLocalAddress
    */
   //##ModelId=3BB2CB41030C
   Address getLocalAddress(bool reliable) const;
 
   /**
-   * Returns the remote address of this connection, if it is connected,
-   * otherwise, an Address is returned which is marked invalid.
-   * @param reliable socket select
+   * @see GNE::Connection::getRemoteAddress
    */
   //##ModelId=3BB2CB41037A
   Address getRemoteAddress(bool reliable) const;
 
   /**
-   * If stats is enabled, returns Connection stats.
-   * @param reliable If greater than 0, returns reliable stats only.\n
-   *                 If 0, returns unreliable transfer stats only.\n
-   *                 If less than 0, returns cumulative stats for both.
-   * @return various connection stats.
-   * @see ConnectionStats
-   * @see GNE::enableStats
+   * @see GNE::Connection::getStats
    */
   //##ModelId=3C106F030036
   ConnectionStats getStats(int reliable) const;
@@ -119,7 +109,5 @@ public:
 };
 
 } // namespace GNE
-
-
 
 #endif /* SOCKETS_H_INCLUDED_C44D55A7 */
