@@ -19,6 +19,7 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/Error.h"
+#include <ostream>
 
 std::ostream& operator << (std::ostream& o, const GNE::Error& err) {
   return o << err.toString();
