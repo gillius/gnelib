@@ -36,19 +36,20 @@ public:
    */
   //##ModelId=3BAEC99B01FE
   enum ErrorCode {
-    NoError = 0,
-    GNEHostVersionLow = 1,
-    GNEHostVersionHigh = 2,
-    UserHostVersionLow = 3,
-    UserHostVersionHigh = 4,
-    CouldNotOpenSocket = 5,
-    ConnectionTimeOut = 6,
-		ConnectionDropped = 7,
-		Read = 8,
-		Write = 9,
-		UnknownPacket = 10,
-		OtherGNELevelError = 11,
-    OtherLowLevelError = 12
+    NoError,
+    GNEHostVersionLow,
+    GNEHostVersionHigh,
+    UserHostVersionLow,
+    UserHostVersionHigh,
+    CouldNotOpenSocket,
+    ConnectionTimeOut,
+		ConnectionDropped,
+		Read,
+		Write,
+		UnknownPacket,
+		PacketTypeMismatch,
+		OtherGNELevelError,
+    OtherLowLevelError
   };
 
 	/**
@@ -129,5 +130,10 @@ private:
 };
 
 } // namespace GNE
+
+/**
+ * Sends the result of toString to the ostream.
+ */
+std::ostream& operator << (std::ostream& o, const GNE::Error& err);
 
 #endif /* ERROR_H_INCLUDED_C4514CDC */
