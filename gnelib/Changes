@@ -1,4 +1,6 @@
 GNE 0.4 to Current
+  Made Timer more robust and safe to call from its callback and from multiple
+    threads at the same time.  Also gave user option to wait in stopTimer.
   Solaris makefiles and fix script added.  Compiles on Solaris using the GNU
     tools and compiler.  Officially tested with gcc 2.95.2 and an UltraSparc
     processor, but should also work with Intel and/or gcc 3.x.
@@ -22,7 +24,9 @@ GNE 0.4 to Current
   Implemented and refined the API related to getting Connection stats.
   Due to some issues, Connection::Stats is now no longer a nested class and
     is now called ConnectionStats.
-  New example exnetperf made for testing/profiling GNE's network performance.
+  New example exnetperf.  Don't pay attention too much to the values as it
+    is still being completed.  When the GNE protocol is finished it will act
+    appropriately.
   Added the CustomPacket class, which allows you to send data without
     creating a packet to encapsulate it.
   GCC 2.9x support!  MingW and GCC 2.9x in Linux should work again with the
