@@ -24,6 +24,8 @@
 
 namespace GNE {
 
+namespace Console {
+
 /**
  * Provides a text-based window view of a buffer of text, similar to a textbox
  * object in a GUI.  This allows one to provide a text-based console which
@@ -44,6 +46,8 @@ public:
 protected:
   virtual void render( int x, int y, std::string text, int renderHints );
 };
+
+} //namespace Console
 
 } //namespace GNE
 

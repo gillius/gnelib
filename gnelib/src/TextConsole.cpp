@@ -27,6 +27,8 @@ using namespace GNE::Console;
 
 namespace GNE {
 
+namespace Console {
+
 TextConsole::TextConsole( int xoffset, int yoffset, int width, int height )
 : ConsoleBuffer( xoffset, yoffset, width, height, 1 ) {
 };
@@ -39,12 +41,13 @@ void TextConsole::erase() {
 void TextConsole::render( int x, int y, string text, int renderHints ) {
   assert( text.find( '\n' ) == string::npos );
   if ( renderHints & REDRAW_HINT ) {
-    //We want to fill the rest of the line with spaces, in case this is a
-    //redraw.
+    //We want to fill the rest of the line with spaces to redraw.
     int numSpaces = getWidth() - x + getXOffset() - stringWidth( text );
     text.append( string( numSpaces, ' ' ) );
   }
   gout << acquire << moveTo( x, y ) << text << flush << release;
 }
+
+} //namespace Console
 
 } //namespace GNE
