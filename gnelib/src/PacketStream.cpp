@@ -129,7 +129,7 @@ int PacketStream::getOutRate() const {
 
 //##ModelId=3B07538101F9
 void PacketStream::waitToSendAll(int waitTime) {
-  assert(waitTime < (INT_MAX / 1000));
+  assert(waitTime <= (INT_MAX / 1000));
   assert(waitTime > 0);
 
   Time t = Timer::getCurrentTime();
@@ -142,10 +142,8 @@ void PacketStream::waitToSendAll(int waitTime) {
     outQCtrl.timedWait(ms);
 
     t = Timer::getCurrentTime();
-    timeOut = (t < waitUntil);
-
-    if (timeOut)
-      ms = (t - waitUntil).getTotaluSec() / 1000;
+    timeOut = (t > waitUntil);
+    ms = (t - waitUntil).getTotaluSec() / 1000;
   }
   outQCtrl.release();
 }
