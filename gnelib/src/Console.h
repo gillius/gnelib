@@ -122,6 +122,23 @@ public:
   static int lgetString(int x, int y, char* str, int maxlen);
 
   /**
+   * Sets the title of the console window to the given parameter, where GNE
+   * can, and where it makes sense (like Windows).  If the title cannot be
+   * set, this function does nothing.
+   * @param title the new window title
+   */
+  //##ModelId=3AFF64270366
+  static void setTitle(const char* title);
+
+  /**
+   * Gets the size of the console, in character columns and character rows.
+   * @param x integer where the number of columns is stored.
+   * @param y integer where the number of rows is stored.
+   */
+  //##ModelId=3AFF64280168
+  static void getConsoleSize(int* x, int* y);
+
+  /**
    * The keycode the enter key gives from getch().
    * @see getch
    */

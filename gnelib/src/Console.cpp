@@ -141,3 +141,13 @@ int Console::lgetString(int x, int y, char* str, int maxlen) {
   }
   return currpos;
 }
+
+//##ModelId=3AFF64270366
+void Console::setTitle(const char* title) {
+  conio_settitle(title);
+}
+
+//##ModelId=3AFF64280168
+void Console::getConsoleSize(int* x, int* y) {
+  conio_getsize(x, y);
+}
