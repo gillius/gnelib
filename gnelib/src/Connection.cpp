@@ -208,7 +208,9 @@ void Connection::onReceive(bool reliable) {
 
 /**
  * \bug we can still get multiple failures if the read fails then PacketStream
- *      fails.
+ *      fails.  I don't think this will cause a deadlock though if we unreg,
+ *      trigger onFailure then PacketStream fails because then the eGen won't
+ *      block.
  */
 //##ModelId=3BB4208C0280
 void Connection::processError(const Error& error) {
@@ -217,13 +219,15 @@ void Connection::processError(const Error& error) {
     onError(error);
     break;
   default:
-    onFailure(error);
     //The EventThread will call disconnect.  This will prevent a deadlock
     //where PacketStream and another thread is trying to disconnect at the
     //same time.
     //But if we don't disconnect we generate endless error messages because
     //we need to unregister immediately.  So we do that.
     unreg(true, true);
+    //We call onFailure after unreg because a deadlock will occur if the
+    //EventThread tries to disconnect before we unreg.
+    onFailure(error);
     break;
   }
 }
