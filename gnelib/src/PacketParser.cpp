@@ -28,6 +28,10 @@
 #include "../include/gnelib/ExitPacket.h"
 #include "../include/gnelib/PingPacket.h"
 #include "../include/gnelib/RateAdjustPacket.h"
+#include "../include/gnelib/ObjectCreationPacket.h"
+#include "../include/gnelib/ObjectUpdatePacket.h"
+#include "../include/gnelib/ObjectDeathPacket.h"
+#include "../include/gnelib/ChannelPacket.h"
 
 namespace GNE {
 namespace PacketParser {
@@ -55,6 +59,10 @@ void registerGNEPackets() {
   packets[2] = ExitPacket::create;
   packets[3] = RateAdjustPacket::create;
   packets[4] = PingPacket::create;
+  packets[5] = ChannelPacket::create;
+  packets[6] = ObjectCreationPacket::create;
+  packets[7] = ObjectUpdatePacket::create;
+  packets[8] = ObjectDeathPacket::create;
 }
 
 void registerPacket(guint8 id, Packet* (*createFunc)()) {
