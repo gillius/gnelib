@@ -52,6 +52,10 @@ public:
     Write,
     UnknownPacket,
     PacketTypeMismatch,
+    DuplicateObjectId,
+    UnknownObjectId,
+    InvalidObjectPacket,
+    InvalidCreationPacketType,
     OtherGNELevelError,
     OtherLowLevelError
   };

@@ -48,6 +48,10 @@ std::ostream& operator << (std::ostream& o, const GNE::Error& err) {
     Write,
     UnknownPacket,
     PacketTypeMismatch,
+    DuplicateObjectId,
+    UnknownObjectId,
+    InvalidObjectPacket,
+    InvalidCreationPacketType,
     OtherGNELevelError,
     OtherLowLevelError
   };
@@ -72,6 +76,10 @@ const std::string ErrorStrings[] = {
   "Network error when trying to write to connection.",
   "Unknown packet type encountered or corrupted data received -- possible additional data loss.",
   "Packet type received does not match next packet type expected.",
+  "An object with the given ID already exists.",
+  "The given object ID does not match a known object.",
+  "A packet of the wrong type was passed to the ObjectBroker.",
+  "The packet ID is not registered as a valid object creation packet.",
   "Other GNE (not a low-level network) error.",
   "Low-level HawkNL error:"
 };
