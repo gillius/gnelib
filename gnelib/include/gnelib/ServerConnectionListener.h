@@ -105,19 +105,25 @@ protected:
   /**
    * A new connection is starting, and now we want the parameters for this
    * new connection.  The three parameters passed should be modified to give
-   * the new connection's flow control parameters and listener.\n
+   * the new connection's flow control parameters and listener.
+   *
    * The third parameter should be set to the initial event listener for the
    * ServerConnection that is being created.  This could be an entirely new
    * ConnectionListener or an already existing one, it doesn't matter.  The
    * returned listener cannot be NULL, since onNewConn must be called or a
-   * memory leak will occur.\n
+   * memory leak will occur.
+   *
    * This pointer will be returned to you through the socket failure event
    * (in this case it was never used, but it is returned in case you need to
    * delete it).  If the connection is successful you can get your pointer
    * back through the resulting ServerConnection class by using
-   * Connection::getListener.\n
-   * This function can be called from multiple threads at the same time.\n
-   * See Connection::Connection for more info about inRate and outRate.
+   * Connection::getListener.
+   *
+   * This function can be called from multiple threads at the same time.
+   *
+   * See PacketStream::PacketStream for more info about inRate and outRate.
+   * @param inRate the maximum rate we will accept.
+   * @param outRate the maximum rate of data we are able/willing to send.
    */
   //##ModelId=3BCFAE5A0064
   virtual void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) = 0;
