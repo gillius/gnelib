@@ -25,7 +25,7 @@ namespace GNE {
 
 const int ObjectCreationPacket::ID = 6;
 
-ObjectCreationPacket::ObjectCreationPacket() {
+ObjectCreationPacket::ObjectCreationPacket() : ObjectBrokerPacket( ID ) {
 }
 
 ObjectCreationPacket::ObjectCreationPacket( int objectId, const Packet& data )

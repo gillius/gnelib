@@ -25,7 +25,7 @@ namespace GNE {
 
 const int ObjectUpdatePacket::ID = 7;
 
-ObjectUpdatePacket::ObjectUpdatePacket() {
+ObjectUpdatePacket::ObjectUpdatePacket() : ObjectBrokerPacket( ID ) {
 }
 
 ObjectUpdatePacket::ObjectUpdatePacket( int objectId, const Packet& data )

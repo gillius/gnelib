@@ -20,6 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "ObjectBroker.h"
 #include "ObjectBrokerPacket.h"
 #include "ObjectCreationPacket.h"
 #include "ObjectUpdatePacket.h"
@@ -53,7 +54,7 @@ namespace GNE {
  * Almost all methods return a smart pointer to a packet, which means you do
  * not need worry about memory allocation.
  */
-class ObjectBrokerServer {
+  class ObjectBrokerServer : public ObjectBroker {
 public:
   /**
    * Creates a new ObjectBrokerServer Object with no taken IDs.
@@ -64,12 +65,6 @@ public:
    * Dtor.
    */
   ~ObjectBrokerServer();
-
-  /**
-   * Returns the number of objects currently being managed by this
-   * ObjectBroker.
-   */
-  int numObjects() const;
 
   /**
    * Method for registering a new object, or getting a creation packet from an
@@ -110,40 +105,19 @@ public:
    */
   ObjectDeathPacket::pointer getDeathPacket( NetworkObject& obj );
 
-  /**
-   * Deregisters the given object entirely from the ObjectBrokerServer.  The
-   * ID of the object is set to an invalid ID, and the onDeregistration event
-   * is called.  Once deregistered, an object must be reregistered before it
-   * can be used with the ObjectBrokerServer again.
-   * 
-   * @param obj a valid NetworkObject (one that has been assigned a valid ID
-   * through getCreationPacket).
-   * 
-   * @see NetworkObject::onDeregistration
-   */
-  void deregisterObject( NetworkObject& obj );
-
 private:
   /**
    * Returns the next valid ID, and marks it as taken.  This method is thread
-   * safe through the "sync" Mutex.  Returns -1 if there are no remaining IDs.
+   * safe through the "sync" Mutex.  Returns false if there are no IDs
+   * remaining.
    */
-  int getNextId();
+  bool assignNextId( NetworkObject& o );
   
 private:
   ObjectBrokerServer( const ObjectBrokerServer& );
   ObjectBrokerServer& operator=( const ObjectBrokerServer& rhs );
 
-  /**
-   * A list of taken IDs.
-   */
-  bool* ids;
-
   int nextId;
-
-  int numObj;
-
-  Mutex sync;
 };
 
 } //namespace GNE

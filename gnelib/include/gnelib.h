@@ -49,6 +49,7 @@
 #include "gnelib/ListServerConnection.h"
 #include "gnelib/Mutex.h"
 #include "gnelib/NetworkObject.h"
+#include "gnelib/ObjectBroker.h"
 #include "gnelib/ObjectBrokerClient.h"
 #include "gnelib/ObjectBrokerPacket.h"
 #include "gnelib/ObjectBrokerServer.h"

@@ -29,29 +29,22 @@
 namespace GNE {
 
 ObjectBrokerServer::ObjectBrokerServer()
-: ids( new bool[65536] ), nextId( 1 ), numObj( 0 ) {
-  for ( int i=0; i < 65536; ++i ) {
-    ids[i] = false;
-  }
+: nextId( 1 ) {
 }
 
 ObjectBrokerServer::~ObjectBrokerServer() {
-  delete[] ids;
-}
-
-int ObjectBrokerServer::numObjects() const {
-  return numObj;
 }
 
 ObjectCreationPacket::pointer
 ObjectBrokerServer::getCreationPacket( NetworkObject& obj ) {
 
   if ( !obj.hasValidId() )
-    obj.setObjectId( getNextId() );
+    if ( !assignNextId( obj ) )
+      return ObjectCreationPacket::pointer( (ObjectCreationPacket*)NULL );
 #ifdef _DEBUG
   else {
     LockMutex lock(sync);
-    assert( ids[ obj.getObjectId() ] );
+    assert( exists( obj.getObjectId() ) );
   }
 #endif
 
@@ -69,7 +62,7 @@ ObjectUpdatePacket::pointer ObjectBrokerServer::getUpdatePacket(
 #ifdef _DEBUG
   assert( obj.hasValidId() );
   sync.acquire();
-  assert( ids[ obj.getObjectId() ] );
+  assert( exists( obj.getObjectId() ) );
   sync.release();
 #endif
 
@@ -92,7 +85,7 @@ ObjectBrokerServer::getDeathPacket( NetworkObject& obj ) {
 #ifdef _DEBUG
   assert( obj.hasValidId() );
   sync.acquire();
-  assert( ids[ obj.getObjectId() ] );
+  assert( exists( obj.getObjectId() ) );
   sync.release();
 #endif
 
@@ -101,41 +94,29 @@ ObjectBrokerServer::getDeathPacket( NetworkObject& obj ) {
     new ObjectDeathPacket( obj.getObjectId(), packet );
   delete packet;
 
-  return ObjectDeathPacket::pointer();
+  return ObjectDeathPacket::pointer( ret );
 }
 
-void ObjectBrokerServer::deregisterObject( NetworkObject& obj ) {
-  assert( obj.hasValidId() );
-
-  sync.acquire();
-  int oldId = obj.getObjectId();
-  assert( ids[ oldId ] );
-  ids[ oldId ] = false;
-  --numObj;
-  obj.setObjectId( -1 );
-  sync.release();
-
-  obj.onDeregistration( oldId );
-}
-
-int ObjectBrokerServer::getNextId() {
-  assert( ids != NULL );
-
+/**
+ * \todo This method could use some optimization really badly, by using an
+ * iterator over the map.
+ */
+bool ObjectBrokerServer::assignNextId( NetworkObject& o ) {
   LockMutex lock(sync);
-  if ( numObj >= 65535 )
-    return -1;
+  if ( numObjects() >= 65535 )
+    return false;
 
   //Find the next valid ID
-  while ( ids[nextId] ) {
+  while ( exists( nextId ) ) {
     ++nextId;
     if ( nextId >= 65536 )
       nextId = 1;
   }
 
   //Mark it used and return it
-  ids[nextId] = true;
-  ++numObj;
-  return nextId;
+  objects[ nextId ] = &o;
+  assignId( o, nextId );
+  return true;
 }
   
 } //namespace GNE

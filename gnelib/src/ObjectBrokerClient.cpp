@@ -43,17 +43,16 @@ ObjectBrokerClient::ObjectBrokerClient() {
 ObjectBrokerClient::~ObjectBrokerClient() {
 }
 
-int ObjectBrokerClient::numObjects() const {
-  LockMutex lock(sync);
-  return objects.size();
-}
-
 void ObjectBrokerClient::registerObject( guint8 id, ObjCreationFunc createFunc ) {
   LockMutex lock(staticSync);
   assert(funcs[id] == NULL);
   funcs[id] = createFunc;
 }
 
+/**
+ * \todo optimize container usage (exists, find, erase, etc).  Applies to
+ * other ObjectBroker (base, client, and server) methods.
+ */
 NetworkObject* ObjectBrokerClient::usePacket( const Packet& packet,
                                               bool ignoreUpdateError) {
   int type = packet.getType();
@@ -66,7 +65,7 @@ NetworkObject* ObjectBrokerClient::usePacket( const Packet& packet,
     assert( ocp.getData() != NULL );
 
     staticSync.acquire();
-    ObjCreationFunc func = funcs[ocp.getObjectId()];
+    ObjCreationFunc func = funcs[ocp.getData()->getType()];
     staticSync.release();
     if ( func == NULL )
       throw Error( Error::InvalidCreationPacketType );
@@ -100,11 +99,10 @@ NetworkObject* ObjectBrokerClient::usePacket( const Packet& packet,
       if ( !exists( objectId ) )
         throw Error( Error::UnknownObjectId );
       ret = objects[objectId];
-      objects.erase( objectId );
     }
     ret->incomingDeathPacket( odp.getData() );
-    ret->setObjectId( -1 );
-    ret->onDeregistration( objectId );
+
+    deregisterObject( *ret );
 
   } else
     throw Error( Error::InvalidObjectPacket );
@@ -117,10 +115,6 @@ NetworkObject& ObjectBrokerClient::usePacket( const Packet& packet ) {
   NetworkObject* ret = usePacket( packet, false );
   assert ( ret != NULL );
   return *ret;
-}
-
-bool ObjectBrokerClient::exists( int objId ) {
-  return (objects.find( objId ) != objects.end());
 }
 
 } //namespace GNE

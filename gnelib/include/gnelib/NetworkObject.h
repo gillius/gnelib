@@ -22,7 +22,7 @@
 
 namespace GNE {
   class Packet;
-  class ObjectBrokerServer;
+  class ObjectBroker;
   
 /**
  * Represents an object which can be replicated through the ObjectBroker.  All
@@ -168,10 +168,9 @@ public: //Events
   virtual void incomingDeathPacket( const Packet* packet ) = 0;
 
 private:
-  //ObjectBrokerServer is a friend so it can set our ObjectID through the
+  //ObjectBroker is a friend so it can set our ObjectID through the
   //provided method.
-  friend class ObjectBrokerServer;
-  friend class ObjectBrokerClient;
+  friend class ObjectBroker;
 
   void setObjectId( int newId );
 

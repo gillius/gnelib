@@ -23,7 +23,8 @@
 
 namespace GNE {
   
-ObjectBrokerPacket::ObjectBrokerPacket() : objectId( -1 ) {
+ObjectBrokerPacket::ObjectBrokerPacket( int id )
+: WrapperPacket( id ), objectId( -1 ) {
 }
 
 ObjectBrokerPacket::ObjectBrokerPacket( int packetId, int objectId, const Packet* data )

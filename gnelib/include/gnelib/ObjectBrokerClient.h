@@ -20,26 +20,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <map>
-#include "Mutex.h"
+#include "ObjectBroker.h"
 
 namespace GNE {
   bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)));
-  class Packet;
-  class NetworkObject;
 
-  /**
-   * The function type used by ObjectBrokerClient to create an object from a
-   * given packet.
-   */
-  typedef NetworkObject* (*ObjCreationFunc)( int objectId, const Packet& );
-  
 /**
  * The ObjectBrokerClient takes packets generated from the ObjectBrokerServer
  * and manages the object creations, updates, and deletes specified.  All
  * methods in ObjectBrokerClient are thread safe.
  */
-class ObjectBrokerClient {
+  class ObjectBrokerClient : public ObjectBroker {
 public:
   /**
    * Default ctor.
@@ -50,12 +41,6 @@ public:
    * Default dtor.
    */
   ~ObjectBrokerClient();
-
-  /**
-   * Returns the number of objects currently being managed by this
-   * ObjectBroker.
-   */
-  int numObjects() const;
 
   /**
    * Registers a new object type with the ObjectBrokerClient by relating a
@@ -133,18 +118,6 @@ private:
   friend bool GNE::initGNE(NLenum, int (*)(void (*)(void)));
 
 private:
-  /**
-   * Returns true if the object ID given exists.  The mutex sync must be locked
-   * when this method is called.
-   */
-  bool exists( int objId );
-
-  mutable Mutex sync;
-  
-  /**
-   * Associates an integer object ID to a NetworkObject.
-   */
-  std::map<int, NetworkObject*> objects;
 };
 
 } //namespace GNE

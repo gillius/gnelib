@@ -34,7 +34,28 @@ public:
   }
 
   PositionedTextPacket( string msg, int x, int y )
-    : msg(msg), x((guint8)x), y((guint8)y) {
+    : Packet(ID), msg(msg), x((guint8)x), y((guint8)y) {
+  }
+
+  virtual ~PositionedTextPacket() {
+  }
+
+  Packet* makeClone() const {
+    return new PositionedTextPacket( *this );
+  }
+
+  static Packet* create() {
+    return new PositionedTextPacket();
+  }
+
+  void writePacket( RawPacket& raw ) const {
+    Packet::writePacket( raw );
+    raw << x << y << msg;
+  }
+
+  void readPacket( RawPacket& raw ) {
+    Packet::readPacket( raw );
+    raw >> x >> y >> msg;
   }
 
   string msg;
@@ -56,7 +77,28 @@ public:
   }
 
   PositionedTextPositionUpdatePacket( int x, int y )
-    : x((guint8)x), y((guint8)y) {
+    : Packet(ID), x((guint8)x), y((guint8)y) {
+  }
+
+  virtual ~PositionedTextPositionUpdatePacket() {
+  }
+
+  Packet* makeClone() const {
+    return new PositionedTextPositionUpdatePacket( *this );
+  }
+
+  static Packet* create() {
+    return new PositionedTextPositionUpdatePacket();
+  }
+
+  void writePacket( RawPacket& raw ) const {
+    Packet::writePacket( raw );
+    raw << x << y;
+  }
+
+  void readPacket( RawPacket& raw ) {
+    Packet::readPacket( raw );
+    raw >> x >> y;
   }
 
   guint8 x, y;
@@ -76,7 +118,28 @@ public:
   }
 
   PositionedTextTextUpdatePacket( string msg )
-    : msg(msg) {
+    : Packet(ID), msg(msg) {
+  }
+
+  virtual ~PositionedTextTextUpdatePacket() {
+  }
+
+  Packet* makeClone() const {
+    return new PositionedTextTextUpdatePacket( *this );
+  }
+
+  static Packet* create() {
+    return new PositionedTextTextUpdatePacket();
+  }
+
+  void writePacket( RawPacket& raw ) const {
+    Packet::writePacket( raw );
+    raw << msg;
+  }
+
+  void readPacket( RawPacket& raw ) {
+    Packet::readPacket( raw );
+    raw >> msg;
   }
 
   string msg;
@@ -124,7 +187,7 @@ public:
 
   void setText( string newMsg ) {
     if ( drawn )
-      erase();
+      eraseImpl();
 
     msg = newMsg;
 
@@ -134,7 +197,7 @@ public:
 
   void setPos( int newX, int newY ) {
     if ( drawn )
-      erase();
+      eraseImpl();
 
     x = newX;
     y = newY;
@@ -145,15 +208,19 @@ public:
 
   void draw() {
     drawn = true;
-    gout << acquire << moveTo(x, y) << msg << flush << release;
+    //We need to do the stringstream thing because we have to determine the
+    //size of the final output string, so erase can work properly.
+    ostringstream temp;
+    temp << getObjectId() << ": " << msg;
+    const string& tempStr = temp.str();
+    drawnSize = (int)tempStr.length();
+
+    gout << acquire << moveTo(x, y) << tempStr << flush << release;
   }
 
   void erase() {
-    if ( drawn ) {
-      string s( msg.length(), ' ' );
-      gout << acquire << moveTo(x, y) << s << flush << release;
-      drawn = false;
-    }
+    eraseImpl();
+    drawn = false;
   }
 
   virtual Packet* createCreationPacket() {
@@ -180,8 +247,10 @@ public:
     const string& s = deathmsg.str();
     dead = true;
     msg = string( s, 0, msg.length() );
-    if ( drawn )
+    if ( drawn ) {
+      erase();
       draw();
+    }
   }
 
   virtual void incomingUpdatePacket( const Packet& packet ) {
@@ -189,13 +258,12 @@ public:
     if ( type == PositionedTextPositionUpdatePacket::ID ) {
       const PositionedTextPositionUpdatePacket& p =
         reinterpret_cast<const PositionedTextPositionUpdatePacket&>(packet);
-      x = (int)p.x;
-      y = (int)p.y;
+      setPos( p.x, p.y );
 
     } else if ( type == PositionedTextTextUpdatePacket::ID ) {
       const PositionedTextTextUpdatePacket& p =
         reinterpret_cast<const PositionedTextTextUpdatePacket&>(packet);
-      msg = p.msg;
+      setText( p.msg );
 
     } else {
       assert( false );
@@ -208,9 +276,18 @@ public:
   }
 
 private:
+  void eraseImpl() {
+    if ( drawn ) {
+      //drawnSize was set in the draw function.
+      string s( drawnSize, ' ' );
+      gout << acquire << moveTo(x, y) << s << flush << release;
+    }
+  }
+
   bool dead;
 
   bool drawn;
+  int drawnSize;
   int x, y;
   string msg;
 };

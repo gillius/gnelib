@@ -18,29 +18,44 @@
  */
 
 #include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/ObjectDeathPacket.h"
-#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/ObjectBroker.h"
+#include "../include/gnelib/NetworkObject.h"
 
 namespace GNE {
 
-const int ObjectDeathPacket::ID = 8;
-
-ObjectDeathPacket::ObjectDeathPacket() : ObjectBrokerPacket( ID ) {
+int ObjectBroker::numObjects() const {
+  LockMutex lock(sync);
+  return objects.size();
 }
 
-ObjectDeathPacket::ObjectDeathPacket( int objectId, const Packet* data )
-: ObjectBrokerPacket( ID, objectId, data ) {
+NetworkObject* ObjectBroker::getObjectById( int objId ) {
+  LockMutex lock(sync);
+  ObjectsIter iter = objects.find( objId );
+  if ( iter == objects.end() )
+    return NULL;
+  else
+    return (*iter).second;
 }
 
-ObjectDeathPacket::~ObjectDeathPacket() {
-}
-  
-Packet* ObjectDeathPacket::makeClone() const {
-  return new ObjectDeathPacket( *this );
+void ObjectBroker::deregisterObject( NetworkObject& obj ) {
+  assert( obj.hasValidId() );
+
+  sync.acquire();
+  int oldId = obj.getObjectId();
+  assert( exists( oldId ) );
+  objects.erase( oldId );
+  assignId( obj, -1 );
+  sync.release();
+
+  obj.onDeregistration( oldId );
 }
 
-Packet* ObjectDeathPacket::create() {
-  return new ObjectDeathPacket();
+bool ObjectBroker::exists( int objId ) {
+  return (objects.find( objId ) != objects.end());
+}
+
+void ObjectBroker::assignId( NetworkObject& o, int newId ) {
+  o.setObjectId( newId );
 }
 
 } //namespace GNE

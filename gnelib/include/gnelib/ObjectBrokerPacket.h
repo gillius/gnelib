@@ -90,7 +90,7 @@ protected:
   /**
    * This ctor is suitable for use only in the create method.
    */
-  ObjectBrokerPacket();
+  ObjectBrokerPacket( int id );
 
 private:
   guint16 objectId;
