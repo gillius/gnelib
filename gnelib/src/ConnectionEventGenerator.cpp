@@ -76,8 +76,7 @@ void ConnectionEventGenerator::run() {
 				}
 			} else {
 				if (!(nlGetError() == NL_SOCKET_ERROR && nlGetSystemError() == 10004)) {
-					gnedbgo2(1, "nlPollGroup Error %i: %s", nlGetError(), nlGetErrorStr(nlGetError()));
-					gnedbgo2(1, "System Error %i: %s", nlGetSystemError(), nlGetSystemErrorStr(nlGetError()));
+					reportHawkNLErroro();
 					assert(false);
 				} else
 					gnedbgo(1, "nlPollGroup call canceled (perhaps to do low-level socket close).  Trying again.");

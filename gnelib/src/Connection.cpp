@@ -165,6 +165,7 @@ void Connection::onReceive(bool reliable) {
 	NLbyte* buf = new NLbyte[RawPacket::RAW_PACKET_LEN];
 	int temp = rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
 	if (temp == NL_INVALID) {
+		reportHawkNLErroro();
 		onFailure(Read);
 	} else if (temp == 0) {
 		//This means the connection was closed on the network-level because
