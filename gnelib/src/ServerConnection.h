@@ -21,6 +21,7 @@
  */
 
 #include "gneintern.h"
+#include "ConnectionEventListener.h"
 #include "Connection.h"
 
 /**
@@ -29,7 +30,7 @@
  * events you wish to respond to.
  */
 //##ModelId=3AE59EF1015E
-class ServerConnection : public Connection {
+class ServerConnection {
 public:
   /**
    * Initalizes this class.
@@ -38,18 +39,28 @@ public:
    * @param port the port number to listen on.
    */
   //##ModelId=3AE59FAF033E
-  ServerConnection(int outRate, int inRate, int port);
+  ServerConnection(int outRate, int inRate);
 
   //##ModelId=3AE59FAF037A
   virtual ~ServerConnection();
 
   /**
+   * Opens a socket ready for listening, but not yet listening.
+   * @param port the port to listen on.
+   * @return true if could not open a socket on the port.
+   */
+  //##ModelId=3B009F57037A
+  bool open(int port);
+
+  /**
    * Starts this socket listening.  onNewConn will be called when a new
    * connection has been negotiated and error checked.
+   * @see onListenFailure
    * @see #onNewConn(Connection*)
+   * @return true, if there was an error.
    */
   //##ModelId=3AE5A0F60028
-  void listen();
+  bool listen();
 
   /**
    * Event triggered when a new connection has been negotiated and error
@@ -61,21 +72,48 @@ public:
   virtual void onNewConn(Connection* newConn) = 0;
 
   /**
-   * There was a failure when trying to listen on this socket.
+   * There was a failure when trying to listen on this socket.  This is not
+   * called when the actual low-level listen fails (that error is returned
+   * from listen), but instead high-level errors while connecting such as a
+   * version mismatch are sent here.
    * Note you must call this function explicity from your overridden
    * function FIRST so the underlying functions recieve this event.
    * @param errorType the type of error
    */
   //##ModelId=3AE5A1310208
-  virtual void onListenFailure(FailureType errorType);
+  virtual void onListenFailure(Connection::FailureType errorType);
 
   /**
-   * Event triggered when one or more packets have been recieved.
-   * Note you must call this function explicity from your overridden
-   * function FIRST so the underlying functions recieve this event.
+   * Returns the address of the listening socket.
    */
+  //##ModelId=3B00A3BE0352
+  NLaddress getLocalAddress() const;
+
+private:
+  //##ModelId=3B009B9E02C6
+  class ServerListener : public ConnectionEventListener {
+  public:
+    //##ModelId=3B009DCD03C0
+    ServerListener(ServerConnection& listener);
+
+    //##ModelId=3B009DCE0046
+    virtual ~ServerListener();
+
+    //##ModelId=3B009BAA00F0
+    void onReceive();
+
+  private:
+    //##ModelId=3B009DB1029E
+    ServerConnection& conn;
+
+  };
+  friend class ServerListener;
+
   //##ModelId=3AE5AF95021C
-  virtual void onRecieve();
+  void onReceive();
+
+  //##ModelId=3B009AE2032A
+  NLsocket socket;
 
 };
 

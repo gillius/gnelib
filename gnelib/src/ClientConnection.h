@@ -33,10 +33,26 @@
 class ClientConnection : public Connection, public Thread {
 public:
   /**
+   * Initializes this ClientConnection.
+   * @param dest an address in the form of xxx.xxx.xxx.xxx:ppppp (for
+   *        internet sockets, or an appropriate NL format if not IP).  You
+   *        must use HawkNL to resolve the hostname, if needed.
+   * @param port local port to open on, default 0 for don't care.
    * @see Connection#Connection(int, int, std::string)
+   * @see ClientConnection(int, int NLaddress)
    */
   //##ModelId=3AE59FAB0000
-  ClientConnection(int outRate, int inRate, std::string address);
+  ClientConnection(int outRate, int inRate, std::string dest, int port = 0);
+
+  /**
+   * Alternate version of ctor taking a native HawkNL address.
+   * @param dest destination address and port.
+   * @param port local port to open on, default 0 for don't care.
+   * @see Connection#Connection(int, int, std::string)
+   * @see ClientConnection(int, int, std::string)
+   */
+  //##ModelId=3AFF8361029E
+  ClientConnection(int outRate, int inRate, NLaddress dest, int port = 0);
 
   //##ModelId=3AE59FAB003C
   virtual ~ClientConnection();
@@ -53,7 +69,13 @@ public:
    * Starts connection to the specified target.  This method does not block,
    * and a thread will be started to handle the connection process.
    * onConnect() or onConnectFailure() will be called depending on the
-   * outcome of this process.
+   * outcome of this process.\n
+   * You can call join after connect to wait until the connection is
+   * finished, when onConnect or onConnectFailure will be called.  When the
+   * called function exits, the thread will stop and join will return.  If
+   * you do not need asyncronous sockets, you do not need to overload these
+   * functions and can rely on the isConnection function.  You still need to
+   * overload onConnectFailure to get a description of the error, however.\n
    * The version number for the library and your own version number will be
    * checked during this phase.  If either protocol versions mismatch,
    * onConnectFailure() will be triggered.

@@ -22,48 +22,59 @@
 
 //##ModelId=3AE5BA8F038E
 static const std::string FailureStrings[] = {
+  "No error.",
   "The host has an earlier version of GNE than this one.",
   "The host has a later version of GNE than this one.",
   "The host has an earlier version of this game.",
   "The host has a later version of this game.",
-  "Could not contact the host.",
   "Could not open a network connection, check to make sure you are connected to the network.",
+  "Could not contact the host due to connection timeout.",
   "Other low-level HawkNL error."
 };
 
 //##ModelId=3AE3591A0186
 Connection::Connection(int outRate, int inRate)
-: ps(outRate, inRate), connected(false), socket(NL_INVALID) {
+: ps(NULL), connected(false), rsocket(NL_INVALID), usocket(NL_INVALID) {
 }
 
 //##ModelId=3AE3591A0187
 Connection::~Connection() {
+  delete ps;
 }
 
 //##ModelId=3AE4A6F00280
 PacketStream& Connection::stream() {
-  return ps;
+  return *ps;
 }
 
 //##ModelId=3AE4C9DD0280
 Connection::Stats Connection::getStats() const {
-  assert(socket != NL_INVALID);
   return Stats();
 }
 
 //##ModelId=3AFF798800C8
-NLaddress Connection::getLocalAddress() const {
-  assert(socket != NL_INVALID);
+NLaddress Connection::getLocalAddress(bool reliable) const {
   NLaddress ret;
-  nlGetLocalAddr(socket, &ret);
+  if (reliable) {
+    assert(rsocket != NL_INVALID);
+    nlGetLocalAddr(rsocket, &ret);
+  } else {
+    assert(usocket != NL_INVALID);
+    nlGetLocalAddr(usocket, &ret);
+  }
   return ret;
 }
 
 //##ModelId=3AFF79880136
-NLaddress Connection::getRemoteAddress() const {
-  assert(socket != NL_INVALID);
+NLaddress Connection::getRemoteAddress(bool reliable) const {
   NLaddress ret;
-  nlGetRemoteAddr(socket, &ret);
+  if (reliable) {
+    assert(rsocket != NL_INVALID);
+    nlGetRemoteAddr(rsocket, &ret);
+  } else {
+    assert(usocket != NL_INVALID);
+    nlGetRemoteAddr(usocket, &ret);
+  }
   return ret;
 }
 
@@ -74,8 +85,10 @@ bool Connection::isConnected() const {
 
 //##ModelId=3AE4A9700212
 void Connection::disconnect() {
-  assert(socket != NL_INVALID);
-  nlClose(socket);
+  if (rsocket != NL_INVALID)
+    nlClose(rsocket);
+  if (usocket != NL_INVALID)
+    nlClose(usocket);
 }
 
 //##ModelId=3AE4C7FC021C
@@ -87,13 +100,27 @@ void Connection::onFailure(FailureType errorType) {
 }
 
 //##ModelId=3AE4A776033E
-void Connection::onRecieve() {
+void Connection::onReceive() {
 }
 
 //##ModelId=3AE4C8F501CC
 void Connection::onDoneWriting() {
 }
 
+//##ModelId=3B009E0903AC
+void Connection::onReceive(bool reliable) {
+}
 
+//##ModelId=3B009D63019A
+Connection::ConnectionListener::ConnectionListener(Connection& listener, bool isReliable) 
+: conn(listener), reliable(isReliable) {
+}
 
+//##ModelId=3B009D630208
+Connection::ConnectionListener::~ConnectionListener() {
+}
+
+//##ModelId=3B0099B700BE
+void Connection::ConnectionListener::onReceive() {
+}
 

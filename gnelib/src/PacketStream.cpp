@@ -23,7 +23,7 @@
 
 //##ModelId=3AE3605F032A
 PacketStream::PacketStream(int outRate2, int inRate2)
-: inRate(inRate2), outRate(outRate2), writer(writeSync) {
+: inRate(inRate2), outRate(outRate2) {
 }
 
 //##ModelId=3AE36060001E
@@ -75,4 +75,12 @@ int PacketStream::getOutRate() const {
 void PacketStream::waitToSendAll() {
 }
 
+
+//##ModelId=3B00990701E0
+void PacketStream::run() {
+}
+
+//##ModelId=3B00A2910212
+void PacketStream::addIncomingPacket(Packet* packet) {
+}
 

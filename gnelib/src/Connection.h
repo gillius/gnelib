@@ -23,6 +23,7 @@
 #include "gneintern.h"
 #include "Thread.h"
 #include "PacketStream.h"
+#include "ConnectionEventListener.h"
 
 /**
  * A class resembling any type of connection to a remote computer.  A
@@ -36,9 +37,7 @@
 class Connection {
 public:
   /**
-   * A struct holding values returned by getStats.  All values are
-   * in actual bytes per second, not program data bytes (meaning this
-   * includes the bytes sent in UDP, TCP, and IP packet headers.
+   * A struct holding values returned by getStats.
    */
   //##ModelId=3AE4CABD00F0
   struct Stats {
@@ -61,11 +60,11 @@ public:
    */
   //##ModelId=3AE4F24B0276
   enum FailureType {
-    GNEHostVersionLow = 0,
-    GNEHostVersionHigh = 1,
-    UserHostVersionLow = 2,
-    UserHostVersionHigh = 3,
-    HostDidNotRespond = 4,
+    NoError = 0,
+    GNEHostVersionLow = 1,
+    GNEHostVersionHigh = 2,
+    UserHostVersionLow = 3,
+    UserHostVersionHigh = 4,
     CouldNotOpenSocket = 5,
     ConnectionTimeOut = 6,
     OtherLowLevelError = 7
@@ -107,15 +106,21 @@ public:
 
   /**
    * Returns the local address of this connection.
+   * @param reliable sometimes two sockets are used for reliable and
+   *                 unreliable data.  Specify which low-level socket you
+   *                 want the address of.
    */
   //##ModelId=3AFF798800C8
-  NLaddress getLocalAddress() const;
+  NLaddress getLocalAddress(bool reliable) const;
 
   /**
    * Returns the remote address of this connection, if it is connected.
+   * @param reliable sometimes two sockets are used for reliable and
+   *                 unreliable data.  Specify which low-level socket you
+   *                 want the address of.
    */
   //##ModelId=3AFF79880136
-  NLaddress getRemoteAddress() const;
+  NLaddress getRemoteAddress(bool reliable) const;
 
   /**
    * Returns true if this Connection is active and ready to send/recieve.
@@ -151,11 +156,9 @@ public:
 
   /**
    * Event triggered when one or more packets have been recieved.
-   * Note you must call this function explicity from your overridden
-   * function FIRST so the underlying functions recieve this event.
    */
   //##ModelId=3AE4A776033E
-  virtual void onRecieve();
+  virtual void onReceive();
 
   /**
    * Event triggered when the write buffer was filled and is now empty.
@@ -169,14 +172,42 @@ public:
 
 protected:
   //##ModelId=3AE4E2340334
-  NLsocket socket;
+  NLsocket rsocket;
 
-private:
+  //##ModelId=3B00ABDD0078
+  NLsocket usocket;
+
   //##ModelId=3AE44E3302DA
-  PacketStream ps;
+  PacketStream* ps;
 
   //##ModelId=3AE4A97A038E
   bool connected;
+
+private:
+  //##ModelId=3B0099530154
+  class ConnectionListener : public ConnectionEventListener {
+  public:
+    //##ModelId=3B009D63019A
+    ConnectionListener(Connection& listener, bool isReliable);
+
+    //##ModelId=3B009D630208
+    virtual ~ConnectionListener();
+
+    //##ModelId=3B0099B700BE
+    void onReceive();
+
+  private:
+    //##ModelId=3B009D150352
+    Connection& conn;
+
+    //##ModelId=3B009D3D03B6
+    bool reliable;
+
+  };
+  friend class ConnectionListener;
+
+  //##ModelId=3B009E0903AC
+  void onReceive(bool reliable);
 
 };
 

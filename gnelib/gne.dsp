@@ -101,7 +101,7 @@ SOURCE=.\src\ConnectionEventGenerator.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ConnectionWriter.cpp
+SOURCE=.\src\ConnectionEventListener.cpp
 # End Source File
 # Begin Source File
 
@@ -181,7 +181,7 @@ SOURCE=.\src\ConnectionEventGenerator.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ConnectionWriter.h
+SOURCE=.\src\ConnectionEventListener.h
 # End Source File
 # Begin Source File
 

@@ -22,15 +22,15 @@
 
 #include "gneintern.h"
 #include "ConditionVariable.h"
-#include "ConnectionWriter.h"
 #include "Mutex.h"
+#include "Thread.h"
 class Packet;
 
 /**
  * This class resembles a packet stream through a connection.
  */
 //##ModelId=3AE35F9E001E
-class PacketStream {
+class PacketStream : public Thread {
 public:
   /**
    * Creates a new PacketStream with the given flow control parameters.
@@ -75,13 +75,6 @@ public:
   void writePacket(const Packet& packet, bool reliable);
 
   /**
-   * Internal function used by ConnectionWriter -- do not use.  Removes the
-   * next packet from the outgoing queue.
-   */
-  //##ModelId=3AE4CDD70122
-  Packet* getNextPacketToSend();
-
-  /**
    * Returns the actual incoming data rate, which may be the same or less
    * that what was originally requested on connection.
    */
@@ -101,6 +94,22 @@ public:
   //##ModelId=3AE4C70203C0
   void waitToSendAll();
 
+  /**
+   * Internal function -- Do not call.  This thread handles throttled writes
+   * to the socket.
+   */
+  //##ModelId=3B00990701E0
+  void run();
+
+  /**
+   * Add the given packet to the incoming queue.  This is normalled used
+   * internally by the Connection class to add the packets, but it is safe
+   * for the user to call, if they want to delay processing of the packets
+   * for a later time and see what other packets are available.
+   */
+  //##ModelId=3B00A2910212
+  void addIncomingPacket(Packet* packet);
+
 private:
 
   //##ModelId=3AE45A8302E4
@@ -113,6 +122,8 @@ private:
     //##ModelId=3AE45C44006A
     bool    reliable;
   };
+  //##ModelId=3AE4CDD70122
+  Packet* getNextPacketToSend();
 
   //##ModelId=3AE45B56017C
   std::queue<PacketStreamData*> out;
@@ -126,9 +137,6 @@ private:
   //##ModelId=3AE4C45D0046
   ConditionVariable writeSync;
 
-  //##ModelId=3AE4CD6E0370
-  ConnectionWriter writer;
-
   //##ModelId=3AE4CED502C6
   Mutex inQCtrl;
 
@@ -136,8 +144,6 @@ private:
   Mutex outQCtrl;
 
 };
-
-
 
 #endif /* PACKETSTREAM_H_INCLUDED_C51CCBFF */
 

@@ -19,6 +19,7 @@
 
 #include "gneintern.h"
 #include "ConnectionEventGenerator.h"
+#include "ConnectionEventListener.h"
 #include "Connection.h"
 
 //##ModelId=3AE359220352
@@ -34,11 +35,15 @@ void ConnectionEventGenerator::run() {
 }
 
 //##ModelId=3AE4E158023A
-void ConnectionEventGenerator::registerConn(NLsocket socket, Connection* conn) {
+void ConnectionEventGenerator::reg(NLsocket socket, ConnectionEventListener* conn) {
 }
 
 //##ModelId=3AE4E17D021C
-void ConnectionEventGenerator::unregisterConn(NLsocket socket) {
+void ConnectionEventGenerator::unreg(NLsocket socket) {
 }
 
+
+//##ModelId=3B00A4B703AC
+void ConnectionEventGenerator::shutdown() {
+}
 

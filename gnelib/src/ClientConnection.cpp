@@ -21,7 +21,15 @@
 #include "ClientConnection.h"
 
 //##ModelId=3AE59FAB0000
-ClientConnection::ClientConnection(int outRate, int inRate, std::string address) 
+ClientConnection::ClientConnection(int outRate, int inRate, std::string dest, int port)
+: Connection(outRate, inRate) {
+  NLaddress addr;
+  nlStringToAddr((NLbyte*)dest.c_str(), &addr);
+  nlOpen(port, NL_RELIABLE);
+}
+
+//##ModelId=3AFF8361029E
+ClientConnection::ClientConnection(int outRate, int inRate, NLaddress dest, int port) 
 : Connection(outRate, inRate) {
 }
 

@@ -1,6 +1,6 @@
 GNE 0.002 to 0.003
-  Various API changes/additions/deletions in the Connection class and related
-    classes.  This API is still very much in developement and working, so do
+  Major API changes/additions/deletions in the Connection classes.
+    This API is still very much in developement and working, so do
     not rely upon it being fixed right now.
   Changed examples to use new Console functions and GNE::NO_NET.
   Added function in Console to set the window title where possible.

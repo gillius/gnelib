@@ -23,7 +23,7 @@
 #include "gneintern.h"
 #include "Mutex.h"
 #include "Thread.h"
-class Connection;
+class ConnectionEventListener;
 
 /**
  * A class used internally by GNE to generate the events in Connection.  Users
@@ -48,28 +48,32 @@ public:
    * @param conn the Connection class associated with the socket.
    */
   //##ModelId=3AE4E158023A
-  void registerConn(NLsocket socket, Connection* conn);
+  void reg(NLsocket socket, ConnectionEventListener* conn);
 
   /**
    * Removes a Connection.
    * @param socket the low-level HawkNL socket for this connection.
    */
   //##ModelId=3AE4E17D021C
-  void unregisterConn(NLsocket socket);
+  void unreg(NLsocket socket);
+
+  /**
+   * Tells the event generator to shutdown.  This function is called
+   * internally on library cleanup, so you should not call it.
+   */
+  //##ModelId=3B00A4B703AC
+  void shutdown();
 
 private:
   //##ModelId=3AE358F701FE
   NLint group;
 
   //##ModelId=3AE35A87032A
-  std::map<NLsocket, Connection*> connections;
+  std::map<NLsocket, ConnectionEventListener*> connections;
 
   //##ModelId=3AE4E2E60348
   Mutex mapCtrl;
-
 };
-
-
 
 #endif /* CONNECTIONEVENTGENERATOR_H_INCLUDED_C51B7986 */
 
