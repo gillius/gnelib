@@ -29,7 +29,7 @@
  * as normal, but a notice is sent to the other side that they made a point.
  */
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 #include <iostream>
 #include <string>
 
@@ -59,7 +59,7 @@ int main() {
 
   setGameInformation("GNE Pong", 1);
 
-  if (initConsole(atexit)) {
+  if (initConsole()) {
     cout << "Unable to initialize GNE Console" << endl;
     exit(3);
   }
@@ -67,9 +67,8 @@ int main() {
 
   //Register our custom packet types.  We can do this anytime after we have
   //initalized GNE, but we must do it before we start to receive packets.
-  PacketParser::registerPacket(
-    (guint8)PaddleMovement::ID, PaddleMovement::create);
-  PacketParser::registerPacket( (guint8)BallMissed::ID, BallMissed::create );
+  defaultRegisterPacket<PaddleMovement>();
+  defaultRegisterPacket<BallMissed>();
 
   gout << "GNE Pong for " << GNE::VER_STR << endl;
   gout << "Local address: " << getLocalAddress() << endl;
@@ -99,7 +98,16 @@ int main() {
  */
 class PingSender : public TimerCallback {
 public:
-  PingSender(Connection* Conn) : conn(Conn) {}
+  typedef SmartPtr<PingSender> sptr;
+  typedef WeakPtr<PingSender> wptr;
+
+protected:
+  PingSender( const Connection::sptr& conn ) : conn(conn) {}
+
+public:
+  static sptr create( const Connection::sptr& conn ) {
+    return sptr( new PingSender( conn ) );
+  }
 
   void timerCallback() {
     PingPacket p;
@@ -107,7 +115,7 @@ public:
   }
 
 private:
-  Connection* conn;
+  Connection::sptr conn;
 };
 
 void doServer(int port) {
@@ -119,35 +127,34 @@ void doServer(int port) {
   Player local(getName(), SCRX-30, SCRX-1);
   Player remote("Remote", 5, 0);
 
-  OurListener server(&remote, &local);
-  if (server.open(port))
+  OurListener::sptr server = OurListener::create(&remote, &local);
+  if (server->open(port))
     errorExit("Cannot open server socket.");
-  if (server.listen())
+  if (server->listen())
     errorExit("Cannot listen on server socket.");
 
-  gout << "Server is listening on: " << server.getLocalAddress() << endl;
+  gout << "Server is listening on: " << server->getLocalAddress() << endl;
   gout << "Waiting for client to connect.  Press a key to abort." << endl;
 
   //waitForPlayer returns the connected player, or NULL if the connection
   //process was aborted by the user.  If any errors occur they will be
   //reported but listening will continue until a successful connect or the
   //user presses a key.
-  PongClient* remotePeer = server.waitForPlayer();
+  PongClient::sptr remotePeer = server->waitForPlayer();
 
-  if (remotePeer != NULL) {
+  if ( remotePeer ) {
     //Start the pingTimer to allow a ping meter
-    Timer pingTimer(new PingSender(remotePeer->getConnection()), 500, true);
-    pingTimer.startTimer();
+    Timer::sptr pingTimer =
+      Timer::create( PingSender::create( remotePeer->getConnection() ), 500 );
+    pingTimer->startTimer();
 
-    local.paddle().setListener(remotePeer);
+    local.paddle().setListener( remotePeer );
     //Start and play the Game.
     Game game(&local, &remote);
     doGameLoop(game);
 
-    pingTimer.stopTimer(true);
-
-    delete remotePeer->getConnection();
-    delete remotePeer;
+    pingTimer->stopTimer(true);
+    remotePeer->getConnection()->disconnect();
   }
 }
 
@@ -171,52 +178,56 @@ void doClient(int port) {
   gout << "Connecting to: " << address << endl;
 
   //We create a new network player tied to the remote paddle.
-  PongClient peer(&remote, &local);
+  PongClient::sptr peer = PongClient::create(&remote, &local);
 
-  ClientConnection client;
+  ClientConnection::sptr client = ClientConnection::create();
 
   //Open a new connection to the selected address, with no bandwidth limit
   //controls, any local bounded port, and unreliable connection is not needed.
-  ConnectionParams p(&peer);
+  ConnectionParams p( peer );
   p.setUnrel(false);
-  if (client.open(address, p))
+  if (client->open(address, p))
     errorExit("Unable to open ClientConnection.");
 
-  client.connect();
-  client.join();
+  client->connect();
+  client->join();
 
-  if (client.isConnected()) {
+  if (client->isConnected()) {
     //Start the pingTimer to allow a ping meter
-    Timer pingTimer(new PingSender(&client), 500, true);
-    pingTimer.startTimer();
+    Timer::sptr pingTimer = Timer::create( PingSender::create(client), 500 );
+    pingTimer->startTimer();
 
-    local.paddle().setListener(&peer);
+    local.paddle().setListener( peer );
     Game game(&local, &remote);
     doGameLoop(game);
 
-    pingTimer.stopTimer(true);
+    pingTimer->stopTimer(true);
 
   } else {
     gout << "An error occured while connecting." << endl;
     gout << "Press a key to continue." << endl;
     getch();
   }
+
+  //We call shutdown GNE so we know all connection active has stopped and
+  //nothing is accessing our Player objects anymore.
+  shutdownGNE();
 }
 
 void doGameLoop(Game& game) {
-  Counter counter;
-  Timer timer(&counter, 40, false);
+  Counter::sptr counter = Counter::create();
+  Timer::sptr timer = Timer::create( counter, 40 );
 
   game.draw(true);
 
   bool exit = false;
-  timer.startTimer();
+  timer->startTimer();
   while (!exit) {
     exit = game.getInput();
     game.update();
     game.draw(false);
     //The counter will throttle the game to 25fps.
-    counter.waitAndDecrement();
+    counter->waitAndDecrement();
   }
 }
 

@@ -38,10 +38,6 @@ public:
 
   static const int ID;
 
-  Packet* makeClone() const {
-    return new PaddleMovement(*this);
-  }
-
   int getSize() const {
     return Packet::getSize() + RawPacket::getSizeOf(newy);
   }
@@ -56,10 +52,6 @@ public:
     raw >> newy;
   }
 
-  static Packet* create() {
-    return new PaddleMovement();
-  }
-
   guint8 newy;
 };
 
@@ -72,14 +64,10 @@ const int PaddleMovement::ID = PacketParser::MIN_USER_ID;
  */
 class BallMissed : public Packet {
 public:
-  BallMissed(): Packet(ID) {}
+  BallMissed() : Packet(ID) {}
   virtual ~BallMissed() {}
 
   static const int ID;
-
-  Packet* makeClone() const {
-    return new BallMissed(*this);
-  }
 
   int getSize() const {
     return Packet::getSize();
@@ -91,10 +79,6 @@ public:
 
   void readPacket(RawPacket& raw) {
     Packet::readPacket(raw);
-  }
-
-  static Packet* create() {
-    return new BallMissed();
   }
 };
 

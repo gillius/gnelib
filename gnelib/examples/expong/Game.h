@@ -101,6 +101,10 @@ private:
  */
 class PaddleListener {
 public:
+  typedef SmartPtr<PaddleListener> sptr;
+  typedef WeakPtr<PaddleListener> wptr;
+
+public:
   virtual void paddleMoved(int newy) = 0;
 
   virtual void ballMissed() = 0;
@@ -115,23 +119,24 @@ const int PADDLE_HEIGHT = 5;
  */
 class Paddle {
 public:
-  Paddle(int x2) : listener(NULL), oldy(10), x(x2), y(10) {
+  Paddle(int x2) : oldy(10), x(x2), y(10) {
   }
 
   //The networking code will call this function when we get a PacketMovement.
   void changePosition(int newy) {
     //We have to change y in the sync to make sure that we don't change it
     //as the game thread is accessing it.
-    sync.acquire();
+    LockMutex lock(sync);
     y = newy;
-    sync.release();
   }
 
   /**
    * The networking code will call this function when a connection is made to
    * set itself up as a listener.
    */
-  void setListener(PaddleListener* newListener) {
+  void setListener( const PaddleListener::sptr& newListener ) {
+    LockMutex lock( sync );
+
     //gnedbgo1(1, "%x is now our listener", newListener);
     listener = newListener;
   }
@@ -149,7 +154,8 @@ public:
    * point was scored.
    */
   bool checkCollision(int chk) {
-    sync.acquire();
+    LockMutex lock( sync );
+
     if (listener) {
       //Only do the check if we have a listener to notify anyways.
       if (chk < y || chk >= y + PADDLE_HEIGHT) {
@@ -157,13 +163,13 @@ public:
         return true;
       }
     }
-    sync.release();
 
     return false;
   }
 
   void getInput(char ch) {
-    sync.acquire();
+    LockMutex lock( sync );
+
     switch (ch) {
     case 'w':
       //If the paddle can move up, we move up a space
@@ -185,14 +191,13 @@ public:
       }
       break;
     }
-    sync.release();
   }
 
   void update() {
   }
 
   void draw(bool redraw) {
-    sync.acquire();
+    LockMutex lock( sync );
 
     //Only draw the paddle if it has moved, or we need to redraw
     if (oldy != y || redraw) {
@@ -208,12 +213,10 @@ public:
       
       oldy = y;
     }
-
-    sync.release();
   }
 
 private:
-  PaddleListener* listener;
+  PaddleListener::sptr listener;
 
   int oldy;
   int x, y;
@@ -315,30 +318,28 @@ public:
   void update() {
     ourPaddle.update();
 
-    sync.acquire();
+    LockMutex lock( sync );
     anim.update();
-    sync.release();
   }
 
   void draw(bool redraw) {
-    sync.acquire();
+    LockMutex lock( sync );
+
     if (updateScore || redraw) {
       mlprintf(x, 0, " %s %2d ", name.c_str(), score);
       updateScore = false;
     }
     anim.draw(redraw);
-    sync.release();
-    ourPaddle.draw(redraw);
 
+    ourPaddle.draw(redraw);
   }
 
   void incrementScore() {
-    sync.acquire();
+    LockMutex lock( sync );
+
     ++score;
     updateScore = true;
     anim.displayMessage(" " + name + " scores! ", x);
-
-    sync.release();
   }
 
   Paddle& paddle() {

@@ -33,6 +33,14 @@
  */
 class PongClient : public ConnectionListener, public PaddleListener {
 public:
+  typedef SmartPtr<PongClient> sptr;
+  typedef WeakPtr<PongClient> wptr;
+
+protected:
+  PongClient(Player* RemotePlayer, Player* LocalPlayer)
+    : remotePlayer(RemotePlayer), localPlayer(LocalPlayer) {}
+
+public:
   /**
    * The PongClient requires a paddle passed to be designated as its
    * associated network player.  If note is not NULL, then that CV is notifed
@@ -40,14 +48,13 @@ public:
    * to enter).  The localPlayer is passed so that we may accredit him with
    * points when the remote paddle misses the ball.
    */
-  PongClient(Player* RemotePlayer, Player* LocalPlayer)
-    : conn(NULL), remotePlayer(RemotePlayer), localPlayer(LocalPlayer) {}
+  static sptr create( Player* RemotePlayer, Player* LocalPlayer ) {
+    return sptr( new PongClient( RemotePlayer, LocalPlayer ) );
+  }
 
   ~PongClient() {}
 
-  //This function is used by the server so it can get the ServerConnection
-  //so it can delete it later.
-  Connection* getConnection() {
+  Connection::sptr getConnection() {
     return conn;
   }
 
@@ -177,7 +184,7 @@ public:
   }
 
 private:
-  Connection* conn;
+  Connection::sptr conn;
 
   Player* remotePlayer;
   Player* localPlayer;
@@ -189,6 +196,14 @@ private:
  */
 class RefuseClient : public ConnectionListener {
 public:
+  typedef SmartPtr<RefuseClient> sptr;
+  typedef WeakPtr<RefuseClient> wptr;
+
+public:
+  static sptr create() {
+    return sptr( new RefuseClient() );
+  }
+
   void onNewConn(SyncConnection& conn2) {
     CustomPacket buf;
     //Tell the client that they have been refused
@@ -202,90 +217,89 @@ private:
 
 class OurListener : public ServerConnectionListener {
 public:
+  typedef SmartPtr<OurListener> sptr;
+  typedef WeakPtr<OurListener> wptr;
+
+protected:
+  OurListener(Player* RemotePlayer, Player* LocalPlayer)
+    : remotePlayer(RemotePlayer), localPlayer(LocalPlayer), accept(true) {
+  }
+
+public:
   /**
    * This listener takes the params it needs to pass them onto the PongClient
    * to set up the game.
    */
-  OurListener(Player* RemotePlayer, Player* LocalPlayer)
-    : ServerConnectionListener(), remotePlayer(RemotePlayer),
-    localPlayer(LocalPlayer), player(NULL), connecting(NULL), accept(true) {
+  static sptr create( Player* RemotePlayer, Player* LocalPlayer ) {
+    sptr ret( new OurListener( RemotePlayer, LocalPlayer ) );
+    ret->setThisPointer( ret );
+    return ret;
   }
 
   virtual ~OurListener() {}
 
-  void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) {
-    sync.acquire();
-    if (listener == connecting) {
+  void onListenFailure(const Error& error, const Address& from, const ConnectionListener::sptr& listener) {
+    LockCV lock(sync);
+
+    if (listener == connecting.lock()) {
       //Only display an error for our real player.  We don't want to see the
       //ConnectionRefused errors.
       gout << acquire << "Connection error: " << error << endl;
       gout << "  Error received from " << from << endl << release;
-      connecting = NULL;
+      connecting.reset();
     }
-    sync.broadcast();
-    sync.release();
 
-    //If listener is NULL, that is OK even.
-    delete listener;
+    //If waitForPlayer is waiting for the connection, wake it up.
+    sync.broadcast();
   }
 
-  void onListenSuccess(ConnectionListener* listener) {
-    sync.acquire();
+  void onListenSuccess( const ConnectionListener::sptr& listener ) {
+    LockCV lock(sync);
+
     player = connecting;
-    connecting = NULL;
+    connecting.reset();
     accept = false;
+
+    //If waitForPlayer is waiting for the connection, wake it up.
     sync.broadcast();
-    sync.release();
   }
 
   void getNewConnectionParams(ConnectionParams& params) {
-    sync.acquire();
+    LockCV lock(sync);
 
     params.setUnrel(false);
-    if (accept && !connecting) {
+    if (accept && !(connecting.lock()) ) {
       //If no one is connecting and we are accepting connections
-      connecting = new PongClient(remotePlayer, localPlayer);
-      params.setListener(connecting);
+      PongClient::sptr temp = PongClient::create( remotePlayer, localPlayer );
+      connecting = temp;
+      params.setListener( temp );
     } else {
-      params.setListener(new RefuseClient());
+      params.setListener( RefuseClient::create() );
     }
-
-    sync.release();
   }
 
   //waitForPlayer returns the connected player, or NULL if the connection
   //process was aborted by the user.
-  PongClient* waitForPlayer() {
-    sync.acquire();
+  PongClient::sptr waitForPlayer() {
+    LockCV lock(sync);
 
-    while (!player && !kbhit()) {
+    while (!(player.lock()) && !kbhit()) {
       //We wait for 250ms to recheck kbhit for pressed keys.
       sync.timedWait(250);
     }
-    if (!player) {
+    if (!(player.lock())) {
       //We were woken up by a keypress, so refuse any further connections.
       accept = false;
-      if (connecting) {
-        //We have a client connecting when we pressed a key, and we have to
-        //wait for that connection to complete so we can delete the connection
-        //that we don't want anymore.
-        while (connecting) {
-          sync.wait();
-        }
-        //When connecting becomes NULL, check for a successful connect, and if
-        //it was, close it.
-        if (player) {
-          player->getConnection()->disconnect();
-          delete player->getConnection();
-          delete player;
-          player = NULL;
-        }
-      }
+
+      //We don't need to wait around if anyone is in the middle of connecting,
+      //because shutting down GNE will close any open connections, and we will
+      //be closing down if we aborted this connection.
+
+      //Return that no client connected.
+      return PongClient::sptr();
     }
 
-    sync.release();
-
-    return player;
+    return player.lock();
   }
 
 private:
@@ -293,12 +307,14 @@ private:
   Player* localPlayer;
 
   //This variable will be non-null when there is a player, so we refuse any
-  //other incoming connections.
-  PongClient* player;
+  //other incoming connections.  Weak pointer used because we don't want to
+  //keep player alive after connect
+  PongClient::wptr player;
 
   //player will be stored here while he is connecting, then moved to player
-  //when the connection was successful.
-  PongClient* connecting;
+  //when the connection was successful.  Weak pointer used because this
+  //variable is only temporary and we don't want to keep anything alive.
+  PongClient::wptr connecting;
 
   //If this is false, then the user canceled the connection process, we we
   //shouldn't even accept the first player.
