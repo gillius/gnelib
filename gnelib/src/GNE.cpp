@@ -19,9 +19,15 @@
 
 #include "gneintern.h"
 #include "ConnectionEventGenerator.h"
+#include "PacketParser.h"
 #include "GNE.h"
 
 namespace GNE {
+  namespace PacketParser {
+    //this is declared here only so the user cannot access it, and the "real"
+    //function can do checking on the ID given to it.
+    void registerGNEPackets();
+  }
 
 int userVersion = 0;
 ConnectionEventGenerator* eGen = NULL;
@@ -39,6 +45,7 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
       nlEnable(NL_BLOCKING_IO);
       nlEnable(NL_TCP_NO_DELAY);
       nlDisable(NL_SOCKET_STATS);
+      PacketParser::registerGNEPackets();
       eGen = new ConnectionEventGenerator();
       eGen->start();
       initialized = true; //We need only to set this to true if we are using HawkNL
