@@ -105,10 +105,10 @@ void Timer::run() {
     Time currTime, sleepTime;
     currTime = getCurrentTime();
     //We add 500 to currTime because we are waiting in milliseconds, so this
-    //is essentially a "round."  If we have less than 500 microseconds left,
+    //is essentially a "round."  If we have less than 1000 microseconds left,
     //there is little use in another sleep call which almost certainly won't
     //return faster than this, so we just call it now.
-    while (nextTime > currTime + 500) {
+    while (nextTime > currTime + 1000) {
       sleepTime = nextTime - currTime;
       Thread::sleep(sleepTime.getTotaluSec() / 1000);
       currTime = getCurrentTime();

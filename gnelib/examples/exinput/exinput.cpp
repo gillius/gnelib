@@ -67,7 +67,7 @@ protected:
       Thread::sleep(rand() % 3500 + 1000);
       mlputchar(x, y, ' ');
       if (running)
-        Thread::sleep(rand() % 500);
+        Thread::sleep(rand() % 500 + 100);
     }
   }
 
