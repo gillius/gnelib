@@ -35,7 +35,7 @@ namespace GNE {
 class Mutex {
 public:
   /**
-   * Initalizes this mutex.
+   * Initializes this mutex.
    */
   Mutex();
 

@@ -32,7 +32,7 @@ const int DLEVEL3 = 4;
 const int DLEVEL4 = 8;
 const int DLEVEL5 = 16;
 /**
- * Function to initalize debugging.  This is safe to call before
+ * Function to initialize debugging.  This is safe to call before
  * initialization of GNE, but can be called at any time (but not multiple
  * times).  No debugging messages will be displayed until this function is
  * called, and it is save to use the debugging macros and doTrace before

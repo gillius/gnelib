@@ -101,7 +101,7 @@ public:
    * two Buffers with the same data, position, and limit.  Changes made to one
    * will not affect the other.
    *
-   * To make this operation efficent, the backing array for this Buffer is only
+   * To make this operation efficient, the backing array for this Buffer is only
    * recreated if the capacity of the left Buffer is smaller than the capacity
    * of the right.  Thus the resulting Buffer's capacity is equal to or greater
    * than the capacities of the two Buffers before the operation.
@@ -316,7 +316,7 @@ public:
 
   /**
    * The max length of a %GNE network packet.  This constant is used mostly by
-   * %GNE's internal code to create packet combonation buffers.
+   * %GNE's internal code to create packet combination buffers.
    */
   static const int RAW_PACKET_LEN;
 

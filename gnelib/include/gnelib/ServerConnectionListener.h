@@ -59,7 +59,7 @@ public:
 
 protected:
   /**
-   * Initalizes this class.
+   * Initializes this class.
    */
   ServerConnectionListener();
 
@@ -100,7 +100,7 @@ public:
    * when it is shut down.
    *
    * Note that a listener can be closed while an event is being processed.
-   * This behaviour was chosen because it matches the behaviour of the
+   * This behavior was chosen because it matches the behavior of the
    * previous %GNE 0.55 API, and because it avoids using mutexes, which keep
    * the events from running in parallel even if they are capable.  This
    * should not affect the events except that the getLocalAddress method may

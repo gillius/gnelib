@@ -89,7 +89,7 @@ struct PingInformation {
  *       used memory in the request table.</li>
  * </ul>
  *
- * Check out the exping example for an example and more explaination on how
+ * Check out the exping example for an example and more explanation on how
  * to use PingPacket.
  */
 class PingPacket : public Packet {
@@ -104,7 +104,7 @@ public:
    * you should use getReply when you get a ping request to make the ping
    * response packet.
    *
-   * The PingPacket::create function passes in false to get an uninitalized
+   * The PingPacket::create function passes in false to get an uninitialized
    * PingPacket for reading.  You will probably only ever use the default
    * form of the constructor.  If you pass false, the state of this object is
    * undefined after creation and is suitable only to use readPacket on.
@@ -142,7 +142,7 @@ public:
    * Every time you create a packet, the request ID is placed into a request
    * table so that the time difference can be measured later.  This takes up
    * some memory.  It is possible that a ping reply is never received,
-   * espically if sending PingPackets over an unreliable connection.  This
+   * especially if sending PingPackets over an unreliable connection.  This
    * function will remove any packets that have been pending for longer than
    * the time specified.  It will return the number of packets that were
    * considered lost based on the specified pending time limit and remove
@@ -199,7 +199,7 @@ private:
    */
   Time T3;
 
-  //Provides syncronization for nextReqId and requests
+  //Provides synchronization for nextReqId and requests
   static Mutex sync;
 
   static guint32 nextReqId;

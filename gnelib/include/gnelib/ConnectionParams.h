@@ -78,7 +78,7 @@ public:
 
   /**
    * The PacketFeeder receives onLowPackets events which are entirely
-   * independant of the serialized event queue of events sent to the
+   * independent of the serialized event queue of events sent to the
    * ConnectionListener.  The default is NULL, and any point is valid.
    * @see PacketStream::setFeeder
    */

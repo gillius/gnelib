@@ -41,14 +41,14 @@ namespace GNE {
 class Time {
 public:
   /**
-   * Initalizes this class with a time of 0.
+   * Initializes this class with a time of 0.
    */
   Time();
 
   Time( const Time& t );
 
   /**
-   * Initalizes this class with the time specified.  The given time need not
+   * Initializes this class with the time specified.  The given time need not
    * be normalized as this will be done automatically.  For example it is
    * acceptable to pass in 0 seconds and 2,000,000 microseconds and it will
    * be normalized to 2 seconds.
@@ -81,7 +81,7 @@ public:
   int getTotaluSec() const;
 
   /**
-   * Returns the total time in milliseconds.  Useful in the same situtations
+   * Returns the total time in milliseconds.  Useful in the same situations
    * as getTotaluSec, but can represent larger time differences.  A 32-bit
    * integer millisecond value can represent a time of about +/- 24.855 days.
    */

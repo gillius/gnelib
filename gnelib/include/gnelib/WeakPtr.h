@@ -30,7 +30,7 @@ namespace GNE {
  *
  * The WeakPtr class is a weak pointer to an object managed by SmartPtr.
  * Weak pointers do not prevent the objects they refer to from being destroyed
- * when all strong pointers dissapear.
+ * when all strong pointers disappear.
  *
  * You cannot access the object directly through the weak pointer.  You have
  * to construct a strong pointer (SmartPtr) in order to use the object.  If

@@ -81,7 +81,7 @@ namespace GNE {
   /**
    * The global event generator.  The library uses this internally to
    * register and unregister connections.  The end-user will not have to use
-   * this object under any normal cirumstances.
+   * this object under any normal circumstances.
    */
   extern SmartPtr<ConnectionEventGenerator> eGen;
 };

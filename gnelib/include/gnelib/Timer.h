@@ -76,7 +76,7 @@ public:
   virtual ~Timer();
 
   /**
-   * Returns the current time from some arbitray point in the past.  This is
+   * Returns the current time from some arbitrary point in the past.  This is
    * usually a very high precision timer that likely provides microsecond
    * or better resolution.
    */
@@ -145,7 +145,7 @@ private:
   SmartPtr<TimerCallback> listener;
 
   /**
-   * Provides syncronization for some functions to make them thread safe.
+   * Provides synchronization for some functions to make them thread safe.
    */
   mutable Mutex sync;
 
