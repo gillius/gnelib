@@ -32,9 +32,9 @@ class Packet;
  * packets into a form suitable to be sent over their own types of network
  * connections or saved/loaded from a file.  A neat trick might be implemented
  * where a file can "mimic" a server to provide the necessary packets to
- * restore the game state.\n
+ * restore the game state.
+ *
  * See the example "expacket" for an example of the usage of this class.
- * \bug I don't think RawPacket handles signed ordinals properly yet.
  */
 //##ModelId=3B075380030F
 class RawPacket {
@@ -87,15 +87,15 @@ public:
   void reset();
 
   /**
-   * Writes raw data starting at the current position.  This acts just like
-   * the memcpy command.
+   * Writes raw data starting at the current position.  This acts similar to
+   * the memcpy function.
    */
   //##ModelId=3B0753810233
   void writeRaw(const gbyte* block, int length);
 
   /**
-   * Like writeBlock, but just the other way around now :).
-   * @see writeBlock
+   * Like writeRaw, but just the other way around now :).
+   * @see writeRaw
    */
   //##ModelId=3B0753810236
   void readRaw(gbyte* block, int length);
