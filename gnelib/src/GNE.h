@@ -2,7 +2,7 @@
 #define GNE_H_INCLUDED_C51DF1DD
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
@@ -113,7 +113,7 @@ class ConnectionEventGenerator;
    * A string representation of the name of the library and the current
    * version.
    */
-  const std::string VER_STR = "GNE v0.002 pre-alpha";
+  const std::string VER_STR = "GNE v0.003 pre-alpha";
 
   /**
    * The low-level header size of a UDP header, which is used with the HawkNL
@@ -150,5 +150,6 @@ class ConnectionEventGenerator;
 }
 
 #endif /* GNE_H_INCLUDED_C51DF1DD */
+
 
 

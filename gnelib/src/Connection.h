@@ -2,7 +2,7 @@
 #define CONNECTION_H_INCLUDED_C51DC478
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
@@ -186,7 +186,8 @@ protected:
   NLsocket usocket;
 
   /**
-   * The PacketStream associated with this Connection.
+   * The PacketStream associated with this Connection.  This object also
+   * contains information about the in and out connection rates.
    */
   //##ModelId=3B075381006E
   PacketStream* ps;
@@ -220,6 +221,13 @@ private:
   };
   friend class ConnectionListener;
 
+  //Functions for PacketStream and parsing packets
+  //##ModelId=3B6B302400CA
+  int rawRead(bool reliable, const NLbyte* buf, int bufSize);
+  //##ModelId=3B6B302401D6
+  int rawWrite(bool reliable, const NLbyte* buf, int bufSize);
+  friend class PacketStream;
+
   //##ModelId=3B07538100B0
   void onReceive(bool reliable);
 
@@ -227,3 +235,5 @@ private:
 
 }
 #endif /* CONNECTION_H_INCLUDED_C51DC478 */
+
+

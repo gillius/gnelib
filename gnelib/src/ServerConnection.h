@@ -2,7 +2,7 @@
 #define SERVERCONNECTION_H_INCLUDED_C4FE6FF3
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
@@ -81,3 +81,5 @@ public:
 
 }
 #endif /* SERVERCONNECTION_H_INCLUDED_C4FE6FF3 */
+
+

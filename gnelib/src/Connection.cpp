@@ -1,5 +1,5 @@
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include "gneintern.h"
 #include "Connection.h"
+#include "RawPacket.h"
+#include "PacketParser.h"
 
 namespace GNE {
 
@@ -99,6 +101,8 @@ void Connection::disconnect() {
 
 //##ModelId=3B0753810084
 void Connection::disconnectSendAll() {
+	ps->waitToSendAll();
+	disconnect();
 }
 
 //##ModelId=3B0753810085
@@ -115,6 +119,21 @@ void Connection::onDoneWriting() {
 
 //##ModelId=3B07538100B0
 void Connection::onReceive(bool reliable) {
+	//Create buffer into a RawPacket
+	NLbyte* buf = new NLbyte[RawPacket::RAW_PACKET_LEN];
+	rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
+	RawPacket raw(buf);
+
+	//parse the packets and add them to the PacketStream
+	bool dummy;
+	Packet* next = NULL;
+	while ((next = PacketParser::parseNextPacket(dummy, raw)) != NULL) {
+		ps->addIncomingPacket(next);
+	}
+	delete[] buf;
+
+	//Start the event
+  onReceive();
 }
 
 //##ModelId=3B075381004E
@@ -128,6 +147,29 @@ Connection::ConnectionListener::~ConnectionListener() {
 
 //##ModelId=3B0753810053
 void Connection::ConnectionListener::onReceive() {
+  conn.onReceive(reliable);
+}
+
+//##ModelId=3B6B302400CA
+int Connection::rawRead(bool reliable, const NLbyte* buf, int bufSize) {
+  NLsocket act;
+  if (reliable)
+    act = rsocket;
+  else
+    act = usocket;
+  return int(nlRead(act, (NLvoid*)buf, (NLint)bufSize));
+}
+
+//##ModelId=3B6B302401D6
+int Connection::rawWrite(bool reliable, const NLbyte* buf, int bufSize) {
+  NLsocket act;
+  if (reliable)
+    act = rsocket;
+  else
+    act = usocket;
+  return int(nlWrite(act, (NLvoid*)buf, (NLint)bufSize));
 }
 
 }
+
+

@@ -2,7 +2,7 @@
 #define PACKETSTREAM_H_INCLUDED_C51CCBFF
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
@@ -27,18 +27,24 @@
 
 namespace GNE {
 class Packet;
+class Connection;
 
 /**
- * This class resembles a packet stream through a connection.
+ * This class resembles a packet stream through a connection.  This class
+ * is maintained by the Connection class, and you shouldn't have to create
+ * your own PacketStreams.
+ * NOTE: all functions in this class are thread safe, since this class uses
+ *       its own mutexes internally.  Note that data in the class may change
+ *       between calls, if another thread changes its state.
  */
 //##ModelId=3B075380030D
-class PacketStream : public Thread {
+class PacketStream : protected Thread {
 public:
   /**
    * Creates a new PacketStream with the given flow control parameters.
    */
   //##ModelId=3B07538101BD
-  PacketStream(int outRate2, int inRate2);
+  PacketStream(int outRate2, int inRate2, Connection& ourOwner);
 
   //##ModelId=3B07538101C0
   virtual ~PacketStream();
@@ -64,6 +70,8 @@ public:
   /**
    * Returns the next packet from the queue, removing it from that queue.
    * It is your responsibility to deallocate the memory for this packet.
+   * @return A pointer to the next packet, which you are responsible for
+   *         deleting, or NULL if there is no next packet.
    */
   //##ModelId=3B07538101C8
   Packet* getNextPacket();
@@ -107,12 +115,20 @@ public:
    * Add the given packet to the incoming queue.  This is normalled used
    * internally by the Connection class to add the packets, but it is safe
    * for the user to call, if they want to delay processing of the packets
-   * for a later time and see what other packets are available.
+   * for a later time and see what other packets are available.\n
+   * Remember queues are LIFO, meaning this inserted packet will be the last
+   * in the queue after addition.\n
+   * Also note that when you pass this object into the queue, you will
+   * eventually get it back from getNextPacket(), so you will want to handle
+   * deallocation at that point.
    */
   //##ModelId=3B07538101FB
   void addIncomingPacket(Packet* packet);
 
 private:
+
+  //##ModelId=3B6B30250015
+  Connection& owner;
 
   //##ModelId=3AE45A8302E4
   std::queue<Packet*> in;
@@ -125,7 +141,7 @@ private:
     bool    reliable;
   };
   //##ModelId=3B07538101FD
-  Packet* getNextPacketToSend();
+  PacketStreamData* getNextPacketToSend();
 
   //##ModelId=3AE45B56017C
   std::queue<PacketStreamData*> out;
@@ -136,16 +152,15 @@ private:
   //##ModelId=3B075381018F
   int outRate;
 
-  //##ModelId=3B0753810191
-  ConditionVariable writeSync;
-
   //##ModelId=3B0753810196
-  Mutex inQCtrl;
+  mutable Mutex inQCtrl;
 
   //##ModelId=3B07538101B9
-  Mutex outQCtrl;
+  mutable ConditionVariable outQCtrl;
 
 };
 
 }
 #endif /* PACKETSTREAM_H_INCLUDED_C51CCBFF */
+
+

@@ -2,7 +2,7 @@
 #define THREAD_H_INCLUDED_C51E3746
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
@@ -107,16 +107,19 @@ public:
    * Detaches a running thread.  A thread must always either
    * be joined or detached if system resources are to be recovered.  A
    * thread may not be joined after being detached.  After detaching a
-   * thread, with deleteThis set to true,
-   * it is undefined to access it any longer outside of its own actual thread.
+   * thread, with delThis set to true, it
+   * is undefined to access it any longer outside of its own actual thread.
    * In other words, at any moment after detach the Thread instance could be
    * be deleted because the thread terminated (or has already terminated).
    * But, of course a running thread could still access itself as it clearly
    * has not stopped and is still running.\n
    * If you care about reading the data from a thread after its completion,
-   * do not use detach and instead use join, or use detach with deleteThis
-   * set to false.  It is useful to do this if you want to release OS thread
-   * resources and still keep the class running (as in the Connection classes).
+   * do not use detach and instead use join.  It is useful to do this if you
+   * want to release OS thread resources
+   * and still keep the class running (as in the Connection classes).\n
+   * Pass false if the the thread should not auto-destruct when it ends --
+   * this is useful when you declared a thread on the stack, or you want to
+   * poll for completion.
    * @param delThis true if the thread should delete itself when it
    *                finishes executing.
    * @see join
@@ -228,3 +231,5 @@ private:
 
 }
 #endif /* THREAD_H_INCLUDED_C51E3746 */
+
+

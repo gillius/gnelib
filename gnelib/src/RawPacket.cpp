@@ -1,5 +1,5 @@
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@
 namespace GNE {
 
 //##ModelId=3B0753810226
-const int RawPacket::RAW_PACKET_LEN = 500;
+int RawPacket::RAW_PACKET_LEN = 512;
 
 //##ModelId=3B075381022A
 RawPacket::RawPacket(NLbyte* buffer) : currLoc(0) {
@@ -204,3 +204,5 @@ RawPacket& RawPacket::operator >> (Packet& x) {
 }
 
 }
+
+

@@ -1,5 +1,5 @@
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
@@ -37,6 +37,9 @@ void Counter::timerCallback() {
   countSync.release();
 }
 
+/**
+ * \todo I don't think we need to use the mutex for a read-only operation.
+ */
 //##ModelId=3B0753810118
 int Counter::getCount() {
   countSync.acquire();
@@ -53,3 +56,5 @@ void Counter::setCount(int newCount) {
 }
 
 }
+
+

@@ -2,7 +2,7 @@
 #define CONSOLE_H_INCLUDED_C507037C
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
@@ -75,14 +75,14 @@ namespace Console {
    * Function to sync on printf.
    * @return number of characters written.
    */
-  int mprintf(char* format, ...);
+  int mprintf(const char* format, ...);
   
   /**
    * Function to sync on printf, and print to a certain location.
    * @return number of characters written.
    * @see mprintf
    */
-  int mlprintf(int x, int y, char* format, ...);
+  int mlprintf(int x, int y, const char* format, ...);
 
   /**
    * A syncronized version of the ANSI function putchar.
@@ -141,3 +141,5 @@ namespace Console {
 }
 
 #endif
+
+

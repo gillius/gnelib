@@ -1,5 +1,5 @@
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001 Jason Winnebeck (gillius@webzone.net)
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
  * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
@@ -100,17 +100,16 @@ void Thread::shutDown() {
 
 //##ModelId=3B0753810382
 void Thread::join() {
-  assert( running );
   assert( !deleteThis );
   valassert(pthread_join( thread_id, NULL ), 0);
   running = false;
 }
 
 //##ModelId=3B0753810383
-void Thread::detach(bool deleteThis) {
+void Thread::detach(bool delThis) {
   assert( !deleteThis );
   valassert(pthread_detach( thread_id ), 0);
-  if (deleteThis) {
+  if (delThis) {
     //Only set deleteThis true if we want to delete ourselves on exit.
     sync.acquire();
     deleteThis = true;
@@ -133,8 +132,10 @@ void Thread::end() {
                         //Thread::detach.
     sync.release();
     delete this;
-  } else
+  } else {
+		running = false;
     sync.release();
+	}
 }
 
 //##ModelId=3B0753810388
@@ -169,3 +170,5 @@ void Thread::remove(Thread* thr) {
 }
 
 }
+
+
