@@ -31,10 +31,12 @@ namespace GNE {
 //##ModelId=3B07538101BD
 PacketStream::PacketStream(int outRate2, int inRate2, Connection& ourOwner)
 : owner(ourOwner), inRate(inRate2), outRate(outRate2) {
+  gnedbgo(5, "created");
 }
 
 //##ModelId=3B07538101C0
 PacketStream::~PacketStream() {
+  gnedbgo(5, "destroyed");
 }
 
 //##ModelId=3B07538101C2
@@ -151,7 +153,7 @@ void PacketStream::run() {
       next->packet->writePacket(raw);
       raw << PacketParser::END_OF_PACKET;
       if (owner.sockets.rawWrite(next->reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
-	owner.processError(Error::Write);
+        owner.processError(Error::Write);
       }
       delete next;
       
@@ -159,11 +161,11 @@ void PacketStream::run() {
       bool done = false;
       outQCtrl.acquire();
       if (out.empty())
-	done = true;
+        done = true;
       outQCtrl.release();
       if (done) {
-	gnedbgo(4, "onDoneWriting event triggered.");
-	owner.onDoneWriting();
+        gnedbgo(4, "onDoneWriting event triggered.");
+        owner.onDoneWriting();
       }
     }
   }
