@@ -1,4 +1,5 @@
 GNE 0.45 to current
+  More work on exnetperf to handle more clients and better format the data.
   Added the LockMutex class as a convenience.  It locks a mutex on creation
     and unlocks it on deletion which is useful for use in functions with many
     exit points, or functions that throw exceptions.

@@ -40,7 +40,10 @@ struct Pos {
   int* packetsOut;
 };
 static Pos gpos = {0, 8, NULL}; //global stats position
-static Pos positions[] = {{0, 17, NULL}};
+static positionsLength = 3;
+static Pos positions[] = {
+  {0, 13, NULL}, {0, 20, NULL}, {0, 27, NULL}, {0, 34, NULL}
+};
 
 class StatsDisplay : public TimerCallback {
 public:
@@ -78,11 +81,18 @@ public:
    * @param packetsOut similar to packetsIn
    */
   bool addConn(Connection* conn, int* packetsIn, int* packetsOut) {
-    //finish and make thread safe.
-    positions[0].conn = conn;
-    positions[0].packetsIn = packetsIn;
-    positions[0].packetsOut = packetsOut;
-    return false;
+    //Since we have multiple exit points, we use this convience class.
+    LockMutex lock(sync);
+
+    Pos* pos = findPos(NULL);
+    if (pos != NULL) {
+      pos->conn = conn;
+      pos->packetsIn = packetsIn;
+      pos->packetsOut = packetsOut;
+      return false;
+    }
+
+    return true;
   }
 
   /**
@@ -90,17 +100,31 @@ public:
    * the list, this function has no effect.
    */
   void delConn(Connection* conn) {
-    //finish and make thread safe.
-    positions[0].conn = NULL;
+    sync.acquire();
+    Pos* pos = findPos(conn);
+    if (pos != NULL) {
+      pos->conn = NULL;
+      pos->packetsIn = pos->packetsOut = NULL;
+
+      //Notify the user that the current screen location has finished its job
+      //(for now at least) by printing disconnected over the IP addr.
+      //We don't delete all of the data in case the user wants to trap the
+      //text to keep the information.
+      mlprintf(pos->x, pos->y, "* disconnected *  ");
+    }
+    sync.release();
   }
 
   /**
    * The callback function that updates the screen.
    */
   void timerCallback() {
-    if (positions[0].conn != NULL)
-      updateStats(positions[0]);
+    sync.acquire();
+    for (int c = 0; c < positionsLength; ++c)
+      if (positions[c].conn != NULL)
+        updateStats(positions[c]);
     updateGlobalStats();
+    sync.release();
   }
 
   /**
@@ -112,25 +136,26 @@ public:
     ConnectionStats all = conn->getStats(-1);
     ConnectionStats rel = conn->getStats(1);
     ConnectionStats unrel = conn->getStats(0);
-    //Printfs are so much nicer in this case over iostreams, eh?
-    mlprintf(ourPos.x, ourPos.y, "%-20s%10s%10s%10s",
-      conn->getRemoteAddress(true).toString().c_str(), "tot =" , "rel +", "unrel");
-    mlprintf(ourPos.x, ourPos.y+1, "%-20s%10d", "HiLvlPkts in", *ourPos.packetsIn);
-    mlprintf(ourPos.x, ourPos.y+2, "%-20s%10d", "HiLvlPkts out", *ourPos.packetsOut);
-    mlprintf(ourPos.x, ourPos.y+3, "%-20s%10d%10d%10d",
-      "bytesin", all.bytesRecv, rel.bytesRecv, unrel.bytesRecv);
-    mlprintf(ourPos.x, ourPos.y+4, "%-20s%10d%10d%10d",
-      "bytesout", all.bytesSent, rel.bytesSent, unrel.bytesSent);
-    mlprintf(ourPos.x, ourPos.y+5, "%-20s%10d%10d%10d",
-      "inRate", all.avgBytesRecv, rel.avgBytesRecv, unrel.avgBytesRecv);
-    mlprintf(ourPos.x, ourPos.y+6, "%-20s%10d%10d%10d",
-      "outRate", all.avgBytesSent, rel.avgBytesSent, unrel.avgBytesSent);
-    mlprintf(ourPos.x, ourPos.y+7, "%-20s%10d%10d%10d",
-      "maxInRate", all.maxAvgBytesRecv, rel.maxAvgBytesRecv, unrel.maxAvgBytesRecv);
-    mlprintf(ourPos.x, ourPos.y+8, "%-20s%10d%10d%10d",
-      "maxOutRate", all.maxAvgBytesSent, rel.maxAvgBytesSent, unrel.maxAvgBytesSent);
-    mlprintf(ourPos.x, ourPos.y+9, "%-20s%10d%10d%10d",
+    //C-style I/O so much nicer in this case over iostreams, eh?
+    //Not that the C-style isn't that nice.  HTML would be our best choice
+    //for formatting this data but we aren't in a web browser, are we ;) ?
+    mlprintf(ourPos.x, ourPos.y, "%-18s%10s%10s%10s%11s%10s%10s",
+      conn->getRemoteAddress(true).toString().c_str(), "in:tot =" , "rel +", "unrel",
+      "out:tot =", "rel +", "unrel");
+    mlprintf(ourPos.x, ourPos.y+1, "%-18s%10d%31d",
+      "HiLvlPkts", *ourPos.packetsIn, *ourPos.packetsOut);
+    mlprintf(ourPos.x, ourPos.y+2, "%-18s%10d%10d%10d",
       "sockets", all.openSockets, rel.openSockets, unrel.openSockets);
+
+    mlprintf(ourPos.x, ourPos.y+3, "%-18s%10d%10d%10d%11d%10d%10d",
+      "bytes", all.bytesRecv, rel.bytesRecv, unrel.bytesRecv,
+      all.bytesSent, rel.bytesSent, unrel.bytesSent);
+    mlprintf(ourPos.x, ourPos.y+4, "%-18s%10d%10d%10d%11d%10d%10d",
+      "bytes/sec", all.avgBytesRecv, rel.avgBytesRecv, unrel.avgBytesRecv,
+      all.avgBytesSent, rel.avgBytesSent, unrel.avgBytesSent);
+    mlprintf(ourPos.x, ourPos.y+5, "%-18s%10d%10d%10d%11d%10d%10d",
+      "max b/s", all.maxAvgBytesRecv, rel.maxAvgBytesRecv, unrel.maxAvgBytesRecv,
+      all.maxAvgBytesSent, rel.maxAvgBytesSent, unrel.maxAvgBytesSent);
   }
 
   /**
@@ -138,16 +163,29 @@ public:
    */
   void updateGlobalStats() {
     ConnectionStats all = GNE::getGlobalStats();
-    mlprintf(gpos.x, gpos.y, "%-20s%10s", "global", "tot");
-    mlprintf(gpos.x, gpos.y+1, "%-20s%10d", "bytesin", all.bytesRecv);
-    mlprintf(gpos.x, gpos.y+2, "%-20s%10d", "bytesout", all.bytesSent);
-    mlprintf(gpos.x, gpos.y+3, "%-20s%10d", "inRate", all.avgBytesRecv);
-    mlprintf(gpos.x, gpos.y+4, "%-20s%10d", "outRate", all.avgBytesSent);
-    mlprintf(gpos.x, gpos.y+5, "%-20s%10d", "maxInRate", all.maxAvgBytesRecv);
-    mlprintf(gpos.x, gpos.y+6, "%-20s%10d", "maxOutRate", all.maxAvgBytesSent);
+    mlprintf(gpos.x, gpos.y, "%-18s%15s%15s", "global", "in:tot", "out:tot");
+    mlprintf(gpos.x, gpos.y+1, "%-18s%15d%15d", "bytesin",
+      all.bytesRecv, all.bytesSent);
+    mlprintf(gpos.x, gpos.y+2, "%-18s%15d%15d", "inRate",
+      all.avgBytesRecv, all.avgBytesSent);
+    mlprintf(gpos.x, gpos.y+3, "%-18s%15d%15d", "maxInRate",
+      all.maxAvgBytesRecv, all.maxAvgBytesSent);
   }
 
 private:
+  /**
+   * Finds the first screen position used by conn.  If conn is NULL this is
+   * OK -- it will find the first empty position.  Returns NULL on error.
+   * sync should already be aquired here so we don't reacquire it.
+   */
+  Pos* findPos(Connection* conn) {
+    for (int c = 0; c < positionsLength; ++c)
+      if (positions[c].conn == conn)
+        return &positions[c];
+    //If we reach here then the loop failed to find a pos.
+    return NULL;
+  }
+
   Timer* timer;
 
   Mutex sync;
