@@ -29,6 +29,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exconsole", "examples\excon
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exbroker", "examples\exbroker\exbroker.vcproj", "{87494935-BE97-442A-A5E6-537AF8EB7C96}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "expointers", "examples\expointers\expointers.vcproj", "{F1C5B270-E2CC-4B88-BEAE-A53E42336740}"
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		ConfigName.0 = Debug
@@ -49,6 +51,7 @@ Global
 		{86603849-8832-4C2F-964E-9C054CDE98B0}.0 = {A7CC192B-C3BE-4517-8811-10BACB066620}
 		{75D4D4F5-986E-4AFC-A483-524A47AB4744}.0 = {A7CC192B-C3BE-4517-8811-10BACB066620}
 		{87494935-BE97-442A-A5E6-537AF8EB7C96}.0 = {A7CC192B-C3BE-4517-8811-10BACB066620}
+		{F1C5B270-E2CC-4B88-BEAE-A53E42336740}.0 = {A7CC192B-C3BE-4517-8811-10BACB066620}
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{68217462-4C6D-4246-B55A-2ADF4F77170C}.Debug.ActiveCfg = Debug|Win32
@@ -111,6 +114,10 @@ Global
 		{87494935-BE97-442A-A5E6-537AF8EB7C96}.Debug.Build.0 = Debug|Win32
 		{87494935-BE97-442A-A5E6-537AF8EB7C96}.Release.ActiveCfg = Release|Win32
 		{87494935-BE97-442A-A5E6-537AF8EB7C96}.Release.Build.0 = Release|Win32
+		{F1C5B270-E2CC-4B88-BEAE-A53E42336740}.Debug.ActiveCfg = Debug|Win32
+		{F1C5B270-E2CC-4B88-BEAE-A53E42336740}.Debug.Build.0 = Debug|Win32
+		{F1C5B270-E2CC-4B88-BEAE-A53E42336740}.Release.ActiveCfg = Release|Win32
+		{F1C5B270-E2CC-4B88-BEAE-A53E42336740}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

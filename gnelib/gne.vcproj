@@ -461,6 +461,9 @@
 				RelativePath="include\gnelib\ServerPlayerListener.h">
 			</File>
 			<File
+				RelativePath="include\gnelib\SmartPtr.h">
+			</File>
+			<File
 				RelativePath=".\include\gnelib\SocketPair.h">
 			</File>
 			<File
@@ -483,6 +486,9 @@
 			</File>
 			<File
 				RelativePath=".\include\gnelib\TimerCallback.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\WeakPtr.h">
 			</File>
 			<File
 				RelativePath="include\gnelib\WrapperPacket.h">

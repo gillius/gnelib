@@ -48,3 +48,8 @@ expong -- It's console pong.  Over the internet.  What kind of nonsense is
   
 exconsole -- shows off the new ConsoleBuffer/TextConsole classes, and acts
   also as a partial test of these classes.
+  
+exbroker --
+
+expointers -- A test for the new SmartPtr and WeakPtr reference counted
+  smart pointer classes.

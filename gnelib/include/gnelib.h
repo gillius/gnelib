@@ -64,6 +64,7 @@
 #include "gnelib/RawPacket.h"
 #include "gnelib/ReceiveEventListener.h"
 #include "gnelib/ServerConnectionListener.h"
+#include "gnelib/SmartPtr.h"
 #include "gnelib/SyncConnection.h"
 #include "gnelib/SynchronizedObject.h"
 #include "gnelib/ServerConnection.h"
@@ -72,5 +73,6 @@
 #include "gnelib/Time.h"
 #include "gnelib/Timer.h"
 #include "gnelib/TimerCallback.h"
+#include "gnelib/WeakPtr.h"
 
 #endif
