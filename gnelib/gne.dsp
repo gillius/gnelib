@@ -329,6 +329,10 @@ SOURCE=.\include\gnelib\Packet.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\gnelib\PacketFeeder.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\gnelib\PacketParser.h
 # End Source File
 # Begin Source File
