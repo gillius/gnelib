@@ -21,7 +21,6 @@
  */
 
 #include "gneintern.h"
-#include "Mutex.h"
 #include "Error.h"
 #include "ConnectionListener.h"
 #include "ConditionVariable.h"
@@ -30,6 +29,8 @@ namespace GNE {
 class Address;
 class Connection;
 class Packet;
+class ClientConnection;
+class ServerConnection;
 
 /**
  * A class for performing syncronous connections.  All methods of this class
@@ -113,7 +114,7 @@ public:
    */
   //##ModelId=3BC3CD6E02BD
   void disconnect() throw (Error);
-  
+
   /**
    * Releases this SyncConnection, returning the underlying Connection to its
    * previous event handler.  Once a SyncConnection has been released, then
@@ -168,6 +169,37 @@ public:
   
 private:
   /**
+   * Not for use for the end-user API.  During connection, events need to be
+   * treated a little differently, as well as releasing, because onNewConn or
+   * onConnect may not have been called or are still processing, and we don't
+   * want to release.  This is used only by the GNE protocol connecting code,
+   * and is used there to help guarantee that onNewConn/onConnect is the
+   * first event, and onDisconnect the last if onNewConn/onConnect ever
+   * finished.  Basically this "delays" the release of this SyncConnection.\n
+   * This must be called BEFORE any events can possibly be received (so
+   * before registration into ConnectionEventGenerator).
+   */
+  void startConnect();
+
+  /**
+   * Complement function with startConnect, this is appropriate to call when
+   * the connection was successful and it is now time to call onDisconnect if
+   * needed if an error occured between onNewConn and endConnect.\n
+   */
+  void endConnect() throw (Error);
+
+  //Make friends so they can use startConnect and endConnect.
+  friend class ServerConnection;
+  friend class ClientConnection;
+  
+  /**
+   * The actual releasing functionality, but in a separate function so that
+   * calling functions can manipulate the mutexes, which are not necessarily
+   * recursive.
+   */
+  void doRelease() throw (Error);
+
+  /**
    * The event listeners for SyncConnection that will override the current
    * listener our connection has.
    */
@@ -204,13 +236,13 @@ private:
    * Sets the error.
    */
   //##ModelId=3BDB10A602DA
-  void setError(const Error& error, bool wasFailure);
+  void setError(const Error& error);
 
   /**
-   * Syncronization for the Error object and release.
+   * Syncronization for the Error object and release and connecting events.
    */
   //##ModelId=3BDB10A501D3
-  Mutex sync;
+  ConditionVariable sync;
 
   /**
    * The current error state of this connection.  Error::NoError if there is
@@ -232,12 +264,19 @@ private:
   //##ModelId=3BDB10A5020E
   ConnectionListener* oldListener;
 
+  volatile bool released;
+
   /**
    * If this is true, we have an outstanding unexplained onDoneWriting event
    * that will be passed on when we release, as with onReceive.
    */
   //##ModelId=3C1081BC0024
   bool onDoneWritingEvent;
+
+  /**
+   * @see setConnectMode
+   */
+  volatile bool connectMode;
 };
 
 } // namespace GNE

@@ -66,8 +66,12 @@ void ConnectionEventGenerator::run() {
           std::map<NLsocket, ReceiveEventListener*>::iterator iter = connections.find(sockBuf[numsockets]);
           //Check to make sure the listener didn't unregister while we were waiting.
           if (iter != connections.end()) {
-            iter->second->onReceive();
+            //Placing the onReceive call first further guarantees that we
+            //don't call events when we shouldn't but if we call it during a
+            //mapCtrl lock there will be deadlock issues in unreg if a
+            //failure in the onReceive event causes a disconnect.
             mapCtrl.release();
+            iter->second->onReceive();
           } else
             mapCtrl.release();
         }

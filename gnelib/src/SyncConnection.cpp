@@ -33,7 +33,9 @@ namespace GNE {
 
 //##ModelId=3BC3CB1703B6
 SyncConnection::SyncConnection(Connection* target)
-: currError(Error::NoError), conn(target), onDoneWritingEvent(false) {
+: currError(Error::NoError), conn(target), released(false),
+onDoneWritingEvent(false), connectMode(false) {
+  gnedbgo(5, "created");
   gnedbgo1(2, "Wrapping Connection %x into a SyncConnection.", conn);
   oldListener = conn->getListener();
   conn->setListener(this);
@@ -42,6 +44,7 @@ SyncConnection::SyncConnection(Connection* target)
 //##ModelId=3BC3CB1703B7
 SyncConnection::~SyncConnection() throw (Error) {
   release();
+  gnedbgo(5, "destroyed");
 }
 
 //##ModelId=3BDB10A502A8
@@ -66,14 +69,11 @@ void SyncConnection::open(const Address& dest, int localPort) throw (Error) {
 void SyncConnection::connect() throw (Error) {
   assert(!isReleased());
   ClientConnection* cli = (ClientConnection*)conn;
-  cli->connect();  //If an error occurs, it will be thrown later.
+  cli->connect(this);
   cli->join();
+  checkError();
 }
 
-/**
- * \bug possible issue with events occuring after release but before
- *      disconnect.
- */
 //##ModelId=3BC3CD6E02BD
 void SyncConnection::disconnect() throw (Error) {
   assert(!isReleased());
@@ -81,37 +81,71 @@ void SyncConnection::disconnect() throw (Error) {
   conn->disconnect();
 }
 
+void SyncConnection::startConnect() {
+  assert(!isReleased());
+  sync.acquire();
+  connectMode = true;
+  sync.release();
+}
+
+void SyncConnection::endConnect() throw (Error) {
+  assert(connectMode);
+  sync.acquire();
+  //we cover this all in one lock in case an onDisconnect occurs between
+  //connectMode = false; and doRelease();
+  connectMode = false;
+  try {
+    doRelease();
+  } catch (Error e) {
+    sync.release();
+    throw;
+  }
+  sync.release();
+}
+
 //##ModelId=3BDB10A50316
 void SyncConnection::release() throw (Error) {
   sync.acquire();
-  if (oldListener != NULL) { //if not released
+  try {
+    doRelease();
+  } catch (Error e) {
+    sync.release();
+    throw;
+  }
+  sync.release();
+}
+
+void SyncConnection::doRelease() throw (Error) {
+  if (!isReleased() && !connectMode) {
+    //If we are not already released and we are not holding events
     gnedbgo1(2, "Releasing Connection %x", conn);
     conn->setListener(oldListener);
-    oldListener = NULL;
-
-    //Notify the old listener for onReceive and onDoneWriting if needed.
-    if (conn->stream().isNextPacket())
-      conn->onReceive();
-    if (onDoneWritingEvent)
-      conn->onDoneWriting();
-
+    released = true;
+    sync.signal();
+    
     //Notify any receivers there was an error, and set release error if there
     //was no error already, otherwise don't change it.
     if (currError.getCode() == Error::NoError) {
       currError = Error(Error::SyncConnectionReleased);
     } else {
       recvNotify.broadcast();
-      sync.release();
       throw currError;
     }
+
+    //Notify the old listener for onReceive and onDoneWriting if needed, and
+    //there are no errors that invalidated the stream (detected above).
+    if (conn->stream().isNextPacket())
+      conn->onReceive();
+    if (onDoneWritingEvent)
+      conn->onDoneWriting();
+    
     recvNotify.broadcast();
   }
-  sync.release();
 }
 
 //##ModelId=3BDB10A50317
 bool SyncConnection::isReleased() const {
-  return (oldListener == NULL);
+  return released;
 }
 
 /**
@@ -189,7 +223,7 @@ void SyncConnection::onConnect(SyncConnection& conn) throw (Error) {
 
 //##ModelId=3BDB10A60078
 void SyncConnection::onConnectFailure(const Error& error) {
-  setError(error, true);
+  setError(error);
 }
 
 //##ModelId=3BDB10A60122
@@ -197,18 +231,31 @@ void SyncConnection::onDisconnect() {
   //This should never happen.  An error should occur first, and at that time
   //we are released, and the onDisconnect event should be sent to the
   //original listener.
-  assert(false);
+  //Unless, we are in connect mode, then we are delaying this event so that
+  //it doesn't happen while onNewConn/onConnect is being processed.  We need
+  //to halt the event thread because certain things like deleting Connections
+  //can only be done from this specific thread.
+  sync.acquire();
+  //We can't assert for connectMode here because the onDisconnect could
+  //happen during the final release() call.
+  gnedbgo(4, "onDisconnect caught and being held");
+  while (!isReleased()) {
+    sync.wait();
+  }
+  sync.release();
+  gnedbgo(4, "Releasing onDisconnect event");
+  oldListener->onDisconnect();
 }
 
 //##ModelId=3BDB10A60154
 void SyncConnection::onError(const Error& error) {
   conn->disconnect();
-  setError(error, false);
+  setError(error);
 }
 
 //##ModelId=3BDB10A601FE
 void SyncConnection::onFailure(const Error& error) {
-  setError(error, true);
+  setError(error);
 }
 
 //##ModelId=3BDB10A6029E
@@ -229,7 +276,14 @@ void SyncConnection::onReceive() {
 
 //##ModelId=3C1081BC015B
 void SyncConnection::onDoneWriting() {
-  onDoneWritingEvent = true;
+  sync.acquire();
+  if (isReleased())
+    //If this is true, then onDoneWriting happened during a release(), and we
+    //need to pass it on through.
+    conn->getListener()->onDoneWriting();
+  else
+    onDoneWritingEvent = true;
+  sync.release();
 }
 
 //##ModelId=3BDB10A6029F
@@ -243,10 +297,9 @@ void SyncConnection::checkError() throw (Error) {
 }
 
 //##ModelId=3BDB10A602DA
-void SyncConnection::setError(const Error& error, bool wasFailure) {
+void SyncConnection::setError(const Error& error) {
   try {
-    if (wasFailure) //Release if conn was lost.
-      release(); //will throw an error if one was already set.
+    release(); //will throw an error if one was already set.
 
     sync.acquire();
     currError = error;

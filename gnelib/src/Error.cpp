@@ -55,7 +55,7 @@ const std::string ErrorStrings[] = {
   "The host has a later version of this game.",
   "Could not open a network connection, check to make sure you are connected to the network.",
   "Could not contact the host due to connection timeout.",
-  "Remote computer suddenly disconnected without warning, or dropped (TCP) (in pre-alpha GNE, this is expected for now...)",
+  "Remote computer suddenly disconnected without warning, or dropped (TCP) (in alpha GNE, this is expected for now...)",
   "The operation was canceled because the SyncConnection is released.",
   "Network error when trying to read from connection.",
   "Network error when trying to write to connection.",

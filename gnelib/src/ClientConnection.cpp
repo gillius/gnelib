@@ -44,25 +44,54 @@ ClientConnection::~ClientConnection() {
 //##ModelId=3B07538003BA
 void ClientConnection::run() {
   gnedbgo1(1, "Trying to connect to %s", address.toString().c_str());
+
   NLaddress temp = address.getAddress();
   NLboolean check = nlConnect(sockets.r, &temp);
+
   if (check == NL_TRUE) {
-    gnedbgo2(2, "connection r: %i, u: %i", sockets.r, sockets.u);
+    //We don't want to doubly-wrap SyncConnections, so we check for a wrapped
+    //one here and else make our own.
+    bool ourSConn = false;
+    if (!sc) {
+      sc = new SyncConnection(this);
+      ourSConn = true;
+    } else
+      assert(sc == getListener());
+    //The sConn reference variable is used only for syntactical convienence.
+    SyncConnection& sConn = *sc;
+    
+    bool onConnectFinished = false;
     assert(eventListener != NULL);
     try {
-      SyncConnection sync(this);
-      eventListener->start();
-      reg(true, false);
+      //We only want to hold events on our own SyncConnection.  On a user
+      //supplied SyncConnection, when it fails we will fail, and
+      //SyncConnection::connect() will throw an error.
+      if (ourSConn)
+        sConn.startConnect();
       ps->start();
       connecting = true;
-      getListener()->onConnect(sync); //SyncConnection will relay this
-      sync.release();
+      eventListener->start();
+      reg(true, false);
+
+      //Do GNE protocol negotiations here
+
+      gnedbgo2(2, "Starting onConnect r: %i, u: %i", sockets.r, sockets.u);
+      getListener()->onConnect(sConn); //SyncConnection will relay this
+      onConnectFinished = true;
       finishedConnecting();
+
+      if (ourSConn) {
+        sConn.endConnect();
+        sConn.release();
+      }
+      if (ourSConn)
+        delete sc;
     } catch (Error e) {
-      //The client should catch any errors in onConnect, but release can
-      //give an error, so we catch it.
-      gnedbgo1(1, "Connection failure: %s", e.toString().c_str());
-      getListener()->onConnectFailure(e);
+      if (ourSConn)
+        delete sc;
+      if (!onConnectFinished)
+        getListener()->onConnectFailure(e);
+      //else onDisconnect should get called.
     }
   } else {
     assert(eventListener != NULL);
@@ -84,9 +113,10 @@ bool ClientConnection::open(const Address& dest, int localPort) {
 }
 
 //##ModelId=3B07538003C1
-void ClientConnection::connect() {
+void ClientConnection::connect(SyncConnection* wrapped) {
   assert(sockets.r != NL_INVALID);
   assert(address);
+  sc = wrapped;
   start();
 }
 

@@ -1,4 +1,8 @@
 GNE 0.4 to Current
+  Fixed LOADS of thread-related bugs in the connecting code where errors
+    might occur, espically if the connection was completed and all data
+    transfered before the code finished (this is likely in the examples where
+    only one simple packet is being sent).
   Added CustomPacket::getMaxUserDataSize to let the user know how large the
     hosted RawPacket can be.
   Made Timer more robust and safe to call from its callback and from multiple

@@ -67,12 +67,17 @@ public:
    * overload onConnectFailure to get a description of the error, however.\n
    * The version number for the library and your own version number will be
    * checked during this phase.  If either protocol versions mismatch,
-   * onConnectFailure() will be triggered.
+   * onConnectFailure() will be triggered.\n
+   * If sConn is not null, then there is currently a SyncConnection wrapped
+   * around this connection.  This is only the case when a user is using only
+   * SyncConnections.  So the user should always pass nothing to this
+   * function -- this parameter is only useful in the code for
+   * SyncConnection::connect().
    * @see #onConnect()
    * @see #onConnectFailure()
    */
   //##ModelId=3B07538003C1
-  void connect();
+  void connect(SyncConnection* wrapped = NULL);
 
 protected:
   /**
@@ -84,10 +89,11 @@ protected:
 
 private:
   /**
-   * Address used only while connecting, then unused afterwards.
+   * These two variables used only while connecting, then unused afterwards.
    */
   //##ModelId=3BB94B19035D
   Address address;
+  SyncConnection* sc;
 };
 
 }

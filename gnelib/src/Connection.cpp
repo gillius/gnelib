@@ -49,6 +49,9 @@ Connection::~Connection() {
       //This section of code allows the ConnectionListeners to delete their
       //associated Connections.
       eventListener->detach(true);
+      //Make sure processError has finished
+      errorSync.acquire();
+      errorSync.release();
     } else {
       eventListener->join();
       delete eventListener;
@@ -151,9 +154,12 @@ void Connection::onDoneWriting() {
 //##ModelId=3C30E3FF01DE
 void Connection::finishedConnecting() {
   sync.acquire();
-  assert(connecting && !connected);
-  connected = true;
-  connecting = false;
+  if (connecting && !connected) {
+    //If this was not true, then we were disconnected before this (and before
+    //the connecting code knows about it).
+    connected = true;
+    connecting = false;
+  }
   sync.release();
 }
 

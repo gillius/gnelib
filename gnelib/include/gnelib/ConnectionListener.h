@@ -65,7 +65,13 @@ public:
    * process will not be considered complete until this function completes.
    * \nIf an error occurs then the connection needs to be killed, so conn can
    * throw its Error outside your function.  Catch it if you need to clean up
-   * anything you were doing, but remember to rethrow it.
+   * anything you were doing, but remember to rethrow it.  If this is the
+   * case, neither onConnectFailure nor onDisconnect will be generated, so
+   * any needed cleanup needs to be done in your exception handler, and this
+   * will be the last event generated.
+   * \nThis event does not have the "non-blocking" requirement that most GNE
+   * events have.  Take as long as needed to establish a connection, such as
+   * transmitting initial game parameters or game state.
    * \nNote: Only ClientConnection generates this event.  The SyncConnection
    * is currently wrapped around a ClientConnection, and you should use
    * SyncConnection::getConnection to get the ClientConnection.
@@ -78,7 +84,7 @@ public:
   virtual void onConnect(SyncConnection& conn) throw (Error);
 
   /**
-   * Event triggered when a connection failed.\n
+   * Event triggered when a connection failed BEFORE onConnect was called.\n
    * After a connection failure, the connection is as if disconnect() was
    * called, therefore you cannot reconnect this connection instance.\n
    * Note that for this case, the event onDisconnect IS NOT CALLED, since
@@ -97,13 +103,19 @@ public:
    * some internal list so you can interact with and delete it later.
    * \nIf an error occurs then the connection needs to be killed, so conn can
    * throw its Error outside your function.  Catch it if you need to clean up
-   * anything you were doing, but remember to rethrow it.\n
+   * anything you were doing, but remember to rethrow it.  If this is the
+   * case, neither ServerConnectionListner::onListenFailure nor onDisconnect
+   * will be generated, so any needed cleanup needs to be done in your
+   * exception handler, and this will be the last event generated.\n
    * Note: Only ServerConnection generates this function.  The SyncConnection
    * is currently wrapped around a ServerConnection, and you should use
    * SyncConnection::getConnection to get the ServerConnection.\n
-   * If the connection failed, though, the function
+   * If the connection failed before this event, though, the function
    * ServerConnectionListener::onListenFailure instead of this function is
    * called.
+   * \nThis event does not have the "non-blocking" requirement that most GNE
+   * events have.  Take as long as needed to establish a connection, such as
+   * transmitting initial game parameters or game state.
    * \nYou should not release the SyncConnection.  You can still interact
    * with the PacketStream directly, though, but the events will be delayed
    * until this function completes.
@@ -120,7 +132,14 @@ public:
    * send any more data or receive any from this event.\n
    * onDisconnect will always be the last event called on this listener, so
    * you can destroy this object after onDisconnect is called and it is not
-   * listening for any other connections.
+   * listening for any other connections.\n
+   * onDisconnect is only called if onNewConn or onConnect totally completed.
+   * If the connection process fails before onNewConn or onConnect, the
+   * connect or listen fail events are generated.  If an error occurs DURING
+   * onNewConn or onConnect, if any cleanup needs to be done, it needs to be
+   * done in the exception handler, and no other failure event will be
+   * generated.  After onNewConn or onConnect completes, then and only then
+   * might a onDisconnect event be generated.
    * \nThis event must be "non-blocking" -- like most GNE events -- as there
    * is only a single event thread per connection.  Therefore, no other
    * events will be called until this function completes for this connection.

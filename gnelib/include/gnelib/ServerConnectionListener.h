@@ -86,7 +86,8 @@ protected:
    * There was a failure when trying to listen on this socket.  This is not
    * called when the actual low-level listen fails (that error is returned
    * from listen), but instead high-level errors while connecting such as a
-   * version mismatch are sent here.\n
+   * version mismatch are sent here.  Only errors that occur BEFORE the
+   * ConnectionListener::onNewConn event are sent here.\n
    * This function may be called from multiple threads at the same time, and
    * may block if it wishes; it does not have the "non-blocking" restriction
    * most GNE events have.\n

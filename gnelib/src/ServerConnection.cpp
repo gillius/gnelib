@@ -49,27 +49,33 @@ ServerConnection::~ServerConnection() {
 //##ModelId=3B0753810280
 void ServerConnection::run() {
   assert(sockets.r != NL_INVALID);
-  gnedbgo2(2, "connection r: %i, u: %i", sockets.r, sockets.u);
-
   assert(eventListener != NULL);
-  connecting = true;
+  gnedbgo1(1, "New connection incoming from %s", getRemoteAddress(true).toString().c_str());
+
+  bool onNewConnFinished = false;
   try {
-    SyncConnection sync(this);
+    SyncConnection sConn(this);
+    sConn.startConnect();
+    ps->start();
+    connecting = true;
     eventListener->start();
     reg(true, false);
-    ps->start();
-    //Do connection negotiaion here
-    getListener()->onNewConn(sync); //SyncConnection will relay this
+
+    //Do GNE protocol connection negotiaion here
+
+    gnedbgo2(2, "Starting onNewConn r: %i, u: %i", sockets.r, sockets.u);
+    getListener()->onNewConn(sConn); //SyncConnection will relay this
+    onNewConnFinished = true;
     finishedConnecting();
-    sync.release();
+
+    //Start bringing connection to normal state.  SyncConnection will make
+    //sure onDisconnect gets called starting with endConnect().
+    sConn.endConnect();
+    sConn.release();
   } catch (Error e) {
-    ourCreator->onListenFailure(e, getRemoteAddress(true), getListener());
+    if (!onNewConnFinished)
+      ourCreator->onListenFailure(e, getRemoteAddress(true), getListener());
   }
 }
 
 }
-
-
-
-
-
