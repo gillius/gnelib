@@ -317,11 +317,11 @@ void Connection::Listener::onReceive() {
 void Connection::reg(bool reliable, bool unreliable) {
   LockMutex lock( sync );
 
-  if (reliable) {
+  if ( reliable && sockets.r != NL_INVALID ) {
     eGen->reg( sockets.r, Listener::sptr( new Listener( this_.lock(), true ) ) );
     gnedbgo1(3, "Registered reliable socket %i", sockets.r);
   }
-  if (unreliable) {
+  if ( unreliable && sockets.u != NL_INVALID ) {
     eGen->reg( sockets.u, Listener::sptr( new Listener( this_.lock(), false ) ) );
     gnedbgo1(3, "Registered unreliable socket %i", sockets.u);
   }
@@ -330,11 +330,11 @@ void Connection::reg(bool reliable, bool unreliable) {
 void Connection::unreg(bool reliable, bool unreliable) {
   LockMutex lock( sync );
 
-  if (reliable) {
+  if ( reliable && sockets.r != NL_INVALID ) {
     eGen->unreg(sockets.r);
     gnedbgo1(3, "Unregistered reliable socket %i", sockets.r);
   }
-  if (unreliable) {
+  if ( unreliable && sockets.u != NL_INVALID ) {
     eGen->unreg(sockets.u);
     gnedbgo1(3, "Unregistered unreliable socket %i", sockets.u);
   }
