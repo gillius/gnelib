@@ -36,6 +36,9 @@ class TimerCallback;
  * All of the methods in this class are safe to call from multiple threads at
  * the same time, and can also be called from the TimerCallback as well, with
  * a few (some obvious) exceptions.
+ *
+ * A Timer thread runs with a higher priority than the main thread, therefore
+ * its callbacks are suitable for short, quick tasks.
  */
 //##ModelId=3B075380037B
 class Timer : public Thread {

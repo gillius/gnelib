@@ -28,6 +28,11 @@ This section has some information that will help you get started with using
 instead as overview to understand the basics of how %GNE works and to point
 you to the examples and documentation to learn to code for %GNE.
 
+In the future I intend to write a small "first %GNE program tutorial," but
+as with all things I'm limited in time, and I'd rather concentrate on %GNE
+code.  If you want to contribute documentation, feel free to contact me via
+the %GNE website.
+
 Do not forget that there are lots of examples and tests in the examples
 directory.  After reading this guide you'll probably want to examine the
 examples to see some sample code.  exaddr, expacket, and exhello are good
@@ -141,6 +146,7 @@ you'll probably not need to use them directly in normal circumstances.
   <ul>
     <li> GNE::Connection * </li>
     <li> GNE::PacketStream * </li>
+    <li> GNE::PacketFeeder </li>
     <li> GNE::ConnectionListener * </li>
     <li> GNE::ClientConnection * </li>
     <li> GNE::ServerConnection * </li>
@@ -177,6 +183,14 @@ you'll probably not need to use them directly in normal circumstances.
   The PacketStream represents an outgoing and an incoming queue of packets.
   To get sent packets, use GNE::PacketStream::getNextPacket to receive the
   next incoming packet.  Use GNE::PacketStream::writePacket to send one.
+  
+  PacketStreams can also be tied with a PacketFeeder.  A PacketFeeder
+  provides a way to feed a continuous stream of packets that is based on the
+  bandwidth of the connection.  For example if you wanted your client to send
+  update packets as fast as it can, but you always want to send the latest
+  information, what you would do is create a packet, send it, wait for it to
+  be sent (based on the bandwidth of the connection), and then repeat again.
+  In GNE a PacketFeeder provides this sort of functionality.
 
   To send and receive packets, you will want to derive your own packet class
   from GNE::Packet and register it with GNE::PacketParser::registerPackets.
@@ -238,7 +252,7 @@ to me at the %GNE website.
 
 \ref toc
 
-\section moreinfo More Information
+\section moreinfo More Information / Website
 
 For more information, try the %GNE website: http://www.rit.edu/~jpw9607/ <br>
 Or the %GNE SourgeForge site: http://www.sf.net/projects/gnelib/
