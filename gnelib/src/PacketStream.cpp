@@ -117,20 +117,20 @@ int PacketStream::getOutRate() const {
  */
 //##ModelId=3B07538101F9
 void PacketStream::waitToSendAll() {
-	//Only temporary for now
-	//When we write this function for real, make sure that if the PacketSteam
-	//is shutting down that we properly exit from this function.
-	Thread::sleep(2000);
+  //Only temporary for now
+  //When we write this function for real, make sure that if the PacketSteam
+  //is shutting down that we properly exit from this function.
+  Thread::sleep(2000);
 }
 
 //##ModelId=3B8DC5D10096
 void PacketStream::shutDown() {
-	Thread::shutDown();
-	//We acquire the mutex to avoid the possiblity of a deadlock between the
-	// test for the shutdown variable and the wait.
-	outQCtrl.acquire();
-	outQCtrl.signal();
-	outQCtrl.release();
+  Thread::shutDown();
+  //We acquire the mutex to avoid the possiblity of a deadlock between the
+  // test for the shutdown variable and the wait.
+  outQCtrl.acquire();
+  outQCtrl.signal();
+  outQCtrl.release();
 }
 
 /**
@@ -146,23 +146,25 @@ void PacketStream::run() {
     outQCtrl.release();
     if (!shutdown) {
       //Do throttled writes
-			PacketStreamData* next = getNextPacketToSend();
-			RawPacket raw;
-			next->packet->writePacket(raw);
-			raw << PacketParser::END_OF_PACKET;
+      PacketStreamData* next = getNextPacketToSend();
+      RawPacket raw;
+      next->packet->writePacket(raw);
+      raw << PacketParser::END_OF_PACKET;
       if (owner.sockets.rawWrite(next->reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
-				owner.processError(Error::Write);
-			}
-			delete next;
-
-			//Optimize this code later
-			bool done = false;
-			outQCtrl.acquire();
-			if (out.empty())
-				done = true;
-			outQCtrl.release();
-			if (done)
-				owner.onDoneWriting();
+	owner.processError(Error::Write);
+      }
+      delete next;
+      
+      //Optimize this code later
+      bool done = false;
+      outQCtrl.acquire();
+      if (out.empty())
+	done = true;
+      outQCtrl.release();
+      if (done) {
+	gnedbgo(4, "onDoneWriting event triggered.");
+	owner.onDoneWriting();
+      }
     }
   }
 }
