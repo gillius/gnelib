@@ -264,7 +264,8 @@ void ServerConnection::getUnreliableInfo() throw (Error) {
 
   Address uDest = sockets.getRemoteAddress(true);
   uDest.setPort((int)portNum);
-  nlSetRemoteAddr(sockets.u, &uDest.getAddress());
+  NLaddress temp = uDest.getAddress();
+  nlSetRemoteAddr(sockets.u, &temp);
 
   delete[] buf;
 }
