@@ -63,6 +63,14 @@ int main(int argc, char* argv[]) {
   initConsole(atexit);
   setTitle("GNE Threads Example");
 
+  mprintf("Testing to see if recursive locks work:");
+  Mutex test;
+  test.acquire();
+  test.acquire();
+  test.release();
+  test.release();
+  mprintf(" success.\n");
+
   HelloWorld* bob = new HelloWorld("Bob");
   bob->start();      //Tells bob to start his job.
   bob->detach(true); //we don't want to see bob again.

@@ -46,6 +46,10 @@ public:
   //##ModelId=3B07538101BD
   PacketStream(int outRate2, int inRate2, Connection& ourOwner);
 
+  /**
+   * Destroys this object.  Any data left remaining in the in or out queues
+   * is destroyed as well.
+   */
   //##ModelId=3B07538101C0
   virtual ~PacketStream();
 
@@ -62,14 +66,22 @@ public:
   int getOutLength() const;
 
   /**
-   * Is there at least one packet in the incoming queue?
+   * Is there at least one packet in the incoming queue?  Note that this does
+   * not guarantee that getNextPacket will return a non-NULL value if it is
+   * possible for any other thread to try to get the data between your call
+   * and getNextPacket.  This is only useful if you want to passively check
+   * for incoming data.  If you are wanting to do anything with that data it
+   * is suggested that you use getNextPacket and if it is non-NULL then
+   * process the data.  That method is thread safe.
    */
   //##ModelId=3B07538101C6
   bool isNextPacket() const;
 
   /**
    * Returns the next packet from the queue, removing it from that queue.
-   * It is your responsibility to deallocate the memory for this packet.
+   * It is your responsibility to deallocate the memory for this packet as
+   * the calling code becomes the owner of the memory the returned packet
+   * occupies.
    * @return A pointer to the next packet, which you are responsible for
    *         deleting, or NULL if there is no next packet.
    */
@@ -77,7 +89,7 @@ public:
   Packet* getNextPacket();
 
   /**
-   * Adds a packet to the outgoing queue.
+   * Adds a packet to the outgoing queue.  The packet given will be copied.
    * @param packet the packet to send.
    * @param should this packet be sent reliably if the connection supports it?
    */

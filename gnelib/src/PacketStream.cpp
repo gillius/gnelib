@@ -36,6 +36,17 @@ PacketStream::PacketStream(int outRate2, int inRate2, Connection& ourOwner)
 
 //##ModelId=3B07538101C0
 PacketStream::~PacketStream() {
+  //We can't do assert(shutdown) in case PacketStream was never started.
+  assert(!isRunning());
+
+  //Clear out our queues.
+  PacketStreamData* outQ = NULL;
+  Packet* inQ = NULL;
+  while (outQ = getNextPacketToSend())
+    delete outQ;
+  while (inQ = getNextPacket())
+    delete inQ;
+
   gnedbgo(5, "destroyed");
 }
 
@@ -155,6 +166,7 @@ void PacketStream::run() {
       if (owner.sockets.rawWrite(next->reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
         owner.processError(Error::Write);
       }
+      delete next->packet;
       delete next;
       
       //Optimize this code later
@@ -177,8 +189,3 @@ void PacketStream::addIncomingPacket(Packet* packet) {
 }
 
 }
-
-
-
-
-

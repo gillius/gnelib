@@ -33,8 +33,8 @@ namespace GNE {
 
 //##ModelId=3BC3CB1703B6
 SyncConnection::SyncConnection(Connection* target)
-: currError(Error::NoError), conn(target), released(false),
-onDoneWritingEvent(false), connectMode(false) {
+: currError(Error::NoError), conn(target),
+released(false), onDoneWritingEvent(false), connectMode(false) {
   gnedbgo(5, "created");
   gnedbgo1(2, "Wrapping Connection %x into a SyncConnection.", conn);
   oldListener = conn->getListener();
@@ -78,9 +78,10 @@ void SyncConnection::connect() throw (Error) {
 void SyncConnection::disconnect() throw (Error) {
   assert(!isReleased());
   release();
-  conn->disconnect();
+  conn->disconnectSendAll();
 }
 
+//##ModelId=3C4116C3023E
 void SyncConnection::startConnect() {
   assert(!isReleased());
   sync.acquire();
@@ -88,11 +89,15 @@ void SyncConnection::startConnect() {
   sync.release();
 }
 
-void SyncConnection::endConnect() throw (Error) {
+//##ModelId=3C4116C30248
+void SyncConnection::endConnect(bool passEvents) throw (Error) {
   assert(connectMode);
   sync.acquire();
-  //we cover this all in one lock in case an onDisconnect occurs between
-  //connectMode = false; and doRelease();
+  //If the connection failed we need to ignore any further events as
+  //onNewConn or onConnect did not successfully finish and that listener
+  //shouldn't get onFailure or onDisconnect.
+  if (!passEvents)
+    oldListener = ConnectionListener::getNullListener();
   connectMode = false;
   try {
     doRelease();
@@ -115,20 +120,24 @@ void SyncConnection::release() throw (Error) {
   sync.release();
 }
 
+//##ModelId=3C4116C30249
 void SyncConnection::doRelease() throw (Error) {
   if (!isReleased() && !connectMode) {
     //If we are not already released and we are not holding events
     gnedbgo1(2, "Releasing Connection %x", conn);
     conn->setListener(oldListener);
     released = true;
-    sync.signal();
     
     //Notify any receivers there was an error, and set release error if there
     //was no error already, otherwise don't change it.
+    recvNotify.acquire();
     if (currError.getCode() == Error::NoError) {
-      currError = Error(Error::SyncConnectionReleased);
+      currError.setCode(Error::SyncConnectionReleased);
+      recvNotify.broadcast(); //Let people waiting for data get the error.
+      recvNotify.release();
     } else {
-      recvNotify.broadcast();
+      recvNotify.broadcast(); //Let people waiting for data get the error.
+      recvNotify.release();
       throw currError;
     }
 
@@ -138,8 +147,6 @@ void SyncConnection::doRelease() throw (Error) {
       conn->onReceive();
     if (onDoneWritingEvent)
       conn->onDoneWriting();
-    
-    recvNotify.broadcast();
   }
 }
 
@@ -149,24 +156,27 @@ bool SyncConnection::isReleased() const {
 }
 
 /**
- * \todo consider timed waits in the future.
+ * \todo consider timed waits in the future, but this won't be needed when
+ *       the GNE protocol is finished and detects timeouts.
  * \todo This probably could be optimized quite a bit -- each packet gets
  *       copied twice!
  */
 //##ModelId=3BC3CFE50014
 SyncConnection& SyncConnection::operator >> (Packet& packet) throw (Error) {
-  checkError();
-  assert(!isReleased());
+  //We have to acquire the mutex now so that an error cannot occur between
+  //checkError and our wait.
   recvNotify.acquire();
-  while (!conn->stream().isNextPacket()) {
-    recvNotify.wait();
-    //Check if we were woken up due to an error.
-    try {
+  try {
+    checkError();
+    assert(!isReleased());
+    while (!conn->stream().isNextPacket()) {
+      recvNotify.wait();
+      //Check if we were woken up due to an error.
       checkError();
-    } catch (Error e) {
-      recvNotify.release();
-      throw;
     }
+  } catch (...) {
+    recvNotify.release();
+    throw;
   }
   recvNotify.release();
 
@@ -175,7 +185,7 @@ SyncConnection& SyncConnection::operator >> (Packet& packet) throw (Error) {
   assert(recv != NULL);  //There had better be some data!
   if (recv->getType() != packet.getType()) {
     gnedbgo2(1, "Packet type mismatch.  Got %d, expected %d.",
-       recv->getType(), packet.getType());
+                recv->getType(), packet.getType());
     throw Error(Error::PacketTypeMismatch);
   }
 
@@ -208,9 +218,8 @@ SyncConnection& SyncConnection::operator << (const Packet& packet) throw (Error)
 
 //##ModelId=3BDB10A50353
 void SyncConnection::onNewConn(SyncConnection& newConn) throw (Error) {
-  //newConn doesn't HAVE to be this, if there was a doubly-wrapped
-  //SyncConnection, which can happen if we wrap then call connect (since
-  //connect makes a new SyncConnection).
+  //newConn should be this object.  We don't do any double wrapping.
+  assert(this == &newConn);
   assert(!isReleased());
   oldListener->onNewConn(newConn);
 }
@@ -231,83 +240,69 @@ void SyncConnection::onDisconnect() {
   //This should never happen.  An error should occur first, and at that time
   //we are released, and the onDisconnect event should be sent to the
   //original listener.
-  //Unless, we are in connect mode, then we are delaying this event so that
-  //it doesn't happen while onNewConn/onConnect is being processed.  We need
-  //to halt the event thread because certain things like deleting Connections
-  //can only be done from this specific thread.
-  sync.acquire();
-  //We can't assert for connectMode here because the onDisconnect could
-  //happen during the final release() call.
-  gnedbgo(4, "onDisconnect caught and being held");
-  while (!isReleased()) {
-    sync.wait();
-  }
-  sync.release();
-  gnedbgo(4, "Releasing onDisconnect event");
-  oldListener->onDisconnect();
+  assert(false);
 }
 
 //##ModelId=3BDB10A60154
 void SyncConnection::onError(const Error& error) {
   conn->disconnect();
-  setError(error);
+  //Turn errors on a SyncConnection into a failure.
+  onFailure(error);
 }
 
+/**
+ * \bug This basically polls at the moment in the error thread and this is
+ *      unacceptable.  Probably would need a ConditionVariable and a boolean
+ *      flag to fix this.
+ */
 //##ModelId=3BDB10A601FE
 void SyncConnection::onFailure(const Error& error) {
   setError(error);
+  //Pass on the onFailure event.  If release just happened, then the current
+  //listener will be the old one and will receive this event.
+  //We wait and pass on the failure this way in case we are in connectMode
+  conn->onFailure(error);
 }
 
 //##ModelId=3BDB10A6029E
 void SyncConnection::onReceive() {
-  //Acquire sync, so if we are releasing we handle this properly.
+  //Notify anyone who is waiting for data to come in (namely operator <<).
   recvNotify.signal();
-  sync.acquire();
-  //If we are released, then a receive event occured during that event,
-  //so we need to pass the event thread to that onReceive.  The mutexes
-  //will make sure onReceive is always properly called from async data,
-  //and that it is not called multiple times (since there is only a max
-  //of one thread per Connection, the mutex here stops multiple
-  //onReceive calls).
-  if (isReleased())
-    conn->getListener()->onReceive();
-  sync.release();
 }
 
 //##ModelId=3C1081BC015B
 void SyncConnection::onDoneWriting() {
-  sync.acquire();
-  if (isReleased())
-    //If this is true, then onDoneWriting happened during a release(), and we
-    //need to pass it on through.
-    conn->getListener()->onDoneWriting();
-  else
-    onDoneWritingEvent = true;
-  sync.release();
+  //setListener in release acts like a mutex so that this flag being set will
+  //never be lost.
+  onDoneWritingEvent = true;
 }
 
 //##ModelId=3BDB10A6029F
 void SyncConnection::checkError() throw (Error) {
-  sync.acquire();
-  //Check for an error.  If there is, we know it won't change.
-  bool err = (currError.getCode() != Error::NoError);
-  sync.release();
-  if (err)
+  recvNotify.acquire();
+  bool isErr = (currError.getCode() != Error::NoError);
+  recvNotify.release();
+
+  if (isErr) {
+    //We release when we discover the error rather than when we set it
+    //because we can't release from the event thread.
+    release();
+    //We can throw currError (which will make a copy) because once an error
+    //is set it does not change.
     throw currError;
+  }
 }
 
 //##ModelId=3BDB10A602DA
 void SyncConnection::setError(const Error& error) {
-  try {
-    release(); //will throw an error if one was already set.
-
-    sync.acquire();
+  //We don't need to lock sync here because events can't occur while release
+  //is setting its "released" error since setListener blocks.  We couldn't
+  //lock it anyways for the same reason as well.
+  recvNotify.acquire();
+  if (currError.getCode() == Error::NoError)
     currError = error;
-    sync.release();
-  } catch (Error e) {
-    //If there was an error already set, release will throw it, so we don't
-    //set the error.
-  }
+  recvNotify.broadcast(); //Let people waiting for data get the error.
+  recvNotify.release();
 }
 
 } //namespace GNE

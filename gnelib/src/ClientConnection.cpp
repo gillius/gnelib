@@ -52,13 +52,13 @@ void ClientConnection::run() {
     //We don't want to doubly-wrap SyncConnections, so we check for a wrapped
     //one here and else make our own.
     bool ourSConn = false;
-    if (!sc) {
-      sc = new SyncConnection(this);
+    if (!sConnPtr) {
+      sConnPtr = new SyncConnection(this);
       ourSConn = true;
     } else
-      assert(sc == getListener());
+      assert(sConnPtr == getListener());
     //The sConn reference variable is used only for syntactical convienence.
-    SyncConnection& sConn = *sc;
+    SyncConnection& sConn = *sConnPtr;
     
     bool onConnectFinished = false;
     assert(eventListener != NULL);
@@ -81,17 +81,19 @@ void ClientConnection::run() {
       finishedConnecting();
 
       if (ourSConn) {
-        sConn.endConnect();
+        sConn.endConnect(true);
         sConn.release();
+        delete sConnPtr;
       }
-      if (ourSConn)
-        delete sc;
     } catch (Error e) {
-      if (ourSConn)
-        delete sc;
-      if (!onConnectFinished)
+      if (!onConnectFinished) {
+        if (ourSConn)
+          sConn.endConnect(false);
         getListener()->onConnectFailure(e);
+      }
       //else onDisconnect should get called.
+      if (ourSConn)
+        delete sConnPtr;
     }
   } else {
     assert(eventListener != NULL);
@@ -116,7 +118,7 @@ bool ClientConnection::open(const Address& dest, int localPort) {
 void ClientConnection::connect(SyncConnection* wrapped) {
   assert(sockets.r != NL_INVALID);
   assert(address);
-  sc = wrapped;
+  sConnPtr = wrapped;
   start();
 }
 

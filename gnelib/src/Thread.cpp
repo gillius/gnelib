@@ -51,6 +51,7 @@ thread_id(0), running(false), deleteThis(false), priority(priority2) {
 
 //##ModelId=3B0753810379
 Thread::~Thread() {
+  assert(!isRunning());
 }
 
 //##ModelId=3B075381037B
@@ -103,12 +104,10 @@ void Thread::detach(bool delThis) {
     //Only set deleteThis true if we want to delete ourselves on exit.
     sync.acquire();
     deleteThis = true;
-    if (!running) {
-      deleteThis = false; //this is just to fix a possible race condition
-                          //with Thread::end.
+    if (!running) {       //delete this if we are already stopped.
       sync.release();
       delete this;
-    } else
+    } else                //else all we want to do is mark deleteThis.
       sync.release();
   }
 }
@@ -116,16 +115,14 @@ void Thread::detach(bool delThis) {
 //##ModelId=3B0753810387
 void Thread::end() {
   sync.acquire();
+  running = false;
   Thread::remove(this);
   if (deleteThis) {
-    deleteThis = false; //this is just to fix a possible race condition with
-                        //Thread::detach.
+    //If we were detached with delThis set, we delete ourselves now.
     sync.release();
     delete this;
-  } else {
-    running = false;
+  } else
     sync.release();
-  }
 }
 
 //##ModelId=3B0753810388
@@ -155,6 +152,7 @@ pthread_t Thread::getID() const {
 
 //##ModelId=3B07538103AA
 void Thread::remove(Thread* thr) {
+  assert(!thr->isRunning());
   mapSync.acquire();
   threads.erase(thr->getID());
   mapSync.release();

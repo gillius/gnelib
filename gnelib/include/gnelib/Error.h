@@ -26,7 +26,9 @@ namespace GNE {
 
 /**
  * This class resembles some sort of error in GNE, with the ability to obtain
- * a textual description of the error.
+ * a textual description of the error.  Objects of type Error are not thread
+ * safe.  This is usually OK since Error objects are not typically shared by
+ * threads.
  */
 //##ModelId=3BAEC0E901EA
 class Error {
@@ -43,6 +45,7 @@ public:
     UserHostVersionHigh,
     CouldNotOpenSocket,
     ConnectionTimeOut,
+    ConnectionRefused,
     ConnectionDropped,
     SyncConnectionReleased,
     Read,

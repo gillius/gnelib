@@ -63,33 +63,53 @@ public:
   /**
    * Event triggered after there is a successful connection.  The connection
    * process will not be considered complete until this function completes.
+   *
    * \nIf an error occurs then the connection needs to be killed, so conn can
    * throw its Error outside your function.  Catch it if you need to clean up
    * anything you were doing, but remember to rethrow it.  If this is the
-   * case, neither onConnectFailure nor onDisconnect will be generated, so
-   * any needed cleanup needs to be done in your exception handler, and this
-   * will be the last event generated.
+   * case, onConnectFailure but not onDisconnect will be generated, so
+   * any needed cleanup needs to be done in your exception handler.
+   *
+   * \nYou can also choose to refuse a connection by calling disconnect on
+   * the given SyncConnection and throwing an Error with an error code of
+   * Error::ConnectionRefused, and will it will make the connection act as if
+   * an error just occured, so onConnectFailure will be called and the above
+   * section of text still applies.
+   *
    * \nThis event does not have the "non-blocking" requirement that most GNE
    * events have.  Take as long as needed to establish a connection, such as
    * transmitting initial game parameters or game state.
+   *
    * \nNote: Only ClientConnection generates this event.  The SyncConnection
    * is currently wrapped around a ClientConnection, and you should use
    * SyncConnection::getConnection to get the ClientConnection.
-   * \nYou should not release the SyncConnection.  You can still interact
-   * with the PacketStream directly, though, but the events will be delayed
-   * until this function completes.
-   * \nIn the near future the ability to refuse connections will be added.
    */
   //##ModelId=3BCA83910078
   virtual void onConnect(SyncConnection& conn) throw (Error);
 
   /**
-   * Event triggered when a connection failed BEFORE onConnect was called.\n
+   * Event triggered when a connection failed before or during the onConnect
+   * event.\n
+   *
    * After a connection failure, the connection is as if disconnect() was
    * called, therefore you cannot reconnect this connection instance.\n
+   *
    * Note that for this case, the event onDisconnect IS NOT CALLED, since
-   * the Connection was never in a connected state.
-   * \nNote: Only ClientConnection generates this event.
+   * the Connection was never in a connected state.\n
+   *
+   * You won't be able to delete the connection from this function, like you
+   * can from onDisconnect because the connection process is still proceding,
+   * and one of your other threads is joining and/or waiting for the
+   * connection to complete.  The proper way to destroy the connection is to
+   * delete it from another thread, probably the same thread that created and
+   * then detached or is joining on it once it learns the connection failed.\n
+   *
+   * This function's purpose is to notify that thread if needed.  If you are
+   * waiting for the connection to complete by using join in that other
+   * thread, you would probably not need to listen for this event (see
+   * the example exhello).\n
+   *
+   * Note: Only ClientConnection generates this event.
    * @see Connection::disconnect()
    */
    //##ModelId=3BCA83920262
@@ -100,26 +120,36 @@ public:
    * checked.  This object is a newly allocated object created from your
    * ServerConnectionCreator object, and this function will be the first time
    * you code has "seen" this object, so you will have to register it into
-   * some internal list so you can interact with and delete it later.
-   * \nIf an error occurs then the connection needs to be killed, so conn can
+   * some internal list so you can interact with and delete it later.\n
+   *
+   * If an error occurs then the connection needs to be killed, so conn can
    * throw its Error outside your function.  Catch it if you need to clean up
    * anything you were doing, but remember to rethrow it.  If this is the
-   * case, neither ServerConnectionListner::onListenFailure nor onDisconnect
-   * will be generated, so any needed cleanup needs to be done in your
-   * exception handler, and this will be the last event generated.\n
+   * case, ServerConnectionListner::onListenFailure will be generated but not
+   * onDisconnect, so any needed cleanup needs to be done in your exception
+   * handler or in onListenFailure.  See ServerConnection::run() for an event
+   * generation summary.  If an error occurs you need not worry about having
+   * to delete the ServerConnection or this object.  onListenFailure should
+   * delete this ConnectionListener as usual if this is needed, and GNE will
+   * destroy the ServerConnection if onNewConn did not complete w/o errors.
+   *
+   * \nYou can also choose to refuse a connection by calling disconnect on
+   * the given SyncConnection and throwing an Error with an error code of
+   * Error::ConnectionRefused, and will it will make the connection act as if
+   * an error just occured, so onListenFailure will be called and the above
+   * section of text still applies.
+   *
    * Note: Only ServerConnection generates this function.  The SyncConnection
    * is currently wrapped around a ServerConnection, and you should use
    * SyncConnection::getConnection to get the ServerConnection.\n
+   *
    * If the connection failed before this event, though, the function
    * ServerConnectionListener::onListenFailure instead of this function is
    * called.
+   *
    * \nThis event does not have the "non-blocking" requirement that most GNE
    * events have.  Take as long as needed to establish a connection, such as
    * transmitting initial game parameters or game state.
-   * \nYou should not release the SyncConnection.  You can still interact
-   * with the PacketStream directly, though, but the events will be delayed
-   * until this function completes.
-   * \nIn the near future the ability to refuse connections will be added.
    */
   //##ModelId=3BCFAE5900AA
   virtual void onNewConn(SyncConnection& newConn) throw (Error);

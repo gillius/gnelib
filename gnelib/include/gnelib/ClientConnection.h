@@ -56,7 +56,9 @@ public:
    * Starts connection to the specified target.  This method does not block,
    * and a thread will be started to handle the connection process.
    * onConnect() or onConnectFailure() will be called depending on the
-   * outcome of this process.\n
+   * outcome of this process.  The exception is that if an error occurs
+   * during onConnect or it chooses to reject the connection,
+   * onConnectFailure will also be called.\n
    * You must call either detach(false) or join on this object after calling
    * connect, depending if you want to wait for the connection to complete.\n
    * You can call join after connect to wait until the connection is
@@ -70,9 +72,9 @@ public:
    * onConnectFailure() will be triggered.\n
    * If sConn is not null, then there is currently a SyncConnection wrapped
    * around this connection.  This is only the case when a user is using only
-   * SyncConnections.  So the user should always pass nothing to this
-   * function -- this parameter is only useful in the code for
-   * SyncConnection::connect().
+   * SyncConnections, and in this case the user should call
+   * SyncConnection::connect(), so in your code you should never need to pass
+   * a parameter to this function.
    * @see #onConnect()
    * @see #onConnectFailure()
    */
@@ -93,7 +95,9 @@ private:
    */
   //##ModelId=3BB94B19035D
   Address address;
-  SyncConnection* sc;
+
+  //##ModelId=3C4116C3013B
+  SyncConnection* sConnPtr;
 };
 
 }

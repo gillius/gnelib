@@ -40,6 +40,13 @@ ourCreator(creator) {
 
 //##ModelId=3B075381027E
 ServerConnection::~ServerConnection() {
+  //If this is the current thread, we did a detach(true) because we failed 
+  //before onNewConn.  Else this is another thread (likely our event thread)
+  //and therefore we call join to wait for run to complete if it is still
+  //running (as it would be if an error occured after onNewConn but before
+  //run finished), and join will also release thread resources.
+  if (Thread::currentThread() != this)
+    join();
   gnedbgo(5, "destroyed");
 }
 
@@ -53,8 +60,8 @@ void ServerConnection::run() {
   gnedbgo1(1, "New connection incoming from %s", getRemoteAddress(true).toString().c_str());
 
   bool onNewConnFinished = false;
+  SyncConnection sConn(this);
   try {
-    SyncConnection sConn(this);
     sConn.startConnect();
     ps->start();
     connecting = true;
@@ -70,11 +77,16 @@ void ServerConnection::run() {
 
     //Start bringing connection to normal state.  SyncConnection will make
     //sure onDisconnect gets called starting with endConnect().
-    sConn.endConnect();
+    sConn.endConnect(true);
     sConn.release();
   } catch (Error e) {
-    if (!onNewConnFinished)
+    if (!onNewConnFinished) {
+      sConn.endConnect(false);
       ourCreator->onListenFailure(e, getRemoteAddress(true), getListener());
+      //We delete ourselves when we terminate since we were never seen by the
+      //user and no one has seen us yet.
+      detach(true);
+    }
   }
 }
 

@@ -24,7 +24,11 @@ namespace GNE {
 
 //##ModelId=3B075381014B
 Mutex::Mutex() {
-  valassert(pthread_mutex_init( &mutex, NULL ), 0);
+  pthread_mutexattr_t attr;
+  valassert(pthread_mutexattr_init(&attr), 0);
+  valassert(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE), 0);
+  valassert(pthread_mutex_init( &mutex, &attr ), 0);
+  valassert(pthread_mutexattr_destroy(&attr), 0);
 }
 
 //##ModelId=3B075381014C

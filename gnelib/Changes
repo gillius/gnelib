@@ -1,4 +1,15 @@
 GNE 0.4 to Current
+  onConnect and onNewConn can now decide to refuse connections at that point
+    by throwing an Error of type ConnectionRefused.
+  PacketStream::run() leaked memory as it forgot to destroy the packets that
+    were copied in PacketStream::writePacket() when it sent them.
+  PacketStream forgot to destroy the data in its queues when it gets
+    destroyed.
+  The mutex class now allows recursive locks.  Previously not all platforms
+    supported it, but you can make one yourself and I think the demand is
+    more for recursive than non-recursive mutexes.
+  Fixed memory leaks related to the previously described thread-related bugs
+    in the connecting code.
   Fixed LOADS of thread-related bugs in the connecting code where errors
     might occur, espically if the connection was completed and all data
     transfered before the code finished (this is likely in the examples where

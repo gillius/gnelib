@@ -54,7 +54,9 @@ ConnectionListener* EventThread::getListener() const {
 
 //##ModelId=3C106F0203DA
 void EventThread::setListener(ConnectionListener* listener) {
+  listenSync.acquire();
   eventListener = listener;
+  listenSync.release();
 }
 
 //##ModelId=3C106F0203DC
@@ -144,15 +146,15 @@ void EventThread::run() {
     eventSync.release();
     if (!shutdown) {
       if (failure) {
+        listenSync.acquire();
         eventListener->onFailure(*failure);
+        listenSync.release();
         delete failure;
         failure = NULL;
-        //onFailure will be the second to last event.
-        onDisconnectEvent = true;
-
-      }
-      if (onDisconnectEvent) {
+      } else if (onDisconnectEvent) {
+        listenSync.acquire();
         eventListener->onDisconnect();
+        listenSync.release();
         return;  //terminate this thread since there are no other events to
                  //process -- onDisconnect HAS to be the last.
 
@@ -160,13 +162,17 @@ void EventThread::run() {
         //This is set to false before in case we get more packets during the
         //onReceive event.
         onReceiveEvent = false;
+        listenSync.acquire();
         eventListener->onReceive();
+        listenSync.release();
 
       } else if (onDoneWritingEvent) {
         //This is set before in case the packets finish writing during the
         //onDoneWriting event.
         onDoneWritingEvent = false;
+        listenSync.acquire();
         eventListener->onDoneWriting();
+        listenSync.release();
 
       } else {
         eventSync.acquire();
@@ -174,7 +180,9 @@ void EventThread::run() {
         //When we get here this is the only reason left why we were woken up!
         assert(!eventQueue.empty());
         Error* e = eventQueue.front();
+        listenSync.acquire();
         eventListener->onError(*e);
+        listenSync.release();
         delete e;
         eventQueue.pop();
 

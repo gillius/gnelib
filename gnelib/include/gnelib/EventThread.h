@@ -74,8 +74,11 @@ public:
   /**
    * Sets a new event listener.  All new events will be sent to the new
    * listener.  If events are still being processed by the old listener, this
-   * change will not affect those running events, however, depending on the
-   * event it could block events for the new listener until it completes.
+   * function will wait until that event completes, then it will release.
+   * At the completion of this statement you know for certain that the old
+   * listener is not being addressed by this thread any longer.\n
+   * If this function is called from an event itself, then the change will
+   * take place at the start of the next event.
    * The passed listener cannot be NULL.
    */
   //##ModelId=3C106F0203DA
@@ -148,6 +151,9 @@ private:
 
   //##ModelId=3C106F1903C3
   ConditionVariable eventSync;
+
+  //##ModelId=3C4116C301A9
+  ConditionVariable listenSync;
 
   //True if this EventThread was ever started at least one time.
   //##ModelId=3C106F0203CB

@@ -87,6 +87,13 @@ public:
   }
 
   void onConnectFailure(const Error& error) {
+    //Since we are using join in our client connecting code, this event is
+    //not really needed, but we can display the error message here or in the
+    //doClient function when it finds out the connection failed.  Either way
+    //does the same thing.
+    //On the other hand, if we used client.detach(false) in doClient, we
+    //could use onConnect and this event to notify doClient of the success or
+    //failure of the connection process.
     mprintf("Connection to server failed.\n");
     mprintf("GNE reported error: %s\n", error.toString().c_str());
   }

@@ -29,10 +29,9 @@ namespace GNE {
  * This class is a wrapper for pthreads, so please read man pages or other
  * documentation for the equivalent pthreads functions if you need to
  * understand the specifics on the semantics of these functions.
- * Note that the Mutex class does not work recursively -- if a thread
- * tries to lock the same mutex twice, undefined results may occur if
- * the current platform does not support recursive mutexes.  Some platforms
- * such as the pthreads_win32 do support recursive mutexes, though.
+ * This version of a mutex is recursive.  This means that if a thread already
+ * owns the mutex, then a second lock will not deadlock.  You need to unlock
+ * the mutex the same number of times it was locked to unlock it.
  */
 //##ModelId=3B07538002DE
 class Mutex {

@@ -24,6 +24,7 @@
 #include "Error.h"
 #include "ConnectionListener.h"
 #include "ConditionVariable.h"
+#include "Mutex.h"
 
 namespace GNE {
 class Address;
@@ -179,14 +180,18 @@ private:
    * This must be called BEFORE any events can possibly be received (so
    * before registration into ConnectionEventGenerator).
    */
+  //##ModelId=3C4116C3023E
   void startConnect();
 
   /**
-   * Complement function with startConnect, this is appropriate to call when
-   * the connection was successful and it is now time to call onDisconnect if
-   * needed if an error occured between onNewConn and endConnect.\n
+   * Complement function with startConnect, this must be called if
+   * startConnect was called.  Pass true to passEvents if the connection was
+   * successful and onFailure and onDisconnect should be passed onto the old
+   * listener.  Pass false if the connection failed and the events should be
+   * discarded and not passed on.
    */
-  void endConnect() throw (Error);
+  //##ModelId=3C4116C30248
+  void endConnect(bool passEvents) throw (Error);
 
   //Make friends so they can use startConnect and endConnect.
   friend class ServerConnection;
@@ -197,6 +202,7 @@ private:
    * calling functions can manipulate the mutexes, which are not necessarily
    * recursive.
    */
+  //##ModelId=3C4116C30249
   void doRelease() throw (Error);
 
   /**
@@ -222,6 +228,9 @@ private:
 
   /**
    * A ConditionVariable we can wait on to wait for incoming data.
+   * This is also used as a mutex for errors, as waiting for incoming data
+   * is also sensitive to if an error happens -- it will stop waiting if the
+   * connection failed.
    */
   //##ModelId=3BDB10A501CE
   ConditionVariable recvNotify;
@@ -239,14 +248,15 @@ private:
   void setError(const Error& error);
 
   /**
-   * Syncronization for the Error object and release and connecting events.
+   * Syncronization for release and connecting events.
    */
   //##ModelId=3BDB10A501D3
-  ConditionVariable sync;
+  Mutex sync;
 
   /**
    * The current error state of this connection.  Error::NoError if there is
-   * no error.
+   * no error.  recvNotify acts to keep this variable from being accessed by
+   * multiple threads.
    */
   //##ModelId=3BDB10A501D8
   Error currError;
@@ -264,6 +274,7 @@ private:
   //##ModelId=3BDB10A5020E
   ConnectionListener* oldListener;
 
+  //##ModelId=3C4116C30220
   volatile bool released;
 
   /**
@@ -276,6 +287,7 @@ private:
   /**
    * @see setConnectMode
    */
+  //##ModelId=3C4116C30234
   volatile bool connectMode;
 };
 

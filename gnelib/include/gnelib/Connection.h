@@ -283,7 +283,7 @@ private:
   //PacketStream might call our processError function.
   friend class PacketStream;
 
-  //SyncConnection might call our onReceive and onDoneWriting events.
+  //SyncConnection might call our event functions.
   friend class SyncConnection;
 
   /**

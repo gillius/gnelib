@@ -47,16 +47,24 @@ public:
   ServerConnection(int outRate, int inRate, ConnectionListener* listener, 
                    NLsocket rsocket2, ServerConnectionListener* creator);
 
+  /**
+   * Destructs this ServerConnection object.  The user need not worry about
+   * the fact that ServerConnection is a thread (in the sense that the user
+   * never need to call detach or join), to do a proper cleanup.
+   */
   //##ModelId=3B075381027E
   virtual ~ServerConnection();
 
 protected:
   /**
-   * This thread performs the connection process.  The thread will have
-   * finished before onNewConn is called.  If the connection was successful,
-   * detach(false) is called, else on failure detach(true) is called to
-   * delete this object once ServerConnectionListener::onListenFailure
-   * completes.
+   * This thread performs the connection process.  If an error occurs:\n
+   * Before onNewConn: ServerConnectionListener::onListenFailure() is called.\n
+   * During onNewConn: Only onNewConn is called and is reponsible for catching
+   *                   the exception and cleaning up anything it has done.
+   *                   onDisconnect will NOT be called, but onListenFailure
+   *                   will be.
+   * After onNewConn:  onDisconnect will be called.  onFailure will likely not
+   *                   be called first.
    */
   //##ModelId=3B0753810280
   void run();
