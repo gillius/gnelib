@@ -151,9 +151,6 @@ private:
   //##ModelId=3B0753810227
   bool ourBuffer;
 
-  //##ModelId=3B0753810228
-  int length;
-
   //##ModelId=3AE4D1ED0014
   NLbyte* data;
 
