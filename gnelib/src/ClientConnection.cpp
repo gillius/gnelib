@@ -22,6 +22,7 @@
 #include "../include/gnelib/ClientConnection.h"
 #include "../include/gnelib/ConnectionListener.h"
 #include "../include/gnelib/Error.h"
+#include "../include/gnelib/Errors.h"
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/SyncConnection.h"
 #include "../include/gnelib/EventThread.h"
@@ -104,7 +105,7 @@ void ClientConnection::run() {
     //user stuff.
     try {
       doHandshake();
-    } catch (Error e) {
+    } catch (Error& e) {
       gnedbgo1(1, "Connection failure during GNE handshake: %s", e.toString().c_str());
       origListener->onConnectFailure(e);
       return;
@@ -149,13 +150,10 @@ void ClientConnection::run() {
       delete params;
       params = NULL;
 
-    } catch (Error e) {
+    } catch (Error& e) {
       if (!onConnectFinished) {
         if (ourSConn) {
-          try {
-            sConn.endConnect(false);
-          } catch (Error e) {
-          }
+          sConn.endConnect(false);
         }
         
         origListener->onConnectFailure(e);
@@ -172,14 +170,14 @@ void ClientConnection::run() {
       params = NULL;
     }
   } else {
-    Error err = Error::createLowLevelError(Error::ConnectionTimeOut);
+    LowLevelError err = LowLevelError(Error::ConnectionTimeOut);
     gnedbgo1(1, "Connection failure: %s", err.toString().c_str());
     origListener->onConnectFailure(err);
   }
 }
 
 //##ModelId=3C783ACF0192
-void ClientConnection::doHandshake() throw (Error) {
+void ClientConnection::doHandshake() {
   //Start the GNE protocol connection process.
   //The first packet is from client to server, and is the connection
   //request packet (CRP).
@@ -201,7 +199,7 @@ void ClientConnection::doHandshake() throw (Error) {
 }
 
 //##ModelId=3C5CED05016E
-void ClientConnection::sendCRP() throw (Error) {
+void ClientConnection::sendCRP() {
   RawPacket crp;
   addHeader(crp);
   addVersions(crp);
@@ -211,7 +209,7 @@ void ClientConnection::sendCRP() throw (Error) {
   int check = sockets.rawWrite(true, crp.getData(), crp.getPosition());
   //The write should succeed and have sent all of our data.
   if (check != crp.getPosition())
-    throw Error::createLowLevelError(Error::Write);
+    throw LowLevelError(Error::Write);
 }
 
 const int MINLEN = 8;
@@ -219,22 +217,22 @@ const int REFLEN = 44;
 const int CAPLEN = 12;
 
 //##ModelId=3C5CED05016F
-Address ClientConnection::getCAP() throw (Error) {
+Address ClientConnection::getCAP() {
   gbyte capBuf[64];
   int check = sockets.rawRead(true, capBuf, 64);
   if (check == NL_INVALID)
-    throw Error::createLowLevelError(Error::Read);
+    throw LowLevelError(Error::Read);
 
   //The packet must be at least as large to check if it is a CAP or a
   //refusal packet.
   if (check < MINLEN) {
     gnedbgo1(1, "Response to CRP is too small (size is %d).", check);
-    throw Error(Error::ProtocolViolation);
+    throw ProtocolViolation(ProtocolViolation::InvalidCAP);
   }
 
   //Now parse the CAP (or refusal packet)
   RawPacket cap(capBuf);
-  checkHeader(cap);
+  checkHeader(cap, ProtocolViolation::InvalidCAP);
 
   gbool isCAP;
   cap >> isCAP;
@@ -244,7 +242,7 @@ Address ClientConnection::getCAP() throw (Error) {
     if (check != CAPLEN){
       gnedbgo2(1, "Expected a CAP of size %d but got %d bytes instead.",
         CAPLEN, check);
-      throw Error(Error::ProtocolViolation);
+      throw ProtocolViolation(ProtocolViolation::InvalidCAP);
     }
 
     //Get the max rate the remote end allows.
@@ -262,7 +260,7 @@ Address ClientConnection::getCAP() throw (Error) {
 
     if (portNum > 65535) {
       gnedbgo1(1, "Invalid port number %d given.", portNum);
-      throw Error(Error::ProtocolViolation);
+      throw ProtocolViolation(ProtocolViolation::InvalidCAP);
 
     } else if (portNum > 0) {
       ret.setPort((int)portNum);
@@ -281,7 +279,7 @@ Address ClientConnection::getCAP() throw (Error) {
   if (check != REFLEN) {
     gnedbgo2(1, "Expected a refusal of size %d but got %d bytes instead.",
       REFLEN, check);
-    throw Error(Error::ProtocolViolation);
+    throw ProtocolViolation(ProtocolViolation::InvalidCAP);
   }
 
   //We got a refusal packet, so let's check the versions.
@@ -297,11 +295,11 @@ Address ClientConnection::getCAP() throw (Error) {
 }
 
 //##ModelId=3C5CED050170
-void ClientConnection::setupUnreliable(const Address& dest) throw (Error) {
+void ClientConnection::setupUnreliable(const Address& dest) {
   assert(dest);
   sockets.u = nlOpen(0, NL_UNRELIABLE);
   if (sockets.u == NL_INVALID)
-    throw Error::createLowLevelError(Error::CouldNotOpenSocket);
+    throw LowLevelError(Error::CouldNotOpenSocket);
   NLaddress temp = dest.getAddress();
   nlSetRemoteAddr(sockets.u, &temp);
   assert( sockets.getLocalAddress(false) );
@@ -314,13 +312,13 @@ void ClientConnection::setupUnreliable(const Address& dest) throw (Error) {
   resp << sockets.getLocalAddress(false).getPort();
   check = sockets.rawWrite(true, resp.getData(), resp.getPosition());
   if (check != resp.getPosition() || check != sizeof(gint32))
-    throw Error::createLowLevelError(Error::Write);
+    throw LowLevelError(Error::Write);
 
   resp.reset();
   resp << PacketParser::END_OF_PACKET;
   check = sockets.rawWrite(false, resp.getData(), resp.getPosition());
   if (check != resp.getPosition() || check != sizeof(PacketParser::END_OF_PACKET))
-    throw Error::createLowLevelError(Error::Write);
+    throw LowLevelError(Error::Write);
 }
 
 }

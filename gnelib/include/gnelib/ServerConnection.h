@@ -85,20 +85,35 @@ protected:
   void run();
 
 private:
+  /**
+   * @throw Error if an error occurs.
+   */
   //##ModelId=3C783ACF02BE
-  void doHandshake() throw (Error);
+  void doHandshake();
 
+  /**
+   * @throw Error if an error occurs.
+   */
   //##ModelId=3C5CED0502CD
-  void getCRP() throw (Error);
+  void getCRP();
 
+  /**
+   * @throw Error if an error occurs.
+   */
   //##ModelId=3C5CED0502CE
   void sendRefusal();
 
+  /**
+   * @throw Error if an error occurs.
+   */
   //##ModelId=3C5CED0502D7
-  void sendCAP() throw (Error);
+  void sendCAP();
 
+  /**
+   * @throw Error if an error occurs.
+   */
   //##ModelId=3C5CED0502D8
-  void getUnreliableInfo() throw (Error);
+  void getUnreliableInfo();
 
   //Temporary storage to hold variables before and during connecting.
   //##ModelId=3C5CED0502C4

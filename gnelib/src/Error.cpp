@@ -19,7 +19,6 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/Error.h"
-#include <sstream>
 
 std::ostream& operator << (std::ostream& o, const GNE::Error& err) {
   return o << err.toString();
@@ -72,7 +71,7 @@ const std::string ErrorStrings[] = {
 };
 
 //##ModelId=3BAEC1A30050
-Error::Error(ErrorCode ec) : code(ec), hawkError(NL_NO_ERROR), sysError(0) {
+Error::Error(ErrorCode ec) : code(ec) {
 }
 
 //##ModelId=3BAEC1A30051
@@ -91,13 +90,7 @@ const void Error::setCode(Error::ErrorCode newCode) {
 
 //##ModelId=3BAEC1DF014A
 std::string Error::toString() const {
-  std::stringstream ret;
-  ret << ErrorStrings[code];
-  if (hawkError != NL_NO_ERROR && hawkError != NL_SOCKET_ERROR)
-    ret << " HawkNL error " << hawkError << ": " << nlGetErrorStr(hawkError);
-  if (sysError != 0)
-    ret << " System error " << sysError << ": " << nlGetSystemErrorStr(sysError);
-  return ret.str();
+  return ErrorStrings[code];
 }
 
 //##ModelId=3BAEC39201C2
@@ -108,17 +101,6 @@ Error::operator bool() const {
 //##ModelId=3BAEC74F0168
 bool Error::operator == (const ErrorCode& rhs) const {
   return (code == rhs);
-}
-
-//##ModelId=3BBA9D6E02BC
-Error Error::createLowLevelError(Error::ErrorCode newCode) {
-  Error ret(newCode);
-  NLenum error = nlGetError();
-  if (error == NL_SOCKET_ERROR || error == NL_SOCK_DISCONNECT)
-    ret.sysError = nlGetSystemError();
-  else
-    ret.hawkError = error;
-  return ret;
 }
 
 } //namespace GNE

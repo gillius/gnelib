@@ -25,6 +25,7 @@
 #include "../include/gnelib/Connection.h"
 #include "../include/gnelib/GNE.h"
 #include "../include/gnelib/Address.h"
+#include "../include/gnelib/Errors.h"
 
 namespace GNE {
 
@@ -84,7 +85,7 @@ void ServerConnectionListener::onReceive() {
       newConn, sock);
     newConn->start();
   } else {
-    Error err = Error::createLowLevelError();
+    LowLevelError err = LowLevelError();
     gnedbgo1(1, "Listening failure (accept failed): %s",
       err.toString().c_str());
     onListenFailure(err, NULL, NULL);

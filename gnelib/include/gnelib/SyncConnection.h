@@ -76,15 +76,13 @@ public:
   SyncConnection(Connection* target);
 
   /**
-   * Destructs this SyncConnection, calling release() if necessary.  This
-   * function is declared as being able to throw an Error object, but this
-   * guaranteed not to fail if the SyncConnection is released already, since
-   * the only error that can occur is one given by release.
+   * Destructs this SyncConnection, calling release() if necessary.  If
+   * releasing would throw an Error, it is ignored.
    *
    * @see release()
    */
   //##ModelId=3BC3CB1703B7
-  virtual ~SyncConnection() throw (Error);
+  virtual ~SyncConnection();
 
   /**
    * Returns the underlying Connection.
@@ -98,11 +96,13 @@ public:
    *
    * It is important that the wrapped Connection is a ClientConnection, 
    * otherwise undefined behavior (likely a crash) will result.
+   *
+   * @throw Error if the connection could not be opened.
    */
   //##ModelId=3BC3CD0902E4
   void open(const Address& dest, int outRate = 0,
             int inRate = 0, int localPort = 0,
-            bool wantUnreliable = true) throw (Error);
+            bool wantUnreliable = true);
   
   /**
    * Attempts to connect to the remote side, and waits for the connection to
@@ -114,17 +114,22 @@ public:
    *
    * It is important that the wrapped Connection is a ClientConnection, 
    * otherwise undefined behavior (likely a crash) will result.
+   *
+   * @throw Error if the connection failed.
    */
   //##ModelId=3BC3CD090320
-  void connect() throw (Error);
+  void connect();
   
   /**
    * Disconnects the underlying Connection.  It is best to use this function
    * instead of getConnection()->disconnect() because this will make sure
    * any pending writes will have completed through a call to release().
+   *
+   * @throw Error if release throws an error, or if the disconnection was
+   *              unsuccessful.
    */
   //##ModelId=3BC3CD6E02BD
-  void disconnect() throw (Error);
+  void disconnect();
 
   /**
    * Releases this SyncConnection, returning the underlying Connection to its
@@ -140,9 +145,12 @@ public:
    * onReceive will be called in the original listener after release if
    * necessary, and onDoneWriting will be called after release if any data
    * since writing packets.
+   *
+   * @throw Error if an error has occured since the last operation on this
+   *              SyncConnection instance.
    */
   //##ModelId=3BDB10A50316
-  void release() throw (Error);
+  void release();
   
   /**
    * Returns true if release() has been called on this SyncConnection, and it
@@ -155,16 +163,17 @@ public:
    * Reads a packet from the connection.  You should provide an already
    * allocated packet whose Packet::readPacket function will be called.
    * There will be type checking performed before this call to make sure the
-   * right packet is being read.  If there is a mismatch, an Error is thrown.
+   * right packet is being read.  If there is a mismatch, an error is thrown.
    * The passed packet is untouched, and the connection remains connected;
    * however, the data just received (the incorrect packet) is lost.
    * The connection will remain connected in this case.
    *
-   * An error is also thrown if a socket failure or error occurs since the
-   * last interaction with this object.
+   * @throw PacketTypeMismatch if the read packet was of the wrong type.
+   * @throw Error if an error occured while reading, or an error occured
+   *              since the last interaction with this object.
    */
   //##ModelId=3BC3CFE50014
-  SyncConnection& operator >> (Packet& packet) throw (Error);
+  SyncConnection& operator >> (Packet& packet);
   
   /**
    * Writes a Packet to the connection by placing it in the outgoing queue.
@@ -176,11 +185,11 @@ public:
    * though.  release() will block until all writes are completed, and the
    * destructor and disconnect() function call release() if needed.
    *
-   * An error is thrown if a socket failure or error occurs since the
-   * last interaction with this object, or during this interaction.
+   * @throw Error if an error occured while writing, or an error occured
+   *              since the last interaction with this object.
    */
   //##ModelId=3BC3DBB000AA
-  SyncConnection& operator << (const Packet& packet) throw (Error);
+  SyncConnection& operator << (const Packet& packet);
   
 private:
   /**
@@ -207,9 +216,13 @@ private:
    * Pass false if the connection failed and the events should be discarded
    * and not passed on.  If false was passed, the listener for the connection
    * was set to ConnectionListener::getNullListener() to discard the events.
+   * If false is passed, and release throws an Error, it is not passed
+   * through.
+   *
+   * @throw Error if release throws.
    */
   //##ModelId=3C4116C30248
-  void endConnect(bool passEvents) throw (Error);
+  void endConnect(bool passEvents);
 
   //Make friends so they can use startConnect and endConnect.
   friend class ServerConnection;
@@ -219,18 +232,21 @@ private:
    * The actual releasing functionality, but in a separate function so that
    * calling functions can manipulate the mutexes, which are not necessarily
    * recursive.
+   *
+   * @throw Error if an error occured while releasing, or an error occured
+   *              since the last interaction with this object.
    */
   //##ModelId=3C4116C30249
-  void doRelease() throw (Error);
+  void doRelease();
 
   /**
    * The event listeners for SyncConnection that will override the current
    * listener our connection has.
    */
   //##ModelId=3BDB10A50353
-  void onNewConn(SyncConnection& newConn) throw (Error);
+  void onNewConn(SyncConnection& newConn);
   //##ModelId=3BDB10A6000A
-  void onConnect(SyncConnection& conn) throw (Error);
+  void onConnect(SyncConnection& conn);
   //##ModelId=3BDB10A60078
   void onConnectFailure(const Error& error);
   //##ModelId=3BDB10A60122
@@ -256,10 +272,12 @@ private:
   ConditionVariable recvNotify;
 
   /**
-   * Checks to see if an Error has occured, and if so, throws it.
+   * Checks to see if an error has occured, and if so, throws it.
+   *
+   * @throw Error if an error has occured.
    */
   //##ModelId=3BDB10A6029F
-  void checkError() throw (Error);
+  void checkError();
 
   /**
    * Sets the error.

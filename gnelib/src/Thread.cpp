@@ -43,7 +43,7 @@ void* Thread::threadStart( void* thread ) {
     mapSync.release(); //start running
     thr->run();
     thr->end();
-  } catch (Error e) {
+  } catch (Error& e) {
     gnedbg2(1, "Unhandled exception, thread terminated. Error %d: %s",
       e.getCode(), e.toString().c_str());
   }

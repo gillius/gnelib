@@ -27,6 +27,7 @@
 #include "../include/gnelib/PacketParser.h"
 #include "../include/gnelib/Time.h"
 #include "../include/gnelib/Timer.h"
+#include "../include/gnelib/Errors.h"
 
 const int BUF_LEN = 1024;
 
@@ -238,7 +239,7 @@ void PacketStream::run() {
         //Release the mutex in case rawWrite blocks
         outQCtrl.release();
         if (owner.sockets.rawWrite(reliable, raw.getData(), raw.getPosition()) == NL_INVALID) {
-          owner.processError( Error::createLowLevelError(Error::Write) );
+          owner.processError( LowLevelError(Error::Write) );
         }
         
         //Discover if we are really done writing, and if so, queue the

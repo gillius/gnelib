@@ -27,6 +27,7 @@
 #include "../include/gnelib/EventThread.h"
 #include "../include/gnelib/RawPacket.h"
 #include "../include/gnelib/Error.h"
+#include "../include/gnelib/Errors.h"
 #include "../include/gnelib/SocketPair.h"
 #include "../include/gnelib/GNE.h"
 
@@ -101,7 +102,7 @@ void ServerConnection::run() {
   //Do the GNE protocol handshake.
   try {
     doHandshake();
-  } catch (Error e) {
+  } catch (Error& e) {
     params->creator->onListenFailure(e, rAddr, origListener);
     //We delete ourselves when we terminate since we were never seen by the
     //user and no one has seen us yet.
@@ -132,15 +133,9 @@ void ServerConnection::run() {
     //sure onDisconnect gets called starting with endConnect().
     sConn.endConnect(true);
     sConn.release();
-  } catch (Error e) {
+  } catch (Error& e) {
     if (!onNewConnFinished) {
-      try {
-        sConn.endConnect(false);
-      } catch (Error e) {
-        //The error might be re-reported, or at least we might get
-        //SyncConnectionReleased if the connection was refused, so we ignore
-        //this error.
-      }
+      sConn.endConnect(false);
       params->creator->onListenFailure(e, rAddr, origListener);
       //We delete ourselves when we terminate since we were never seen by the
       //user and no one has seen us yet.
@@ -155,15 +150,16 @@ void ServerConnection::run() {
 }
 
 //##ModelId=3C783ACF02BE
-void ServerConnection::doHandshake() throw (Error) {
+void ServerConnection::doHandshake() {
   //Receive the client's CRP.
   gnedbgo(2, "Waiting for the client's CRP.");
   try {
     getCRP();
-  } catch (Error e) {
+  } catch (Error& e) {
     if (e.getCode() == Error::GNETheirVersionHigh ||
       e.getCode() == Error::GNETheirVersionLow ||
-      e.getCode() == Error::UserVersionMismatch) {
+      e.getCode() == Error::UserVersionMismatch ||
+      e.getCode() == Error::WrongGame) {
       gnedbgo(2, "Versions don't match, sending refusal.");
       sendRefusal();
     }
@@ -186,17 +182,17 @@ void ServerConnection::doHandshake() throw (Error) {
 const int CRPLEN = 48;
 
 //##ModelId=3C5CED0502CD
-void ServerConnection::getCRP() throw (Error) {
+void ServerConnection::getCRP() {
   gbyte crpBuf[64];
   int check = sockets.rawRead(true, crpBuf, 64);
   if (check != CRPLEN) {
     if (check == NL_INVALID) {
       gnedbgo(1, "nlRead error when trying to get CRP.");
-      throw Error::createLowLevelError(Error::Read);
+      throw LowLevelError(Error::Read);
     } else {
       gnedbgo2(1, "Protocol violation trying to get CRP.  Got %d bytes expected %d",
         check, CRPLEN);
-      throw Error::createLowLevelError(Error::ProtocolViolation);
+      throw ProtocolViolation(ProtocolViolation::InvalidCRP);
     }
   }
 
@@ -205,7 +201,7 @@ void ServerConnection::getCRP() throw (Error) {
 
   //Check the header and versions.  These will throw exceptions if there is
   //a problem.
-  checkHeader(crp);
+  checkHeader(crp, ProtocolViolation::InvalidCRP);
   checkVersions(crp);
 
   guint32 maxOutRate;
@@ -238,7 +234,7 @@ void ServerConnection::sendRefusal() {
 }
 
 //##ModelId=3C5CED0502D7
-void ServerConnection::sendCAP() throw (Error) {
+void ServerConnection::sendCAP() {
   RawPacket cap;
   addHeader(cap);
   cap << gTrue;
@@ -257,18 +253,18 @@ void ServerConnection::sendCAP() throw (Error) {
   gnedbgo1(5, "Sent a CAP with %d bytes.", check);
   //The write should succeed and have sent all of our data.
   if (check != cap.getPosition())
-    throw Error::createLowLevelError(Error::Write);
+    throw LowLevelError(Error::Write);
 }
 
 //##ModelId=3C5CED0502D8
-void ServerConnection::getUnreliableInfo() throw (Error) {
+void ServerConnection::getUnreliableInfo() {
   gbyte* buf = new gbyte[64];
   int check = sockets.rawRead(true, buf, 64);
   if (check != sizeof(gint32)) {
     delete[] buf;
     if (check == NL_INVALID) {
       gnedbgo(1, "nlRead error when trying to get unreliable info.");
-      throw Error::createLowLevelError(Error::Read);
+      throw LowLevelError(Error::Read);
     } else {
       gnedbgo2(1, "Protocol violation trying to get unrel info.  Got %d bytes expected %d",
         check, sizeof(guint16));

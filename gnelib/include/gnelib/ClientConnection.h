@@ -113,16 +113,16 @@ protected:
 
 private:
   /**
-   * Does the GNE protocol handshake, throwing an exception on error.
+   * Does the GNE protocol handshake, throwing an Error on error.
    */
   //##ModelId=3C783ACF0192
-  void doHandshake() throw (Error);
+  void doHandshake();
 
   /**
    * Sends the CRP, throwing an Error on error.
    */
   //##ModelId=3C5CED05016E
-  void sendCRP() throw (Error);
+  void sendCRP();
 
   /**
    * Tries to get the CAP (or refusal packet), throwing an Error on error or
@@ -132,13 +132,13 @@ private:
    *         returned address is undefined.
    */
   //##ModelId=3C5CED05016F
-  Address getCAP() throw (Error);
+  Address getCAP();
 
   /**
-   * Sets up the unreliable connection.
+   * Sets up the unreliable connection, throwing an Error on error.
    */
   //##ModelId=3C5CED050170
-  void setupUnreliable(const Address& dest) throw (Error);
+  void setupUnreliable(const Address& dest);
 
   //Temp storage of connection params.
   //##ModelId=3C5CED05013D

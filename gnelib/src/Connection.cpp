@@ -27,6 +27,7 @@
 #include "../include/gnelib/PacketParser.h"
 #include "../include/gnelib/ConnectionEventGenerator.h"
 #include "../include/gnelib/Error.h"
+#include "../include/gnelib/Errors.h"
 #include "../include/gnelib/SocketPair.h"
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/GNE.h"
@@ -151,16 +152,17 @@ void Connection::addVersions(RawPacket& raw) {
 }
 
 //##ModelId=3C82ABA50326
-void Connection::checkHeader(RawPacket& raw) throw (Error) {
+void Connection::checkHeader(RawPacket& raw,
+                             ProtocolViolation::ViolationType t) {
   gbyte headerG, headerN, headerE;
   raw >> headerG >> headerN >> headerE;
 
   if (headerG != 'G' || headerN != 'N' || headerE != 'E')
-    throw Error(Error::ProtocolViolation);
+    throw ProtocolViolation(t);
 }
 
 //##ModelId=3C82ABA5036C
-void Connection::checkVersions(RawPacket& raw) throw (Error) {
+void Connection::checkVersions(RawPacket& raw) {
   //Get the version numbers
   GNEProtocolVersionNumber them;
   raw >> them.version >> them.subVersion >> them.build;
@@ -217,7 +219,7 @@ void Connection::onReceive(bool reliable) {
       processError(Error::ConnectionDropped);
     } else {
       //This is some other bad error that we need to report
-      processError(Error::createLowLevelError(Error::Read));
+      processError(LowLevelError(Error::Read));
     }
   } else if (temp == 0) {
     //In HawkNL 1.4b3 and earlier, this _USED_ to mean that...

@@ -124,8 +124,8 @@ public:
   }
 
   void onConnectFailure(const Error& error) {
-    mlprintf(0, 0, "Connection to server failed.   ");
-    mlprintf(0, 1, "  GNE reported error: %s   ", error.toString().c_str());
+    mprintf("Connection to server failed.   ");
+    mprintf("  GNE reported error: %s   ", error.toString().c_str());
   }
 
   void onDoneWriting() {
@@ -312,37 +312,44 @@ void doClient(int outRate, int inRate, int port) {
   client.connect();
   client.join();
 
-  sDisplay->startDisplay();
-  //We allow the client to change the incoming and outgoing datarate on the
-  //fly by pressing r.
-  while (getch() == (int)'r') {
-    char newRateStr[16] = "";
-    int newRate = 3200;
-    char clr[] = 
-      "                                                                    ";
-    //We can't use gin here because gin is not thread safe like gout is, this
-    //is because the cursor moving around constantly.
-    mlprintf(0, 21,
-      "Pick a new requested outgoing rate (0 == no limit, -1 == no change):",
-      client.stream().getRemoteOutLimit());
-    lgetString(0, 22, newRateStr, 10);
-    sscanf(newRateStr, "%d", &newRate);
-    client.stream().setRates(newRate, -1);
-
-    mlprintf(0, 23,
-      "Pick a new maximum incoming rate (0 == no limit, -1 == no change):",
-      client.stream().getRemoteOutLimit());
-    lgetString(0, 24, newRateStr, 10);
-    sscanf(newRateStr, "%d", &newRate);
-    client.stream().setRates(-1, newRate);
-
-    //Now we clear these lines so the user doesn't think they are still
-    //inputting data.
-    mlprintf(0, 21, clr);
-    mlprintf(0, 22, clr);
-    mlprintf(0, 23, clr);
-    mlprintf(0, 24, clr);
+  if (client.isConnected()) {
+    
+    sDisplay->startDisplay();
+    //We allow the client to change the incoming and outgoing datarate on the
+    //fly by pressing r.
+    while (getch() == (int)'r') {
+      char newRateStr[16] = "";
+      int newRate = 3200;
+      char clr[] = 
+        "                                                                    ";
+      //We can't use gin here because gin is not thread safe like gout is, this
+      //is because the cursor moving around constantly.
+      mlprintf(0, 21,
+        "Pick a new requested outgoing rate (0 == no limit, -1 == no change):",
+        client.stream().getRemoteOutLimit());
+      lgetString(0, 22, newRateStr, 10);
+      sscanf(newRateStr, "%d", &newRate);
+      client.stream().setRates(newRate, -1);
+      
+      mlprintf(0, 23,
+        "Pick a new maximum incoming rate (0 == no limit, -1 == no change):",
+        client.stream().getRemoteOutLimit());
+      lgetString(0, 24, newRateStr, 10);
+      sscanf(newRateStr, "%d", &newRate);
+      client.stream().setRates(-1, newRate);
+      
+      //Now we clear these lines so the user doesn't think they are still
+      //inputting data.
+      mlprintf(0, 21, clr);
+      mlprintf(0, 22, clr);
+      mlprintf(0, 23, clr);
+      mlprintf(0, 24, clr);
+    }
+    
+    client.disconnectSendAll();
+  
+  } else {
+    gout << "An error occured while connecting.  Press a key." << endl;
+    getch();
   }
-
-  client.disconnectSendAll();
 }

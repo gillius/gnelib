@@ -75,7 +75,7 @@ public:
         HelloPacket response("Hello, client!  I'm the syncronous server!");
         conn << response;
       }
-    } catch (Error e) {
+    } catch (Error& e) {
       gout << acquire;
       gout << "An error occured during communications." << endl;
       gout << "  The error was: " << e << endl;
@@ -151,10 +151,12 @@ void doClient(int outRate, int inRate, int port) {
       
       gout << "Disconnecting." << endl;
       client.disconnect();
-    } catch (Error e) {
+
+    } catch (Error& e) {
       gout << "An error occured while trying to communicate." << endl;
       gout << "  The error was: " << e << endl;
     }
+
     delete &client;
     delete clientConn;
   //}

@@ -30,7 +30,6 @@
 #include "../../include/gnelib.h"
 
 #include <sys/timeb.h>
-#include <pthread.h>
 
 using namespace GNE;
 using namespace GNE::Console;
@@ -66,12 +65,8 @@ protected:
     mprintf("Hello World!  My name is %s.\n", getName().c_str());
     Thread::sleep(50);
 
-    mprintf(" %s Id: %i %i\n", getName().c_str(), getID(), pthread_self());
-    Thread::sleep(100);
-
     mprintf(" %s Ref: %x %x\n", getName().c_str(), Thread::currentThread(), this);
 
-    assert(getID() == pthread_self());
     assert(Thread::currentThread() == this);
 
     testMutex.release();

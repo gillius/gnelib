@@ -235,8 +235,10 @@ void doClient(int outRate, int inRate, int port) {
         client->stream().writePacket(req, false);
       }
     }
+  } else {
+    gout << "An error occured while connecting.  Press a key." << endl;
+    getch();
   }
-  //else the onFailure event will report the error and we will quit.
 
   client->disconnectSendAll();
 }

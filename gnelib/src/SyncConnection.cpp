@@ -42,7 +42,7 @@ released(false), onDoneWritingEvent(false), connectMode(false) {
 }
 
 //##ModelId=3BC3CB1703B7
-SyncConnection::~SyncConnection() throw (Error) {
+SyncConnection::~SyncConnection() {
   release();
   gnedbgo(5, "destroyed");
 }
@@ -58,7 +58,7 @@ Connection* SyncConnection::getConnection() const {
 //##ModelId=3BC3CD0902E4
 void SyncConnection::open(const Address& dest,
                           int outRate, int inRate, 
-                          int localPort, bool wantUnreliable) throw (Error) {
+                          int localPort, bool wantUnreliable) {
   assert(!isReleased());
   if (((ClientConnection*)conn)->open(dest, outRate, inRate, localPort, wantUnreliable))
     throw Error(Error::CouldNotOpenSocket);
@@ -68,7 +68,7 @@ void SyncConnection::open(const Address& dest,
  * \todo Check out possibility of a dynamic cast.
  */
 //##ModelId=3BC3CD090320
-void SyncConnection::connect() throw (Error) {
+void SyncConnection::connect() {
   assert(!isReleased());
   ClientConnection* cli = (ClientConnection*)conn;
   cli->connect(this);
@@ -77,7 +77,7 @@ void SyncConnection::connect() throw (Error) {
 }
 
 //##ModelId=3BC3CD6E02BD
-void SyncConnection::disconnect() throw (Error) {
+void SyncConnection::disconnect() {
   release();
   conn->disconnectSendAll();
 }
@@ -91,7 +91,7 @@ void SyncConnection::startConnect() {
 }
 
 //##ModelId=3C4116C30248
-void SyncConnection::endConnect(bool passEvents) throw (Error) {
+void SyncConnection::endConnect(bool passEvents) {
   assert(connectMode);
   //We use a LockMutex to lock sync so that if an exception occurs, sync will
   //automatically be unlocked.
@@ -103,11 +103,16 @@ void SyncConnection::endConnect(bool passEvents) throw (Error) {
   if (!passEvents)
     oldListener = ConnectionListener::getNullListener();
   connectMode = false;
-  doRelease();
+  try {
+    doRelease();
+  } catch (Error& e) {
+    if (passEvents)
+      throw e;
+  }
 }
 
 //##ModelId=3BDB10A50316
-void SyncConnection::release() throw (Error) {
+void SyncConnection::release() {
   //We use a LockMutex to lock sync so that if an exception occurs, sync will
   //automatically be unlocked.
   LockMutex lock(sync);
@@ -115,7 +120,7 @@ void SyncConnection::release() throw (Error) {
 }
 
 //##ModelId=3C4116C30249
-void SyncConnection::doRelease() throw (Error) {
+void SyncConnection::doRelease() {
   if (!isReleased() && !connectMode) {
     //If we are not already released and we are not holding events
     gnedbgo1(2, "Releasing Connection %x", conn);
@@ -157,12 +162,12 @@ bool SyncConnection::isReleased() const {
 
 /**
  * \todo consider timed waits in the future, but this won't be needed when
- *       the GNE protocol is finished and detects timeouts.
+ *       the %GNE protocol implementation is finished and detects timeouts.
  * \todo This probably could be optimized quite a bit -- each packet gets
  *       copied twice!
  */
 //##ModelId=3BC3CFE50014
-SyncConnection& SyncConnection::operator >> (Packet& packet) throw (Error) {
+SyncConnection& SyncConnection::operator >> (Packet& packet) {
   //We have to acquire the mutex now so that an error cannot occur between
   //checkError and our wait.
   recvNotify.acquire();
@@ -206,7 +211,7 @@ SyncConnection& SyncConnection::operator >> (Packet& packet) throw (Error) {
 }
 
 //##ModelId=3BC3DBB000AA
-SyncConnection& SyncConnection::operator << (const Packet& packet) throw (Error) {
+SyncConnection& SyncConnection::operator << (const Packet& packet) {
   checkError();
   assert(!isReleased());
 
@@ -217,7 +222,7 @@ SyncConnection& SyncConnection::operator << (const Packet& packet) throw (Error)
 }
 
 //##ModelId=3BDB10A50353
-void SyncConnection::onNewConn(SyncConnection& newConn) throw (Error) {
+void SyncConnection::onNewConn(SyncConnection& newConn) {
   //newConn should be this object.  We don't do any double wrapping.
   assert(this == &newConn);
   assert(!isReleased());
@@ -225,7 +230,7 @@ void SyncConnection::onNewConn(SyncConnection& newConn) throw (Error) {
 }
 
 //##ModelId=3BDB10A6000A
-void SyncConnection::onConnect(SyncConnection& conn) throw (Error) {
+void SyncConnection::onConnect(SyncConnection& conn) {
   assert(!isReleased());
   oldListener->onConnect(conn);
 }
@@ -278,7 +283,7 @@ void SyncConnection::onDoneWriting() {
 }
 
 //##ModelId=3BDB10A6029F
-void SyncConnection::checkError() throw (Error) {
+void SyncConnection::checkError() {
   recvNotify.acquire();
   bool isErr = (currError.getCode() != Error::NoError);
   recvNotify.release();

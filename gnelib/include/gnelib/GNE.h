@@ -156,14 +156,15 @@ namespace GNE {
 
   /**
    * Compares other versions against this library.  This is used internally
-   * by GNE to compare versions.  It throws Error::GNETheirVersionHigh,
-   * Error::GNETheirVersionLow, WrongGame, or UserVersionMismatch if the
-   * versions are different, else if the versions are both the same it
-   * returns nor throws anything.  It checks the GNE version numbers first,
+   * by GNE to compare versions.  It checks the GNE version numbers first,
    * then the game name, then the user versions.
+   *
+   * @throw Error if the GNE versions did not match.
+   * @throw WrongGame if the game is of the wrong type.
+   * @throw UserVersionMismatch if the user versions are different.
    */
   void checkVersions(const GNEProtocolVersionNumber& otherGNE,
-    std::string otherName, guint32 otherUser) throw (Error);
+    std::string otherName, guint32 otherUser);
 
   /**
    * A numeric representation of the current version of this library.

@@ -27,12 +27,12 @@
 #include "gnelib/Connection.h"
 #include "gnelib/ConnectionEventGenerator.h"
 #include "gnelib/ConnectionStats.h"
+#include "gnelib/Console.h"
 #include "gnelib/ConsoleStream.h"
+#include "gnelib/Counter.h"
 #include "gnelib/CustomPacket.h"
 #include "gnelib/Error.h"
-#include "gnelib/ReceiveEventListener.h"
-#include "gnelib/Console.h"
-#include "gnelib/Counter.h"
+#include "gnelib/Errors.h"
 #include "gnelib/GNE.h"
 #include "gnelib/ListServerConnection.h"
 #include "gnelib/Mutex.h"
@@ -41,6 +41,7 @@
 #include "gnelib/PacketParser.h"
 #include "gnelib/PingPacket.h"
 #include "gnelib/RawPacket.h"
+#include "gnelib/ReceiveEventListener.h"
 #include "gnelib/ServerConnectionListener.h"
 #include "gnelib/SyncConnection.h"
 #include "gnelib/ServerConnection.h"
@@ -48,7 +49,10 @@
 #include "gnelib/Time.h"
 #include "gnelib/Timer.h"
 #include "gnelib/TimerCallback.h"
+
+#ifdef _DEBUG
 #include "gnelib/GNEDebug.h"
+#endif
 
 #endif
 

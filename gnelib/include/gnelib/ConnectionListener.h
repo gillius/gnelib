@@ -86,9 +86,11 @@ public:
    * Note: Only ClientConnection generates this event.  The SyncConnection
    * is currently wrapped around a ClientConnection, and you should use
    * SyncConnection::getConnection to get the ClientConnection.
+   *
+   * @throw Error if an error occurs and the connection was not successful.
    */
   //##ModelId=3BCA83910078
-  virtual void onConnect(SyncConnection& conn) throw (Error);
+  virtual void onConnect(SyncConnection& conn);
 
   /**
    * Event triggered when a connection failed before or during the onConnect
@@ -154,9 +156,11 @@ public:
    * This event does not have the "non-blocking" requirement that most GNE
    * events have.  Take as long as needed to establish a connection, such as
    * transmitting initial game parameters or game state.
+   *
+   * @throw Error if an error occurs and the connection was not successful.
    */
   //##ModelId=3BCFAE5900AA
-  virtual void onNewConn(SyncConnection& newConn) throw (Error);
+  virtual void onNewConn(SyncConnection& newConn);
 
   /**
    * An event triggered when a socket is closing for any reason.  This event

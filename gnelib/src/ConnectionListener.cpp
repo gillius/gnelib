@@ -33,7 +33,7 @@ ConnectionListener* ConnectionListener::getNullListener() {
 }
 
 //##ModelId=3BCA83910078
-void ConnectionListener::onConnect(SyncConnection& conn) throw (Error) {
+void ConnectionListener::onConnect(SyncConnection& conn) {
 }
 
 //##ModelId=3BCA83920262
@@ -41,7 +41,7 @@ void ConnectionListener::onConnectFailure(const Error& error) {
 }
 
 //##ModelId=3BCFAE5900AA
-void ConnectionListener::onNewConn(SyncConnection& newConn) throw (Error) {
+void ConnectionListener::onNewConn(SyncConnection& newConn) {
 }
 
 //##ModelId=3BCA83BA02F8

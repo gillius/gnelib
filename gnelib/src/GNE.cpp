@@ -24,6 +24,7 @@
 #include "../include/gnelib/GNE.h"
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/Error.h"
+#include "../include/gnelib/Errors.h"
 #include "../include/gnelib/PingPacket.h"
 
 namespace GNE {
@@ -131,7 +132,7 @@ GNEProtocolVersionNumber getGNEProtocolVersion() {
   GNEProtocolVersionNumber ret;
   ret.version = 0;
   ret.subVersion = 0;
-  ret.build = 4;
+  ret.build = 5;
 
   return ret;
 }
@@ -156,7 +157,7 @@ void setGameInformation(std::string gameName, guint32 version) {
 }
 
 void checkVersions(const GNEProtocolVersionNumber& otherGNE,
-                   std::string otherName, guint32 otherUser) throw (Error) {
+                   std::string otherName, guint32 otherUser) {
   GNEProtocolVersionNumber us = getGNEProtocolVersion();
 
   //Check the GNE version numbers
@@ -173,11 +174,11 @@ void checkVersions(const GNEProtocolVersionNumber& otherGNE,
 
   //Check the game name
   if (otherName != gameNameBuf)
-    throw Error(Error::WrongGame);
+    throw WrongGame(otherName);
 
   //Check the user version numbers
   if (userVersion != otherUser)
-    throw Error(Error::UserVersionMismatch);
+    throw UserVersionMismatch(otherUser);
 }
 
 }

@@ -25,6 +25,7 @@
 #include "PacketStream.h"
 #include "ReceiveEventListener.h"
 #include "Error.h"
+#include "Errors.h"
 #include "SocketPair.h"
 #include "Address.h"
 #include "ConnectionStats.h"
@@ -190,11 +191,13 @@ protected:
    * after the header.  If it throws an exception, the read position is
    * undefined.
    *
+   * @param t the type of ProtocolViolation to throw if it throws one.
    * @throw ProtocolViolation if the next bytes of the RawPacket is not the
    *                          proper %GNE header.
    */
   //##ModelId=3C82ABA50326
-  void checkHeader(RawPacket& raw) throw (Error);
+  void checkHeader(RawPacket& raw,
+    ProtocolViolation::ViolationType t = ProtocolViolation::OtherViolation);
 
   /**
    * A utility function for ServerConnection and ClientConnection to check
@@ -207,7 +210,7 @@ protected:
    * @throw UserVersionMismatch if the user version numbers don't match.
    */
   //##ModelId=3C82ABA5036C
-  void checkVersions(RawPacket& raw) throw (Error);
+  void checkVersions(RawPacket& raw);
 
   //For information about events, see the ConnectionListener class.
   //##ModelId=3B07538100AC

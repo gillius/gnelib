@@ -1,4 +1,11 @@
 GNE 0.45 to current
+  Exception scheme changed.  Exception specifiers were removed because it was
+    found that they can be problematic with some compilers and cause
+    undesired behavior with intermediate functions if they are changed.
+    Catch statements should now catch Error& instead of Error to allow for
+    polymorphic errors.  An Error hierarcy was added to better describe
+    errors and increase client code's ability to handle and interpret those
+    errors.
   GNE::Thread::getID is now a private method, because the underlying thread
     implementation might change in the future.
   GNE now compiles against the C runtime dynamically rather than statically,

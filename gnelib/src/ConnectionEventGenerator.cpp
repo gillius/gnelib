@@ -22,6 +22,7 @@
 #include "../include/gnelib/ReceiveEventListener.h"
 #include "../include/gnelib/ConditionVariable.h"
 #include "../include/gnelib/Connection.h"
+#include "../include/gnelib/Errors.h"
 
 namespace GNE {
 
@@ -77,7 +78,7 @@ void ConnectionEventGenerator::run() {
         //The only valid error is NL_INVALID_SOCKET which happens if we close
         //a socket while nlPollGroup is using it.
         if (nlGetError() != NL_INVALID_SOCKET) {
-          gnedbgo1(1, "%s", Error::createLowLevelError().toString().c_str());
+          gnedbgo1(1, "%s", LowLevelError().toString().c_str());
           assert(false);
         }
       }
