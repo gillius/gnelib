@@ -62,8 +62,7 @@ void ConditionVariable::wait() {
 //##ModelId=3AEEF7660032
 void ConditionVariable::timedWait(int ms) {
   Time t = Timer::getAbsoluteTime();
-  Time t2(0, ms*1000);
-  t = t + t2;
+  t += ms*1000;
   timespec tv;
   tv.tv_sec = t.getSec();
   tv.tv_nsec = t.getuSec() * 1000;
