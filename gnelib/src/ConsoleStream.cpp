@@ -21,7 +21,12 @@
 #include "../include/gnelib/ConsoleStream.h"
 #include "../include/gnelib/ConsoleStreambuf.h"
 #include "../include/gnelib/Mutex.h"
-#include <ostream>
+
+#ifdef OLD_CPP
+  #include <ostream.h>
+#else
+  #include <ostream>
+#endif
 
 std::ostream& operator << (std::ostream& o, const GNE::Console::ConsoleManipulator& cm) {
   cm.action(o);
