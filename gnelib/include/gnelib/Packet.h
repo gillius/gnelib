@@ -107,13 +107,12 @@ public:
   static Packet* create();
 
 	/**
-	 * Copy operator.  This is used so far in SyncConnection's >> operator.
+	 * Copy operator you can use to help you in creating your own.
 	 * There is a debug assert in this function that checks to make sure the
-	 * types match.  Call this operator first from your overloaded operator,
-	 * or the operator for the class you derived from, if it was not Packet.
+	 * types match.  Call this operator first from your copy operator.
 	 */
   //##ModelId=3BDB10A500BE
-	virtual Packet& operator = (const Packet& rhs);
+	Packet& operator = (const Packet& rhs);
 
   /**
    * The 32-bit timestamp for this packet.  You may use any system for
