@@ -149,8 +149,7 @@ public:
    * point was scored.
    */
   bool checkCollision(int chk) {
-    //We don't need to acquire the mutex, since only the local side will have
-    //a listener, and the network code won't access the local paddle.
+    sync.acquire();
     if (listener) {
       //Only do the check if we have a listener to notify anyways.
       if (chk < y || chk >= y + PADDLE_HEIGHT) {
@@ -158,13 +157,13 @@ public:
         return true;
       }
     }
+    sync.release();
 
     return false;
   }
 
   void getInput(char ch) {
-    //We don't need to use sync here because the remote paddle won't ever be
-    //in this function.
+    sync.acquire();
     switch (ch) {
     case 'w':
       //If the paddle can move up, we move up a space
@@ -186,6 +185,7 @@ public:
       }
       break;
     }
+    sync.release();
   }
 
   void update() {
@@ -221,6 +221,8 @@ private:
   //We have to provide a mutex, because the networking code can change our
   //position at any time, if we are being controlled by the network.  If the
   //y position was changed in the middle of a draw, Bad Things would happen.
+  //So anytime we access y we will acquire this mutex to allow only one
+  //thread at a time into that area of code.
   Mutex sync;
 };
 

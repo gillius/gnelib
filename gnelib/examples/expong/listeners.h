@@ -40,9 +40,8 @@ public:
    * to enter).  The localPlayer is passed so that we may accredit him with
    * points when the remote paddle misses the ball.
    */
-  PongClient(Player* RemotePlayer, Player* LocalPlayer, ConditionVariable* note)
-    : conn(NULL), remotePlayer(RemotePlayer), localPlayer(LocalPlayer),
-    notify(note) {}
+  PongClient(Player* RemotePlayer, Player* LocalPlayer)
+    : conn(NULL), remotePlayer(RemotePlayer), localPlayer(LocalPlayer) {}
 
   ~PongClient() {}
 
@@ -77,8 +76,10 @@ public:
     gbool accepted;
     conn2 >> buf;
     buf.getData() >> accepted;
-    if (!accepted)
+    if (!accepted) {
+      conn2.disconnect();
       throw Error(Error::ConnectionRefused);
+    }
 
     //If we are accepted, we should be receiving the remote player's name.
     conn2 >> buf;
@@ -112,14 +113,6 @@ public:
     string remoteName;
     buf.getData() >> remoteName;
     remotePlayer->setName(remoteName);
-
-    //Set ourself as a player, and notify the server code that a player has
-    //arrived.
-    notify->acquire();
-    remotePeer = this;
-    if (notify)
-      notify->broadcast();
-    notify->release();
   }
 
   void onReceive() {
@@ -168,8 +161,8 @@ public:
   }
 
   void onConnectFailure(const Error& error) {
-    mlprintf(0, 0, "Connection to server failed.   ");
-    mlprintf(0, 1, "  GNE reported error: %s   ", error.toString().c_str());
+    gout << "Connection to server failed." << endl;
+    gout << "  GNE reported error: " << error << endl;
   }
 
 private:
@@ -177,8 +170,23 @@ private:
 
   Player* remotePlayer;
   Player* localPlayer;
+};
 
-  ConditionVariable* notify;
+/**
+ * This is a class that the server side uses to refuse a client if one is
+ * already connected.
+ */
+class RefuseClient : public ConnectionListener {
+public:
+  void onNewConn(SyncConnection& conn2) throw (Error) {
+    CustomPacket buf;
+    //Tell the client that they have been refused
+    buf.getData() << gFalse;
+    conn2 << buf;
+    conn2.disconnect();
+    throw Error(Error::ConnectionRefused);
+  }
+private:
 };
 
 class OurListener : public ServerConnectionListener {
@@ -187,28 +195,74 @@ public:
    * This listener takes the params it needs to pass them onto the PongClient
    * to set up the game.
    */
-  OurListener(Player* RemotePlayer, Player* LocalPlayer, ConditionVariable* note)
+  OurListener(Player* RemotePlayer, Player* LocalPlayer)
     : ServerConnectionListener(), remotePlayer(RemotePlayer),
-    localPlayer(LocalPlayer), notify(note) {
+    localPlayer(LocalPlayer), player(NULL), accept(true) {
   }
 
   virtual ~OurListener() {}
 
   void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) {
-    gout << acquire << "Connection error: " << error << endl;
-    gout << "  Error received from " << from << endl << release;
+    sync.acquire();
+    if (listener == player) {
+      //Only display an error for our real player.  We don't want to see the
+      //ConnectionRefused errors.
+      gout << acquire << "Connection error: " << error << endl;
+      gout << "  Error received from " << from << endl << release;
+    }
+    sync.release();
+
     //If listener is NULL, that is OK even.
     delete listener;
   }
 
   void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
+    sync.acquire();
+
     inRate = outRate = 0;
-    listener = new PongClient(remotePlayer, localPlayer, notify);
+    if (player || !accept) {
+      listener = new RefuseClient();
+    } else {
+      //If no one is playing and we are accepting connections
+      listener = player = new PongClient(remotePlayer, localPlayer);
+    }
+
+    sync.release();
+  }
+
+  //waitForPlayer returns the connected player, or NULL if the connection
+  //process was aborted by the user.
+  PongClient* waitForPlayer() {
+    sync.acquire();
+    while (!player && !kbhit()) {
+      //We wait for 250ms to recheck kbhit for pressed keys.
+      sync.timedWait(250);
+    }
+    if (!player) {
+      //We were woken up by a keypress, so refuse any further connections.
+      accept = false;
+    }
+
+    sync.release();
+
+    return player;
   }
 
 private:
   Player* remotePlayer;
   Player* localPlayer;
 
-  ConditionVariable* notify;
+  //This variable will be non-null when there is a player, so we refuse any
+  //other incoming connections.
+  PongClient* player;
+
+  //If this is false, then the user canceled the connection process, we we
+  //shouldn't even accept the first player.
+  bool accept;
+
+  //We use a CV because getNewConnectionParams might be called from
+  //different threads, and we want to make sure only one client connects at a
+  //time.  This protects the state of player.
+  //The CV is notified when a new player arrives.
+  ConditionVariable sync;
 };

@@ -38,13 +38,6 @@ using namespace GNE;
 using namespace GNE::Console;
 using namespace GNE::PacketParser;
 
-//A global.  Perhaps there are better ways of doing this, but when this
-//becomes non-null, then the players have been set up and the game is ready
-//to begin.
-//Only the server uses this variable to check for an incoming player.
-class PongClient;
-PongClient* remotePeer = NULL;
-
 //Our includes have code in it.  Normally this is a bad thing, but to simplify
 //the makefile process, each example in GNE only has one .cpp.
 #include "packets.h"
@@ -85,12 +78,12 @@ int main() {
 
   int port;
   if (type != 1) {
-    setTitle("GNE Net Performance Tester -- Server");
+    setTitle("GNE Pong -- Server");
     gout << "Reminder: ports <= 1024 on UNIX can only be used by the superuser." << endl;
     port = getPort("listen on");
     doServer(port);
   } else {
-    setTitle("GNE Net Performance Tester -- Client");
+    setTitle("GNE Pong -- Client");
     port = getPort("connect to");
     doClient(port);
   }
@@ -103,14 +96,11 @@ void doServer(int port) {
   //Generate debugging logs to server.log if in debug mode.
   initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL5, "server.log");
 #endif
-  //We use a ConditionVariable to wait for clients to come in.
-  ConditionVariable notify;
-
   //We set up the players to give to the Game when we are ready to start.
   Player local(getName(), SCRX-30, SCRX-1);
   Player remote("Remote", 5, 0);
 
-  OurListener server(&remote, &local, &notify);
+  OurListener server(&remote, &local);
   if (server.open(port))
     errorExit("Cannot open server socket.");
   if (server.listen())
@@ -119,13 +109,11 @@ void doServer(int port) {
   gout << "Server is listening on: " << server.getLocalAddress() << endl;
   gout << "Waiting for client to connect.  Press a key to abort." << endl;
 
-  //There may be better ways of doing this, but we spin a little waiting for
-  //someone to connect.
-  notify.acquire();
-  while (!kbhit() && remotePeer == NULL) {
-    notify.timedWait(250);
-  }
-  notify.release();
+  //waitForPlayer returns the connected player, or NULL if the connection
+  //process was aborted by the user.  If any errors occur they will be
+  //reported but listening will continue until a successful connect or the
+  //user presses a key.
+  PongClient* remotePeer = server.waitForPlayer();
 
   if (remotePeer != NULL) {
     local.paddle().setListener(remotePeer);
@@ -157,9 +145,8 @@ void doClient(int port) {
 
   gout << "Connecting to: " << address << endl;
 
-  //We create a new network player tied to the remote paddle, and we send
-  //NULL to signify that we don't need any notification.
-  PongClient peer(&remote, &local, NULL);
+  //We create a new network player tied to the remote paddle.
+  PongClient peer(&remote, &local);
   ClientConnection client(&peer);
 
   //Open a new connection to the selected address, with no bandwidth limit
@@ -174,6 +161,10 @@ void doClient(int port) {
     local.paddle().setListener(&peer);
     Game game(&local, &remote);
     doGameLoop(game);
+  } else {
+    gout << "An error occured while connecting." << endl;
+    gout << "Press a key to continue." << endl;
+    getch();
   }
 }
 
