@@ -42,7 +42,9 @@ protected:
 
 public:
   static sptr create( ConsoleBuffer& cb ) {
-    return sptr( new ConsoleTest( cb ) );
+    sptr ret( new ConsoleTest( cb ) );
+    ret->setThisPointer( ret );
+    return ret;
   }
 
   void run() {

@@ -50,6 +50,7 @@ int NetworkObject::getObjectId() const {
 }
 
 bool NetworkObject::hasValidId() const {
+  assert( objectId <= 65535 );
   return ( objectId >= 0 );
 }
   
