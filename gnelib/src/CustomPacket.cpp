@@ -24,8 +24,11 @@
 
 namespace GNE {
 
+//##ModelId=3C65C6D00076
+const int CustomPacket::ID = 1;
+
 //##ModelId=3C0B257E03C4
-CustomPacket::CustomPacket() : Packet(1), data(NULL), ourBuf(NULL) {}
+CustomPacket::CustomPacket() : Packet(ID), data(NULL), ourBuf(NULL) {}
 
 //##ModelId=3C0B257E03C5
 CustomPacket::~CustomPacket() {

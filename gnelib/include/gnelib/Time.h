@@ -25,6 +25,7 @@
 //including this file, despite the usage between #include <> and #include ""
 
 #include "gneintern.h"
+class ostream;
 
 namespace GNE {
 
@@ -98,6 +99,12 @@ public:
   Time diff(const Time& rhs) const;
 
   /**
+   * Returns a string representation of this time in seconds, for example
+   * this might return 5.002052 if there was 5 seconds and 2052 microseconds.
+   */
+  std::string toString() const;
+
+  /**
    * Less-than operator that works as expected.
    */
   //##ModelId=3B07538103E7
@@ -151,6 +158,10 @@ private:
 };
 
 }
+
+/**
+ * Sends the result of toString to the ostream.
+ */
+std::ostream& operator << (std::ostream& o, const GNE::Time& time);
+
 #endif /* TIME_H_INCLUDED_C51412BE */
-
-

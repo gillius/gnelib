@@ -148,6 +148,8 @@ void PacketStream::shutDown() {
 
 /**
  * \todo combine packets, do throttling, optimize
+ * \bug  we need a way to guarantee that the write won't block when trying
+ *       to send the ExitPacket on shutdown.
  */
 //##ModelId=3B07538101FA
 void PacketStream::run() {
@@ -169,7 +171,8 @@ void PacketStream::run() {
       delete next->packet;
       delete next;
       
-      //Optimize this code later
+      //Discover if we are really done writing, and if so, queue the
+      //onDoneWriting event.
       bool done = false;
       outQCtrl.acquire();
       if (out.empty())
@@ -179,6 +182,12 @@ void PacketStream::run() {
         owner.onDoneWriting();
     }
   }
+  //We want to try to send the required ExitPacket, if possible, over the
+  //reliable connection.
+  //We need a good way to make sure this doesn't block though, but the
+  //current solution here will have to do for now.
+  RawPacket raw;
+
 }
 
 //##ModelId=3B07538101FB

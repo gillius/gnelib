@@ -104,7 +104,7 @@ private:
   //##ModelId=3C5CED050269
   LockMutex& operator= (LockMutex& rhs);
 
-  //##ModelId=3C5CED05025F
+  //##ModelId=3C65C6D00095
   Mutex& mutex;
 };
 

@@ -169,6 +169,10 @@ SOURCE=.\src\PacketStream.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\PingPacket.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\RawPacket.cpp
 # End Source File
 # Begin Source File
@@ -302,6 +306,10 @@ SOURCE=.\include\gnelib\PacketParser.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\PacketStream.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\PingPacket.h
 # End Source File
 # Begin Source File
 

@@ -23,8 +23,7 @@
 
 namespace GNE {
 
-//##ModelId=3B0753810226
-int RawPacket::RAW_PACKET_LEN = 512;
+const int RawPacket::RAW_PACKET_LEN = 512;
 
 //##ModelId=3B075381022A
 RawPacket::RawPacket(gbyte* buffer) : currLoc(0) {

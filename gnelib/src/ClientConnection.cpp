@@ -37,7 +37,7 @@ namespace GNE {
 //##ModelId=3C5CED0500C7
 class ClientConnectionParams {
 public:
-  //##ModelId=3C5CED050183
+  //##ModelId=3C65C6D0001D
   Address dest;
   //##ModelId=3C5CED050187
   int outRate;
@@ -45,7 +45,7 @@ public:
   int inRate;
   //##ModelId=3C5CED050189
   bool unrel;
-  //##ModelId=3C5CED05018D
+  //##ModelId=3C65C6D00029
   SyncConnection* sConnPtr;
 };
 

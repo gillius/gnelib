@@ -104,8 +104,11 @@ namespace GNE {
 
 //##ModelId=3C5CED0500EC
   struct GNEProtocolVersionNumber {
+  //##ModelId=3C65C7A20213
     guint8 version;
+  //##ModelId=3C65C7A20218
     guint8 subVersion;
+  //##ModelId=3C65C7A20220
     guint16 build;
   };
 

@@ -46,6 +46,12 @@ public:
   virtual ~CustomPacket();
 
   /**
+   * The ID for this type of packet.
+   */
+  //##ModelId=3C65C6D00076
+  static const int ID;
+
+  /**
    * Returns the RawPacket for reading or writing.  If a RawPacket already
    * exists through a call to getData or by a readPacket call, this method
    * will create a new RawPacket ready for writing.\n
@@ -118,6 +124,7 @@ private:
    * If this is non-null, then the current RawPacket is using a buffer that
    * we allocated, and we need to delete it.
    */
+  //##ModelId=3C65C7A201EB
   gbyte* ourBuf;
 };
 

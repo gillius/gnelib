@@ -103,7 +103,7 @@ void Connection::disconnect() {
     //  shutdown and/or never started
     unreg(true, true);
     gnedbgo2(2, "disconnecting r: %i, u: %i", sockets.r, sockets.u);
-    ps->shutDown();
+    ps->shutDown(); //PacketStream will try to send the required ExitPacket.
     ps->join();
     onDisconnect();
     //This will also shutdown the EventThread, and we will join on it in the

@@ -25,6 +25,7 @@
 //Packet type includes used for registration.
 #include "../include/gnelib/Packet.h"
 #include "../include/gnelib/CustomPacket.h"
+#include "../include/gnelib/PingPacket.h"
 
 namespace GNE {
 namespace PacketParser {
@@ -49,6 +50,7 @@ void registerGNEPackets() {
   }
   packets[0] = Packet::create;
   packets[1] = CustomPacket::create;
+  packets[4] = PingPacket::create;
 }
 
 void registerPacket(guint8 id, Packet* (*createFunc)()) {

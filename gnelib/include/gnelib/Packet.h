@@ -28,10 +28,13 @@ class RawPacket;
 /**
  * The base packet class, used for dealing with all types of packets at a
  * fundamental level.  All types of packets must inherit from this class to
- * be recognized by GNE.  GNE already implmenets some types of packets.\n
+ * be recognized by GNE.  GNE already implmenets some types of packets.
+ *
  * When you create a new packet you MUST define your own versions of all
- * virtual functions or the program will fail.\n
- * See the example expacket on how to properly derive from a Packet class.
+ * virtual functions or the program will fail.
+ *
+ * See the example expacket on how to properly derive from a Packet class, or
+ * look at the code for the other GNE packets.
  */
 //##ModelId=3B075380030C
 class Packet {
@@ -43,7 +46,8 @@ public:
    * as a end-of-data marker or for sending some message that requires no
    * data, it is suggested that you simply derive a class from Packet that
    * adds no data, but has a unique ID so it can be "recognized" easier.
-   * @param id a number from 0 to 255.
+   * @param id a number from PacketParser::MIN_USER_ID to 255.  GNE packet
+   *        id's are from 0 to MIN_USER_ID-1, inclusive.
    */
   //##ModelId=3B0753810151
   Packet(int id = 0);
@@ -52,13 +56,20 @@ public:
   virtual ~Packet();
 
   /**
+   * The ID for this type of packet.
+   */
+  //##ModelId=3C65C6D000A8
+  static const int ID;
+
+  /**
    * Returns a newly allocated exact copy of this packet.
    */
   //##ModelId=3B0753810155
   virtual Packet* makeClone() const;
 
   /**
-   * Returns the type of this packet.
+   * Returns the type of this instance.  This allows you to identify the type
+   * of packet you have when you only have a Packet*.
    */
   //##ModelId=3B0753810157
   int getType() const;
@@ -78,7 +89,7 @@ public:
 
   /**
    * Writes the packet to the given RawPacket.  You can continue writing more
-   * packets to the RawPacket after this function.  You must make sure there
+   * packets to the RawPacket after this method.  You must make sure there
    * is enough space in the RawPacket to fit this new packet.  When
    * overloading this function, call writePacket on the parent class then
    * write your own variables.
@@ -87,9 +98,10 @@ public:
   virtual void writePacket(RawPacket& raw) const;
 
   /**
-   * Reads this packet from the given RawPacket.  This will overwrite all of
-   * the values in this class.  When overloading this function, call
-   * readPacket on the parent class then read your own variables.\n
+   * Reads this packet from the given RawPacket.  When overloading this
+   * function, call readPacket on the parent class then read your own
+   * variables.
+   *
    * Note that the parser has already read the packet type from raw so it can
    * create this packet, so it should not be re-read.  This object already
    * knows its type from creation.  This is only relevant to the implemenation
@@ -114,20 +126,12 @@ public:
    * types match.  Call this operator first from your copy operator.  Many
    * GNE packets may not support this operation, so check the documentation
    * first -- if no operator = exists, then assume you cannot copy packets
-   * this way, unless the documentation says otherwise.
+   * this way, unless the documentation says otherwise.<br>
+   * If you can't use operator= on a packet, you can use makeClone to
+   * achieve a nearly equivalent result.
    */
   //##ModelId=3BDB10A500BE
   Packet& operator = (const Packet& rhs);
-
-  /**
-   * The 32-bit timestamp for this packet.  You may use any system for
-   * timestamping, for example seconds, milliseconds, or frames.  However,
-   * whichever timestamping system you select, you MUST guarantee that a
-   * packet that comes after another have a higher timestamp.  This is
-   * so that late(obsolete) packets can be dropped, if they should be.
-   */
-  //##ModelId=3B0753810150
-  int timestamp;
 
 private:
   //##ModelId=3B089B520140

@@ -1,4 +1,11 @@
 GNE 0.45 to current
+  Added Time::toString and the ability to output it to an ostream.
+  New example exping to show and test PingPacket.
+  Added ID attribute to every GNE Packet class.
+  A new class PingPacket to handle pinging.
+  Removed the timestamp value from the Packet class.  That should have been
+    removed long ago.  Another packet will eventually be created that
+    supports timestamps.
   A mutex was no longer needed in Connection and was causing deadlocks, so it
     was removed.  The mutex was left over from the old event system before it
     was rewritten.

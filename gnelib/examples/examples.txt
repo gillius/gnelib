@@ -37,3 +37,6 @@ exsynchello -- Same as exhello, but uses only SyncConnections.  exsynchello
 exnetperf -- Shows how to use the statistical functions in GNE.  This
   example should serve well for GNE to measure network performance, as best
   as is possible with the GNE and HawkNL APIs.
+
+exping -- Shows how to use the PingPacket API and how to create and respond
+  to PingPackets.  Also functions as a test of the PingPacket class.

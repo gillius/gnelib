@@ -24,6 +24,7 @@
 #include "../include/gnelib/GNE.h"
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/Error.h"
+#include "../include/gnelib/PingPacket.h"
 
 namespace GNE {
   namespace PacketParser {

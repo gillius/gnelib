@@ -23,9 +23,11 @@
 
 namespace GNE {
 
+//##ModelId=3C65C6D000A8
+const int Packet::ID = 0;
+
 //##ModelId=3B0753810151
 Packet::Packet(int id) : type((guint8)id) {
-  timestamp = 0;
 }
 
 //##ModelId=3B0753810153
@@ -44,17 +46,16 @@ int Packet::getType() const {
 
 //##ModelId=3B0753810159
 int Packet::getSize() const {
-  return sizeof(timestamp) + sizeof(type);
+  return sizeof(type);
 }
 
 //##ModelId=3B075381015B
 void Packet::writePacket(RawPacket& raw) const {
-  raw << type << timestamp;
+  raw << type;
 }
 
 //##ModelId=3B075381015E
 void Packet::readPacket(RawPacket& raw) {
-  raw >> timestamp;
 }
 
 //##ModelId=3B089AE802BC
@@ -66,7 +67,6 @@ Packet* Packet::create() {
 Packet& Packet::operator = (const Packet& rhs) {
   //The type should already by the same
   assert(type == rhs.type);
-  timestamp = rhs.timestamp;
   return *this;
 }
 

@@ -19,6 +19,13 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/Time.h"
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+
+std::ostream& operator << (std::ostream& o, const GNE::Time& time) {
+  return o << time.toString();
+}
 
 namespace GNE {
 
@@ -67,6 +74,12 @@ Time Time::diff(const Time& rhs) const {
   Time ret = operator-(rhs);
   ret.sec = labs(ret.sec);
   return ret;
+}
+
+std::string Time::toString() const {
+  std::stringstream ret;
+  ret << sec << '.' << std::setfill('0') << std::setw(6) << microsec;
+  return ret.str();
 }
 
 //##ModelId=3B07538103E7

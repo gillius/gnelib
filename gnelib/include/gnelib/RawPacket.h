@@ -34,6 +34,12 @@ class Packet;
  * where a file can "mimic" a server to provide the necessary packets to
  * restore the game state.
  *
+ * The name of this class has confused a few.  RawPacket is not derived from
+ * GNE::Packet, so it is not an actual GNE packet.  This class represents the
+ * raw block of memory that will be sent over the network.  There is a class
+ * called CustomPacket which will allow you to send RawPackets directly
+ * across the network.
+ *
  * See the example "expacket" for an example of the usage of this class.
  */
 //##ModelId=3B075380030F
@@ -106,6 +112,9 @@ public:
    */
   //##ModelId=3B0753810239
   RawPacket& operator << (gint8 x);
+  /**
+   * This operator also works for gbool and gbyte.
+   */
   //##ModelId=3B075381023B
   RawPacket& operator << (guint8 x);
   //##ModelId=3B075381023D
@@ -137,6 +146,9 @@ public:
    */
   //##ModelId=3B0753810266
   RawPacket& operator >> (gint8& x);
+  /**
+   * This operator also works for gbool and gbyte.
+   */
   //##ModelId=3B0753810268
   RawPacket& operator >> (guint8& x);
   //##ModelId=3B075381026A
@@ -169,13 +181,13 @@ public:
    * used for writing will always have a buffer of this size.
    */
   //##ModelId=3B0753810226
-  static int RAW_PACKET_LEN;
+  static const int RAW_PACKET_LEN;
 
 private:
   //##ModelId=3B0753810227
   bool ourBuffer;
 
-  //##ModelId=3AE4D1ED0014
+  //##ModelId=3C65C7A2028B
   gbyte* data;
 
   /**

@@ -39,6 +39,7 @@
 #include "gnelib/Packet.h"
 #include "gnelib/PacketStream.h"
 #include "gnelib/PacketParser.h"
+#include "gnelib/PingPacket.h"
 #include "gnelib/RawPacket.h"
 #include "gnelib/ServerConnectionListener.h"
 #include "gnelib/SyncConnection.h"

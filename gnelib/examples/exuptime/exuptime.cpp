@@ -42,7 +42,7 @@ int main() {
     //The move operation will be "executed" when the stream is next flushed,
     //and gout is line-buffered so it flushes on endl as well as the usual
     //methods.
-    gout << moveTo(25, 0) << t.getSec() << '.' << t.getuSec() << "   " << endl;
+    gout << moveTo(25, 0) << t << endl;
   }
 
   return 0;
