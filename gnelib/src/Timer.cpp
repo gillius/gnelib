@@ -26,8 +26,7 @@ namespace GNE {
 
 //##ModelId=3B0753820030
 Timer::Timer(TimerCallback* callback, int rate, bool destroy)
-: running(false), callbackRate(rate),
-listener(callback), destroyListener(destroy) {
+: callbackRate(rate), listener(callback), destroyListener(destroy) {
 }
 
 //##ModelId=3B0753820034
@@ -74,24 +73,23 @@ Time Timer::getAbsoluteTime() {
 
 //##ModelId=3B0753820067
 void Timer::startTimer() {
-  assert(running == false);
+  assert(isRunning() == false);
   nextTime = getCurrentTime();
   nextTime += callbackRate * 1000;
-  running = true;
   start();
 }
 
 //##ModelId=3B0753820068
 void Timer::stopTimer() {
-  if (running) {
-    running = false;
+  if (isRunning()) {
+    shutDown();
     join();
   }
 }
 
 //##ModelId=3B0753820069
 void Timer::run() {
-  while (running) {
+  while (!shutdown) {
     Time currTime, sleepTime;
     currTime = getCurrentTime();
     while (nextTime > currTime) {
@@ -102,11 +100,6 @@ void Timer::run() {
     listener->timerCallback();
     nextTime += callbackRate * 1000;
   }
-}
-
-//##ModelId=3B075382006A
-bool Timer::isRunning() {
-  return running;
 }
 
 }

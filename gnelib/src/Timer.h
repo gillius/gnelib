@@ -90,21 +90,12 @@ public:
   //##ModelId=3B0753820069
   void run();
 
-  /**
-   * Is this Timer running?
-   */
-  //##ModelId=3B075382006A
-  bool isRunning();
-
 private:
   /**
    * Next time the callbacks will be activated.
    */
   //##ModelId=3B07538103FB
   Time nextTime;
-
-  //##ModelId=3B0753820028
-  bool running;
 
   //##ModelId=3B0753820029
   int callbackRate;

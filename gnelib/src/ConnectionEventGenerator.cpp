@@ -27,7 +27,7 @@ namespace GNE {
 
 //##ModelId=3B07538100B9
 ConnectionEventGenerator::ConnectionEventGenerator() 
-: running(true), group(NL_INVALID) {
+: group(NL_INVALID) {
   group = nlGroupCreate();
   assert(group != NL_INVALID);
   sockBuf = new NLsocket[NL_MAX_GROUP_SOCKETS];
@@ -46,12 +46,12 @@ ConnectionEventGenerator::~ConnectionEventGenerator() {
  */
 //##ModelId=3B07538100BC
 void ConnectionEventGenerator::run() {
-  while (running) {
+  while (!shutdown) {
     mapCtrl.acquire();
-    while (connections.empty() && running) {
+    while (connections.empty() && !shutdown) {
       mapCtrl.wait();
     }
-    if (running) {
+    if (!shutdown) {
       int numsockets = nlPollGroup(group, NL_READ_STATUS, sockBuf, NL_MAX_GROUP_SOCKETS);
       for (numsockets--; numsockets >= 0; numsockets--) {
         connections[sockBuf[numsockets]]->onReceive();
@@ -81,9 +81,9 @@ void ConnectionEventGenerator::unreg(NLsocket socket) {
 }
 
 //##ModelId=3B07538100DF
-void ConnectionEventGenerator::shutdown() {
+void ConnectionEventGenerator::shutDown() {
   mapCtrl.signal();
-  running = false;
+  Thread::shutDown();
 }
 
 }

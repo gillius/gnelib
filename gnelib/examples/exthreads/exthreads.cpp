@@ -45,8 +45,15 @@ public:
   }
 
   void run() {
+    //Note that if we were sitting in an infinite loop, we would have to
+    //respond to the shutdown variable, as shown in comments.  The commented
+    //code would be the proper code if we wanted to repeat an action forever.
+    //You would call shutDown then join on this thread to stop it in this
+    //case.
+    //while (!shutdown) {
     mprintf("Hello World!  My name is %s.\n Id: %i %i\n Ref: %x %x\n",
       getName().c_str(), getID(), pthread_self(), Thread::currentThread(), this);
+    //}
   }
 };
 
@@ -72,11 +79,11 @@ int main(int argc, char* argv[]) {
   mprintf("Waiting for Sally to end.\n");
   sally->join(); //we must either join or detach every thread.
   mprintf("Sally ended.  Killing Sally.\n");
-  assert(sally->hasEnded());
+  assert(!sally->isRunning());
   delete sally;  //in the join case, we must delete the thread after joining.
 
   mprintf("Sally died.  Now waiting for Joe to end.\n");
-  while (!joe->hasEnded()) {}
+  while (joe->isRunning()) {}
   mprintf("Joe has ended.  Detaching Joe.\n");
   joe->detach(true); //But even if we detach after a thread ends it will
                      //still destroy itself.

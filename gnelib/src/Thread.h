@@ -82,6 +82,17 @@ public:
   std::string getName() const;
 
   /**
+   * Tells this thread to shutdown, if it in an infinite loop.  You will
+   * probably want to call join right after calling this to wait for the
+   * shutdown to complete which is dependant on the thread you are shutting
+   * down.\n
+   * This function is virtual if the thread needs any additional actions to
+   * notify itself to shutdown, for example if it is waiting for some event on
+   * a ConditionVariable.
+   */
+  virtual void shutDown();
+
+  /**
    * A blocking call that returns when this thread terminates, or returns
    * immediately if the thread has terminated.  A thread must always either
    * be joined or detached if system resources are to be recovered.  A
@@ -105,12 +116,12 @@ public:
    * do not use detach and instead use join, or use detach with deleteThis
    * set to false.  It is useful to do this if you want to release OS thread
    * resources and still keep the class running (as in the Connection classes).
-   * @param deleteThis true if the thread should delete itself when it
-   *                   finishes executing.
+   * @param delThis true if the thread should delete itself when it
+   *                finishes executing.
    * @see join
    */
   //##ModelId=3B0753810383
-  void detach(bool deleteThis);
+  void detach(bool delThis);
 
   /**
    * This function is the starting point for this thread.
@@ -132,12 +143,6 @@ public:
    */
   //##ModelId=3B0753810388
   bool isRunning() const;
-
-  /**
-   * Returns if the thread has finished running after being started.
-   */
-  //##ModelId=3B07538103A3
-  bool hasEnded() const;
 
   /**
    * Starts this thread running.
@@ -177,6 +182,17 @@ public:
   //##ModelId=3B0753810335
   static const int HIGH_PRI;
 
+protected:
+  /**
+   * This variable is set to true when this thread should exit.  Users that
+   * implement a Thread class must respond to this if the thread wants to
+   * wait in an infinite loop.  Threads that will eventually stop can respond
+   * only optionally to this, but if they last for a long time, shutting down
+   * all threads may take awhile.  Responding to this flag usually takes
+   * nothing more than a while (!shutdown) {} loop.
+   */
+  bool shutdown;
+
 private:
   /**
    * This is an internal-only function called by the underlying pthreads
@@ -192,13 +208,10 @@ private:
   pthread_t thread_id;
 
   //##ModelId=3B0753810336
-  bool started;
-
-  //##ModelId=3B0753810337
-  bool ended;
+  bool running;
 
   //##ModelId=3B0753810338
-  bool detached;
+  bool deleteThis;
 
   //##ModelId=3AE11D5F023A
   static std::map<pthread_t, Thread*> threads;
@@ -208,9 +221,6 @@ private:
 
   //##ModelId=3B075381033B
   Mutex sync;
-
-  //##ModelId=3B0753810371
-  static Mutex mapSync;
 
 };
 

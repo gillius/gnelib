@@ -57,7 +57,7 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
 
 void shutdownGNE() {
   if (initialized) {
-    eGen->shutdown();
+    eGen->shutDown();
     eGen->join();
     nlShutdown();
     initialized = false;

@@ -67,12 +67,9 @@ public:
    * internally on library cleanup, so you should not call it.
    */
   //##ModelId=3B07538100DF
-  void shutdown();
+  void shutDown();
 
 private:
-  //##ModelId=3B07538100B3
-  bool running;
-
   //##ModelId=3AE358F701FE
   NLint group;
 

@@ -31,8 +31,8 @@ const int Thread::DEF_PRI = 0;
 const int Thread::HIGH_PRI = 1;
 //##ModelId=3AE1F1CA00DC
 const std::string Thread::DEF_NAME = "Thread";
-//##ModelId=3B0753810371
-Mutex Thread::mapSync;
+
+static Mutex mapSync;
 
 extern "C" {
   /**
@@ -40,6 +40,8 @@ extern "C" {
    */
   static void* threadStart( void* thread ) {
     Thread* thr = ( ( Thread* )( thread ) );
+    mapSync.acquire(); //This is to make sure the map is updated before we
+    mapSync.release(); //start running
     thr->run();
     thr->end();
     return NULL;
@@ -47,13 +49,13 @@ extern "C" {
 }
 
 //##ModelId=3B0753810375
-Thread::Thread() : name(DEF_NAME), thread_id(0), started(false), ended(false),
-detached(false), priority(DEF_PRI) {
+Thread::Thread() : name(DEF_NAME), thread_id(0), running(false),
+deleteThis(false), priority(DEF_PRI), shutdown(false) {
 }
 
 //##ModelId=3B0753810376
 Thread::Thread(std::string name2, int priority2) : name(name2), thread_id(0),
-started(false), ended(false), detached(false), priority(priority2) {
+running(false), deleteThis(false), priority(priority2), shutdown(false) {
 }
 
 //##ModelId=3B0753810379
@@ -91,24 +93,29 @@ std::string Thread::getName() const {
   return name;
 }
 
+void Thread::shutDown() {
+  shutdown = true;
+}
+
 //##ModelId=3B0753810382
 void Thread::join() {
-  assert( started );
+  assert( running );
+  assert( !deleteThis );
   valassert(pthread_join( thread_id, NULL ), 0);
+  running = false;
 }
 
 //##ModelId=3B0753810383
 void Thread::detach(bool deleteThis) {
-  assert( started );
-  assert( !detached );
+  assert( !deleteThis );
   valassert(pthread_detach( thread_id ), 0);
   if (deleteThis) {
-    //Only set detached true if we want to delete ourselves on exit.
+    //Only set deleteThis true if we want to delete ourselves on exit.
     sync.acquire();
-    detached = true;
-    if (ended) {
-      detached = false; //this is just to fix a possible race condition with
-                        //Thread::end.
+    deleteThis = true;
+    if (!running) {
+      deleteThis = false; //this is just to fix a possible race condition
+                          //with Thread::end.
       sync.release();
       delete this;
     } else
@@ -120,10 +127,9 @@ void Thread::detach(bool deleteThis) {
 void Thread::end() {
   sync.acquire();
   Thread::remove(this);
-  ended = true;
-  if (detached) {
-    ended = false; //this is just to fix a possible race condition with
-                   //Thread::detach.
+  if (deleteThis) {
+    deleteThis = false; //this is just to fix a possible race condition with
+                        //Thread::detach.
     sync.release();
     delete this;
   } else
@@ -132,19 +138,14 @@ void Thread::end() {
 
 //##ModelId=3B0753810388
 bool Thread::isRunning() const {
-  return started;
-}
-
-//##ModelId=3B07538103A3
-bool Thread::hasEnded() const {
-  return ended;
+  return running;
 }
 
 //##ModelId=3B07538103A5
 void Thread::start() {
-  started = true;
-  pthread_create( &thread_id, NULL, threadStart, this );
+  running = true;
   mapSync.acquire();
+  pthread_create( &thread_id, NULL, threadStart, this );
   threads[ thread_id ] = this;
   mapSync.release();
 }
