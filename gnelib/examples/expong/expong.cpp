@@ -235,9 +235,12 @@ int getPort(const char* prompt) {
 }
 
 string getName() {
-  string ret;
-  gin.ignore(INT_MAX, '\n');
-  gout << "Enter your name: ";
-  getline(gin, ret);
-  return ret;
+  char buf[128];
+  gout << "Enter your name: " << flush;
+  //We use getString rather than getline because of a getline bug in the MSVC
+  //DLL for MSVC 6 and earlier which reads an additional character.
+  //http://support.microsoft.com/directory/article.asp?ID=KB;EN-US;Q240015&
+  getString(buf, 128);
+  gout << endl;
+  return buf;
 }
