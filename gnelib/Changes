@@ -1,4 +1,6 @@
 GNE 0.002 to 0.003
+  Renamed the Time.h header file to TimeGne.h to resolve conflicts with the
+    standard header file time.h.
   Implemented an internal debugging system that is started and configured on
     the user's demands.  The user can also use functions to write to this
 	conditionally generated log file.  Each message has a type/level number

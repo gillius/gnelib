@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX"gneintern.h" /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "include/gnelib" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX"gneintern.h" /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fr /YX"gneintern.h" /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "include/gnelib" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fr /YX"gneintern.h" /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -181,103 +181,103 @@ SOURCE=.\src\TimerCallback.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\src\ClientConnection.h
+SOURCE=.\include\gnelib\ClientConnection.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ConditionVariable.h
+SOURCE=.\include\gnelib\ConditionVariable.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\conioport.h
+SOURCE=.\include\gnelib\conioport.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Connection.h
+SOURCE=.\include\gnelib\Connection.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ConnectionEventGenerator.h
+SOURCE=.\include\gnelib\ConnectionEventGenerator.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ConnectionEventListener.h
+SOURCE=.\include\gnelib\ConnectionEventListener.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Console.h
+SOURCE=.\include\gnelib\Console.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Counter.h
+SOURCE=.\include\gnelib\Counter.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\GNE.h
+SOURCE=.\include\gnelib\GNE.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\GNEDebug.h
+SOURCE=.\include\gnelib\GNEDebug.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\gneintern.h
+SOURCE=.\include\gnelib\gneintern.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ListServerConnection.h
+SOURCE=.\include\gnelib\ListServerConnection.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Mutex.h
+SOURCE=.\include\gnelib\Mutex.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\OnReceiveEventThread.h
+SOURCE=.\include\gnelib\OnReceiveEventThread.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Packet.h
+SOURCE=.\include\gnelib\Packet.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\PacketParser.h
+SOURCE=.\include\gnelib\PacketParser.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\PacketStream.h
+SOURCE=.\include\gnelib\PacketStream.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\RawPacket.h
+SOURCE=.\include\gnelib\RawPacket.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ServerConnection.h
+SOURCE=.\include\gnelib\ServerConnection.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ServerConnectionCreator.h
+SOURCE=.\include\gnelib\ServerConnectionCreator.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ServerConnectionListener.h
+SOURCE=.\include\gnelib\ServerConnectionListener.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Thread.h
+SOURCE=.\include\gnelib\Thread.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Time.h
+SOURCE=.\include\gnelib\TimeGne.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Timer.h
+SOURCE=.\include\gnelib\Timer.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\TimerCallback.h
+SOURCE=.\include\gnelib\TimerCallback.h
 # End Source File
 # End Group
 # Begin Source File
