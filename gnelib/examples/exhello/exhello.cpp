@@ -66,6 +66,14 @@ public:
   void onConnect(SyncConnection& conn2) throw (Error) {
     conn = conn2.getConnection();
     mprintf("Connection to server successful.\n");
+    mprintf("  From us at %s/TCP to client at %s/TCP.\n",
+      conn->getLocalAddress(true).toString().c_str(),
+      conn->getRemoteAddress(true).toString().c_str());
+    mprintf("  From us at %s/UDP to client at %s/UDP.\n",
+      conn->getLocalAddress(false).toString().c_str(),
+      conn->getRemoteAddress(false).toString().c_str());
+    mprintf("  Negotiated outbound data rate: %i bps\n",
+      conn->stream().getOutRate());
   }
 
   void onReceive() {
@@ -135,7 +143,15 @@ public:
 
   void onNewConn(SyncConnection& conn2) throw (Error) {
     conn = conn2.getConnection();
-    mprintf("Connection received from %s; waiting for message...\n", conn->getRemoteAddress(true).toString().c_str());
+    mprintf("Connection received; waiting for message...\n");
+    mprintf("  From us at %s/TCP to client at %s/TCP.\n",
+      conn->getLocalAddress(true).toString().c_str(),
+      conn->getRemoteAddress(true).toString().c_str());
+    mprintf("  From us at %s/UDP to client at %s/UDP.\n",
+      conn->getLocalAddress(false).toString().c_str(),
+      conn->getRemoteAddress(false).toString().c_str());
+    mprintf("  Negotiated outbound data rate: %i bps\n",
+      conn->stream().getOutRate());
   }
 
   void onReceive() {
@@ -226,7 +242,7 @@ void doClient(int outRate, int inRate, int port) {
       client->stream().writePacket(message, false);
       //Wait a little for any responses.
       gout << "Waiting a second for any responses..." << endl;
-      Thread::sleep(1000);
+      Thread::sleep(3000);
       client->stream().waitToSendAll();
       
     }
