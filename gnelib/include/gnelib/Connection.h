@@ -70,7 +70,15 @@ public:
 
 	/**
 	 * A Connection will automatically disconnect if it is connected when it
-	 * is destructed.
+	 * is destructed.  It is NOT reccomended to disconnect in this way because
+	 * onDisconnect is a virtual function, and virtual functions do not work in
+	 * constructors and destructors.\n
+	 * In order for that event to work, you must add the following code to your
+	 * derived class:\n
+	 * if (isConnected()) onDisconnect();\n
+	 * You may choose to add this code at your own discretion.  Placing it
+	 * there acts only as a safety, so there is no disadvantage in adding it.
+	 * @see onDisconnect()
 	 */
   //##ModelId=3B0753810076
   virtual ~Connection();
@@ -145,10 +153,14 @@ public:
 	 * is always called once and only once if a socket was connected.  At the
 	 * time this event is called, the sockets are still connected, so you can
 	 * get their address (for logging and/or reporting reasons), but you cannot
-	 * send any more data or receive any from this event.
+	 * send any more data or receive any from this event.\n
+	 * Note that this event is not called if the socket is disconnected through
+	 * the destructor, unless you add some code to your derived class's
+	 * destructor.  See Connection::~Connection for more details.
 	 * \nThis event must be "non-blocking" -- like most GNE events -- as there
 	 * is only a single event thread.  Therefore, some events for any 
 	 * connection will not be called until this function completes.
+	 * @see ~Connection()
 	 */
   //##ModelId=3BB4208C0104
 	virtual void onDisconnect();
@@ -276,7 +288,9 @@ private:
 	/**
 	 * Used to keep some functions thread-safe.
 	 */
+  //##ModelId=3BC3B98001C3
 	Mutex sync;
+  //##ModelId=3BC3B98001C8
 	Mutex errorSync;
 
 	/**

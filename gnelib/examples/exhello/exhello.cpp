@@ -89,6 +89,9 @@ public:
 	}
 
 	virtual ~OurClient() {
+		//Because we allow disconnects by destruction, we have to add this line
+		//of code if we always want onDisconnect called properly.
+		if (isConnected()) onDisconnect();
 		mprintf("Client instance killed.\n");
 	}
 
@@ -136,6 +139,9 @@ public:
 	}
 
   virtual ~OurServer() {
+		//Because we allow disconnects by destruction, we have to add this line
+		//of code if we always want onDisconnect called properly.
+		if (isConnected()) onDisconnect();
 		mprintf("ServerConnection instance killed\n");
 	}
 
@@ -275,6 +281,7 @@ void doServer(int outRate, int inRate, int port) {
   cout << "Press a key to shutdown server." << endl;
   getch();
   //When the server class is destructed, it will stop listening and shutdown.
+	//We added the onDisconnect line similar to the client side connection.
 }
 
 void doClient(int outRate, int inRate, int port) {
@@ -303,7 +310,11 @@ void doClient(int outRate, int inRate, int port) {
 	client.stream().writePacket(message, true);
 	client.stream().waitToSendAll();
 	//When OurClient goes out of scope, the destructor will disconnect, so we
-	//need not call it explicitly.
+	//need not call it explicitly.  But to do this correctly you have to add a
+	//line of code in the destructor!  See OurClient::~OurClient.
+
+	//If we called disconnect directly or we didn't want to guarantee the
+	//processing of onDisconnect, we could leave that line out of the dtor.
 }
 
 
