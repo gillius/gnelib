@@ -39,10 +39,10 @@ public:
   //##ModelId=3BAEC99B01FE
   enum ErrorCode {
     NoError,
-    GNEHostVersionLow,
-    GNEHostVersionHigh,
-    UserHostVersionLow,
-    UserHostVersionHigh,
+    ProtocolViolation,
+    GNETheirVersionLow,
+    GNETheirVersionHigh,
+    UserVersionMismatch,
     CouldNotOpenSocket,
     ConnectionTimeOut,
     ConnectionRefused,

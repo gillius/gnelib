@@ -28,10 +28,10 @@ std::ostream& operator << (std::ostream& o, const GNE::Error& err) {
 /*
   enum ErrorCode {
     NoError,
-    GNEHostVersionLow,
-    GNEHostVersionHigh,
-    UserHostVersionLow,
-    UserHostVersionHigh,
+    ProtocolViolation,
+    GNETheirVersionLow,
+    GNETheirVersionHigh,
+    UserVersionMismatch,
     CouldNotOpenSocket,
     ConnectionTimeOut,
     ConnectionRefused,
@@ -50,11 +50,11 @@ namespace GNE {
 
 const std::string ErrorStrings[] = {
   "No error.",
-  "The host has an earlier version of GNE than this one.",
-  "The host has a later version of GNE than this one.",
-  "The host has an earlier version of this game.",
-  "The host has a later version of this game.",
-  "Could not open a network connection, check to make sure you are connected to the network.",
+  "The remote end did not follow the specifications of the GNE protocol.",
+  "The remote end uses an earlier version of the GNE protocol.",
+  "The remote end uses a later version of the GNE protocol.",
+  "The user protocol version numbers do not match.",
+  "Could not open a network socket.",
   "Could not contact the host due to connection timeout.",
   "The remote end decided to refuse your connection request.",
   "Remote computer suddenly disconnected without warning, or dropped (TCP) (in alpha GNE, this is expected for now...)",
