@@ -17,12 +17,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifdef OLD_CPP
+#include "OldConsoleStreambuf.inc"
+#else
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ConsoleStreambuf.h"
 #include "../include/gnelib/Console.h"
-#ifdef OLD_CPP
-#include "OldConsoleStreambuf.cpp"
-#else
 #include <streambuf>
 
 namespace GNE {
