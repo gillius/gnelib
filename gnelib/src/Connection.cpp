@@ -36,13 +36,12 @@ namespace GNE {
 Connection::Connection(int outRate, int inRate, ConnectionListener* listener)
 : connecting(false), connected(false), rlistener(NULL), ulistener(NULL) {
   ps = new PacketStream(outRate, inRate, *this);
-  eventListener = new EventThread(listener);
+  eventListener = new EventThread(this, listener);
 }
 
 //##ModelId=3B0753810076
 Connection::~Connection() {
   disconnect();
-  delete ps;
   if (eventListener->hasStarted()) {
     //disconnect calls onDisconnect, which should shut down the EventThread,
     //and allow detach and join to work as we expect.
@@ -58,6 +57,7 @@ Connection::~Connection() {
     //If it was never started, we just delete it.
     delete eventListener;
   }
+  delete ps;
 }
 
 //##ModelId=3BCE75A80280
@@ -148,6 +148,7 @@ void Connection::onDoneWriting() {
   eventListener->onDoneWriting();
 }
 
+//##ModelId=3C30E3FF01DE
 void Connection::finishedConnecting() {
   sync.acquire();
   assert(connecting && !connected);
@@ -210,8 +211,8 @@ void Connection::processError(const Error& error) {
   default:
     errorSync.acquire();
     onFailure(error);
+    //The EventThread will disconnect us after onFailure finishes.
     errorSync.release();
-    disconnect();
     break;
   }
 }
