@@ -24,6 +24,7 @@
 
 #include "../include/gnelib/GNEDebug.h"
 #include "../include/gnelib/Mutex.h"
+#include "../include/gnelib/Lock.h"
 #include "../include/gnelib/Thread.h"
 #include <ctime>
 #include <cstring>
@@ -32,12 +33,14 @@ namespace GNE {
 
 static int dbgLevelMask = 0;
 static FILE* logFile = NULL;
-static Mutex* sync = NULL;
+static Mutex sync;
 static char* buf = NULL;
+static bool initialized = false;
 
 bool initDebug(int levelMask, const char* fileName) {
+  LockMutex lock( sync );
+
   dbgLevelMask = levelMask;
-  sync = new Mutex();
 
   buf = new char[512];
   if (fileName == NULL) {
@@ -48,21 +51,27 @@ bool initDebug(int levelMask, const char* fileName) {
     strcpy(buf, fileName);
 
   logFile = fopen(buf, "wt");
-  if (!logFile)
+  if (!logFile) {
+    delete[] buf;
+    buf = NULL;
     return true;
-  else
-    return false;
+  }
+
+  initialized = true;
+  return false;
 }
 
 void killDebug() {
+  LockMutex lock( sync );
+
   if (logFile != NULL)
     fclose(logFile);
   delete[] buf;
-  delete sync;
 
   logFile = NULL;
   buf = NULL;
-  sync = NULL;
+
+  initialized = false;
 }
 
 void doTrace(int level, const char* fn, int lineno, const char* msg, ...) {
@@ -84,24 +93,26 @@ void doTrace(int level, const char* fn, int lineno, const char* msg, ...) {
       thrName = "main";
     }
 
-    sync->acquire();
-    vsprintf(buf, msg, arg);
+    LockMutexEx lock( sync );
+    if ( initialized ) {
+      vsprintf(buf, msg, arg);
 
-    //Remove the path to the file, to conserve line width.
-    char* temp = strrchr(fn, '\\'); //Try Microsoft style path
-    if (temp == NULL) {
-      temp = strrchr(fn, '/');      //Try UNIX style path
-      if (temp == NULL)
-        temp = buf;                 //If all else fails...
-      else
+      //Remove the path to the file, to conserve line width.
+      char* temp = strrchr(fn, '\\'); //Try Microsoft style path
+      if (temp == NULL) {
+        temp = strrchr(fn, '/');      //Try UNIX style path
+        if (temp == NULL)
+          temp = buf;                 //If all else fails...
+        else
+          temp++;
+      } else
         temp++;
-    } else
-      temp++;
-    //The longest filename is ConnectionEventGenerator.cpp, which is 28 chars.
-    fprintf(logFile, "%28s, line %4i, thrd %8s: %s\n",
-            temp, lineno, thrName.c_str(), buf);
-    fflush(logFile); //Try to be resiliant to errors.
-    sync->release();
+      //The longest filename is ConnectionEventGenerator.cpp, which is 28 chars.
+      fprintf(logFile, "%28s, line %4i, thrd %8s: %s\n",
+        temp, lineno, thrName.c_str(), buf);
+      fflush(logFile); //Try to be resiliant to errors.
+    }
+    lock.release();
 
     va_end(arg);
   }

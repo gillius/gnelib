@@ -75,7 +75,15 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)), int time
 #ifndef WIN32
     signal(SIGPIPE, SIG_IGN);
 #endif
+
+#ifdef _DEBUG
+    //Register killDebug separately, so we can still print out debugging
+    //messages until the last minute possible.
+    atexit_ptr(killDebug);
+#endif
+
     atexit_ptr(shutdownGNE);
+
     return false;
   }
   return false;
@@ -117,10 +125,7 @@ void shutdownGNE() {
 
   Console::shutdownConsole();
 
-  gnedbg(1, "Closed GNE");
-#ifdef _DEBUG
-  killDebug(); //closes debugging if it was opened
-#endif
+  gnedbg(1, "GNE Shutdown");
 }
 
 Address getLocalAddress() {

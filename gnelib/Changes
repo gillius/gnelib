@@ -1,4 +1,8 @@
 GNE 0.55 to current
+  The debug log isn't shutdown when an explicit GNE::shutdownGNE call is
+    made.  This resolves some hard-to-avoid crashes when using the gnedbg
+    macros.  Instead logging runs in its own atexit after GNE's.
+  Added the PacketStream::writePacket method taking a SmartPtr.
   LockObject nad LockObjectEx added.  These work on SynchronizedObjects like
     gout.
   onTimeout events were being generated even when the timeout value was set to
