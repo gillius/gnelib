@@ -27,6 +27,8 @@ ifndef NO_OLD_CPP
 CPPFLAGS            += -DOLD_CPP
 endif
 
+CPPFLAGS            += -D_XOPEN_SOURCE=500
+
 EXAMPLE_CPP          = $(wildcard examples/*/*.cpp)
 
 EXAMPLE_O            = $(EXAMPLE_CPP:.cpp=.o)

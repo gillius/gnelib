@@ -9,3 +9,8 @@ Jason Winnebeck (gillius@users.sourceforge.net)
 Elias Pschernig (elias@users.sourceforge.net)
   Created and maintains MingW makefile, helps with rest of makefile system.
   Created the Allegro example exballs.
+
+November, 2002
+Peter Hull
+  One of few who reported and proposed fixes for the pthread compilation
+   problem under Linux.
