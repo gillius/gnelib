@@ -23,6 +23,7 @@
 #include "../include/gnelib/ConditionVariable.h"
 #include "../include/gnelib/Connection.h"
 #include "../include/gnelib/Errors.h"
+#include "../include/gnelib/Lock.h"
 
 namespace GNE {
 
@@ -90,23 +91,26 @@ void ConnectionEventGenerator::run() {
   }
 }
 
-void ConnectionEventGenerator::reg(NLsocket socket, const ReceiveEventListener::sptr& conn) {
+void ConnectionEventGenerator::reg(NLsocket socket, const ReceiveEventListener::sptr& listener) {
   assert(socket != NL_INVALID);
-  mapCtrl.acquire();
-  nlGroupAddSocket(group, socket);
-  connections[socket] = conn;
-  mapCtrl.release();
+
+  LockCV lock( mapCtrl );
+  if ( connections.find(socket) == connections.end() ) {
+    nlGroupAddSocket(group, socket);
+    connections[socket] = listener;
+  }
   mapCtrl.signal(); //This will wake up the daemon thread if this is the first
                     // registered, and it is sleeping.
 }
 
 void ConnectionEventGenerator::unreg(NLsocket socket) {
   assert(socket != NL_INVALID);
-  mapCtrl.acquire();
-  assert(connections.find(socket) != connections.end());
-  nlGroupDeleteSocket(group, socket);
-  connections.erase(socket);
-  mapCtrl.release();
+
+  LockCV lock( mapCtrl );
+  if(connections.find(socket) != connections.end()) {
+    nlGroupDeleteSocket(group, socket);
+    connections.erase(socket);
+  }
 }
 
 void ConnectionEventGenerator::shutDown() {
