@@ -60,12 +60,12 @@ public:
     return new HelloPacket();
   }
 
-	string getMessage() {
-		return message;
-	}
+  string getMessage() {
+    return message;
+  }
 
 private:
-	string message;
+  string message;
 };
 
 class OurListener : public ServerConnectionListener {
@@ -77,12 +77,12 @@ public:
   virtual ~OurListener() {}
 
   void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) {
-		mprintf("Connection error: %s\n", error.toString().c_str());
-		mprintf("  Error received from %s", from.toString().c_str());
-		delete listener;
-	}
+    mprintf("Connection error: %s\n", error.toString().c_str());
+    mprintf("  Error received from %s", from.toString().c_str());
+    delete listener;
+  }
 
-	void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener);
+  void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener);
 
 private:
 };
@@ -105,15 +105,15 @@ int getPort(const char* prompt) {
 
 void doMain(const char* connType) {
   if (initGNE(NL_IP, atexit)) {
-		exit(1);
-	}
+    exit(1);
+  }
   setUserVersion(1); //sets our user protocol version number, used in
                      //the connection process by GNE to version check.
   initConsole(atexit);
   setTitle("GNE Basic Connections Example");
   registerPacket(MIN_USER_ID, HelloPacket::create);
 
-	gout << "GNE " << connType << " Basic Connections Example for " << GNE::VER_STR << endl;
+  gout << "GNE " << connType << " Basic Connections Example for " << GNE::VER_STR << endl;
   gout << "Local address: " << getLocalAddress() << endl;
   gout << "Should we act as the server, or the client?" << endl;
   gout << "Type 1 for client, 2 for server: ";
@@ -130,13 +130,16 @@ void doMain(const char* connType) {
     setTitle("GNE Basic Connections Example -- Client");
     port = getPort("connect to");
     doClient(3000, 3000, port);
+
+    gout << "Press a key to continue." << endl;
+    getch();
   }
 }
 
 void doServer(int outRate, int inRate, int port) {
 #ifdef _DEBUG
-	//Generate debugging logs to server.log if in debug mode.
-	initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "server.log");
+  //Generate debugging logs to server.log if in debug mode.
+  initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "server.log");
 #endif
   OurListener server;
   if (server.open(port))
