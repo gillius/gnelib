@@ -39,21 +39,25 @@ Connection::Connection()
 : connecting(false), connected(false), exiting(false) {
 }
 
+void Connection::disconnectAll() {
+  Thread::requestAllShutdown( Thread::CONNECTION );
+}
+
 Connection::~Connection() {
   //no need to disconnect here because we should never have been started or
   //have been disconnected.
   assert( !connecting && !connected );
 }
 
-ConnectionListener* Connection::getListener() const {
+ConnectionListener::sptr Connection::getListener() const {
   EventThread::sptr et = eventThread.lock();
   if ( et )
     return et->getListener();
   else
-    return NULL;
+    return ConnectionListener::sptr();
 }
 
-void Connection::setListener(ConnectionListener* listener) {
+void Connection::setListener(const ConnectionListener::sptr& listener) {
   EventThread::sptr et = eventThread.lock();
   if ( et )
     et->setListener( listener );
@@ -104,9 +108,7 @@ void Connection::disconnect() {
     ps->shutDown(); //PacketStream will try to send the required ExitPacket.
     ps->join();
 
-    //This will also shutdown the EventThread, and we will join on it in the
-    //destructor (because this could be our EventThread, and you can't join
-    //on yourself).
+    //Shutdown the EventThread.
     EventThread::sptr et = eventThread.lock();
     assert( et ); //if we are connected we HAVE to have a valid EventThread
     et->onDisconnect();
@@ -128,7 +130,7 @@ void Connection::disconnectSendAll(int waitTime) {
 
 void Connection::setThisPointer( const wptr& weakThis ) {
   this_ = weakThis;
-  eventThreadTemp = EventThread::create( NULL, weakThis.lock() );
+  eventThreadTemp = EventThread::create( weakThis.lock() );
   eventThread = eventThreadTemp;
 }
 

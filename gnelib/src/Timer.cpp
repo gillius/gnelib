@@ -28,6 +28,12 @@ namespace GNE {
 Timer::Timer(const SmartPtr<TimerCallback>& callback, int rate)
 : Thread("Timer", Thread::HIGHER_PRI), callbackRate(rate*1000),
   listener(callback) {
+
+  setType(TIMER);
+}
+
+void Timer::stopAll() {
+  Thread::requestAllShutdown( Thread::TIMER );
 }
 
 Timer::sptr Timer::create(const SmartPtr<TimerCallback>& callback, int rate) {
@@ -88,20 +94,24 @@ void Timer::startTimer() {
   }
 }
 
-/**
- * \bug if called from multiple threads, if any thread has called
- *      stopTimer(true) and another thread calls stopTimer(false) it will
- *      wait until the join completes.
- */
+void Timer::shutDown() {
+  stopTimer( false );
+}
+
 void Timer::stopTimer(bool waitForEnd) {
-  LockMutex lock( sync );
+  LockMutexEx lock( sync );
+
+  if (shutdown && !waitForEnd)
+    return;
 
   if (isRunning()) {
-    shutDown();
+    Thread::shutDown();
     if (waitForEnd) {
       assert(Thread::currentThread().get() != this);
-      if ( Thread::currentThread().get() != this )
+      if ( Thread::currentThread().get() != this ) {
+        lock.release();
         join();
+      }
     }
   }
 }

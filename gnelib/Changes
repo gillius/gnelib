@@ -1,4 +1,11 @@
 GNE 0.55 to current
+  onTimeout events were being generated even when the timeout value was set to
+    0.
+  Like Connections and Timers, ServerConnectionListeners can live after
+    being "lost".  The method ServerConnectionListener::closeAllListeners was
+    added.
+  Thread::requestAllShutdown, Timer::stopAll, Connection::disconnectAll
+    methods added.
   optional clearOnExit param to Console::initConsole
   Thread::waitForAllThreads didn't work right at all.  How did I miss that?!
   Major API changes, see http://www.rit.edu/~jpw9607/gne/apichanges.htm

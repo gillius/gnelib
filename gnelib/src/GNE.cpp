@@ -27,6 +27,10 @@
 #include "../include/gnelib/Errors.h"
 #include "../include/gnelib/PingPacket.h"
 #include "../include/gnelib/ObjectBrokerClient.h"
+#include "../include/gnelib/Timer.h"
+#include "../include/gnelib/Connection.h"
+#include "../include/gnelib/Console.h"
+#include "../include/gnelib/ServerConnectionListener.h"
 
 #ifndef WIN32
 #include <signal.h>
@@ -44,12 +48,14 @@ guint32 userVersion = 0;
 ConnectionEventGenerator::sptr eGen;
 
 static bool initialized = false;
+static int timeToWait = 10000;
 
-bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
+bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)), int timeToClose ) {
   if (!initialized) {
-    gnedbg(1, "GNE initalized");
+    gnedbg(1, "GNE initialized");
     PacketParser::registerGNEPackets();
     ObjectBrokerClient::staticInit();
+    timeToWait = timeToClose;
 
     if (networkType != NO_NET) {
       if (nlInit() == NL_FALSE)
@@ -77,15 +83,39 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
 
 void shutdownGNE() {
   if ( eGen ) {
+    gnedbg( 1, "Shutting down CEG." );
     eGen->shutDown();
-    eGen->join();
-    eGen.reset();
+    //I'd like to use a join because that's cleaner, but I want to make sure
+    //the program does not block indefinitely when closing.
   }
 
+  gnedbg( 1, "GNE Shutdown begin: Closing all listeners." );
+  ServerConnectionListener::closeAllListeners();
+  gnedbg( 1, "Shutting down all connections." );
+  Connection::disconnectAll();
+  gnedbg( 1, "Stopping all timers." );
+  Timer::stopAll();
+  gnedbg( 1, "Shutting down all user threads." );
+  Thread::requestAllShutdown( Thread::USER );
+
+  gnedbg1( 1, "Waiting up to %d ms for all threads to shutdown.", timeToWait );
+  bool timeout = Thread::waitForAllThreads( timeToWait );
+  if ( timeout ) {
+    gnedbg( 1, "Wait timeout: NOT ALL THREADS SHUT DOWN!" );
+  }
+
+  if ( eGen && eGen->isRunning() ) {
+    gnedbg( 1, "CEG failed to shut down properly!  Please file a bug report." );
+  }
+  eGen.reset();
+
   if (initialized) {
+    gnedbg( 1, "Shutting down HawkNL." );
     nlShutdown();
     initialized = false;
   }
+
+  Console::shutdownConsole();
 
   gnedbg(1, "Closed GNE");
 #ifdef _DEBUG

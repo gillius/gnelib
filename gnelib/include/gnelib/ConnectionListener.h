@@ -21,9 +21,13 @@
  */
 
 
+#include "SmartPtr.h"
+#include "WeakPtr.h"
+
 namespace GNE {
 class Error;
 class SyncConnection;
+class Connection;
 
 /**
  * @ingroup midlevel
@@ -55,6 +59,10 @@ class SyncConnection;
  * @see ServerConnectionListener::onListenFailure
  */
 class ConnectionListener {
+public: //typedefs
+  typedef SmartPtr<ConnectionListener> sptr;
+  typedef WeakPtr<ConnectionListener> wptr;
+
 public:
   virtual ~ConnectionListener();
 
@@ -64,7 +72,7 @@ public:
    * is no need to create your own listener.  This listener will ignore all
    * events.
    */
-  static ConnectionListener* getNullListener();
+  static sptr getNullListener();
 
   /**
    * Event triggered after there is a successful connection.  The connection
@@ -74,7 +82,8 @@ public:
    * throw its Error outside your function.  Catch it if you need to clean up
    * anything you were doing, but remember to rethrow it.  If this is the
    * case, onConnectFailure but not onDisconnect will be generated, so
-   * any needed cleanup needs to be done in your exception handler.
+   * any needed cleanup needs to be done in your exception handler (or class
+   * destructor).
    *
    * You can also choose to refuse a connection by throwing an Error with an
    * error code of Error::ConnectionRefused, and will it will make the
@@ -103,14 +112,7 @@ public:
    * Note that for this case, the event onDisconnect IS NOT CALLED, since
    * the Connection was never in a connected state.
    *
-   * You won't be able to delete the connection from this function, like you
-   * can from onDisconnect because the connection process is still proceding,
-   * and one of your other threads is joining and/or waiting for the
-   * connection to complete.  The proper way to destroy the connection is to
-   * delete it from another thread, probably the same thread that created and
-   * then detached or is joining on it once it learns the connection failed.
-   *
-   * This function's purpose is to notify that thread if needed.  If you are
+   * This event's purpose is to notify this listener if needed.  If you are
    * waiting for the connection to complete by using join in that other
    * thread, you would probably not need to listen for this event (see
    * the example exhello).
@@ -125,7 +127,7 @@ public:
    * checked.  This object is a newly allocated object created from your
    * ServerConnectionCreator object, and this function will be the first time
    * you code has "seen" this object, so you will have to register it into
-   * some internal list so you can interact with and delete it later.
+   * some internal list if you want to interact with it later.
    *
    * If an error occurs then the connection needs to be killed, so conn can
    * throw its Error outside your function.  Catch it if you need to clean up
@@ -133,10 +135,7 @@ public:
    * case, ServerConnectionListner::onListenFailure will be generated but not
    * onDisconnect, so any needed cleanup needs to be done in your exception
    * handler or in onListenFailure.  See ServerConnection::run() for an event
-   * generation summary.  If an error occurs you need not worry about having
-   * to delete the ServerConnection or this object.  onListenFailure should
-   * delete this ConnectionListener as usual if this is needed, and GNE will
-   * destroy the ServerConnection if onNewConn did not complete w/o errors.
+   * generation summary.
    *
    * You can also choose to refuse a connection by throwing an Error with an
    * error code of Error::ConnectionRefused, and will it will make the
@@ -162,10 +161,10 @@ public:
   virtual void onNewConn(SyncConnection& newConn);
 
   /**
-   * An event triggered when a socket is closing for any reason.  This event
-   * is always called once and only once if a socket was connected.  At the
-   * time this event is called, the sockets are disconnected, so you can't
-   * get stats or addresses from the connection.
+   * An event triggered when a Connection is closing for any reason.  This
+   * event is always called once and only once if a socket was connected.
+   * At the time this event is called, the sockets are disconnected, so you
+   * can't get stats or addresses from the connection.
    *
    * The PacketStream is still valid, and there still may be data in the
    * queue for you to read, even if you pick up all data in the onReceive
@@ -185,7 +184,6 @@ public:
    * done in the exception handler, and no other failure event will be
    * generated.  After onNewConn or onConnect completes, then and only then
    * might a onDisconnect event be generated.
-   * @see ~Connection()
    */
   virtual void onDisconnect();
 

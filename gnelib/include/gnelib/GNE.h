@@ -34,24 +34,44 @@ namespace GNE {
   class Address;
 
   /**
-   * Initalizes GNE and HawkNL.  Call this before using any HawkNL or GNE
+   * Initalizes %GNE and HawkNL.  Call this before using any HawkNL or %GNE
    * functions.  Pass it the atexit function so shutdown will be called on
-   * exit.  A call to any other GNE function before this function succeeds
+   * exit.  A call to any other %GNE function before this function succeeds
    * is undefined.
-   * @param networkType a HawkNL network driver, such as NL_IP or NL_IPX
-   * @return true if GNE or HawkNL could not be initalized.
+   *
+   * Neither initGNE nor shutdownGNE calls are thread-safe, so they should
+   * only be called by the main thread.
+   *
+   * @param networkType a HawkNL network driver, such as NL_IP or NL_IPX.
+   *                    I've only ever tested NL_IP.
+   * @param timeToClose the amount of time in milliseconds to wait for
+   *   connections to finish closing, timers to shut down, and user threads
+   *   to close.
+   *
+   * @return true if %GNE or HawkNL could not be initalized.
+   *
+   * @see shutdownGNE
    */
-  bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)));
+  bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)), int timeToClose = 10000 );
 
   /**
-   * Shutsdown GNE and HawkNL.  This function should be called only after all
-   * connections are individually shutdown to properly deinitalize the
-   * library.  However, this function is acceptable enough to be used on an
-   * "emergency" shutdown due to some error -- just don't try to call any
-   * other GNE or HawkNL function after calling this.
+   * Shuts down %GNE and HawkNL.  All open connections will be closed, all
+   * active timers will be shut down, and the shutDown method of all of the
+   * threads you have created will be called.  The method will block for the
+   * time passed into the initGNE function.  After that time has passed, the
+   * shutdown function exits.  If it is being called as a result of the atexit
+   * procedure, the process will be forcefully shutdown when the atexit
+   * handlers quit, so a stalled/crashed thread won't keep the program from
+   * shutting down, but it will keep destructors from being called.
    *
-   * Note that it is possible that this function may block for a short time
-   * (500ms or less), while the event generators shut down.
+   * Note that if you have connections, timers, or threads running when main
+   * ends, you can be running code or be receiving events after the main
+   * function has ended.  If this will be a problem you should explicitly call
+   * the shutdownGNE method.
+   * 
+   * Neither initGNE nor shutdownGNE calls are thread-safe, so they should
+   * only be called by the main thread, and most certainly not from any %GNE
+   * Thread (this also means you cannot call "exit" from a %GNE Thread).
    */
   void shutdownGNE();
 

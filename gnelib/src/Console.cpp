@@ -80,13 +80,11 @@ GOut& GOut::operator << ( GOFType f ) {
   return *this;
 }
 
-bool initConsole(int (*atexit_ptr)(void (*func)(void)), bool clearOnExit) {
+bool initConsole( bool clearOnExit ) {
   LockMutex lock( outSync );
 
   if (!initialized) {
     conio_init(&ENTER, &BACKSPACE);
-    assert(atexit_ptr);
-    atexit_ptr(shutdownConsole);
     gin.tie(&gout); //tie the input and output together.
     initialized = true;
     clearOnEnd = clearOnExit;
@@ -94,8 +92,11 @@ bool initConsole(int (*atexit_ptr)(void (*func)(void)), bool clearOnExit) {
   return false;
 }
 
+bool initConsole(int (*)(void (*)(void))) {
+  return initConsole( true );
+}
+
 void shutdownConsole() {
-  assert(initialized);
   LockMutex lock( outSync );
 
   if (initialized) {

@@ -145,17 +145,23 @@ class moveTo;
 
   /**
    * Initalizes the console part of GNE.  This may be called multiple times.
-   * Pass it your atexit function so the console will be shutdown
-   * automatically on program exit.
    *
    * Set the clearOnExit variable to true if after the program is finished the
    * console should clear the screen and move the cursor back to the top.
    * Set to false to preserve the screen contents and cursor position after
    * Console close if possible.
    *
-   * @return true if the console could not be initalized.
+   * @return true if the console could not be initialized.
    */
-  bool initConsole(int (*atexit_ptr)(void (*func)(void)), bool clearOnExit = true );
+  bool initConsole( bool clearOnExit = true );
+
+  /**
+   * Initalizes the console part of GNE.  This may be called multiple times.
+   *
+   * @return true if the console could not be initialized.
+   * @deprecated the atexit pointer is no longer needed or used.
+   */
+  bool initConsole(int (*atexit_ptr)(void (*func)(void)) );
 
   /**
    * Shuts down the console part of GNE.  This may be called multiple times.

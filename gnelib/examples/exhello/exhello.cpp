@@ -36,7 +36,7 @@
  * more will only require a little more code.
  */
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 #include <iostream>
 #include <string>
 
@@ -48,9 +48,18 @@ using namespace GNE::PacketParser;
 #include "shared.h"
 
 class OurClient : public ConnectionListener {
-public:
-  OurClient() : conn(NULL) {
+public: //typedefs
+  typedef SmartPtr<OurClient> sptr;
+  typedef SmartPtr<OurClient> wptr;
+
+protected:
+  OurClient() {
     mprintf("Client listener created.\n");
+  }
+
+public:
+  static sptr create() {
+    return sptr( new OurClient() );
   }
 
   ~OurClient() {
@@ -59,10 +68,6 @@ public:
 
   void onDisconnect() { 
     mprintf("Client just disconnected.\n");
-    //This is an iffy practice.  If we do this, we have to be careful to
-    //always note that each new connection we use this listener with gets
-    //its own new copy which we don't destroy later.
-    delete this;
   }
 
   void onExit() {
@@ -91,9 +96,9 @@ public:
     while ( (message = conn->stream().getNextPacket()) != NULL ) {
       if (message->getType() == MIN_USER_ID) {
         HelloPacket* helloMessage = (HelloPacket*)message;
-        mprintf("got message: \"");
-        mprintf(helloMessage->getMessage().c_str());
-        mprintf("\"\n");
+        LockObject lock( gout );
+        gout << "got message: \"" << helloMessage->getMessage() << '\"'
+             << endl;
       } else
         mprintf("got bad packet.\n");
       delete message;
@@ -115,20 +120,26 @@ public:
     //not really needed, but we can display the error message here or in the
     //doClient function when it finds out the connection failed.  Either way
     //does the same thing.
-    //On the other hand, if we used client.detach(false) in doClient, we
-    //could use onConnect and this event to notify doClient of the success or
-    //failure of the connection process.
     mprintf("Connection to server failed.\n");
     mprintf("GNE reported error: %s\n", error.toString().c_str());
   }
 private:
-  Connection* conn;
+  Connection::sptr conn;
 };
 
 class OurServer : public ConnectionListener {
-public:
-  OurServer() : conn(NULL), received(false) {
+public: //typedefs
+  typedef SmartPtr<OurServer> sptr;
+  typedef SmartPtr<OurServer> wptr;
+
+protected:
+  OurServer() : received(false) {
     mprintf("Server listener created\n");
+  }
+
+public:
+  static sptr create() {
+    return sptr( new OurServer() );
   }
 
   virtual ~OurServer() {
@@ -143,8 +154,6 @@ public:
     mprintf("ServerConnection just disconnected.\n");
     if (!received)
       mprintf("No message received.\n");
-    delete conn;
-    delete this;
   }
 
   void onExit() {
@@ -205,7 +214,7 @@ public:
   }
 
 private:
-  Connection* conn;
+  Connection::sptr conn;
   bool received;
 };
 
@@ -216,7 +225,7 @@ void OurListener::getNewConnectionParams(ConnectionParams& params) {
   //exsynchello will NOT request unreliable, but that's OK -- if no
   //unreliable socket exists, unreliable data will be sent reliable.
   params.setUnrel(true);
-  params.setListener(new OurServer());
+  params.setListener( OurServer::create() );
 }
 
 int main(int argc, char* argv[]) {
@@ -238,17 +247,15 @@ void doClient(int outRate, int inRate, int port) {
     errorExit("Invalid address.");
   gout << "Connecting to: " << address << endl;
 
-  //uncomment the loop to perform a stress test.
-  //for (int i=0; i <100; i++) {
-    ConnectionParams params(new OurClient());
+  //uncomment the loop and reduce sleep time to perform a stress test.
+  //for (int i=0; i < 100; i++) {
+    ConnectionParams params( OurClient::create() );
     params.setUnrel(true);
     params.setOutRate(outRate);
     params.setInRate(inRate);
-    ClientConnection* client = new ClientConnection();
-    if (client->open(address, params)) {
-      delete client;
+    ClientConnection::sptr client = ClientConnection::create();
+    if (client->open(address, params))
       errorExit("Cannot open client socket.");
-    }
     
     client->connect();
     client->join();     //join on the connection thread
@@ -276,8 +283,8 @@ void doClient(int outRate, int inRate, int port) {
       client->disconnectSendAll();
       
     }
-    
-    delete client;
+
+    //client will be destroyed here as its sptr will go out of scope.
   //}
 }
 

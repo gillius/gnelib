@@ -22,22 +22,27 @@
 
 namespace GNE {
 
-ConnectionParams::ConnectionParams(ConnectionListener* Listener)
+ConnectionParams::ConnectionParams()
+: feeder(NULL), feederTimeout(0), feederThresh(0),
+timeout(0), outRate(0), inRate(0), localPort(0), unrel(false) {
+}
+
+ConnectionParams::ConnectionParams(const ConnectionListener::sptr& Listener)
 : listener(Listener), feeder(NULL), feederTimeout(0), feederThresh(0),
 timeout(0), outRate(0), inRate(0), localPort(0), unrel(false) {
 }
 
 bool ConnectionParams::checkParams() const {
   return (outRate < 0 || inRate < 0 || localPort < 0 || localPort > 65535
-    || listener == NULL || timeout < 0 || feederTimeout < 0
+    || !listener || timeout < 0 || feederTimeout < 0
     || feederThresh < 0);
 }
 
-void ConnectionParams::setListener(ConnectionListener* Listener) {
+void ConnectionParams::setListener( const ConnectionListener::sptr& Listener ) {
   listener = Listener;
 }
 
-ConnectionListener* ConnectionParams::getListener() const {
+const ConnectionListener::sptr& ConnectionParams::getListener() const {
   return listener;
 }
 

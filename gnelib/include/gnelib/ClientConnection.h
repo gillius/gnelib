@@ -31,6 +31,7 @@ class ConnectionListener;
 class Error;
 class ClientConnectionParams;
 class ConnectionParams;
+class SyncConnection;
 
 /**
  * @ingroup midlevel
@@ -84,16 +85,17 @@ public:
    * checked during this phase.  If either protocol versions mismatch,
    * onConnectFailure() will be triggered.
    *
-   * If wrapped is not null, then there is currently a SyncConnection wrapped
-   * around this connection.  This is only the case when a user is using only
-   * SyncConnections, and in this case the user should call
-   * SyncConnection::connect(), so in your code you should never need to pass
-   * a parameter to this function.
-   *
    * @see ConnectionListener#onConnect()
    * @see ConnectionListener#onConnectFailure()
    */
-  void connect(SyncConnection* wrapped = NULL);
+  void connect();
+  
+private:
+  friend class SyncConnection;
+  //This method only to be called by SyncConnection
+  //raw pointer we know is OK since SyncConnection joins on this, the raw ptr
+  //is guaranteed to be valid through the whole connect process.
+  void connect( const SmartPtr<SyncConnection>& );
 
 protected:
   /**

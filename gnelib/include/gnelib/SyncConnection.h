@@ -68,16 +68,27 @@ class ConnectionParams;
  * See the example exsynchello for more help with the usage of this class.
  */
 class SyncConnection : public ConnectionListener {
+public: //typedefs
+  typedef SmartPtr<SyncConnection> sptr;
+  typedef WeakPtr<SyncConnection> wptr;
+
+private: //ctor is private because of member thisPtr
+  /**
+   * @see create
+   */
+  SyncConnection( const SmartPtr<Connection>& target );
+
 public:
   /**
    * Creates a new SyncConnection.  Pass in the Connection that you want to
    * wrap.  See the details above for more information.
    */
-  SyncConnection(Connection* target);
+  static sptr create( const SmartPtr<Connection>& target );
 
   /**
    * Destructs this SyncConnection, calling release() if necessary.  If
-   * releasing would throw an Error, it is ignored.
+   * releasing would throw an Error, it is ignored.  If you wish to capture
+   * all errors, you should call release yourself.
    *
    * @see release()
    */
@@ -86,7 +97,7 @@ public:
   /**
    * Returns the underlying Connection.
    */
-  Connection* getConnection() const;
+  SmartPtr<Connection> getConnection() const;
   
   /**
    * Just like ClientConnection::open, this will open the port, ready for
@@ -175,6 +186,9 @@ public:
    * though.  release() will block until all writes are completed, and the
    * destructor and disconnect() function call release() if needed.
    *
+   * A SyncConnection should be released or destroyed before the start of
+   * %GNE shutdown if you want to guarantee all packet sends were attempted.
+   *
    * @throw Error if an error occured while writing, or an error occured
    *              since the last interaction with this object.
    */
@@ -260,6 +274,11 @@ private:
   void setError(const Error& error);
 
   /**
+   * Weak pointer to this, set in create.
+   */
+  wptr thisPtr;
+
+  /**
    * Syncronization for release and connecting events.
    */
   Mutex sync;
@@ -274,13 +293,13 @@ private:
   /**
    * The underlying Connection.
    */
-  Connection* conn;
+  SmartPtr<Connection> conn;
 
   /**
    * The old listener for asyncronous communications that the Connection just
    * had.  If this is NULL, then this object has been released.
    */
-  ConnectionListener* oldListener;
+  SmartPtr<ConnectionListener> oldListener;
 
   volatile bool released;
 

@@ -31,6 +31,7 @@ ConnectionEventGenerator::ConnectionEventGenerator()
   group = nlGroupCreate();
   assert(group != NL_INVALID);
   sockBuf = new NLsocket[NL_MAX_GROUP_SOCKETS];
+  setType( SYSTEM );
   gnedbgo(5, "created");
 }
 

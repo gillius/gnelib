@@ -23,7 +23,7 @@
 #include "ObjectBroker.h"
 
 namespace GNE {
-  bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)));
+  bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)), int);
 
 /**
  * @ingroup highlevel
@@ -117,7 +117,7 @@ private:
    */
   static void staticInit();
 
-  friend bool GNE::initGNE(NLenum, int (*)(void (*)(void)));
+  friend bool GNE::initGNE(NLenum, int (*)(void (*)(void)), int);
 
 private:
 };

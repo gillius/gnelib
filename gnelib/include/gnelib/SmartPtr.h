@@ -130,6 +130,16 @@ template<class T, class U> SmartPtr<T> dynamic_pointer_cast(SmartPtr<U> const & 
     return SmartPtr<T>( boost::dynamic_pointer_cast<T>( r ) );
 }
 
+/**
+ * Deleter that does nothing for the SmartPtr.  Useful for making SmartPtrs to
+ * static variables.
+ */
+class null_deleter {
+public:
+  void operator() (void const *) const {
+  }
+};
+
 };
 
 #endif //#define GNESMARTPTR_H_KPW312

@@ -32,21 +32,32 @@
 
 namespace GNE {
 
-SyncConnection::SyncConnection(Connection* target)
+SyncConnection::SyncConnection( const SmartPtr<Connection>& target )
 : currError(Error::NoError), conn(target), released(false),
 connectMode(false) {
   gnedbgo(5, "created");
   gnedbgo1(2, "Wrapping Connection %x into a SyncConnection.", conn);
   oldListener = conn->getListener();
-  conn->setListener(this);
+}
+
+SyncConnection::sptr SyncConnection::create( const SmartPtr<Connection>& target ) {
+  sptr ret( new SyncConnection( target ) );
+  ret->thisPtr = ret;
+  target->setListener( ret );
+  return ret;
 }
 
 SyncConnection::~SyncConnection() {
-  release();
+  try { 
+    release();
+  } catch ( const Error& ) {
+  } catch ( ... ) {
+    assert( false );
+  }
   gnedbgo(5, "destroyed");
 }
 
-Connection* SyncConnection::getConnection() const {
+Connection::sptr SyncConnection::getConnection() const {
   return conn;
 }
 
@@ -56,13 +67,16 @@ Connection* SyncConnection::getConnection() const {
 void SyncConnection::open(const Address& dest, const ConnectionParams& params) {
   assert(!isReleased());
   //We want to "pirate" the caller's listener change request so that we remain
-  //charge as we are wrapped around the ClientConnection.
+  //in charge as we are wrapped around the ClientConnection.
   oldListener = params.getListener();
   ConnectionParams p(params);
-  p.setListener(this);
+  sptr temp = thisPtr.lock();
+  assert( temp );
+  p.setListener( temp );
   //Perform the actual open
-  if (((ClientConnection*)conn)->open(dest, p))
-    throw Error(Error::CouldNotOpenSocket);
+  ClientConnection::sptr cliConn = static_pointer_cast<ClientConnection>( conn );
+  if ( cliConn->open(dest, p) )
+    throw Error( Error::CouldNotOpenSocket );
 }
 
 /**
@@ -70,9 +84,11 @@ void SyncConnection::open(const Address& dest, const ConnectionParams& params) {
  */
 void SyncConnection::connect() {
   assert(!isReleased());
-  ClientConnection* cli = (ClientConnection*)conn;
-  cli->connect(this);
-  cli->join();
+  ClientConnection::sptr cliConn = static_pointer_cast<ClientConnection>( conn );
+  sptr temp = thisPtr.lock();
+  assert( temp );
+  cliConn->connect( temp );
+  cliConn->join();
   checkError();
 }
 
@@ -182,7 +198,7 @@ SyncConnection& SyncConnection::operator >> (Packet& packet) {
   if (recv->getType() != packet.getType()) {
     gnedbgo2(1, "Packet type mismatch.  Got %d, expected %d.",
                 recv->getType(), packet.getType());
-    throw Error(Error::PacketTypeMismatch);
+    throw PacketTypeMismatch( recv->getType() );
   }
 
   //Copy the packet.
@@ -242,13 +258,13 @@ void SyncConnection::onError(const Error& error) {
 void SyncConnection::onFailure(const Error& error) {
   setError(error);
   //Stop the event thread until release properly restarts it.
-  conn->setListener(NULL);
+  conn->setListener( ConnectionListener::sptr() );
 }
 
 void SyncConnection::onExit() {
   setError( Error(Error::ExitNoticeReceived) );
   //Stop the event thread until release properly restarts it.
-  conn->setListener(NULL);
+  conn->setListener( ConnectionListener::sptr() );
 }
 
 void SyncConnection::onReceive() {

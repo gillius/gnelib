@@ -40,7 +40,17 @@ class ConnectionParams;
  * events you wish to respond to.
  *
  * You need to create a static "create" method like other classes in GNE since
- * ServerConnectionListener is managed by a SmartPtr.
+ * ServerConnectionListener is managed by a SmartPtr.  There exists a master
+ * list of ServerConnectionListener objects that are actively listening.
+ * Therefore you don't need to keep the reference around to keep the object
+ * from getting prematurely deleted.
+ *
+ * When %GNE closes, all active listeners will be shutdown, so the close
+ * operation is optional.  You can close early by calling the close method.
+ * The static method closeAllListeners is also available to you.
+ *
+ * All of the methods in this class are safe to call from multiple threads at
+ * the same time unless otherwise noted.
  */
 class ServerConnectionListener {
 public:
@@ -55,29 +65,68 @@ protected:
 
 public:
   /**
-   * Destructor.
+   * Destructor.  Closes the listening connection if it is open.
    */
   virtual ~ServerConnectionListener();
 
   /**
-   * Opens a socket ready for listening, but not yet listening.
+   * For all active listeners, calls close on them.  This method is implicitly
+   * called when GNE shuts down.
+   */
+  static void closeAllListeners();
+
+  /**
+   * Opens a socket ready for listening, but not yet listening.  If the socket
+   * has already been opened, this method has no effect and returns false.
+   * This fact may be an issue, since if you call open with one port, calling
+   * open again won't change the port unless you close.
+   *
+   * Unless you restrict your usage of the open function to a single thread or
+   * use an external mutex, it is impossible to safely change port.  This is
+   * usually not a problem as most users will initialize the listener from only
+   * a single thread.
+   *
    * @param port the port to listen on.
    * @return true if could not open a socket on the port.
    */
   bool open(int port);
 
   /**
-   * Closes the listening connection.
+   * Closes the listening connection.  It is OK to call close at any time,
+   * even if already closed or never opened.  You can start the listener again
+   * by calling open and listen.
+   *
+   * The close operation is optional.  %GNE will shut down active listeners
+   * when it is shut down.
+   *
+   * Note that a listener can be closed while an event is being processed.
+   * This behaviour was chosen because it matches the behaviour of the
+   * previous %GNE 0.55 API, and because it avoids using mutexes, which keep
+   * the events from running in parallel even if they are capable.  This
+   * should not affect the events except that the getLocalAddress method may
+   * return an invalid address.
    */
   void close();
 
   /**
    * Starts this socket listening.  onNewConn will be called when a new
-   * connection has been negotiated and error checked.  When you are
-   * finished, delete this object and the dtor will clean things up.
+   * connection has been negotiated and error checked.
    *
+   * This method also registers the listener into the master list, so you after
+   * this method is called you no longer need to keep the reference.
+   *
+   * If already listening, this method has no effect and returns false.
+   *
+   * While a listener is listening, it is added to a master list so that it
+   * won't be destroyed prematurely.  It is removed from the list when the
+   * listener is closed (this includes when all listeners are shutdown when
+   * %GNE is shut down).
+   *
+   * @pre listener has been opened with open.
    * @see onListenFailure
-   * @return true, if there was an error.
+   * @see onListenSuccess
+   * @see open
+   * @return true, if there was an error starting the listen
    */
   bool listen();
 
@@ -89,6 +138,10 @@ public:
   /**
    * Returns the address of the listening socket.  If the listener has not
    * been opened or is not listening, an invalid address is returned.
+   *
+   * Most notably, a listener can be closed while an event is being processed.
+   *
+   * @see close
    */
   Address getLocalAddress() const;
 
@@ -119,7 +172,7 @@ protected:
    *                 getNewConnectionParams was never called.
    */
   virtual void onListenFailure(const Error& error, const Address& from,
-                               ConnectionListener* listener) = 0;
+                               const SmartPtr<ConnectionListener>& listener) = 0;
 
   /**
    * This is an optional event to catch which is called after
@@ -135,21 +188,17 @@ protected:
    * useful, where the same implementation using only onNewConn would be
    * harder to program and understand.
    *
+   * This function can be called from multiple threads at the same time.
+   *
    * @param listener The listener than you returned from
    *                 getNewConnectionParams.
    */
-  virtual void onListenSuccess(ConnectionListener* listener);
+  virtual void onListenSuccess(const SmartPtr<ConnectionListener>& listener);
 
   /**
    * A new connection is starting, and now we want the parameters for this
    * new connection.  The parameters passed should be modified to give
    * the new connection's flow control parameters and listener.
-   *
-   * The listener pointer will be returned to you through the socket failure
-   * event (in this case it was never used, but it is returned in case you
-   * need to delete it).  If the connection is successful you can get your
-   * pointer back through the resulting ServerConnection class by using
-   * Connection::getListener, or through the onListenSuccess event.
    *
    * This function can be called from multiple threads at the same time.
    */
@@ -159,11 +208,14 @@ private:
   //interface functions solely for ServerConnection
   friend class ServerConnection;
 
+  //performs the actual close operation w/o removing from list.
+  void rawClose();
+
   //These methods relay the message on, locking the sync mutex.
   void processOnListenFailure( const Error& error, const Address& from,
-                               ConnectionListener* listener);
+                               const SmartPtr<ConnectionListener>& listener);
 
-  void processOnListenSuccess( ConnectionListener* listener );
+  void processOnListenSuccess( const SmartPtr<ConnectionListener>& listener );
 
 private:
   class ServerListener : public ReceiveEventListener {

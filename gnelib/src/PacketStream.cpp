@@ -46,6 +46,8 @@ reqOutRate(reqOutRate2), feeder(NULL), feederTimeout(0), lowPacketsThreshold(0) 
   assert(reqOutRate2 >= 0);
   assert(maxOutRate2 >= 0);
 
+  setType( CONNECTION );
+
   //Calculate the current rate and step.
   setupCurrRate();
 

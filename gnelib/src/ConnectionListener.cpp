@@ -26,9 +26,9 @@ namespace GNE {
 ConnectionListener::~ConnectionListener() {
 }
 
-ConnectionListener* ConnectionListener::getNullListener() {
+ConnectionListener::sptr ConnectionListener::getNullListener() {
   static ConnectionListener nullListener;
-  return &nullListener;
+  return sptr( &nullListener, null_deleter() );
 }
 
 void ConnectionListener::onConnect(SyncConnection& conn) {

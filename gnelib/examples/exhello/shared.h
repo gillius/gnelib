@@ -22,8 +22,6 @@
 
 //This header contains the shared code between exhello and exsynchello.
 
-#include "../../include/gnelib.h"
-
 void doMain(const char* connType);
 void errorExit(const char* error);
 int getPort(const char* prompt);
@@ -73,17 +71,26 @@ private:
 const int HelloPacket::ID = MIN_USER_ID;
 
 class OurListener : public ServerConnectionListener {
+protected:
+  OurListener(int iRate, int oRate) 
+    : ServerConnectionListener(), iRate(iRate), oRate(oRate) {
+  }
+
 public:
-  OurListener(int iRate2, int oRate2) 
-    : ServerConnectionListener(), iRate(iRate2), oRate(oRate2) {
+  typedef SmartPtr<OurListener> sptr;
+  typedef WeakPtr<OurListener> wptr;
+
+  static sptr create(int iRate, int oRate) {
+    sptr ret( new OurListener( iRate, oRate ) );
+    ret->setThisPointer( ret );
+    return ret;
   }
 
   virtual ~OurListener() {}
 
-  void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) {
+  void onListenFailure(const Error& error, const Address& from, const ConnectionListener::sptr& listener) {
     mprintf("Connection error: %s\n", error.toString().c_str());
     mprintf("  Error received from %s\n", from.toString().c_str());
-    delete listener;
   }
 
   void getNewConnectionParams(ConnectionParams& params);
@@ -94,7 +101,9 @@ private:
 };
 
 void errorExit(const char* error) {
-  gout << "Error: " << error << endl;
+  gout << "Fatal Error: " << error << endl;
+  gout << " Press a key." << endl;
+  getch();
   exit(1);
 }
 
@@ -146,21 +155,26 @@ void doMain(const char* connType) {
   }
 }
 
+//For both types of exhello, starting the server is the same.
 void doServer(int outRate, int inRate, int port) {
 #ifdef _DEBUG
   //Generate debugging logs to server.log if in debug mode.
   initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5, "server.log");
 #endif
-  OurListener server(inRate, outRate);
-  if (server.open(port))
+
+  OurListener::sptr server = OurListener::create(inRate, outRate);
+  if (server->open(port))
     errorExit("Cannot open server socket.");
-  if (server.listen())
+  if (server->listen())
     errorExit("Cannot listen on server socket.");
 
-  gout << "Server is listening on: " << server.getLocalAddress() << endl;
+  gout << "Server is listening on: " << server->getLocalAddress() << endl;
   gout << "Press a key to shutdown server." << endl;
   getch();
-  //When the server class is destructed, it will stop listening and shutdown.
+
+  //This is not strictly needed, all listeners will be shutdown when GNE
+  //shuts down.
+  server->close();
 }
 
 #endif

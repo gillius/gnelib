@@ -30,45 +30,96 @@
 
 namespace GNE {
 
+typedef std::vector<ServerConnectionListener::sptr> SCLList;
+typedef SCLList::iterator SCLListIter;
+
+static SCLList listeners;
+static Mutex listSync;
+
 ServerConnectionListener::ServerConnectionListener()
-: listening(false) {
+: listening(false), socket( NL_INVALID ) {
   gnedbgo(5, "created");
 }
 
 ServerConnectionListener::~ServerConnectionListener() {
+  //We shouldn't be listening
+  assert( !listening );
+
+  //However... open could have been called but never listen.
+  //This could cause a problem if called after GNE shutdown.
+  rawClose();
+
   gnedbgo(5, "destroyed");
 }
 
+void ServerConnectionListener::closeAllListeners() {
+  LockMutex lock( listSync );
+
+  SCLListIter iter = listeners.begin();
+  for ( ; iter != listeners.end(); ++iter )
+    (*iter)->rawClose();
+
+  listeners.clear();
+}
+
 bool ServerConnectionListener::open(int port) {
-  socket = nlOpen(port, NL_RELIABLE_PACKETS);
-  return (socket == NL_INVALID);
+  LockMutex lock(sync);
+
+  if ( socket == NL_INVALID ) {
+    socket = nlOpen(port, NL_RELIABLE_PACKETS);
+    return (socket == NL_INVALID);
+  } else
+    return false;
 }
 
 void ServerConnectionListener::close() {
-  LockMutex lock(sync);
+  //must lock listSync before sync always.
+  LockMutex lock( listSync );
+  LockMutex lock2( sync );
 
-  if (listening) {
-    gnedbgo1(3, "Unregistering listen socket %i", socket);
-    GNE::eGen->unreg(socket);
-    nlClose(socket);
-    listening = false;
-  }
+  SCLList& l = listeners;
+  l.erase( std::remove( l.begin(), l.end(), this_.lock() ), l.end() );
+
+  rawClose();
 }
 
 bool ServerConnectionListener::listen() {
-  LockMutex lock(sync);
+  //must lock listSync before sync always, so we are FORCED to do a defensive
+  //lock on listSync.
+  LockMutex lock( listSync );
+  LockMutex lock2( sync );
+
+  if ( socket == NL_INVALID )
+    return true;
 
   NLboolean ret = nlListen(socket);
   if (ret == NL_TRUE) {
     gnedbgo1(3, "Registering listen socket %i", socket);
-    GNE::eGen->reg(socket, ServerListener::sptr( new ServerListener( this_.lock() ) ) );
+
+    //Lock our strong pointer, making sure setThisPointer was called.
+    sptr this_strong = this_.lock();
+    assert( this_strong );
+
+    //Do the actual register.
+    GNE::eGen->reg(socket, ServerListener::sptr( new ServerListener( this_strong ) ) );
     listening = true;
+
+    //We shouldn't already be in this list...
+    assert( std::find( listeners.begin(), listeners.end(), this_strong ) == listeners.end() );
+
+    //Add us to the list.
+    listeners.push_back( this_strong );
+
+    //success
     return false;
   }
+
   return true;
 }
 
 bool ServerConnectionListener::isListening() const {
+  LockMutex lock(sync);
+
   return listening;
 }
 
@@ -82,20 +133,21 @@ void ServerConnectionListener::onReceive() {
 
     if (!params) {
       //If the params were valid
-      ServerConnection::sptr newConn = ServerConnection::create(params, sock, this);
+      assert( !this_.expired() );
+      ServerConnection::sptr newConn = ServerConnection::create(params, sock, this_.lock());
       gnedbgo2(4, "Spawning a new ServerConnection %x on socket %i",
         newConn, sock);
       newConn->start();
     } else {
       //If the params are not valid, report the error
-      onListenFailure(Error(Error::OtherGNELevelError), Address(),
+      onListenFailure( Error(Error::OtherGNELevelError), Address(),
         params.getListener());
     }
   } else {
     LowLevelError err = LowLevelError();
     gnedbgo1(1, "Listening failure (accept failed): %s",
       err.toString().c_str());
-    onListenFailure(err, Address(), NULL);
+    onListenFailure( err, Address(), ConnectionListener::sptr() );
   }
 }
 
@@ -111,17 +163,36 @@ Address ServerConnectionListener::getLocalAddress() const {
   }
 }
 
-void ServerConnectionListener::processOnListenFailure( const Error& error, const Address& from, ConnectionListener* listener) {
-  LockMutex lock( sync );
+void ServerConnectionListener::setThisPointer( const sptr& thisPointer ) {
+  this_ = thisPointer;
+}
+
+void ServerConnectionListener::rawClose() {
+  LockMutex lock(sync);
+
+  if (listening) {
+    gnedbgo1(3, "Unregistering listen socket %i", socket);
+    GNE::eGen->unreg(socket);
+    listening = false;
+  }
+  
+  if ( socket != NL_INVALID ) {
+    nlClose(socket);
+    socket = NL_INVALID;
+  }
+}
+
+void ServerConnectionListener::processOnListenFailure( const Error& error, const Address& from, const ConnectionListener::sptr& listener) {
+  //LockMutex lock( sync );
   onListenFailure( error, from, listener );
 }
 
-void ServerConnectionListener::processOnListenSuccess( ConnectionListener* listener ) {
-  LockMutex lock( sync );
+void ServerConnectionListener::processOnListenSuccess( const ConnectionListener::sptr& listener ) {
+  //LockMutex lock( sync );
   onListenSuccess( listener );
 }
 
-void ServerConnectionListener::onListenSuccess(ConnectionListener* listener) {
+void ServerConnectionListener::onListenSuccess(const ConnectionListener::sptr& listener) {
   //The default behavior for this event is to do nothing.
 }
 
@@ -137,8 +208,3 @@ void ServerConnectionListener::ServerListener::onReceive() {
 }
 
 }
-
-
-
-
-

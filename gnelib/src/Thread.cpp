@@ -92,8 +92,8 @@ void* Thread::threadStart(void* thread) {
   return 0;
 }
 
-Thread::Thread(std::string name2, int priority2) : shutdown(false), name(name2),
-started(false), running(false), joined(false), priority(priority2) {
+Thread::Thread(std::string name2, int priority2) : type(USER), shutdown(false),
+name(name2), started(false), running(false), joined(false), priority(priority2) {
   id = new ThreadIDData();
   gnedbgo( 5, "Thread created" );
 }
@@ -178,6 +178,16 @@ bool Thread::waitForAllThreads(int ms) {
   return timeout;
 }
 
+void Thread::requestAllShutdown( ThreadType threadType ) {
+  LockMutex lock( mapSync );
+
+  ThreadMapIter iter = threads.begin();
+  for ( ; iter != threads.end(); ++iter ) {
+    if ( threadType == ALL || iter->second->type == threadType )
+      iter->second->shutDown();
+  }
+}
+
 std::string Thread::getName() const {
   return name;
 }
@@ -186,10 +196,6 @@ void Thread::shutDown() {
   shutdown = true;
 }
 
-/**
- * \bug only works for 1 thread in pthreads.
- * \todo allow multiple threads to do join.
- */
 void Thread::join() {
   assert( !joined && started );
   if ( started ) {
@@ -197,6 +203,7 @@ void Thread::join() {
 #ifdef WIN32
     valassert(WaitForSingleObject( id->hThread, INFINITE ), WAIT_OBJECT_0);
 #else
+    LockMutex lock( joinSync );
     valassert(pthread_join( id->thread_id, NULL ), 0);
 #endif
   }
@@ -278,16 +285,25 @@ Thread::sptr Thread::getThisPointer() const {
   return thisThread.lock();
 }
 
+void Thread::setType( ThreadType newType ) {
+  type = newType;
+}
+
 void Thread::remove( const ThreadIDData& d ) {
   mapSync.vanillaAcquire();
-  assert( threads.find( d.thread_id) != threads.end() );
+  //We need to delay the possible destructor until AFTER erase finishes,
+  //because the destructor can invoke currentThread if it runs a debug output
+  //statement, and Bad Things happen since currentThread finds an element that
+  //doesn't really exist.
+  sptr temp;
+  {
+    ThreadMapIter iter = threads.find( d.thread_id);
+    assert( iter != threads.end() );
+    temp = iter->second;
+  }
   threads.erase(d.thread_id);
+  temp.reset();
   mapSync.vanillaRelease();
 }
 
 }
-
-
-
-
-

@@ -29,15 +29,16 @@
 
 namespace GNE {
 
-  EventThread::EventThread(ConnectionListener* listener, Connection::sptr conn)
-: Thread("EventThr", Thread::HIGH_PRI), ourConn(conn), eventListener(listener),
+EventThread::EventThread( const Connection::sptr& conn )
+: Thread("EventThr", Thread::HIGH_PRI), ourConn(conn),
 onReceiveEvent(false), onTimeoutEvent(false),
 onDisconnectEvent(false), onExitEvent(false), failure(NULL) {
   gnedbgo(5, "created");
+  setType( CONNECTION );
 }
 
-EventThread::sptr EventThread::create(ConnectionListener* listener, Connection::sptr conn) {
-  sptr ret( new EventThread( listener, conn ) );
+EventThread::sptr EventThread::create( const Connection::sptr& conn ) {
+  sptr ret( new EventThread( conn ) );
   ret->setThisPointer( ret );
   return ret;
 }
@@ -53,11 +54,14 @@ EventThread::~EventThread() {
   gnedbgo(5, "destroyed");
 }
 
-ConnectionListener* EventThread::getListener() const {
-  return eventListener;
+ConnectionListener::sptr EventThread::getListener() const {
+  listenSync.acquire();
+  ConnectionListener::sptr ret = eventListener;
+  listenSync.release();
+  return ret;
 }
 
-void EventThread::setListener(ConnectionListener* listener) {
+void EventThread::setListener( const ConnectionListener::sptr& listener) {
   //Acquire listenSync to wait for the current event to complete.
   listenSync.acquire();
 
@@ -72,7 +76,7 @@ void EventThread::setListener(ConnectionListener* listener) {
   listenSync.release();
 }
 
-int EventThread::getTimeout() {
+int EventThread::getTimeout() const {
   return (timeout.getuSec() / 1000);
 }
 
@@ -143,7 +147,9 @@ void EventThread::onReceive() {
 }
 
 void EventThread::shutDown() {
-  Thread::shutDown();
+  //Yep.  No setting of shutdown.  We want to try to close gracefully.  If we
+  //can't do that we couldn't respond to shutdown either.
+  ourConn->disconnect();
 
   eventSync.acquire();
   eventSync.signal();
@@ -151,13 +157,14 @@ void EventThread::shutDown() {
 }
 
 void EventThread::run() {
-  while (!shutdown) {
+  while ( true ) {
+    //Yup.  No checking of shutdown.  When shutDown is called we call disconnect
+    //on our connection, which should lead to a graceful shutdown.
     eventSync.acquire();
     //Wait while we have no listener and/or we have no events.
-    while (eventListener == NULL || 
-           (!onReceiveEvent && !failure
-           && !onDisconnectEvent && eventQueue.empty() && !shutdown
-           && !onExitEvent && !onTimeoutEvent) ) {
+    while (!eventListener || (!onReceiveEvent && !failure &&
+           !onDisconnectEvent && eventQueue.empty() &&
+           !onExitEvent && !onTimeoutEvent) ) {
       //Calculate the time to wait
       if ( timeout == Time() ) {
         //wait "forever"
@@ -169,68 +176,71 @@ void EventThread::run() {
       }
     }
     eventSync.release();
-    if (!shutdown) {
-      checkForTimeout();
 
-      //Check for events, processing them if events are pending
-      if (failure) {
-        listenSync.acquire();
-        eventListener->onFailure(*failure);
-        listenSync.release();
-        ourConn->disconnect();
-        delete failure;
-        failure = NULL;
+    checkForTimeout();
 
-      } else if (onExitEvent) {
-        onExitEvent = false;
-        listenSync.acquire();
-        eventListener->onExit();
-        listenSync.release();
-        ourConn->disconnect();
+    //Check for events, processing them if events are pending
+    if (failure) {
+      listenSync.acquire();
+      eventListener->onFailure(*failure);
+      listenSync.release();
+      ourConn->disconnect();
+      delete failure;
+      failure = NULL;
 
-      } else if (onDisconnectEvent) {
-        listenSync.acquire();
-        eventListener->onDisconnect();
-        listenSync.release();
-        return;  //terminate this thread since there are no other events to
-                 //process -- onDisconnect HAS to be the last.
+    } else if (onExitEvent) {
+      onExitEvent = false;
+      listenSync.acquire();
+      eventListener->onExit();
+      listenSync.release();
+      ourConn->disconnect();
 
-      } else if (onReceiveEvent) {
-        //This is set to false before in case we get more packets during the
-        //onReceive event.
-        onReceiveEvent = false;
-        listenSync.acquire();
-        eventListener->onReceive();
-        listenSync.release();
+    } else if (onDisconnectEvent) {
+      listenSync.acquire();
+      eventListener->onDisconnect();
+      listenSync.release();
+      return;  //terminate this thread since there are no other events to
+      //process -- onDisconnect HAS to be the last.
 
-      } else if (onTimeoutEvent) {
-        onTimeoutEvent = false;
-        listenSync.acquire();
-        eventListener->onTimeout();
-        listenSync.release();
+    } else if (onReceiveEvent) {
+      //This is set to false before in case we get more packets during the
+      //onReceive event.
+      onReceiveEvent = false;
+      listenSync.acquire();
+      eventListener->onReceive();
+      listenSync.release();
 
-      } else {
-        eventSync.acquire();
+    } else if (onTimeoutEvent) {
+      onTimeoutEvent = false;
+      listenSync.acquire();
+      eventListener->onTimeout();
+      listenSync.release();
 
-        //When we get here this is the only reason left why we were woken up!
-        assert(!eventQueue.empty());
-        Error* e = eventQueue.front();
-        listenSync.acquire();
-        eventListener->onError(*e);
-        listenSync.release();
-        delete e;
-        eventQueue.pop();
+    } else {
+      eventSync.acquire();
 
-        eventSync.release();
-      }
+      //When we get here this is the only reason left why we were woken up!
+      assert(!eventQueue.empty());
+      Error* e = eventQueue.front();
+      listenSync.acquire();
+      eventListener->onError(*e);
+      listenSync.release();
+      delete e;
+      eventQueue.pop();
+
+      eventSync.release();
     }
   }
 }
 
 void EventThread::checkForTimeout() {
-  timeSync.acquire();
+  LockMutexEx lock( timeSync );
+
+  if ( timeout == Time() )
+    return;
+
   Time t = nextTimeout;
-  timeSync.release();
+  lock.release();
 
   if ( Timer::getAbsoluteTime() > t )
     onTimeout();

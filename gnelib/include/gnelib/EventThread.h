@@ -25,6 +25,8 @@
 #include "Mutex.h"
 #include "ConditionVariable.h"
 #include "Time.h"
+#include "SmartPtr.h"
+#include "WeakPtr.h"
 
 namespace GNE {
 class ConnectionListener;
@@ -65,38 +67,38 @@ protected:
   /**
    * @see create
    */
-  EventThread(ConnectionListener* listener, SmartPtr<Connection> conn);
+  EventThread( const SmartPtr<Connection>& conn );
 
 public:
   typedef SmartPtr<EventThread> sptr;
   typedef WeakPtr<EventThread> wptr;
 
   /**
-   * Initializes this class as a event thread for listener.
+   * Initializes this class as a event thread for a listener.
    * The conn pointer is used to call disconnect when an onFailure
    * event is finally processed.  This is to assure that disconnect is called
    * from a safe thread that won't lead to deadlock when a failure occurs.
    *
    * The SmartPtr also keeps the Connection alive if it is still active.
    */
-  static sptr create(ConnectionListener* listener, SmartPtr<Connection> conn);
+  static sptr create( const SmartPtr<Connection>& conn );
 
   virtual ~EventThread();
 
   /**
    * Use GNE::Connection::getListener.
    */
-  ConnectionListener* getListener() const;
+  SmartPtr<ConnectionListener> getListener() const;
   
   /**
    * Use GNE::Connection::setListener.
    */
-  void setListener(ConnectionListener* listener);
+  void setListener( const SmartPtr<ConnectionListener>& listener );
 
   /**
    * Use GNE::Connection::getTimeout.
    */
-  int getTimeout();
+  int getTimeout() const;
 
   /**
    * Use GNE::Connection::setTimeout.
@@ -163,11 +165,11 @@ private:
 
   //The listener for our events.  All on* events go here.  This is protected
   //so ClientConnection can send events as well.
-  ConnectionListener* eventListener;
+  SmartPtr<ConnectionListener> eventListener;
 
   ConditionVariable eventSync;
 
-  ConditionVariable listenSync;
+  mutable ConditionVariable listenSync;
 
   //Variables for handling onTimeout events.
   Mutex timeSync;

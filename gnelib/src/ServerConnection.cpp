@@ -41,15 +41,19 @@ namespace GNE {
 class ServerConnectionParams {
 public:
   ConnectionParams cp;
-  ServerConnectionListener* creator;
+  ServerConnectionListener::sptr creator;
   bool doJoin;
 };
 
-ServerConnection::ServerConnection(const ConnectionParams& p,
-                                   NLsocket rsocket2,
-                                   ServerConnectionListener* creator)
+ServerConnection::ServerConnection()
 : Thread("SrvrConn", Thread::HIGH_PRI) {
   gnedbgo(5, "created");
+}
+
+void ServerConnection::init( const ConnectionParams& p,
+                        NLsocket rsocket2,
+                        const SmartPtr<ServerConnectionListener>& creator ) {
+  setType( CONNECTION );
   assert(!p);
   sockets.r = rsocket2;
   setListener(p.getListener());
@@ -62,10 +66,11 @@ ServerConnection::ServerConnection(const ConnectionParams& p,
 
 ServerConnection::sptr
 ServerConnection::create(const ConnectionParams& p, NLsocket rsocket,
-                         ServerConnectionListener* creator) {
-  sptr ret( new ServerConnection( p, rsocket, creator ) );
+                         const SmartPtr<ServerConnectionListener>& creator) {
+  sptr ret( new ServerConnection() );
   ret->Thread::setThisPointer( ret );
   ret->Connection::setThisPointer( ret );
+  ret->init( p, rsocket, creator );
   return ret;
 }
 
@@ -75,16 +80,18 @@ ServerConnection::~ServerConnection() {
 }
 
 /**
+ * \bug if GNE shuts down while connecting... well that's just bad news.  This
+ *      thread may not connect and end in time, causing undefined behavior.
  * \bug The PacketFeeder is set after onNewConn, so it is possible that if
  *      the user sets a different PacketFeeder right after connecting, it
  *      might "get lost" and if set during onNewConn, is definitely lost.
  */
 void ServerConnection::run() {
   assert(sockets.r != NL_INVALID);
-  assert(getListener() != NULL);
+  assert(getListener());
   //endConnect will set the null listener to discard the events, so we
   //have to cache the current listener.
-  ConnectionListener* origListener = getListener();
+  ConnectionListener::sptr origListener = getListener();
 
   //We cache the remote address because after an error occurs we may not be
   //able to get it to pass to the listen failure function.
@@ -103,7 +110,8 @@ void ServerConnection::run() {
 
   //Start up the connecting SyncConnection and start the onNewConn event.
   bool onNewConnFinished = false;
-  SyncConnection sConn(this);
+  SyncConnection::sptr sConnPtr = SyncConnection::create( this_.lock() );
+  SyncConnection& sConn = *sConnPtr;
   try {
     sConn.startConnect();
     ps->start();

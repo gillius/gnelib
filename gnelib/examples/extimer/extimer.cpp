@@ -97,10 +97,10 @@ private:
 };
   
 int main() {
+  //GNE::initDebug( DLEVEL1 | DLEVEL5, "extimerd.txt" );
   initGNE(NO_NET, atexit);
-  initConsole(atexit);
+  initConsole();
   setTitle("GNE Timers Example");
-  //GNE::initDebug( DLEVEL1 | DLEVEL5, "debug.txt" );
 
   //Doing some tests on Time class
   mprintf("Time class tests:\n");
@@ -135,12 +135,17 @@ int main() {
 
   mlprintf(0, 14, "Shutting down timers, please wait...");
 
+  //these calls are optional.  When GNE shuts down it will shut all timers
+  //down.  You can also use Timer::stopAll.
   t1->stopTimer(false);
   t2->stopTimer(false);
-  t3->stopTimer(false);
-  t4->stopTimer(false);
 
-  Thread::waitForAllThreads( 3000 );
+  //t1 through t4 should be shut down by GNE -- so we test this by "forgetting"
+  // to stop t3 and t4 examine the extimerd.txt log file to be sure they stopped.
+  //t3->stopTimer(false);
+  //t4->stopTimer(false);
 
+  //When GNE shuts down, it will wait up to (by default) 10 seconds for all
+  //connections, timers, and threads to end.
   return 0;
 }

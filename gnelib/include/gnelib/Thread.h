@@ -44,6 +44,19 @@ public: //typedefs
 
 public:
   /**
+   * An enum for specifing the thread type.  You should never need to use this
+   * directly, since anything you create should have type USER.
+   */
+  enum ThreadType {
+    USER,      /**< this thread is a user-created thread. */
+    TIMER,     /**< this thread is a Timer thread. */
+    SYSTEM,    /**< this thread is a %GNE-created thread. */
+    CONNECTION,/**< this thread is for a Connection. */
+    ALL        /**< used only as a parameter to some functions. */
+  };
+
+public:
+  /**
    * Creates a new thread, ready to run but not yet running.
    * @param name the name of this thread
    * @param priority the priority this thread has
@@ -82,21 +95,27 @@ public:
   static void yield();
 
   /**
-   * This method will wait for all threads that the user can control or see
-   * to end.  All of the threads created implicitly have a deterministic end
-   * so that when you destruct objects the threads associated with them are
-   * deleted.  Therefore only threads that you have directly created might
-   * still be running.  You can use this static method to wait for and 
-   * therefore verify their completion, since when main exits, your threads
-   * will be terminated forcefully if they are running.
+   * This method will wait for all threads that have a type != SYSTEM.  This
+   * includes threads from connections and threads from timers, so if you have
+   * any active connections or timers this method will almost always timeout.
+   * Therefore this method is best meant for making sure that after you have
+   * shutdown all of the connections, timers, and threads you have created
+   * that you are guaranteed that they have ended, so that you may freely
+   * release any resources they were using.
+   *
+   * GNE calls this method for you implicitly when GNE is shutdown.  This may
+   * be a problem since by default GNE is shutdown with an atexit routine that
+   * runs after main ends.  If this is a problem, you should explicitly call
+   * GNE::shutdownGNE.
    *
    * The implementation of this method is simple and therefore not intended
    * to be used to create a program where you create detached threads and
    * then use the main thread to sit in this function until the "real"
    * program completes.  It is meant solely as a method of definitvely
    * verifying the completion of temporary threads, and waiting short times
-   * for these threads to finish if needed.  If you need to wait a long time,
-   * use join on the threads you've made, as this method is more efficient.
+   * for these threads to finish if needed.  If you need to wait a long time
+   * (over 10 seconds) use join on the threads you've made, as join is much
+   * more efficient.
    *
    * You may want to execute the requestAllShutdown method before calling
    * this method.
@@ -104,20 +123,34 @@ public:
    * @param ms the amount of time to wait for the threads before giving up.
    *           This is used so a stalled or crashed thread will still allow
    *           you to terminate the program.
-   * @return true if all threads have completed, or false if there are still
+   * @return false if all threads have completed, or true if there are still
    *              some threads running and the method timed out.
    *
    * @see requestAllShutdown
+   * @see Connection::disconnectAll
+   * @see GNE::shutdownGNE
+   * @see Timer::stopAll
    */
   static bool waitForAllThreads(int ms);
 
   /**
-   * Calls the shutDown method of all running threads.  This is simply a
-   * request to the thread that it should shut down, it is up to the
-   * implementation whether to ignore or heed this advice, and how quickly.
+   * Calls the shutDown method of all running threads of the given type.
+   * This is simply a request to the thread that it should shut down -- it
+   * is up to the implementation whether to ignore or heed this advice, and
+   * how quickly.  You can pass the special type ALL to this function.
+   *
+   * Only %GNE itself should call requestAllShutdown with a parameter
+   * besides "USER".  If you call this function, you should only use the
+   * parameter USER.  If you want to shut down timers or connections, use
+   * the appopriate functions of those classes.
+   *
+   * Threads marked as SYSTEM should never be touched by the user.  They will
+   * shutdown when GNE exits.
+   *
+   * @see Connection::disconnectAll
+   * @see Timer::stopAll
    */
-  //TODO: implement this
-  //static void requestAllShutdown();
+  static void requestAllShutdown( ThreadType threadType );
 
   /**
    * Returns the name of this thread.
@@ -233,6 +266,13 @@ protected:
   sptr getThisPointer() const;
 
   /**
+   * Sets this Thread's type.  You shouldn't call this function, since the
+   * thread type USER is default, and only threads created by GNE should be
+   * anything but USER.
+   */
+  void setType( ThreadType newType );
+
+  /**
    * This variable is set to true when this thread should exit.  Users that
    * implement a Thread class must respond to this if the thread wants to
    * wait in an infinite loop.  Threads that will eventually stop can respond
@@ -274,6 +314,8 @@ private:
 
   wptr thisThread;
 
+  ThreadType type;
+
   std::string name;
 
   bool started;
@@ -283,6 +325,10 @@ private:
   bool joined;
 
   int priority;
+
+#ifndef WIN32
+  Mutex joinSync; //needed for pthreads-based platforms.
+#endif
 };
 
 }

@@ -52,10 +52,19 @@ public:
   typedef WeakPtr<Timer> wptr;
 
   /**
+   * Stops all Timers.
+   */
+  static void stopAll();
+
+  /**
    * Create a timer callback.  The first call to the callback will occur
    * after "rate" milliseconds, so this class is suitable for setting
    * timeouts for your operations.  Use the startTimer method to start this
    * timer.
+   *
+   * The callback should not contain a SmartPtr reference to its Timer,
+   * because this would create a cycle.  It can contain a WeakPtr to its
+   * Timer, however.
    *
    * @param callback A newly allocated object to perform callbacks on.
    * @param rate the callback rate in milliseconds.
@@ -93,6 +102,11 @@ public:
    * Timer once you have stopped it, you need to create a new Timer.
    */
   void startTimer();
+
+  /**
+   * Equivalent to calling stopTimer with false.
+   */
+  virtual void shutDown();
 
   /**
    * Stops the timer and stops calling the callback.  The timer will likely

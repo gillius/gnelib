@@ -20,9 +20,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "ConnectionListener.h"
 
 namespace GNE {
-class ConnectionListener;
 class PacketFeeder;
 
 /**
@@ -33,15 +33,26 @@ class PacketFeeder;
  * to expand the list of parameters, and perhaps change the defaults.  This
  * class when constructed sets everything to defaults, so change only the
  * parameters that you care about.
+ *
+ * Many of the methods in this class are not thread-safe, so instances of this
+ * class should not be shared between threads.  Copies can be made of objects
+ * of this class, though, should sharing be needed.
  */
 class ConnectionParams {
 public:
   /**
    * Creates a new ConnectionParams object using the default values, and
-   * optionally setting the listener property.  A non-NULL listener is always
+   * not setting the listener property.  A non-NULL listener is always
    * needed by the time it comes active, so it is almost always specified.
    */
-  ConnectionParams(ConnectionListener* Listener = NULL);
+  ConnectionParams();
+
+  /**
+   * Creates a new ConnectionParams object using the default values, and
+   * setting the listener property.  A non-NULL listener is always
+   * needed by the time it comes active, so it is almost always specified.
+   */
+  ConnectionParams( const ConnectionListener::sptr& Listener );
 
   /**
    * Returns true if any of the parameters are invalid or out of range.
@@ -57,9 +68,12 @@ public:
    * The ConnectionListener that will receive events from the Connection.
    * Valid value is any non-NULL pointer.
    */
-  void setListener(ConnectionListener* Listener);
+  void setListener( const ConnectionListener::sptr& Listener);
 
-  ConnectionListener* getListener() const;
+  /**
+   * Returns the value set by getListener.
+   */
+  const ConnectionListener::sptr& getListener() const;
 
   /**
    * The PacketFeeder receives onLowPackets events which are entirely
@@ -69,6 +83,9 @@ public:
    */
   void setFeeder(PacketFeeder* Feeder);
 
+  /**
+   * Returns the value set by setFeeder.
+   */
   PacketFeeder* getFeeder() const;
 
   /**
@@ -79,6 +96,9 @@ public:
    */
   void setFeederTimeout(int FeederTimeout);
 
+  /**
+   * Returns the value set by setFeederTimeout.
+   */
   int getFeederTimeout() const;
 
   /**
@@ -88,6 +108,9 @@ public:
    */
   void setLowPacketThreshold(int limit);
 
+  /**
+   * Returns the value set by setLowPacketThreshold.
+   */
   int getLowPacketThreshold() const;
 
   /**
@@ -110,6 +133,9 @@ public:
    */
   void setOutRate(int OutRate);
 
+  /**
+   * Returns the value set by setOutRate.
+   */
   int getOutRate() const;
 
   /**
@@ -121,6 +147,9 @@ public:
    */
   void setInRate(int InRate);
 
+  /**
+   * Returns the value set by setInRate.
+   */
   int getInRate() const;
 
   /**
@@ -138,6 +167,9 @@ public:
    */
   void setLocalPort(int LocalPort);
 
+  /**
+   * Returns the value set by setLocalPort.
+   */
   int getLocalPort() const;
 
   /**
@@ -153,10 +185,13 @@ public:
    */
   void setUnrel(bool set);
 
+  /**
+   * Returns the value set by setUnrel.
+   */
   bool getUnrel() const;
 
 private:
-  ConnectionListener* listener;
+  ConnectionListener::sptr listener;
 
   PacketFeeder* feeder;
 

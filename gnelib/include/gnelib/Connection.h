@@ -69,6 +69,12 @@ public:
   typedef SmartPtr<Connection> sptr;
   typedef WeakPtr<Connection> wptr;
 
+public: //static methods
+  /**
+   * Disconnects all active connections in the GNE system.
+   */
+  static void disconnectAll();
+
 public:
 
   /**
@@ -88,7 +94,7 @@ public:
    *             considering removing it.  If you have a strong case to
    *             leave it in, please tell me.
    */
-  ConnectionListener* getListener() const;
+  SmartPtr<ConnectionListener> getListener() const;
 
   /**
    * Sets a new event listener.  All new events will be sent to the new
@@ -110,7 +116,7 @@ public:
    * listener to discard all events before you wrap this Connection with a
    * SyncConnection.
    */
-  void setListener(ConnectionListener* listener);
+  void setListener( const SmartPtr<ConnectionListener>& listener);
 
   /**
    * Returns the timeout for this connection.  Returns 0 at any time if the
@@ -227,6 +233,11 @@ protected:
    * SmartPtr to itself.
    */
   void setThisPointer( const wptr& weakThis );
+
+  /**
+   * A weak pointer to this own object.
+   */
+  wptr this_;
 
   /**
    * Starts the EventThread running.
@@ -351,11 +362,6 @@ private:
     bool reliable;
 
   };
-
-  /**
-   * A weak pointer to this own object.
-   */
-  wptr this_;
 
   /**
    * A weak reference to the EventThread that will we will keep forever, that

@@ -41,8 +41,15 @@ class ConnectionParams;
  */
 class ServerConnection : public Connection, public Thread {
 protected:
-  ServerConnection(const ConnectionParams& p, NLsocket rsocket,
-                   ServerConnectionListener* creator);
+  /**
+   * We need information gained from setThisPointer to initialize, so the real
+   * work is done in the init method, which should be called right after
+   * constructon and setThisPointer has been called.
+   */
+  ServerConnection();
+
+  void init(const ConnectionParams& p, NLsocket rsocket,
+            const SmartPtr<ServerConnectionListener>& creator );
 
 public:
   typedef SmartPtr<ServerConnection> sptr;
@@ -54,11 +61,13 @@ public:
    *
    * @param rsocket2 the reliable socket received from the accept command.
    * @param creator the ServerConnectionListener that created us, so that we
-   *                may call its onListenFailure event.
+   *                may call its onListenFailure event.  This strong pointer
+   *                will be released after the connection finished, as to not
+   *                worry about cycles.
    * @see ServerConnectionListener
    */
   static sptr create(const ConnectionParams& p, NLsocket rsocket,
-                     ServerConnectionListener* creator);
+                     const SmartPtr<ServerConnectionListener>& creator);
 
   /**
    * Destructs this ServerConnection object.  The user need not worry about

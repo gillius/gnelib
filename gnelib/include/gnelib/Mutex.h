@@ -69,6 +69,8 @@ private:
 };
 
 /**
+ * @ingroup threading
+ *
  * A small helper class for Mutex which locks the mutex in its ctor and
  * unlocks it in its destructor.  This is handy if a largish function has
  * multiple exit points espically if it throws exceptions.  This class makes
@@ -78,9 +80,7 @@ private:
  * A LockMutex instance may not be copied, and you must specify a mutex to
  * lock in its constructor.
  *
- * This class might be expanded in the future to allow it to be released
- * early, and provide additional features, but its core functionality will
- * remain the same.
+ * @see LockMutexEx
  */
 class LockMutex {
 public:
@@ -98,6 +98,46 @@ private:
   LockMutex& operator= (LockMutex& rhs);
 
   Mutex& mutex;
+};
+
+/**
+ * @ingroup threading
+ *
+ * Works exactly like LockMutex but allows early release.  Two separate classes
+ * were provided because on many compilers LockMutex has absolutely 0 overhead
+ * while when trying to provide early release, there may be some overhead.
+ *
+ * Since those cases are rare, the ex version can be used when early release
+ * is needed.
+ *
+ * @see LockMutex
+ */
+class LockMutexEx {
+public:
+  LockMutexEx(Mutex& mutexToLock) : mutex(mutexToLock), released(false) {
+    mutex.acquire();
+  }
+
+  void release() {
+    if ( !released ) {
+      mutex.release();
+      released = true;
+    }
+  }
+
+  ~LockMutexEx() {
+    if ( !released )
+      mutex.release();
+  }
+private:
+  //LockMutexEx cannot be copied or constructed defaultly.
+  LockMutexEx();
+  LockMutexEx(LockMutexEx&);
+  LockMutexEx& operator= (LockMutexEx& rhs);
+
+  Mutex& mutex;
+
+  bool released;
 };
 
 }

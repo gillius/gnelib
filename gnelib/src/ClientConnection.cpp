@@ -40,12 +40,13 @@ class ClientConnectionParams {
 public:
   Address dest;
   ConnectionParams cp;
-  SyncConnection* sConnPtr;
+  SmartPtr<SyncConnection> sConnPtr;
 };
 
 ClientConnection::ClientConnection()
 : Thread("CliConn", Thread::HIGH_PRI), params(NULL) {
   gnedbgo(5, "created");
+  setType( CONNECTION );
 }
 
 ClientConnection::sptr ClientConnection::create() {
@@ -76,7 +77,11 @@ bool ClientConnection::open(const Address& dest,
   return (sockets.r == NL_INVALID);
 }
 
-void ClientConnection::connect(SyncConnection* wrapped) {
+void ClientConnection::connect() {
+  connect( SyncConnection::sptr() );
+}
+
+void ClientConnection::connect( const SyncConnection::sptr& wrapped ) {
   assert(sockets.r != NL_INVALID);
   assert(params != NULL);
   assert(params->dest);
@@ -87,16 +92,17 @@ void ClientConnection::connect(SyncConnection* wrapped) {
 }
 
 /**
+ * \bug if GNE shuts down while connecting... well that's just bad news.
  * \bug The PacketFeeder is set after onNewConn, so it is possible that if
  *      the user sets a different PacketFeeder right after connecting, it
  *      might "get lost" and if set during onNewConn, is definitely lost.
  */
 void ClientConnection::run() {
-  assert(getListener() != NULL);
+  assert( getListener() );
   gnedbgo1(1, "Trying to connect to %s", params->dest.toString().c_str());
   //endConnect will set the null listener to discard the events, so we
   //have to cache the current listener.
-  ConnectionListener* origListener = getListener();
+  ConnectionListener::sptr origListener = getListener();
 
   NLaddress temp = params->dest.getAddress();
   NLboolean check = nlConnect(sockets.r, &temp);
@@ -117,7 +123,7 @@ void ClientConnection::run() {
     //one here and else make our own.
     bool ourSConn = false;
     if (!params->sConnPtr) {
-      params->sConnPtr = new SyncConnection(this);
+      params->sConnPtr = SyncConnection::create( this_.lock() );
       ourSConn = true;
     } else
       assert(params->sConnPtr == getListener());
@@ -148,7 +154,6 @@ void ClientConnection::run() {
       if (ourSConn) {
         sConn.endConnect(true);
         sConn.release();
-        delete params->sConnPtr;
       }
 
       //Setup the packet feeder
@@ -169,9 +174,6 @@ void ClientConnection::run() {
 
       if (e.getCode() == Error::ConnectionRefused)
         sConn.disconnect();
-
-      if (ourSConn)
-        delete params->sConnPtr;
 
       //We are done using the ClientConnectionParams.
       delete params;
