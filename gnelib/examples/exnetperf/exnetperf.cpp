@@ -26,43 +26,58 @@
  * on performace.  (SyncConnection will most likely be used only while
  * connecting).
  * This example could also be used to test the bandwidth throttling.
+ * Right now this example isn't completed yet, but it is getting close.
  */
 
 #include "../../include/gnelib.h"
+#include "rndalgor.cpp"
 #include <iostream>
+#include "StatsDisplay.h" //Our helper class for displaying the stats.
 
 using namespace std;
 using namespace GNE;
 using namespace GNE::PacketParser;
 using namespace GNE::Console;
 
-void updateGlobalStats();
 void errorExit(const char* error);
 int getPort(const char* prompt);
 void doServer(int outRate, int inRate, int port);
 void doClient(int outRate, int inRate, int port);
 
-//This keeps track of some screen positions when can write to.
-//Essentially makes tiles out of the screen.
-struct Pos {
-  int x, y;
-  bool taken;
-};
-static Pos gpos = {0, 8, false}; //global stats position
-static Pos positions[] = {{0, 17, false}};
+/**
+ * A small wrapper around rndalgor from the jrnd library, which is not
+ * thread-safe.
+ */
+class Randomizer {
+public:
+  Randomizer() {
+    slongrand(time(NULL));
+  }
 
-const Pos& getNextPos() {
-  return positions[0];
-}
+  ~Randomizer() {}
+
+  int getNum() {
+    sync.acquire();
+    int ret = longrand();
+    sync.release();
+    return ret;
+  }
+
+private:
+  Mutex sync;
+};
+
+static StatsDisplay* sDisplay;
+static Randomizer random;
 
 //The PerfTester class works on both the client and the server side.
 class PerfTester : public ConnectionListener {
 public:
-  PerfTester(const Pos& ourPos2) : packetsIn(0),  packetsOut(0),
-                                   ourPos(ourPos2), conn(NULL) {}
+  PerfTester() : packetsIn(0), packetsOut(0), conn(NULL) {}
   ~PerfTester() {}
 
   void onDisconnect() {
+    sDisplay->delConn(conn);
     if (serverSide) {
       //see serverSide declaration for more info
       delete conn;
@@ -74,25 +89,26 @@ public:
     serverSide = false;
     conn = conn2.getConnection();
     writePackets(); //Send an initial batch of data.
+    sDisplay->addConn(conn, &packetsIn, &packetsOut);
   }
 
   void onNewConn(SyncConnection& conn2) throw (Error) {
     serverSide = true;
     conn = conn2.getConnection();
-    conn2.release();
     writePackets();
+    sDisplay->addConn(conn, &packetsIn, &packetsOut);
   }
 
   void onReceive() {
+    //We don't need to do anything to the data we are being sent.  The low-
+    //level routines will keep track of the stats for us, so we just delete
+    //the packets we get.
     Packet* next = conn->stream().getNextPacket();
     while (next != NULL) {
       delete next;
       packetsIn++;
       next = conn->stream().getNextPacket();
     }
-    //We don't need to do anything to the data we are being sent.  The low-
-    //level routines will keep track of the stats for us.
-    updateStats();
   }
 
   void onFailure(const Error& error) {
@@ -114,46 +130,30 @@ public:
     writePackets();
   }
 
-  //Try to send out some more packets.
+  //Try to send out some more packets of random size with random databytes.
   void writePackets() {
+    //Find packetsize in 32-bit words
+    //We pick a range of 2 to 100 because that is the typical GNE packet
+    //size in game.  GNE is meant to combine the packets to optimize
+    //bandwith.
+    //int packetSize = random.getNum() % 48 + 2;
+
+    //Big packet test, to represent GNE transmitting files or initial game
+    //information.
+    int packetSize = CustomPacket::getMaxUserDataSize() / 4 - 1;
+
+    //Create a packet with random data
     CustomPacket temp;
-    temp.getData() << "Hello World!";
+    for (int c = 0; c < packetSize; c++)
+      temp.getData() << random.getNum();
+
     conn->stream().writePacket(temp, true);
     packetsOut++;
-
-    updateStats();
   }
 
-  //write the stats out to our position.
-  void updateStats() {
-    updateGlobalStats();
-    ConnectionStats all = conn->getStats(-1);
-    ConnectionStats rel = conn->getStats(1);
-    ConnectionStats unrel = conn->getStats(0);
-    //Printfs are so much nicer in this case, eh?
-    mlprintf(ourPos.x, ourPos.y, "%-20s%10s%10s%10s",
-      conn->getRemoteAddress(true).toString().c_str(), "tot =" , "rel +", "unrel");
-    mlprintf(ourPos.x, ourPos.y+1, "%-20s%10d", "HiLvlPkts in", packetsIn);
-    mlprintf(ourPos.x, ourPos.y+2, "%-20s%10d", "HiLvlPkts out", packetsOut);
-    mlprintf(ourPos.x, ourPos.y+3, "%-20s%10d%10d%10d",
-      "bytesin", all.bytesRecv, rel.bytesRecv, unrel.bytesRecv);
-    mlprintf(ourPos.x, ourPos.y+4, "%-20s%10d%10d%10d",
-      "bytesout", all.bytesSent, rel.bytesSent, unrel.bytesSent);
-    mlprintf(ourPos.x, ourPos.y+5, "%-20s%10d%10d%10d",
-      "inRate", all.avgBytesRecv, rel.avgBytesRecv, unrel.avgBytesRecv);
-    mlprintf(ourPos.x, ourPos.y+6, "%-20s%10d%10d%10d",
-      "outRate", all.avgBytesSent, rel.avgBytesSent, unrel.avgBytesSent);
-    mlprintf(ourPos.x, ourPos.y+7, "%-20s%10d%10d%10d",
-      "maxInRate", all.maxAvgBytesRecv, rel.maxAvgBytesRecv, unrel.maxAvgBytesRecv);
-    mlprintf(ourPos.x, ourPos.y+8, "%-20s%10d%10d%10d",
-      "maxOutRate", all.maxAvgBytesSent, rel.maxAvgBytesSent, unrel.maxAvgBytesSent);
-    mlprintf(ourPos.x, ourPos.y+9, "%-20s%10d%10d%10d",
-      "sockets", all.openSockets, rel.openSockets, unrel.openSockets);
-  }
 private:
   int packetsIn;
   int packetsOut;
-  Pos ourPos;
   Connection* conn;
 
   //We use this because this class can be client or server.  In the client
@@ -185,22 +185,11 @@ public:
 
   void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
     inRate = outRate = 0; //0 meaning no limits on rates.
-    listener = new PerfTester(getNextPos());
+    listener = new PerfTester();
   }
 
 private:
 };
-
-void updateGlobalStats() {
-  ConnectionStats all = GNE::getGlobalStats();
-  mlprintf(gpos.x, gpos.y, "%-20s%10s", "global", "tot");
-  mlprintf(gpos.x, gpos.y+1, "%-20s%10d", "bytesin", all.bytesRecv);
-  mlprintf(gpos.x, gpos.y+2, "%-20s%10d", "bytesout", all.bytesSent);
-  mlprintf(gpos.x, gpos.y+3, "%-20s%10d", "inRate", all.avgBytesRecv);
-  mlprintf(gpos.x, gpos.y+4, "%-20s%10d", "outRate", all.avgBytesSent);
-  mlprintf(gpos.x, gpos.y+5, "%-20s%10d", "maxInRate", all.maxAvgBytesRecv);
-  mlprintf(gpos.x, gpos.y+6, "%-20s%10d", "maxOutRate", all.maxAvgBytesSent);
-}
 
 void errorExit(const char* error) {
   shutdownConsole();
@@ -233,6 +222,7 @@ int main() {
     exit(3);
   }
   setTitle("GNE Net Performance Tester");
+  sDisplay = new StatsDisplay(500);
 
   gout << "GNE Net Performance Tester for " << GNE::VER_STR << endl;
   gout << "Local address: " << getLocalAddress() << endl;
@@ -253,6 +243,7 @@ int main() {
     doClient(0, 0, port);
   }
 
+  delete sDisplay;
   return 0;
 }
 
@@ -269,6 +260,7 @@ void doServer(int outRate, int inRate, int port) {
 
   gout << "Server is listening on: " << server.getLocalAddress() << endl;
   gout << "Press a key to shutdown server." << endl;
+  sDisplay->startDisplay();
   getch();
   //When the server class is destructed, it will stop listening and shutdown.
 }
@@ -288,13 +280,15 @@ void doClient(int outRate, int inRate, int port) {
   gout << "Connecting to: " << address << endl;
   gout << "Press a key to stop the testing. " << endl;
 
-  ClientConnection client(outRate, inRate, new PerfTester(getNextPos()));
+  ClientConnection client(outRate, inRate, new PerfTester());
   if (client.open(address, 0)) //localPort = 0, for any local port.
     errorExit("Cannot open client socket.");
 
   client.connect();
   client.join();
 
+  sDisplay->startDisplay();
   getch(); //Wait for user keypress
+
   client.disconnectSendAll();
 }
