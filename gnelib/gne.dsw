@@ -32,6 +32,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name expacket
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name exrawtest
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -67,6 +70,21 @@ Package=<4>
 ###############################################################################
 
 Project: "expacket"=".\EXAMPLES\expacket\expacket.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name gne
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "exrawtest"=".\EXAMPLES\exrawtest\exrawtest.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
