@@ -5,31 +5,31 @@
 
 ifeq ($(MINGDIR),)
 patherror:
-	@echo Please specify your mingw32 directory via set MINGDIR=*
+   @echo Please specify your mingw32 directory via set MINGDIR=*
 endif
 
 # set up all the variables used in the main makefile
 
-GCC						= g++
+CPP                  = g++
 
-AR							= ar
+AR                   = ar
 
-EXAMPLE_LIBS			= $(LIB_STATIC) -lNL -lwsock32 -lpthreadGC
+EXAMPLE_LIBS         = $(LIB_STATIC) -lNL -lwsock32 -lpthreadGC
 
-LINKER_OPTIONS			= -mthreads
+LDFLAGS              = -mthreads
 
-COMPILER_OPTIONS		= -Wall -O3 -s
+CPPFLAGS             = -Wall -O3 -s
 
-EXAMPLE_CPP				= $(wildcard examples/*/*.cpp)
+EXAMPLE_CPP          = $(wildcard examples/*/*.cpp)
 
-EXAMPLE_O				= $(EXAMPLE_CPP:.cpp=.o)
+EXAMPLE_O            = $(EXAMPLE_CPP:.cpp=.o)
 
-EXAMPLE_EXE				= $(addprefix examples/,$(notdir $(EXAMPLE_O:.o=.exe)))
+EXAMPLE_EXE          = $(addprefix examples/,$(notdir $(EXAMPLE_O:.o=.exe)))
 
-LIB_CPP					= $(wildcard src/*.cpp)
+LIB_CPP              = $(wildcard src/*.cpp)
 
-LIB_O						= $(LIB_CPP:.cpp=.o)
+LIB_O                = $(LIB_CPP:.cpp=.o)
 
-LIB_STATIC				= src/libgnelib.a
+LIB_STATIC           = src/libgnelib.a
 
-VPATH						= $(dir $(EXAMPLE_CPP))
+VPATH                = $(dir $(EXAMPLE_CPP))
