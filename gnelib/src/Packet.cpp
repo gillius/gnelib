@@ -19,28 +19,37 @@
 
 #include "gneintern.h"
 #include "Packet.h"
+#include "RawPacket.h"
 
 //##ModelId=3AE4D49C0168
-Packet::Packet() {
+Packet::Packet(int id) : type((NLubyte)id) {
 }
 
 //##ModelId=3AE4D49C019A
 Packet::~Packet() {
 }
 
-//##ModelId=3AE4D51000FA
-RawPacket* Packet::createRaw(bool reliable) {
-  return NULL;
+//##ModelId=3B0723A6001E
+Packet* Packet::makeClone() const {
+  return new Packet(*this);
 }
 
 //##ModelId=3AE4DA920276
-NLubyte Packet::getType() {
-  return (NLubyte)0;
+int Packet::getType() const {
+  return (int)type;
 }
 
-//##ModelId=3AE4D58E0136
-Packet* Packet::parsePacket(RawPacket& packet) {
-  return NULL;
+//##ModelId=3B0723A600FA
+int Packet::getSize() const {
+  return sizeof(timestamp) + sizeof(type);
 }
 
+//##ModelId=3B06EDF30302
+void Packet::writePacket(RawPacket& raw) const {
+  raw << type << timestamp;
+}
 
+//##ModelId=3B06EE000352
+void Packet::readPacket(RawPacket& raw) {
+  raw >> timestamp;
+}
