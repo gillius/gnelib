@@ -61,6 +61,10 @@ int kbhit() {
   return conio_kbhit();
 }
 
+//This is an undef because under Linux at least it appears that getch is a
+//macro.
+#undef getch
+
 int getch() {
   return conio_getch();
 }

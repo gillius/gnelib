@@ -19,7 +19,7 @@
 
 #include "gneintern.h"
 #include "Timer.h"
-#include "Time.h"
+#include "TimeGne.h"
 #include "TimerCallback.h"
 
 namespace GNE {
@@ -36,9 +36,11 @@ Timer::~Timer() {
     delete listener;
 }
 
-/**
- * \todo write UNIX version
- */
+#ifndef WIN32
+//For the gettimeofday function.
+#include <sys/time.h>
+#endif
+
 //##ModelId=3B0753820036
 Time Timer::getCurrentTime() {
   Time ret;
@@ -49,26 +51,26 @@ Time Timer::getCurrentTime() {
   ret.setSec(int(t.QuadPart / freq.QuadPart));
   ret.setuSec(int((t.QuadPart % freq.QuadPart) * 1000000 / freq.QuadPart));
 #else
-#error Need to port Timer::getCurrentTime()
+  timeval tv;
+  gettimeofday(&tv, NULL);
+  ret.setSec(tv.tv_sec);
+  ret.setuSec(tv.tv_usec);
 #endif
   return ret;
 }
 
-/**
- * \todo write UNIX version
- */
 //##ModelId=3B0753820065
 Time Timer::getAbsoluteTime() {
-  Time ret;
 #ifdef WIN32
+  Time ret;
   _timeb t;
   _ftime(&t);
   ret.setSec(t.time);
   ret.setuSec(t.millitm * 1000);
-#else
-#error Need to port Timer::getAbsoluteTime()
-#endif
   return ret;
+#else
+  return getCurrentTime();
+#endif
 }
 
 //##ModelId=3B0753820067

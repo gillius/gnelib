@@ -20,7 +20,7 @@
 #include "gneintern.h"
 #include "ConditionVariable.h"
 #include "Mutex.h"
-#include "Time.h"
+#include "TimeGne.h"
 #include "Timer.h"
 
 namespace GNE {

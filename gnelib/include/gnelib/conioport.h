@@ -8,10 +8,10 @@
 #include <conio.h>
 #include <windows.h>
 
-void conio_init (void) { system("cls"); }
-void conio_exit (void) {}
-int conio_kbhit (void) { return kbhit(); }
-int conio_getch (void) { return getch(); }
+void conio_init () { system("cls"); }
+void conio_exit () {}
+int conio_kbhit () { return kbhit(); }
+int conio_getch () { return getch(); }
 void conio_gotoxy (int x, int y) {
   COORD pos = {x, y};
   SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
@@ -37,35 +37,30 @@ void conio_settitle(const char* title) {
 
 static int __gf__cached__gf__ = 0, __gf__cached_value__gf__ = 0;
 
-inline void conio_init (void)
-{
-	int x,y;
-	initscr();
-	start_color();
-	cbreak();
-	noecho();
-	nonl();
-//	intrflush (stdscr, FALSE);
-	keypad (stdscr, TRUE);
-	nodelay (stdscr, TRUE);
-	scrollok (stdscr, TRUE);
+void conio_init () {
+  initscr();
+  start_color();
+  cbreak();
+  noecho();
+  nonl();
+  //intrflush (stdscr, FALSE);
+  keypad (stdscr, TRUE);
+  nodelay (stdscr, TRUE);
+  scrollok (stdscr, TRUE);
 }
 
-inline void conio_exit (void)
-{
-	endwin();
+void conio_exit () {
+  endwin();
 }
 
-inline int conio_kbhit (void)
-{
+int conio_kbhit () {
   if (__gf__cached__gf__) return 1;
   __gf__cached_value__gf__ = getch();
   if (__gf__cached_value__gf__ != ERR) __gf__cached__gf__ = 1;
   return __gf__cached__gf__;
 }
 
-inline int conio_getch (void)
-{
+int conio_getch () {
   if (__gf__cached__gf__) {
 	__gf__cached__gf__ = 0;
 	return __gf__cached_value__gf__;
@@ -73,12 +68,15 @@ inline int conio_getch (void)
 	return getch();
 }
 
-inline void conio_gotoxy (int x, int y) { move (y-1, x-1); }
+void conio_gotoxy (int x, int y) {
+  move (y-1, x-1);
+}
 
 void conio_getsize(int* x, int* y) {
   *x = 0;
   *y = 0;
 }
+
 void conio_settitle(const char* title) {
 }
 

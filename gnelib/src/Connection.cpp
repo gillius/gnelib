@@ -32,25 +32,25 @@ namespace GNE {
 
 //##ModelId=3B0753810073
 Connection::Connection(int outRate, int inRate, ConnectionListener* listener)
-: connecting(false), connected(false), eventListener(listener),
+: eventListener(listener), connecting(false), connected(false),
 rlistener(NULL), ulistener(NULL) {
-	ps = new PacketStream(outRate, inRate, *this);
+  ps = new PacketStream(outRate, inRate, *this);
 }
 
 //##ModelId=3B0753810076
 Connection::~Connection() {
-	disconnect();
+  disconnect();
   delete ps;
 }
 
 //##ModelId=3BCE75A80280
 ConnectionListener* Connection::getListener() const {
-	return eventListener;
+  return eventListener;
 }
 
 //##ModelId=3BCE75A80282
 void Connection::setListener(ConnectionListener* listener) {
-	eventListener = listener;
+  eventListener = listener;
 }
 
 //##ModelId=3B0753810078
@@ -243,4 +243,4 @@ void Connection::unreg(bool reliable, bool unreliable) {
 	}
 }
 
-}
+} //Namespace GNE
