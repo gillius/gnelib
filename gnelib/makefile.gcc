@@ -8,11 +8,11 @@ DEBUGFLAGS           = $(COMMONFLAGS) -g -D_DEBUG
 OPTIMIZEFLAGS        = $(COMMONFLAGS) -O3 -s
 
 ifdef DEBUGMODE
-CPPFLAGS            += $(DEBUGFLAGS)
-CFLAGS              += $(DEBUGFLAGS)
+CPPFLAGS             = $(DEBUGFLAGS)
+CFLAGS               = $(DEBUGFLAGS)
 else
-CPPFLAGS            += $(OPTIMIZEFLAGS)
-CFLAGS              += $(OPTIMIZEFLAGS)
+CPPFLAGS             = $(OPTIMIZEFLAGS)
+CFLAGS               = $(OPTIMIZEFLAGS)
 endif
 
 ifdef OLD_CPP
