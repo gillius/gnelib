@@ -113,10 +113,13 @@
 				RelativePath=".\src\Address.cpp">
 			</File>
 			<File
-				RelativePath="ChannelPacket.cpp">
+				RelativePath="src\ChannelPacket.cpp">
 			</File>
 			<File
 				RelativePath="src\ChannelProvider.cpp">
+			</File>
+			<File
+				RelativePath="src\Client.cpp">
 			</File>
 			<File
 				RelativePath=".\src\ClientConnection.cpp">
@@ -179,6 +182,27 @@
 				RelativePath=".\src\Mutex.cpp">
 			</File>
 			<File
+				RelativePath="src\NetworkObject.cpp">
+			</File>
+			<File
+				RelativePath="src\ObjectBrokerClient.cpp">
+			</File>
+			<File
+				RelativePath="src\ObjectBrokerPacket.cpp">
+			</File>
+			<File
+				RelativePath="src\ObjectBrokerServer.cpp">
+			</File>
+			<File
+				RelativePath="src\ObjectCreationPacket.cpp">
+			</File>
+			<File
+				RelativePath="src\ObjectDeathPacket.cpp">
+			</File>
+			<File
+				RelativePath="src\ObjectUpdatePacket.cpp">
+			</File>
+			<File
 				RelativePath=".\src\Packet.cpp">
 			</File>
 			<File
@@ -198,6 +222,9 @@
 			</File>
 			<File
 				RelativePath=".\src\ReceiveEventListener.cpp">
+			</File>
+			<File
+				RelativePath="src\Server.cpp">
 			</File>
 			<File
 				RelativePath=".\src\ServerConnection.cpp">
@@ -225,6 +252,9 @@
 			</File>
 			<File
 				RelativePath=".\src\TimerCallback.cpp">
+			</File>
+			<File
+				RelativePath="src\WrapperPacket.cpp">
 			</File>
 			<File
 				RelativePath=".\src\conioport.c">
@@ -321,6 +351,27 @@
 				RelativePath="include\gnelib\MutexData.h">
 			</File>
 			<File
+				RelativePath="include\gnelib\NetworkObject.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ObjectBrokerClient.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ObjectBrokerPacket.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ObjectBrokerServer.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ObjectCreationPacket.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ObjectDeathPacket.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\ObjectUpdatePacket.h">
+			</File>
+			<File
 				RelativePath="include\gnelib\OldConsoleStreambuf.h">
 			</File>
 			<File
@@ -337,6 +388,12 @@
 			</File>
 			<File
 				RelativePath=".\include\gnelib\PingPacket.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\Player.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\PlayerData.h">
 			</File>
 			<File
 				RelativePath="include\gnelib\PlayerList.h">
@@ -388,6 +445,9 @@
 			</File>
 			<File
 				RelativePath=".\include\gnelib\TimerCallback.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\WrapperPacket.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\conioport.h">
