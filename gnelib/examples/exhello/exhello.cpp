@@ -249,7 +249,7 @@ void doClient(int outRate, int inRate, int port) {
   gout << "Connecting to: " << address << endl;
 
   //uncomment the loop and reduce sleep time to perform a stress test.
-  for (int i=0; i < 100; i++) {
+  //for (int i=0; i < 100; i++) {
     ConnectionParams params( OurClient::create() );
     params.setUnrel(true);
     params.setOutRate(outRate);
@@ -285,7 +285,7 @@ void doClient(int outRate, int inRate, int port) {
     }
 
     //client will be destroyed here as its sptr will go out of scope.
-  }
+  //}
 }
 
 
