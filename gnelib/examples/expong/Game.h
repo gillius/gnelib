@@ -250,7 +250,7 @@ public:
       //a little bit.
       if (inc) {
         ++currChar;
-        if (currChar >= msg.size()) {
+        if ((std::string::size_type)currChar >= msg.size()) {
           currChar = 0;
           
           if (currMode == DRAW)
