@@ -37,7 +37,8 @@ using namespace GNE::Console;
 
 class HelloWorld : public Thread {
 public:
-  HelloWorld(std::string myName) : Thread(myName) {
+  HelloWorld(std::string myName, Mutex& mutexToTest)
+    : Thread(myName), testMutex(mutexToTest) {
     mprintf("%s is born\n", myName.c_str());
   }
   virtual ~HelloWorld() {
@@ -52,10 +53,34 @@ protected:
     //You would call shutDown then join on this thread to stop it in this
     //case.
     //while (!shutdown) {
-    mprintf("Hello World!  My name is %s.\n Id: %i %i\n Ref: %x %x\n",
-      getName().c_str(), getID(), pthread_self(), Thread::currentThread(), this);
+    //  do_stuff();
     //}
+
+    //Test the mutex we were given.  In normal operation the acquire should
+    //not deadlock.  If it does there was a problem with unlocking the mutex
+    //in the main thread.
+    //The sleeps are to give the other threads a chance to go.  We should
+    //never see two threads given the same mutex intertwine their prints.
+    testMutex.acquire();
+
+    mprintf("Hello World!  My name is %s.\n", getName().c_str());
+    Thread::sleep(50);
+
+    mprintf(" %s Id: %i %i\n", getName().c_str(), getID(), pthread_self());
+    Thread::sleep(100);
+
+    mprintf(" %s Ref: %x %x\n", getName().c_str(), Thread::currentThread(), this);
+
+    assert(getID() == pthread_self());
+    assert(Thread::currentThread() == this);
+
+    testMutex.release();
   }
+
+private:
+  //We try to acquire this mutex just to test it to see if it was really
+  //unlocked in the main thread.
+  Mutex& testMutex;
 };
 
 int main(int argc, char* argv[]) {
@@ -71,20 +96,45 @@ int main(int argc, char* argv[]) {
   test.release();
   mprintf(" success.\n");
 
-  HelloWorld* bob = new HelloWorld("Bob");
+  Mutex test2;
+  mprintf("Testing recursive locks with LockMutex:");
+  try {
+    //The LockMutex class locks the mutex when it is created.  When it is
+    //destroyed the mutex is unlocked, and this is useful if a function has
+    //mutliple return statements or throws exceptions.  You would never want
+    //to use them as they are here (nested).  Only one LockMutex is ever
+    //needed.
+    LockMutex lock(test2);
+    LockMutex lock2(test2);
+
+    //When we throw an exception, variables in this block like lock and lock2
+    //will be destroyed, and when a LockMutex is destroyed it unlocked the
+    //mutex that it locked when it was created.
+    throw 0;
+  } catch (...) {
+  }
+  mprintf(" success.\n");
+
+  //We make the HelloWorld threads, giving them some mutexes to test.  If two
+  //threads are using the same mutex, they can't go at the same time.  So all
+  //of Sally's statements should come before or after all of Joe's.  Bob uses
+  //a different mutex so his statements will be mixed in with Sally's and
+  //Joe's.
+  HelloWorld* bob = new HelloWorld("Bob", test);
   bob->start();      //Tells bob to start his job.
   bob->detach(true); //we don't want to see bob again.
 
-  HelloWorld* sally = new HelloWorld("Sally");
+  HelloWorld* sally = new HelloWorld("Sally", test2);
   sally->start();
 
-  HelloWorld* joe = new HelloWorld("Joe");
+  HelloWorld* joe = new HelloWorld("Joe", test2);
   joe->start();
 
   assert(sally->isRunning()); //Sally should be running.  Note this is true
                               //because sally->start() was called, and not
                               //because the thread has ACTUALLY started
-                              //executing.
+                              //executing by the OS having given it any CPU
+                              //time.
   mprintf("Waiting for Sally to end.\n");
   sally->join(); //we must either join or detach every thread.
   mprintf("Sally ended.  Killing Sally.\n");
