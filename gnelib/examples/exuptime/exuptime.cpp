@@ -18,24 +18,18 @@
  */
 
 #include "../../src/gnelib.h"
-#include "../coniox.h"
 
 int main() {
-  GNE::init(NL_IP);
-
-  conio_init();
+  GNE::init(NL_IP, atexit);
+  Console::init(atexit);
   
-  mprintf("The time in seconds, is:\n");
-  mprintf("Time is from some arbitrary point in the past.\n");
-  mprintf("In Windows, this is actually the system uptime, as it uses the rdtsc\n  instruction.");
-  while (!kbhit()) {
-    conio_gotoxy(25, 0);
+  Console::mprintf("The time in seconds, is:\n");
+  Console::mprintf("Time is from some arbitrary point in the past.\n");
+  Console::mprintf("In Windows, this is actually the system uptime, as it uses the rdtsc\n  instruction.");
+  while (!Console::kbhit()) {
     Time t = Timer::getCurrentTime();
-    mprintf("%i.%i  ", t.getSec(), t.getuSec());
+    Console::mlprintf(25, 0, "%i.%i  ", t.getSec(), t.getuSec());
   }
 
-  conio_exit();
-  
-  GNE::exit(0);
   return 0;
 }
