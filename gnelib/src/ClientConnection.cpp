@@ -21,15 +21,7 @@
 #include "ClientConnection.h"
 
 //##ModelId=3AE59FAB0000
-ClientConnection::ClientConnection(int outRate, int inRate, std::string dest, int port)
-: Connection(outRate, inRate) {
-  NLaddress addr;
-  nlStringToAddr((NLbyte*)dest.c_str(), &addr);
-  nlOpen(port, NL_RELIABLE);
-}
-
-//##ModelId=3AFF8361029E
-ClientConnection::ClientConnection(int outRate, int inRate, NLaddress dest, int port) 
+ClientConnection::ClientConnection(int outRate, int inRate)
 : Connection(outRate, inRate) {
 }
 
@@ -37,23 +29,35 @@ ClientConnection::ClientConnection(int outRate, int inRate, NLaddress dest, int 
 ClientConnection::~ClientConnection() {
 }
 
-//##ModelId=3AE5AF7A0384
-void ClientConnection::run() {
-}
-
 /**
  * \todo time sync with server
  */
+//##ModelId=3AE5AF7A0384
+void ClientConnection::run() {
+  NLboolean check = nlConnect(rsocket, &address);
+  if (check == NL_TRUE) {
+    connected = true;
+    onConnect();
+  } else {
+    onConnectFailure(ConnectionTimeOut);
+  }
+}
+
+//##ModelId=3B00C2E40302
+bool ClientConnection::open(std::string dest, int port) {
+  NLaddress addr;
+  nlStringToAddr((NLbyte*)dest.c_str(), &addr);
+  return open(addr, port);
+}
+
+//##ModelId=3B00C2E50104
+bool ClientConnection::open(NLaddress dest, int port) {
+  address = dest;
+  rsocket = nlOpen(port, NL_RELIABLE);
+  return (rsocket == NL_INVALID);
+}
+
 //##ModelId=3AE59FD4019A
 void ClientConnection::connect() {
+  start();
 }
-
-//##ModelId=3AE59FBB01A4
-void ClientConnection::onConnect() {
-}
-
-//##ModelId=3AE59FCA0168
-void ClientConnection::onConnectFailure(FailureType errorType) {
-}
-
-

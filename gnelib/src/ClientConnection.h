@@ -34,25 +34,11 @@ class ClientConnection : public Connection, public Thread {
 public:
   /**
    * Initializes this ClientConnection.
-   * @param dest an address in the form of xxx.xxx.xxx.xxx:ppppp (for
-   *        internet sockets, or an appropriate NL format if not IP).  You
-   *        must use HawkNL to resolve the hostname, if needed.
-   * @param port local port to open on, default 0 for don't care.
    * @see Connection#Connection(int, int, std::string)
    * @see ClientConnection(int, int NLaddress)
    */
   //##ModelId=3AE59FAB0000
-  ClientConnection(int outRate, int inRate, std::string dest, int port = 0);
-
-  /**
-   * Alternate version of ctor taking a native HawkNL address.
-   * @param dest destination address and port.
-   * @param port local port to open on, default 0 for don't care.
-   * @see Connection#Connection(int, int, std::string)
-   * @see ClientConnection(int, int, std::string)
-   */
-  //##ModelId=3AFF8361029E
-  ClientConnection(int outRate, int inRate, NLaddress dest, int port = 0);
+  ClientConnection(int outRate, int inRate);
 
   //##ModelId=3AE59FAB003C
   virtual ~ClientConnection();
@@ -66,10 +52,32 @@ public:
   void run();
 
   /**
+   * Opens the socket, ready for connect, but does not yet connect.
+   * @param dest an address in the form of xxx.xxx.xxx.xxx:ppppp (for
+   *        internet sockets, or an appropriate NL format if not IP).  You
+   *        must use HawkNL to resolve the hostname, if needed.
+   * @param port local port to open on, default 0 for don't care.
+   * @return true if the socket could not be opened.
+   */
+  //##ModelId=3B00C2E40302
+  bool open(std::string dest, int port = 0);
+
+  /**
+   * Alternate version of open taking a native HawkNL address.
+   * @param dest destination address and port.
+   * @param port local port to open on, default 0 for don't care.
+   * @return true if the socket could not be opened.
+   */
+  //##ModelId=3B00C2E50104
+  bool open(NLaddress dest, int port = 0);
+
+  /**
    * Starts connection to the specified target.  This method does not block,
    * and a thread will be started to handle the connection process.
    * onConnect() or onConnectFailure() will be called depending on the
    * outcome of this process.\n
+   * You must call either detach(false) or join on this object after calling
+   * connect, depending if you want to wait for the connection to complete.\n
    * You can call join after connect to wait until the connection is
    * finished, when onConnect or onConnectFailure will be called.  When the
    * called function exits, the thread will stop and join will return.  If
@@ -86,21 +94,27 @@ public:
   void connect();
 
   /**
-   * Event triggered after there is a successful connection.
-   * Note you must call this function explicity from your overridden
-   * function FIRST so the underlying functions recieve this event.
+   * Event triggered after there is a successful connection.  Note that if
+   * you are joining on this object, the calling thread will still block
+   * until this function returns.
    */
   //##ModelId=3AE59FBB01A4
-  virtual void onConnect();
+  virtual void onConnect() = 0;
 
   /**
-   * Event triggered when a connection failed.
-   * Note you must call this function explicity from your overridden
-   * function FIRST so the underlying functions recieve this event.
+   * Event triggered when a connection failed.  Note that if
+   * you are joining on this object, the calling thread will still block
+   * until this function returns.
    */
   //##ModelId=3AE59FCA0168
-  virtual void onConnectFailure(FailureType errorType);
+  virtual void onConnectFailure(FailureType errorType) = 0;
 
+private:
+  /**
+   * Address used only while connecting, then unused afterwards.
+   */
+  //##ModelId=3B00C31A0064
+  NLaddress address;
 };
 
 

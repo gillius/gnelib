@@ -39,6 +39,10 @@ Connection::Connection(int outRate, int inRate)
 
 //##ModelId=3AE3591A0187
 Connection::~Connection() {
+  if (rsocket != NL_INVALID)
+    nlClose(rsocket);
+  if (usocket != NL_INVALID)
+    nlClose(usocket);
   delete ps;
 }
 
