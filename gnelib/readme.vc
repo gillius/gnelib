@@ -24,7 +24,7 @@ directory for MSVC.
 Once this is done, you should be able to #include <gnelib.h> and link in the
 gned.lib or gne.lib file into your project and be up and running.  If you run
 into any troubles, please visit the website or contact the authors -- these
-links listed in the main readme file.
+links are listed in the main readme file.
 
 ------------------------------------------------------------------------------
 

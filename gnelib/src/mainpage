@@ -80,6 +80,7 @@ you'll probably not need to use them directly in normal circumstances.
     <li> GNE::ConditionVariable </li>
     <li> GNE::Timer </li>
     <li> GNE::TimerCallback </li>
+    <li> GNE::Counter </li>
   </ul>
   
   Threads are used throughout %GNE.  You will need a basic understanding of
