@@ -22,7 +22,7 @@
 
 #include "gneintern.h"
 #include "TimerCallback.h"
-#include "Mutex.h"
+#include "ConditionVariable.h"
 
 namespace GNE {
 
@@ -71,12 +71,20 @@ public:
   //##ModelId=3C5CED0501BE
   void adjustCount(int val);
 
+  /**
+   * This method blocks until the count is greater than zero.  If the count
+   * is already greater than zero it returns immediately.  In either case, the
+   * value of the counter is decremented.
+   */
+  //##ModelId=3C7C0AFD0391
+  void waitAndDecrement();
+
 private:
   //##ModelId=3B07538100E5
   int count;
 
   //##ModelId=3B07538100E7
-  Mutex countSync;
+  ConditionVariable countSync;
 
 };
 
