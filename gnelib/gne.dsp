@@ -97,6 +97,10 @@ SOURCE=.\src\ConditionVariable.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\conioport.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Connection.cpp
 # End Source File
 # Begin Source File
@@ -126,6 +130,10 @@ SOURCE=.\src\GNE.cpp
 # Begin Source File
 
 SOURCE=.\src\GNEDebug.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\gstreambufs.cpp
 # End Source File
 # Begin Source File
 
@@ -242,6 +250,10 @@ SOURCE=.\include\gnelib\GNEDebug.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\gneintern.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\gstreambufs.h
 # End Source File
 # Begin Source File
 
