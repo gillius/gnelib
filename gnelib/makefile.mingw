@@ -1,0 +1,35 @@
+# mingw specific makefile
+
+# check if MINGDIR has been set
+# under DOS/WIN, there's no easy way to figure the compiler dir out otherwise
+
+ifeq ($(MINGDIR),)
+patherror:
+	@echo Please specify your mingw32 directory via set MINGDIR=*
+endif
+
+# set up all the variables used in the main makefile
+
+GCC						= g++
+
+AR							= ar
+
+EXAMPLE_LIBS			= $(LIB_STATIC) -lNL -lwsock32 -lpthreadw32
+
+LINKER_OPTIONS			= -mthreads
+
+COMPILER_OPTIONS		= -O3 -s
+
+EXAMPLE_CPP				= $(wildcard examples/*/*.cpp)
+
+EXAMPLE_O				= $(EXAMPLE_CPP:.cpp=.o)
+
+EXAMPLE_EXE				= $(addprefix examples/,$(notdir $(EXAMPLE_O:.o=.exe)))
+
+LIB_CPP					= $(wildcard src/*.cpp)
+
+LIB_O						= $(LIB_CPP:.cpp=.o)
+
+LIB_STATIC				= src/libgnelib.a
+
+VPATH						= $(dir $(EXAMPLE_CPP))
