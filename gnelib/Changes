@@ -3,6 +3,7 @@ GNE 0.003 to 0.4
     classes gout and gin exist that work even when curses is active, since they
     make use of the Console class I/O functions.  Both styles of I/O may be
     mixed.  The examples have been updated due to this change.
+  Fixed a deadlock bug that occurs when GNE is shut down.
   Lots of improvements, additions, and optimizations for the Console class and
     API.
   Making GNE work with Linux out of the box.
