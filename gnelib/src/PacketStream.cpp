@@ -30,7 +30,7 @@ namespace GNE {
 
 //##ModelId=3B07538101BD
 PacketStream::PacketStream(int outRate2, int inRate2, Connection& ourOwner)
-: inRate(inRate2), outRate(outRate2), owner(ourOwner) {
+: owner(ourOwner), inRate(inRate2), outRate(outRate2) {
 }
 
 //##ModelId=3B07538101C0
@@ -148,7 +148,7 @@ void PacketStream::run() {
 			RawPacket raw;
 			next->packet->writePacket(raw);
 			raw << PacketParser::END_OF_PACKET;
-      owner.rawWrite(next->reliable, raw.getData(), raw.getLength());
+      owner.rawWrite(next->reliable, raw.getData(), raw.getPosition());
 			delete next;
     }
   }

@@ -61,7 +61,7 @@ const std::string Connection::FailureStrings[] = {
 
 //##ModelId=3B0753810073
 Connection::Connection(int outRate, int inRate)
-: connected(false), rsocket(NL_INVALID), usocket(NL_INVALID),
+: rsocket(NL_INVALID), usocket(NL_INVALID), connected(false), 
 rlistener(NULL), ulistener(NULL) {
 	ps = new PacketStream(outRate, inRate, *this);
 }

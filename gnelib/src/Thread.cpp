@@ -52,13 +52,13 @@ extern "C" {
 }
 
 //##ModelId=3B0753810375
-Thread::Thread() : name(DEF_NAME), thread_id(0), running(false),
-deleteThis(false), priority(DEF_PRI), shutdown(false) {
+Thread::Thread() :  shutdown(false), name(DEF_NAME), thread_id(0),
+running(false), deleteThis(false), priority(DEF_PRI) {
 }
 
 //##ModelId=3B0753810376
-Thread::Thread(std::string name2, int priority2) : name(name2), thread_id(0),
-running(false), deleteThis(false), priority(priority2), shutdown(false) {
+Thread::Thread(std::string name2, int priority2) : shutdown(false), name(name2),
+thread_id(0), running(false), deleteThis(false), priority(priority2) {
 }
 
 //##ModelId=3B0753810379
