@@ -133,8 +133,14 @@ int lgetString(int x, int y, char* str, int maxlen) {
       currpos--;
       if (currpos < 0)
         currpos = 0;        //Hit the end
-      else
+      else {
         mlputchar(currpos+x, y, ' ');
+
+        //Performing this action helps to keep the cursor in the proper
+        //position.
+        if (currpos > 0)
+          mlputchar(currpos-1+x, y, (int)str[currpos-1]);
+      }
     } else {
       currpos++;
       if (currpos > maxlen) {
