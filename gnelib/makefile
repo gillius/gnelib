@@ -16,10 +16,10 @@ $(LIB_STATIC): $(LIB_O)
 	$(AR) rs $@ $^
 
 $(LIB_CPP_O): %.o: %.cpp
-	$(CPP) -Iinclude/gnelib -c -o $@ -MMD $(CPPFLAGS) $<
+	$(CPP) -c -o $@ -MMD $(CPPFLAGS) $<
 
 $(LIB_C_O): %.o: %.c
-	$(CC) -Iinclude/gnelib -c -o $@ -MMD $(CFLAGS) $<
+	$(CC) -c -o $@ -MMD $(CFLAGS) $<
 
 $(EXAMPLE_EXE): $(EXE_MASK): $(EXAMPLE_DIR) %.o $(LIB_STATIC)
 	$(CPP) -o $@ $(LDFLAGS) $< $(EXAMPLE_LIBS)

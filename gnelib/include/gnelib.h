@@ -25,7 +25,7 @@
 #include "gnelib/ConnectionListener.h"
 #include "gnelib/ConditionVariable.h"
 #include "gnelib/Connection.h"
-#include "gnelib/ErrorGne.h"
+#include "gnelib/Error.h"
 #include "gnelib/ConnectionEventGenerator.h"
 #include "gnelib/ReceiveEventListener.h"
 #include "gnelib/Console.h"
@@ -42,11 +42,12 @@
 #include "gnelib/SyncConnection.h"
 #include "gnelib/ServerConnection.h"
 #include "gnelib/Thread.h"
-#include "gnelib/TimeGne.h"
+#include "gnelib/Time.h"
 #include "gnelib/Timer.h"
 #include "gnelib/TimerCallback.h"
 #include "gnelib/GNEDebug.h"
 
 #endif
+
 
 

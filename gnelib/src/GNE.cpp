@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
-#include "ConnectionEventGenerator.h"
-#include "PacketParser.h"
-#include "GNE.h"
-#include "Address.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/ConnectionEventGenerator.h"
+#include "../include/gnelib/PacketParser.h"
+#include "../include/gnelib/GNE.h"
+#include "../include/gnelib/Address.h"
 
 namespace GNE {
   namespace PacketParser {
@@ -120,6 +120,9 @@ void setUserVersion(int version) {
 }
 
 }
+
+
+
 
 
 

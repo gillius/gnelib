@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
-#include "PacketParser.h"
-#include "Packet.h"
-#include "RawPacket.h"
-#include "Mutex.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/PacketParser.h"
+#include "../include/gnelib/Packet.h"
+#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Mutex.h"
 
 namespace GNE {
 namespace PacketParser {
@@ -89,5 +89,8 @@ Packet* parseNextPacket(bool& endOfPackets, RawPacket& raw) {
 
 }
 }
+
+
+
 
 

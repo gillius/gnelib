@@ -24,7 +24,7 @@
 #include "Thread.h"
 #include "PacketStream.h"
 #include "ReceiveEventListener.h"
-#include "ErrorGne.h"
+#include "Error.h"
 #include "SocketPair.h"
 
 namespace GNE {
@@ -304,5 +304,6 @@ private:
 
 }
 #endif /* CONNECTION_H_INCLUDED_C51DC478 */
+
 
 

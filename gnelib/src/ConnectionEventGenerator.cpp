@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
-#include "ConnectionEventGenerator.h"
-#include "ReceiveEventListener.h"
-#include "ConditionVariable.h"
-#include "Connection.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/ConnectionEventGenerator.h"
+#include "../include/gnelib/ReceiveEventListener.h"
+#include "../include/gnelib/ConditionVariable.h"
+#include "../include/gnelib/Connection.h"
 
 namespace GNE {
 
@@ -111,5 +111,8 @@ void ConnectionEventGenerator::shutDown() {
 }
 
 }
+
+
+
 
 

@@ -17,9 +17,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
-#include "Packet.h"
-#include "RawPacket.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/Packet.h"
+#include "../include/gnelib/RawPacket.h"
 
 namespace GNE {
 
@@ -71,5 +71,8 @@ Packet& Packet::operator = (const Packet& rhs) {
 }
 
 }
+
+
+
 
 

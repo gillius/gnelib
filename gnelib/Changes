@@ -1,4 +1,7 @@
 GNE 0.003 to 0.4
+  New include structure and method of inclusion, although more typing and
+    perhaps less flexible, now works properly on all platforms without name
+    changing and small cludges and hacks.
   Some of the examples make use of these new I/O classes even though using
     mprintf was perfectly fine to get some testing for these classes.
   Implemented new streambufs to be used with ostream and istream, so now two

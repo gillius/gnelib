@@ -17,16 +17,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"  
-#include "SyncConnection.h"
-#include "ErrorGne.h"
-#include "Mutex.h"
-#include "ConditionVariable.h"
-#include "Connection.h"
-#include "ClientConnection.h"
-#include "PacketStream.h"
-#include "ConnectionListener.h"
-#include "Packet.h"
+#include "../include/gnelib/gneintern.h"  
+#include "../include/gnelib/SyncConnection.h"
+#include "../include/gnelib/Error.h"
+#include "../include/gnelib/Mutex.h"
+#include "../include/gnelib/ConditionVariable.h"
+#include "../include/gnelib/Connection.h"
+#include "../include/gnelib/ClientConnection.h"
+#include "../include/gnelib/PacketStream.h"
+#include "../include/gnelib/ConnectionListener.h"
+#include "../include/gnelib/Packet.h"
 
 namespace GNE {
 
@@ -233,3 +233,8 @@ void SyncConnection::setError(const Error& error) {
 }
 
 } //namespace GNE
+
+
+
+
+

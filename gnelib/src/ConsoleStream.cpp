@@ -17,10 +17,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
-#include "ConsoleStream.h"
-#include "ConsoleStreambuf.h"
-#include "Mutex.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/ConsoleStream.h"
+#include "../include/gnelib/ConsoleStreambuf.h"
+#include "../include/gnelib/Mutex.h"
 
 std::ostream& operator << (std::ostream& o, GNE::Console::ConsoleManipulator& cm) {
   cm.action(o);
@@ -72,3 +72,7 @@ void moveTo::action(std::ostream& o) {
 
 }
 }
+
+
+
+

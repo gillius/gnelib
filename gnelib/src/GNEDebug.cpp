@@ -19,9 +19,9 @@
 
 #ifdef _DEBUG
 
-#include "gneintern.h"
-#include "GNEDebug.h"
-#include "Mutex.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/GNEDebug.h"
+#include "../include/gnelib/Mutex.h"
 #include <ctime>
 #include <cstring>
 
@@ -95,3 +95,7 @@ void doTrace(int level, const char* fn, int lineno, const char* msg, ...) {
 }
 
 #endif //_DEBUG
+
+
+
+

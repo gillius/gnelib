@@ -17,12 +17,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
-#include "ClientConnection.h"
-#include "ConnectionListener.h"
-#include "ErrorGne.h"
-#include "Address.h"
-#include "SyncConnection.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/ClientConnection.h"
+#include "../include/gnelib/ConnectionListener.h"
+#include "../include/gnelib/Error.h"
+#include "../include/gnelib/Address.h"
+#include "../include/gnelib/SyncConnection.h"
 
 namespace GNE {
 
@@ -91,5 +91,9 @@ void ClientConnection::connect() {
 }
 
 }
+
+
+
+
 
 

@@ -17,9 +17,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
-#include "SocketPair.h"
-#include "Address.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/SocketPair.h"
+#include "../include/gnelib/Address.h"
 
 namespace GNE {
 
@@ -101,3 +101,7 @@ int SocketPair::rawWrite(bool reliable, const NLbyte* buf, int bufSize) const {
 }
 
 } //Namespace GNE
+
+
+
+

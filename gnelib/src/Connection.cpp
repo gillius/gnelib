@@ -17,16 +17,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
-#include "Connection.h"
-#include "ConnectionListener.h"
-#include "RawPacket.h"
-#include "PacketParser.h"
-#include "ConnectionEventGenerator.h"
-#include "ErrorGne.h"
-#include "SocketPair.h"
-#include "Address.h"
-#include "GNE.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/Connection.h"
+#include "../include/gnelib/ConnectionListener.h"
+#include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/PacketParser.h"
+#include "../include/gnelib/ConnectionEventGenerator.h"
+#include "../include/gnelib/Error.h"
+#include "../include/gnelib/SocketPair.h"
+#include "../include/gnelib/Address.h"
+#include "../include/gnelib/GNE.h"
 
 namespace GNE {
 
@@ -244,3 +244,8 @@ void Connection::unreg(bool reliable, bool unreliable) {
 }
 
 } //Namespace GNE
+
+
+
+
+

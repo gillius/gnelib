@@ -17,8 +17,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
-#include "ErrorGne.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/Error.h"
 #include <sstream>
 
 std::ostream& operator << (std::ostream& o, const GNE::Error& err) {
@@ -117,3 +117,8 @@ Error Error::createLowLevelError() {
 }
 
 }
+
+
+
+
+

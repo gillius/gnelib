@@ -17,14 +17,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
-#include "ServerConnectionListener.h"
-#include "ConnectionEventGenerator.h"
-#include "ServerConnection.h"
-#include "ConnectionListener.h"
-#include "Connection.h"
-#include "GNE.h"
-#include "Address.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/ServerConnectionListener.h"
+#include "../include/gnelib/ConnectionEventGenerator.h"
+#include "../include/gnelib/ServerConnection.h"
+#include "../include/gnelib/ConnectionListener.h"
+#include "../include/gnelib/Connection.h"
+#include "../include/gnelib/GNE.h"
+#include "../include/gnelib/Address.h"
 
 namespace GNE {
 
@@ -108,5 +108,8 @@ void ServerConnectionListener::ServerListener::onReceive() {
 }
 
 }
+
+
+
 
 

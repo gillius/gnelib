@@ -22,7 +22,7 @@
 
 #include "gneintern.h"
 #include "Mutex.h"
-#include "ErrorGne.h"
+#include "Error.h"
 #include "ConnectionListener.h"
 #include "ConditionVariable.h"
 
@@ -226,3 +226,5 @@ private:
 } // namespace GNE
 
 #endif /* SYNCCONNECTION_H_INCLUDED_C43C0621 */
+
+

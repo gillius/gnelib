@@ -2,7 +2,7 @@
 //belongs to George foot gfoot@users.sourceforge.net.  The Windows portion
 //of this code is public domain.
 
-#include "conioport.h"
+#include "../include/gnelib/conioport.h"
 
 #ifdef WIN32
 // *** WINDOWS API CONSOLE CODE ***
@@ -134,3 +134,7 @@ int conio_vprintf(const char* format, va_list ap) {
 }
 
 #endif
+
+
+
+

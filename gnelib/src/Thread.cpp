@@ -17,9 +17,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
-#include "Thread.h"
-#include "ConditionVariable.h"
+#include "../include/gnelib/gneintern.h"
+#include "../include/gnelib/Thread.h"
+#include "../include/gnelib/ConditionVariable.h"
 
 namespace GNE {
 
@@ -165,5 +165,8 @@ void Thread::remove(Thread* thr) {
 }
 
 }
+
+
+
 
 

@@ -98,6 +98,9 @@ public:
 
 	void onDisconnect() { 
 		mprintf("Client just disconnected.\n");
+    //This is an iffy practice.  If we do this, we have to be careful to
+    //always note that each new connection we use this listener with gets
+    //its own new copy which we don't destroy later.
 		delete this;
 	}
 
