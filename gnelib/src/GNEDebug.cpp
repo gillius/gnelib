@@ -95,7 +95,8 @@ void doTrace(int level, const char* fn, int lineno, const char* msg, ...) {
         temp++;
     } else
       temp++;
-    fprintf(logFile, "%30s, line %4i, thrd %8s: %s\n",
+    //The longest filename is ConnectionEventGenerator.cpp, which is 28 chars.
+    fprintf(logFile, "%28s, line %4i, thrd %8s: %s\n",
             temp, lineno, thrName.c_str(), buf);
     fflush(logFile); //Try to be resiliant to errors.
     sync->release();
