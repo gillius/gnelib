@@ -60,7 +60,7 @@ public:
    * Returns non-zero if a key is waiting in the buffer to be received by
    * getch.  You cannot use this call while an lgetstring is being processed.
    * @see getch
-   * @see lgetstring
+   * @see lgetString
    */
   //##ModelId=3AF8AADE038E
   static int kbhit();
@@ -71,7 +71,7 @@ public:
    * is being processed.
    * @return the next character
    * @see kbhit
-   * @see lgetstring
+   * @see lgetString
    */
   //##ModelId=3AF8AADF0050
   static int getch();

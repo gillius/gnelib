@@ -47,6 +47,8 @@ public:
    * library.  However, this function is acceptable enough to be used on an
    * "emergency" shutdown due to some error -- just don't try to call any
    * other GNE or HawkNL function after calling this.
+   * Note that it is possible that this function may block for a short time
+   * (500ms or less), while the event generators shut down.
    */
   //##ModelId=3AE270CE033E
   static void shutdown();
