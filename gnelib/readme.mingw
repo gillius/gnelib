@@ -23,7 +23,7 @@ Put this in your mingw/lib folder.
 
 pthreads-dll-2001-07-12/lib/pthreadGC.dll
 
-Put this in your windows shared libraries folder.
+Put this in your windows shared libraries folder. (i.e. SYSTEM or System32)
 
 3. Installation
 
