@@ -49,9 +49,7 @@ void ClientConnection::run() {
 		gnedbgo2(2, "connection r: %i, u: %i", sockets.r, sockets.u);
     onConnect();
   } else {
-		gnedbgo2(1, "HawkNL error: %i %s", nlGetError(), nlGetErrorStr(nlGetError()));
-		gnedbgo2(1, "HawkNL error: %i %s", nlGetSystemError(), nlGetSystemErrorStr(nlGetSystemError()));
-    onConnectFailure(Error::ConnectionTimeOut);
+    onConnectFailure(Error::createLowLevelError().setCode(Error::ConnectionTimeOut));
   }
 }
 

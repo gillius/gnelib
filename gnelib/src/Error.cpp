@@ -98,10 +98,11 @@ bool Error::operator == (const ErrorCode& rhs) const {
 //##ModelId=3BBA9D6E02BC
 Error Error::createLowLevelError() {
 	Error ret(Error::NoError);
-	if (nlGetError() == NL_SOCKET_ERROR)
+	NLenum error = nlGetError();
+	if (error == NL_SOCKET_ERROR || error == NL_SOCK_DISCONNECT)
 		ret.sysError = nlGetSystemError();
 	else
-		ret.hawkError = nlGetError();
+		ret.hawkError = error;
 	return ret;
 }
 
