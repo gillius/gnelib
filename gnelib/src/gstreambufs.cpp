@@ -32,15 +32,18 @@ namespace Console {
 //********************************
 const int IBUF_LEN = 128;
 
+//##ModelId=3BF8444503C9
 ginbuf::ginbuf() {
   buf = new char[IBUF_LEN];
   setg(buf, buf + IBUF_LEN, buf + IBUF_LEN);
 }
 
+//##ModelId=3BF8444503CA
 ginbuf::~ginbuf() {
   delete[] buf;
 }
 
+//##ModelId=3BF8444503CB
 ginbuf::int_type ginbuf::underflow() {
   //If there is data still in the input buffer, return it.
   if (gptr() < egptr())
@@ -71,6 +74,7 @@ ginbuf::int_type ginbuf::underflow() {
 //********************************
 const int OBUF_LEN = 128;
 
+//##ModelId=3BF8444503CD
 goutbuf::goutbuf() {
   buf = new char[OBUF_LEN];
   setp(buf, buf + OBUF_LEN - 1);
@@ -78,6 +82,7 @@ goutbuf::goutbuf() {
   //terminate the string during a flush to output a whole string at a time.
 }
 
+//##ModelId=3BF8444503CE
 goutbuf::~goutbuf() {
   //Actually we don't want to flush, because when this dtor is called we can't
   //output.
@@ -85,11 +90,13 @@ goutbuf::~goutbuf() {
   delete[] buf;
 }
 
+//##ModelId=3BF8444503CF
 int goutbuf::sync() {
   flush_output();
   return 0;
 }
 
+//##ModelId=3BF8444503D0
 void goutbuf::flush_output() {
   //We always have a space for the null pointer because we reserved an
   //extra position when we called setp, and we do so again at the end of
@@ -101,6 +108,7 @@ void goutbuf::flush_output() {
   }
 }
 
+//##ModelId=3BF8444503D1
 goutbuf::int_type goutbuf::overflow(int_type meta) {
   if (meta != traits_type::eof()) {
     flush_output();
@@ -109,6 +117,7 @@ goutbuf::int_type goutbuf::overflow(int_type meta) {
   return traits_type::not_eof(meta);
 }
   
+//##ModelId=3BF8444503D3
 std::streamsize goutbuf::xsputn(const char_type *ptr, std::streamsize count) {
   for (int i=0; i<count; i++) {
     sputc(ptr[i]);

@@ -32,15 +32,20 @@ namespace Console {
  * class for multithreaded I/O.\n
  * For specifics on these functions, consult a standard C++ library reference.
  */
+//##ModelId=3BF844450360
 class ginbuf : public std::streambuf {
 public:
+  //##ModelId=3BF8444503C9
   ginbuf();
+  //##ModelId=3BF8444503CA
   ~ginbuf();
 
 protected:
+  //##ModelId=3BF8444503CB
   int_type underflow();
 
 private:
+  //##ModelId=3BF8444503C8
   char* buf;
 };
 
@@ -50,18 +55,26 @@ private:
  * class for multithreaded I/O.\n
  * For specifics on these functions, consult a standard C++ library reference.
  */
+//##ModelId=3BF844450364
 class goutbuf : public std::streambuf {
 public:
+  //##ModelId=3BF8444503CD
   goutbuf();
+  //##ModelId=3BF8444503CE
   ~goutbuf();
 
 protected:
+  //##ModelId=3BF8444503CF
   int sync();
+  //##ModelId=3BF8444503D0
   void flush_output();
+  //##ModelId=3BF8444503D1
   int_type overflow(int_type meta = traits_type::eof());
+  //##ModelId=3BF8444503D3
   std::streamsize xsputn(const char_type *ptr, std::streamsize count);
 
 private:
+  //##ModelId=3BF8444503CC
   char* buf;
 };
 
