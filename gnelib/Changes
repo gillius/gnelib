@@ -1,4 +1,4 @@
-GNE 0.55 to current
+GNE 0.55 to 0.70
   Added ErrorCode User for user-inherited Error objects.
   Throwing exceptions during readPacket and writePacket is now allowed.
   RawPacket class was retired and replaced by the new safer class Buffer.
