@@ -263,6 +263,13 @@ void SyncConnection::onFailure(const Error& error) {
   conn->setListener(NULL);
 }
 
+//##ModelId=3C70672C009C
+void SyncConnection::onExit() {
+  setError( Error(Error::ExitNoticeReceived) );
+  //Stop the event thread until release properly restarts it.
+  conn->setListener(NULL);
+}
+
 //##ModelId=3BDB10A6029E
 void SyncConnection::onReceive() {
   //Notify anyone who is waiting for data to come in (namely operator <<).

@@ -161,8 +161,8 @@ public:
   /**
    * An event triggered when a socket is closing for any reason.  This event
    * is always called once and only once if a socket was connected.  At the
-   * time this event is called, the sockets are still connected, so you can
-   * get their address (for logging and/or reporting reasons).
+   * time this event is called, the sockets are disconnected, so you can't
+   * get stats or addresses from the connection.
    *
    * The PacketStream is still valid, and there still may be data in the
    * queue for you to read, even if you pick up all data in the onReceive
@@ -171,8 +171,9 @@ public:
    * disconnects.
    *
    * onDisconnect will always be the last event called on this listener, so
-   * you can destroy this object after onDisconnect is called and it is not
-   * listening for any other connections.
+   * you can destroy this object after onDisconnect is called.  Before
+   * onDisconnect was called either onFailure or onExit were called if you
+   * did not terminate the connection yourself using Connection::disconnect.
    *
    * onDisconnect is only called if onNewConn or onConnect totally completed.
    * If the connection process fails before onNewConn or onConnect, the
@@ -185,6 +186,19 @@ public:
    */
   //##ModelId=3BCA83BA02F8
   virtual void onDisconnect();
+
+  /**
+   * This event is triggered when the remote end has gracefully closed the
+   * connection.  The connection will soon be disconnected and the next
+   * event you will receive is onDisconnect.  The connection should be
+   * considered in an disconnected state.
+   *
+   * This event must be "non-blocking" -- like most GNE events -- as there
+   * is only a single event thread per connection.  Therefore, no other
+   * events will be called until this function completes for this connection.
+   */
+  //##ModelId=3C70672B0357
+  virtual void onExit();
 
   /**
    * This event is triggered when a non-fatal error occurs in a connection

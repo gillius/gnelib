@@ -38,7 +38,7 @@ public:
    */
   //##ModelId=3BAEC99B01FE
   enum ErrorCode {
-    NoError,
+    NoError = 0,
     ProtocolViolation,
     GNETheirVersionLow,
     GNETheirVersionHigh,
@@ -48,6 +48,7 @@ public:
     ConnectionRefused,
     ConnectionDropped,
     SyncConnectionReleased,
+    ExitNoticeReceived,
     Read,
     Write,
     UnknownPacket,

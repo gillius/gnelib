@@ -131,6 +131,11 @@ void Connection::onDisconnect() {
   eventListener->onDisconnect();
 }
 
+//##ModelId=3C70672B031B
+void Connection::onExit() {
+  eventListener->onExit();
+}
+
 //##ModelId=3B0753810085
 void Connection::onFailure(const Error& error) {
   eventListener->onFailure(error);

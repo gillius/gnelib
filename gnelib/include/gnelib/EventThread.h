@@ -93,6 +93,12 @@ public:
   /**
    * For more information about these events, see ConnectionListener.
    */
+  //##ModelId=3C70672C0037
+  void onExit();
+
+  /**
+   * For more information about these events, see ConnectionListener.
+   */
   //##ModelId=3C106F0203DD
   void onFailure(const Error& error);
 
@@ -170,6 +176,11 @@ private:
   //next event called, and everything else should stop.
   //##ModelId=3C106F0203CE
   bool onDisconnectEvent;
+
+  //If this is true, an graceful exit notice was received, and the next event
+  //is an onDisconnectEvent.
+  //##ModelId=3C70672C002D
+  bool onExitEvent;
 
   //Wish we could combine error events and report the last error, but this
   //really isn't what the API specifies, so we should keep track of every

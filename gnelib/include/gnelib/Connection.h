@@ -173,6 +173,9 @@ protected:
   //##ModelId=3BB4208C0104
   void onDisconnect();
 
+  //##ModelId=3C70672B031B
+  void onExit();
+
   //##ModelId=3B0753810085
   void onFailure(const Error& error);
 

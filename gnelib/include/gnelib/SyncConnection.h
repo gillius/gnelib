@@ -221,6 +221,8 @@ private:
   void onError(const Error& error);
   //##ModelId=3BDB10A601FE
   void onFailure(const Error& error);
+  //##ModelId=3C70672C009C
+  void onExit();
   //##ModelId=3BDB10A6029E
   void onReceive();
   //##ModelId=3C1081BC015B

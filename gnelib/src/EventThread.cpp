@@ -31,7 +31,7 @@ namespace GNE {
 EventThread::EventThread(ConnectionListener* listener, Connection* conn)
 : Thread("EventThr"), ourConn(conn), eventListener(listener),
 started(false), onReceiveEvent(false), onDoneWritingEvent(false),
-onDisconnectEvent(false), failure(NULL) {
+onExitEvent(false), onDisconnectEvent(false), failure(NULL) {
   gnedbgo(5, "created");
 }
 
@@ -70,16 +70,28 @@ void EventThread::setListener(ConnectionListener* listener) {
 //##ModelId=3C106F0203DC
 void EventThread::onDisconnect() {
   gnedbgo(1, "onDisconnect Event triggered.");
-  onDisconnectEvent = true;
   //We acquire the mutex to avoid the possiblity of a deadlock between the
   // test for the shutdown variable and the wait.
   eventSync.acquire();
+  onDisconnectEvent = true;
+  eventSync.signal();
+  eventSync.release();
+}
+
+//##ModelId=3C70672C0037
+void EventThread::onExit() {
+  assert(failure == NULL); //only onFailure or onExit can happen.
+  gnedbgo(1, "onExit Event triggered.");
+
+  eventSync.acquire();
+  onExitEvent = true;
   eventSync.signal();
   eventSync.release();
 }
 
 //##ModelId=3C106F0203DD
 void EventThread::onFailure(const Error& error) {
+  assert(!onExitEvent); //only onFailure or onExit can happen.
   gnedbgo1(1, "onFailure Event: %s", error.toString().c_str());
 
   eventSync.acquire();
@@ -101,9 +113,9 @@ void EventThread::onError(const Error& error) {
 //##ModelId=3C106F0203E1
 void EventThread::onReceive() {
   gnedbgo(4, "onReceive event triggered.");
-  onReceiveEvent = true;
 
   eventSync.acquire();
+  onReceiveEvent = true;
   eventSync.signal();
   eventSync.release();
 }
@@ -111,9 +123,9 @@ void EventThread::onReceive() {
 //##ModelId=3C106F0203E2
 void EventThread::onDoneWriting() {
   gnedbgo(4, "onDoneWriting event triggered.");
-  onDoneWritingEvent = true;
 
   eventSync.acquire();
+  onDoneWritingEvent = true;
   eventSync.signal();
   eventSync.release();
 }
@@ -145,7 +157,8 @@ void EventThread::run() {
     //Wait while we have no listener and/or we have no events.
     while (eventListener == NULL || 
            (!onReceiveEvent && !onDoneWritingEvent && !failure
-           && !onDisconnectEvent && eventQueue.empty() && !shutdown) ) {
+           && !onDisconnectEvent && eventQueue.empty() && !shutdown
+           && !onExitEvent) ) {
       eventSync.wait();
     }
     eventSync.release();
@@ -157,6 +170,13 @@ void EventThread::run() {
         ourConn->disconnect();
         delete failure;
         failure = NULL;
+
+      } else if (onExitEvent) {
+        listenSync.acquire();
+        eventListener->onExit();
+        listenSync.release();
+        ourConn->disconnect();
+
       } else if (onDisconnectEvent) {
         listenSync.acquire();
         eventListener->onDisconnect();

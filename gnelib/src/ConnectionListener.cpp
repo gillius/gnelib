@@ -48,6 +48,10 @@ void ConnectionListener::onNewConn(SyncConnection& newConn) throw (Error) {
 void ConnectionListener::onDisconnect() {
 }
 
+//##ModelId=3C70672B0357
+void ConnectionListener::onExit() {
+}
+
 //##ModelId=3BCA83C600B4
 void ConnectionListener::onError(const Error& error) {
 }
