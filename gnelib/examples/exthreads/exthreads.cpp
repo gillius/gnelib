@@ -120,7 +120,7 @@ protected:
 
 int main(int argc, char* argv[]) {
   initGNE(NO_NET, atexit);
-  initConsole(atexit);
+  initConsole(false);
   setTitle("GNE Threads Example");
 
   mprintf("Testing to see if recursive locks work:");
@@ -221,7 +221,7 @@ int main(int argc, char* argv[]) {
   
   mprintf( "You should see joe die after you press a key (when main ends), if you have\n" );
   mprintf( " the window stay open after the program exits.\n" );
-  mprintf("Press a key to continue.");
+  mprintf( "Press a key to continue.\n" );
   getch();
 
   //At this point, all threads that are running will be terminated.  When
