@@ -19,6 +19,7 @@
 
 #include "../../include/gnelib.h"
 
+using namespace std; //for endl
 using namespace GNE;
 using namespace GNE::Console;
 
@@ -27,12 +28,16 @@ int main() {
   initConsole(atexit);
   setTitle("GNE Timer Example");
   
-  mprintf("The time in seconds, is:\n");
-  mprintf("Time is from some arbitrary point in the past.\n");
-  mprintf("In Windows, this is actually the system uptime, as it uses the rdtsc\n  instruction.");
+  gout << "The time in seconds, is:" << endl;
+  gout << "Time is from some arbitrary point in the past." << endl;
+  gout << "In Windows, this is actually the system uptime, as it uses the rdtsc" << endl
+       << "  instruction." << endl;
   while (!kbhit()) {
     Time t = Timer::getCurrentTime();
-    mlprintf(25, 0, "%i.%i  ", t.getSec(), t.getuSec());
+    //The move operation will be "executed" when the stream is next flushed,
+    //and gout is line-buffered so it flushes on endl as well as the usual
+    //methods.
+    gout << moveTo(25, 0) << t.getSec() << '.' << t.getuSec() << "   " << endl;
   }
 
   return 0;
