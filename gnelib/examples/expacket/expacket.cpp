@@ -34,18 +34,20 @@
 using namespace std;
 using namespace GNE;
 using namespace GNE::PacketParser;
+using namespace GNE::Console;
 
 #include "expacket.h"
 
 int main(int argc, char* argv[]) {
   initGNE(NO_NET, atexit);
+  initConsole(atexit);
   Console::setTitle("GNE Packet Test");
   registerPacket(MIN_USER_ID, PersonPacket::create);
   //we don't register UnknownPacket to try to trigger an error later so we
   //can test error handling of the parser.
   
   PersonPacket jason;
-  jason.age = 19;
+  jason.age = 20;
   jason.firstName = "Jason";
   jason.lastName = "Winnebeck";
   jason.timestamp = 0;
@@ -60,11 +62,14 @@ int main(int argc, char* argv[]) {
   packetTest(jason, elias);
   parseTest(jason, elias);
 
+  gout << "Press a key to continue: " << endl;
+  getch();
+
   return 0;
 }
 
 void packetTest(const PersonPacket& jason, const PersonPacket& elias) {
-  cout << "Creating two PersonPackets" << endl;
+  gout << "Creating two PersonPackets" << endl;
 
   RawPacket raw(NULL);
   jason.writePacket(raw);
@@ -89,14 +94,14 @@ void packetTest(const PersonPacket& jason, const PersonPacket& elias) {
   raw >> dummy;
   raw >> t2;
 
-  cout << t1.firstName << ' ' << t1.lastName << ", " << (int)t1.age
+  gout << t1.firstName << ' ' << t1.lastName << ", " << (int)t1.age
     << " years.  (size/type: " << t1.getSize() << '/' << t1.getType() << ')' << endl;
-  cout << t2.firstName << ' ' << t2.lastName << ", " << (int)t2.age
+  gout << t2.firstName << ' ' << t2.lastName << ", " << (int)t2.age
     << " years.  (size/type: " << t2.getSize() << '/' << t2.getType() << ')' << endl;
 }
 
 void parseTest(const Packet& jason, const Packet& elias) {
-  cout << "Starting packet tests.  If no \"Unexpected values\" are seen, everything worked." << endl;
+  gout << "Starting packet tests.  If no \"Unexpected values\" are seen, everything worked." << endl;
   Packet packet1;
   UnknownPacket packet2;
 
@@ -110,16 +115,16 @@ void parseTest(const Packet& jason, const Packet& elias) {
 
   bool end = false;
   Packet* next = parseNextPacket(end, raw1);
-  cout << end << ", " << next << ", " << next->getType() << endl;
+  gout << end << ", " << next << ", " << next->getType() << endl;
   if (end == true || next == NULL || next->getType() != 0)
-    cout << "(1)Unexpected values." << endl;
+    gout << "(1)Unexpected values." << endl;
   delete next;
 
   //This one should fail as we did not register UnknownPacket.
   next = parseNextPacket(end, raw1);
-  cout << end << ", " << next << endl;
+  gout << end << ", " << next << endl;
   if (end == true || next != NULL)
-    cout << "(2)Unexpected values." << endl;
+    gout << "(2)Unexpected values." << endl;
 
   raw1.reset();
   //After we register, we should be able to completely read the RawPacket.
@@ -128,15 +133,15 @@ void parseTest(const Packet& jason, const Packet& elias) {
   while(!end) {
     next = parseNextPacket(end, raw1);
     if (end && next != NULL)
-      cout << "(3)Unexpected values." << endl;
+      gout << "(3)Unexpected values." << endl;
     if (!end && next == NULL)
-      cout << "(4)Unexpected values." << endl;
+      gout << "(4)Unexpected values." << endl;
     if (!end) {
-      cout << end << ", " << next << ", " << next->getType() << endl;
+      gout << end << ", " << next << ", " << next->getType() << endl;
       delete next;
     }
   }
-  cout << end << ", " << next << endl;
+  gout << end << ", " << next << endl;
 }
 
 
