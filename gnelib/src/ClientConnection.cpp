@@ -34,12 +34,18 @@ namespace GNE {
  * Simply just a class to temporarily hold connection parameters until the
  * ClientConnection is connected, then it is useless.
  */
+//##ModelId=3C5CED0500C7
 class ClientConnectionParams {
 public:
+  //##ModelId=3C5CED050183
   Address dest;
+  //##ModelId=3C5CED050187
   int outRate;
+  //##ModelId=3C5CED050188
   int inRate;
+  //##ModelId=3C5CED050189
   bool unrel;
+  //##ModelId=3C5CED05018D
   SyncConnection* sConnPtr;
 };
 
@@ -178,6 +184,7 @@ void ClientConnection::run() {
   }
 }
 
+//##ModelId=3C5CED05016E
 void ClientConnection::sendCRP() throw (Error) {
   GNEProtocolVersionNumber ver = GNE::getGNEProtocolVersion();
 
@@ -198,6 +205,7 @@ const int REFLEN = sizeof(gbool) + sizeof(guint8) + sizeof(guint8) +
 
 const int CAPLEN = sizeof(gbool) + sizeof(guint32);
 
+//##ModelId=3C5CED05016F
 Address ClientConnection::getCAP() throw (Error) {
   gbyte* capBuf = new gbyte[RawPacket::RAW_PACKET_LEN];
   int check = nlRead(sockets.r, (NLvoid*)capBuf, RawPacket::RAW_PACKET_LEN);
@@ -278,6 +286,7 @@ Address ClientConnection::getCAP() throw (Error) {
   return Address();
 }
 
+//##ModelId=3C5CED050170
 void ClientConnection::setupUnreliable(const Address& dest) throw (Error) {
   assert(dest);
   sockets.u = nlOpen(0, NL_UNRELIABLE);

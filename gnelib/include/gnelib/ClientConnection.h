@@ -115,6 +115,7 @@ private:
   /**
    * Sends the CRP, throwing an Error on error.
    */
+  //##ModelId=3C5CED05016E
   void sendCRP() throw (Error);
 
   /**
@@ -124,14 +125,17 @@ private:
    *         no unreliable connection was requested, the value of the
    *         returned address is undefined.
    */
+  //##ModelId=3C5CED05016F
   Address getCAP() throw (Error);
 
   /**
    * Sets up the unreliable connection.
    */
+  //##ModelId=3C5CED050170
   void setupUnreliable(const Address& dest) throw (Error);
 
   //Temp storage of connection params.
+  //##ModelId=3C5CED05013D
   ClientConnectionParams* params;
 };
 

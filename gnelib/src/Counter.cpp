@@ -49,6 +49,7 @@ void Counter::setCount(int newCount) {
   countSync.release();
 }
 
+//##ModelId=3C5CED0501BE
 void Counter::adjustCount(int val) {
   countSync.acquire();
   count += val;

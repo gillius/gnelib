@@ -36,11 +36,16 @@ namespace GNE {
  * Simply just a class to temporarily hold connection parameters until the
  * ClientConnection is connected, then it is useless.
  */
+//##ModelId=3C5CED05010A
 class ServerConnectionParams {
 public:
+  //##ModelId=3C5CED0502EB
   int outRate;
+  //##ModelId=3C5CED0502EC
   int inRate;
+  //##ModelId=3C5CED0502EE
   ServerConnectionListener* creator;
+  //##ModelId=3C5CED0502F2
   bool unrel;
 };
 
@@ -137,6 +142,7 @@ void ServerConnection::run() {
 const int CRPLEN = sizeof(guint8) + sizeof(guint8) + sizeof(guint16) +
                    sizeof(guint32) + sizeof(guint32) + sizeof(gbool);
 
+//##ModelId=3C5CED0502CD
 Error ServerConnection::getCRP() {
   gbyte* crpBuf = new gbyte[RawPacket::RAW_PACKET_LEN];
   int check = nlRead(sockets.r, (NLvoid*)crpBuf, RawPacket::RAW_PACKET_LEN);
@@ -183,6 +189,7 @@ Error ServerConnection::getCRP() {
   return Error(Error::NoError);
 }
 
+//##ModelId=3C5CED0502CE
 void ServerConnection::sendRefusal() {
   GNEProtocolVersionNumber us = GNE::getGNEProtocolVersion();
   RawPacket ref;
@@ -195,6 +202,7 @@ void ServerConnection::sendRefusal() {
   //are refusing the connection and there is nothing else we can do.
 }
 
+//##ModelId=3C5CED0502D7
 void ServerConnection::sendCAP() throw (Error) {
   RawPacket cap;
   cap << gTrue;
@@ -212,6 +220,7 @@ void ServerConnection::sendCAP() throw (Error) {
     throw Error::createLowLevelError(Error::Write);
 }
 
+//##ModelId=3C5CED0502D8
 void ServerConnection::getUnreliableInfo() throw (Error) {
   gbyte* buf = new gbyte[RawPacket::RAW_PACKET_LEN];
   int check = nlRead(sockets.r, (NLvoid*)buf, RawPacket::RAW_PACKET_LEN);

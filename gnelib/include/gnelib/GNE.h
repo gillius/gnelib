@@ -102,6 +102,7 @@ namespace GNE {
    */
   int getOpenConnections();
 
+//##ModelId=3C5CED0500EC
   struct GNEProtocolVersionNumber {
     guint8 version;
     guint8 subVersion;

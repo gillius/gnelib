@@ -68,6 +68,7 @@ public:
    * Adjusts the counter's value by adding val to the current count.  This
    * means that negative numbers will subtract from the current count.
    */
+  //##ModelId=3C5CED0501BE
   void adjustCount(int val);
 
 private:

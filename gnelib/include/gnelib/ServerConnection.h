@@ -77,15 +77,20 @@ protected:
   void run();
 
 private:
+  //##ModelId=3C5CED0502CD
   Error getCRP();
 
+  //##ModelId=3C5CED0502CE
   void sendRefusal();
 
+  //##ModelId=3C5CED0502D7
   void sendCAP() throw (Error);
 
+  //##ModelId=3C5CED0502D8
   void getUnreliableInfo() throw (Error);
 
   //Temporary storage to hold variables before and during connecting.
+  //##ModelId=3C5CED0502C4
   ServerConnectionParams* params;
 };
 
