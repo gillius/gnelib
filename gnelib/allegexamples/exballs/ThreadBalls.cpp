@@ -1,8 +1,16 @@
 // Allegro example program, using the GNElib Threads/Timers/Networking engine //
+//Written by networm, modified some by Gillius
 #include <allegro.h>
 #include <winalleg.h>
 #include "../AllegroSample.h"
 #include "../../include/gnelib.h"
+
+using namespace GNE;
+
+//Gillius: added countSync because to do increment or decrement, you need to
+//use a mutex to prevent threads from corrupting the data.  And data that is
+//shared between threads that is not read-only needs a mutex.
+Mutex countSync;
 
 const int BALLSNUM = 50;
 int NEWCOUNT = 0;
@@ -20,6 +28,13 @@ int STOPCOUNT = 0;
 // actual thread to be executed. It's just a normal while loop, with calls to
 // sleep() which wait the specified time. You can already see in this example
 // what a powerfull tool threads are.
+
+// Note from Gillius: In Windows it is the automatic acquire_screen and
+// release_screen of Allegro that lets this example work so well, since for
+// DirectX it acts as a mutex for the screen.  At this time there is no
+// threading guarantees on Allegro, so it is best to keep your game engine to
+// a single thread -- although Allegro is getting more and more thread safe.
+
 class ThreadBall : public Thread {
 public:
 
@@ -43,7 +58,9 @@ public:
     x = ix;
     y = iy;
     
+    countSync.acquire();
     NEWCOUNT++;
+    countSync.release();
   }
 
   ~ThreadBall() {    
@@ -54,8 +71,11 @@ public:
             
     rectfill(screen, ix - ir*2 , iy - ir*2, ix + ir*2, iy + ir*2,
       makecol(255, 0, 0));    
-    destroy_bitmap(bmp);  
-    DELETECOUNT++;  
+    destroy_bitmap(bmp);
+
+    countSync.acquire();
+    DELETECOUNT++;
+    countSync.release();
   }
 
   void run() { 
@@ -64,7 +84,9 @@ public:
     int iy;
     int ir = (int) (radius + 0.5);
     
+    countSync.acquire();
     STARTCOUNT++;
+    countSync.release();
     
     while(life > 0) {
       sleep(10);
@@ -102,9 +124,10 @@ public:
     
     rectfill(screen, ix - ir*2 , iy - ir*2, ix + ir*2, iy + ir*2,
       makecol(0, 100, 0));    
-      
-    STOPCOUNT++;      
-        
+    
+    countSync.acquire();
+    STOPCOUNT++;
+    countSync.release();
   }
 private:
   BITMAP *bmp;
@@ -118,7 +141,7 @@ int main(void) {
 
   AllegroSample::init(500,500);
 
-  GNE::init(NL_IP, atexit);
+  initGNE(NO_NET, atexit);
   
   // Keep a list of all the ThreadBalls.
   ThreadBall *ball[BALLSNUM];
