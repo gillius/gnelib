@@ -20,18 +20,19 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/Timer.h"
 #include "../include/gnelib/Time.h"
+#include "../include/gnelib/Mutex.h"
 #include "../include/gnelib/TimerCallback.h"
 
 namespace GNE {
 
 //##ModelId=3B0753820030
 Timer::Timer(TimerCallback* callback, int rate, bool destroy)
-: callbackRate(rate), listener(callback), destroyListener(destroy) {
+: callbackRate(rate*1000), listener(callback), destroyListener(destroy) {
 }
 
 //##ModelId=3B0753820034
 Timer::~Timer() {
-  stopTimer();
+  stopTimer(true);
   if (destroyListener)
     delete listener;
 }
@@ -75,18 +76,26 @@ Time Timer::getAbsoluteTime() {
 
 //##ModelId=3B0753820067
 void Timer::startTimer() {
-  assert(isRunning() == false);
-  nextTime = getCurrentTime();
-  nextTime += callbackRate * 1000;
-  start();
+  sync.acquire();
+  if (!isRunning()) {
+    nextTime = getCurrentTime();
+    nextTime += callbackRate;
+    start();
+  }
+  sync.release();
 }
 
 //##ModelId=3B0753820068
-void Timer::stopTimer() {
+void Timer::stopTimer(bool waitForEnd) {
+  sync.acquire();
   if (isRunning()) {
     shutDown();
-    join();
+    if (waitForEnd) {
+      assert(Thread::currentThread() != this);
+      join();
+    }
   }
+  sync.release();
 }
 
 //##ModelId=3B0753820069
@@ -94,20 +103,18 @@ void Timer::run() {
   while (!shutdown) {
     Time currTime, sleepTime;
     currTime = getCurrentTime();
-    while (nextTime > currTime) {
+    //We add 500 to currTime because we are waiting in milliseconds, so this
+    //is essentially a "round."  If we have less than 500 microseconds left,
+    //there is little use in another sleep call which almost certainly won't
+    //return faster than this, so we just call it now.
+    while (nextTime > currTime + 500) {
       sleepTime = nextTime - currTime;
       Thread::sleep(sleepTime.getTotaluSec() / 1000);
       currTime = getCurrentTime();
     }
     listener->timerCallback();
-    nextTime += callbackRate * 1000;
+    nextTime += callbackRate;
   }
 }
 
 }
-
-
-
-
-
-
