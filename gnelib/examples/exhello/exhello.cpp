@@ -116,10 +116,10 @@ public:
   }
 
   void onConnectFailure( Connection& conn, const Error& error) {
-    //Since we are using join in our client connecting code, this event is
-    //not really needed, but we can display the error message here or in the
-    //doClient function when it finds out the connection failed.  Either way
-    //does the same thing.
+    //Since we are using waitForConnect in our client connecting code, this
+    //event is not really needed, but we can display the error message here or
+    //in the doClient function when it finds out the connection failed.  Either
+    //way does the same thing.
     mprintf("Connection to server failed.\n");
     mprintf("GNE reported error: %s\n", error.toString().c_str());
   }
@@ -279,7 +279,8 @@ void doClient(int outRate, int inRate, int port) {
       client->disconnectSendAll();      
     }
 
-    //client will be destroyed here as its sptr will go out of scope.
+    //client will be destroyed here as its sptr will go out of scope and because
+    //it is disconnected.
   //}
 }
 

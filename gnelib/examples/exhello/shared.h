@@ -38,7 +38,7 @@ public:
 public:
   HelloPacket() : Packet(ID) {}
   //copy ctor not needed
-  HelloPacket(string message2) : Packet(MIN_USER_ID), message(message2) {}
+  HelloPacket(string message2) : Packet(ID), message(message2) {}
 
   virtual ~HelloPacket() {}
 
