@@ -1,4 +1,9 @@
 GNE 0.55 to current
+  Complete reexamination and major overhaul of event generation to listeners,
+    and the synchronization that occured as a result.  Hopefully this will
+    get rid of the deadlocks and hopefully most if not all of the remaining
+    bugs dealing with connections.
+  Fixed 2 memory leaks in Connection.
   Fixed overflow bugs in Time.
   The debug log isn't shutdown when an explicit GNE::shutdownGNE call is
     made.  This resolves some hard-to-avoid crashes when using the gnedbg

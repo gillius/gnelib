@@ -98,15 +98,15 @@ public:
 
   /**
    * Sets a new event listener.  All new events will be sent to the new
-   * listener.  The function will block until the current event being
-   * processed (by the old listener) completes.  If this is called from the
-   * event thread itself the function returns immediately and the next event
-   * will be sent to the new listener.
+   * listener.  This method has no effect on an event currently being processed
+   * and this method will not block to wait until the listener change has
+   * taken place.  The next method generated will go to the newly set listener.
    *
    * If the passed listener is NULL, this will hold the event thread.  This
    * does NOT stop event generation -- generated events still will enter the
    * queue but the actual event function will not be called until a proper
-   * listener is set.
+   * listener is set.  If you hold the event thread, a new listener should be
+   * set quickly as the connection is basically "frozen" during this time.
    *
    * You MUST have an event listener set because the event thread must call
    * its required events before this object can be destroyed.
@@ -391,12 +391,6 @@ private:
    * Parses the packets recieved, then calls onReceive.
    */
   void onReceive(bool reliable);
-
-  /**
-   * When we get an ExitPacket we want to ignore any further errors,
-   * espically NL_MESSAGE_END.
-   */
-  bool exiting;
 
   /**
    * Determines whether the error given is fatal or non-fatal, and calls the

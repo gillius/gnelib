@@ -65,6 +65,7 @@ public:
 
   /**
    * Removes a socket.  If the socket is not registered, then no action takes
+   * place.  This method will not block to wait for the unregistration to take
    * place.
    *
    * @param socket the low-level HawkNL socket for this connection.
