@@ -75,8 +75,8 @@ void ConditionVariable::timedWait(int ms) {
 
 void ConditionVariable::timedWait(const Time& until) {
   timespec tv;
-  tv.tv_sec = t.getSec();
-  tv.tv_nsec = t.getuSec() * 1000;
+  tv.tv_sec = until.getSec();
+  tv.tv_nsec = until.getuSec() * 1000;
   pthread_cond_timedwait(&cond, &(mutex->mutex), &tv);
 }
 
