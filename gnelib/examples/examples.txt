@@ -33,3 +33,7 @@ exsynchello -- Same as exhello, but uses only SyncConnections.  exsynchello
   and exhello should be able to talk to each other, but in practice it is
   not recommended to mix event-driven and SyncConnections, because it makes
   for more complex code, but it is entirely possible.
+
+exnetperf -- Shows how to use the statistical functions in GNE.  This
+  example should serve well for GNE to measure network performance, as best
+  as is possible with the GNE and HawkNL APIs.

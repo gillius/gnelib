@@ -129,6 +129,10 @@ SOURCE=.\src\Counter.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\CustomPacket.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Error.cpp
 # End Source File
 # Begin Source File
@@ -246,6 +250,10 @@ SOURCE=.\include\gnelib\ConsoleStreambuf.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\Counter.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\CustomPacket.h
 # End Source File
 # Begin Source File
 
