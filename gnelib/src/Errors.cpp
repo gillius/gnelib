@@ -37,6 +37,9 @@ LowLevelError::LowLevelError(ErrorCode newCode)
     hawkError = error;
 }
 
+LowLevelError::~LowLevelError() {
+}
+
 //##ModelId=3C86E09000C6
 std::string LowLevelError::toString() const {
   std::ostringstream ret;
@@ -55,6 +58,9 @@ std::string LowLevelError::toString() const {
 //##ModelId=3C86E0900163
 WrongGame::WrongGame(std::string GameName)
 : Error(Error::WrongGame), gameName(GameName) {
+}
+
+WrongGame::~WrongGame() {
 }
 
 //##ModelId=3C86E0900165
@@ -85,6 +91,9 @@ const std::string ViolationStrings[] = {
 //##ModelId=3C86E09000FB
 ProtocolViolation::ProtocolViolation(ViolationType T)
 : Error(Error::ProtocolViolation), t(T) {
+}
+
+ProtocolViolation::~ProtocolViolation() {
 }
 
 //##ModelId=3C86E09000FD

@@ -66,7 +66,7 @@ public:
   Error(ErrorCode ec = NoError);
 
   //##ModelId=3BAEC1A30051
-  ~Error();
+  virtual ~Error();
 
   /**
    * Returns the error code for this error.

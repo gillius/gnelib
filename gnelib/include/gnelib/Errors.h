@@ -41,6 +41,8 @@ public:
   //##ModelId=3C86E09000C4
   LowLevelError(ErrorCode newCode = OtherLowLevelError);
 
+  virtual ~LowLevelError();
+
   //##ModelId=3C86E09000C6
   virtual std::string toString() const;
 
@@ -68,6 +70,8 @@ public:
   //##ModelId=3C86E0900163
   WrongGame(std::string GameName);
 
+  virtual ~WrongGame();
+
   /**
    * Returns the mismatched game name.
    */
@@ -92,6 +96,8 @@ public:
   PacketTypeMismatch(int OtherID)
     : Error(Error::PacketTypeMismatch), otherID(OtherID) {}
 
+  virtual ~PacketTypeMismatch() {}
+
   /**
    * Returns the offending packet's ID.
    */
@@ -114,6 +120,8 @@ public:
   //##ModelId=3C86E090015E
   UserVersionMismatch(guint32 OtherVer)
     : Error(Error::UserVersionMismatch), otherVer(OtherVer) {}
+
+  virtual ~UserVersionMismatch() {}
 
   /**
    * Returns the offending user version.
@@ -146,6 +154,8 @@ public:
   //##ModelId=3C86E09000FB
   ProtocolViolation(ViolationType T = OtherViolation);
 
+  virtual ~ProtocolViolation();
+
   //##ModelId=3C86E09000FD
   ViolationType getViolationType() const;
   //##ModelId=3C86E09000FF
@@ -162,3 +172,4 @@ private:
 }
 
 #endif
+
