@@ -1,4 +1,5 @@
 GNE 0.45 to current
+  Fixed thread-related bug in ServerConnection dtor.
   Implemented PacketStream::waitToSendAll and added timeout option.
   Fixed a bug in ConnectionEventGenerator where it can try to start an event
     on a listener that was just unregistered, and this would cause an access
