@@ -77,13 +77,20 @@ int main(int argc, char* argv[]) {
   joe->detach(); //But even if we detach after a thread ends it will still
                  //destroy itself.
 
+  //Sleep, measuring our sleep time two ways
   clock_t start = clock();
+  Time lastTime = Timer::getCurrentTime();
+
   Console::mprintf("Sleeping for 2459 milliseconds.\n");
   Thread::sleep(2459);
-  clock_t finish = clock();
-  float napTime = (float)(finish - start) / CLOCKS_PER_SEC;
 
-  Console::mprintf("Goodbye.  A nice %f second nap that was.\n", napTime);
+  Time diffTime = Timer::getCurrentTime();
+  clock_t finish = clock();
+  float sysNapTime = (float)(finish - start) / CLOCKS_PER_SEC;
+  diffTime = diffTime - lastTime;
+
+  Console::mprintf("System reports sleeping time of %f\n", sysNapTime);
+  Console::mprintf("GNE timers report sleeping time of %i microseconds (us)\n", diffTime.getTotaluSec());
 
   //At this point, all threads that are running will be terminated.  When
   //main exits, everything goes.  Use join if you want to guarantee your
