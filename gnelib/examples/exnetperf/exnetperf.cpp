@@ -29,7 +29,7 @@
  * Right now this example isn't completed yet, but it is getting close.
  */
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 #include "rndalgor.h"
 #include <iostream>
 #include <cstdio>
@@ -60,42 +60,41 @@ public:
   ~Randomizer() {}
 
   int getNum() {
-    sync.acquire();
-    int ret = longrand();
-    sync.release();
-    return ret;
+    LockMutex lock( sync );
+    return longrand();
   }
 
 private:
   Mutex sync;
 };
 
-static StatsDisplay* sDisplay;
+static StatsDisplay::sptr sDisplay;
 static Randomizer rng;
 
 //The PerfTester class works on both the client and the server side.
 class PerfTester : public ConnectionListener, public PacketFeeder {
 public:
-  PerfTester() : packetsIn(0), packetsOut(0), conn(NULL) {}
+  typedef SmartPtr<PerfTester> sptr;
+  typedef WeakPtr<PerfTester> wptr;
+
+  PerfTester() : packetsIn(0), packetsOut(0) {}
+public:
+  static sptr create() {
+    return sptr( new PerfTester() );
+  }
+
   ~PerfTester() {}
 
   void onDisconnect() {
     sDisplay->delConn(conn);
-    if (serverSide) {
-      //see serverSide declaration for more info
-      delete conn;
-    }
-    delete this;
   }
 
   void onConnect(SyncConnection& conn2) {
-    serverSide = false;
     conn = conn2.getConnection();
     sDisplay->addConn(conn, &packetsIn, &packetsOut);
   }
 
   void onNewConn(SyncConnection& conn2) {
-    serverSide = true;
     conn = conn2.getConnection();
     sDisplay->addConn(conn, &packetsIn, &packetsOut);
   }
@@ -164,39 +163,37 @@ public:
 private:
   int packetsIn;
   int packetsOut;
-  Connection* conn;
-
-  //We use this because this class can be client or server.  In the client
-  //side, the ClientConnection is on the stack and is automatically
-  //destroyed but on the server side the ServerConnection is on the heap and
-  //needs to be deleted.
-  //Normially the recommended way is to have in onDisconnect report to the
-  //main thread or some other responsible thread to control the creation or
-  //deletion of the listener and connection, and have that thread check and
-  //do the deletes, rather than use "delete conn; delete this;."  But in a
-  //small program such as this, it is probably acceptable (at least much
-  //easier to program!).
-  bool serverSide;
+  Connection::sptr conn;
 };
 
 class OurListener : public ServerConnectionListener {
 public:
-  OurListener(int iRate2, int oRate2)
-    : ServerConnectionListener(), iRate(iRate2), oRate(oRate2) {
+  typedef SmartPtr<OurListener> sptr;
+  typedef WeakPtr<OurListener> wptr;
+
+protected:
+  OurListener(int iRate, int oRate)
+    : ServerConnectionListener(), iRate(iRate), oRate(oRate) {
+  }
+
+public:
+  static sptr create( int iRate, int oRate ) {
+    sptr ret( new OurListener( iRate, oRate ) );
+    ret->setThisPointer( ret );
+    return ret;
   }
 
   virtual ~OurListener() {}
 
-  void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) {
+  void onListenFailure(const Error& error, const Address& from, const ConnectionListener::sptr& listener) {
     mlprintf(0, 0, "Connection error: %s   ", error.toString().c_str());
     mlprintf(0, 1, "  Error received from %s   ", from.toString().c_str());
-    delete listener;
   }
 
   void getNewConnectionParams(ConnectionParams& params) {
     params.setRates(oRate, iRate);
 
-    PerfTester* tester = new PerfTester();
+    PerfTester::sptr tester = PerfTester::create();
     params.setListener(tester);
     params.setFeeder(tester);
   }
@@ -246,12 +243,12 @@ int main() {
   //connection process to verify our identity.
   setGameInformation("Net Perf Example", 1);
 
-  if (initConsole(atexit)) {
+  if (initConsole()) {
     cout << "Unable to initialize GNE Console" << endl;
     exit(3);
   }
   setTitle("GNE Net Performance Tester");
-  sDisplay = new StatsDisplay(500);
+  sDisplay = StatsDisplay::create(500);
 
   gout << "GNE Net Performance Tester for " << GNE::VER_STR << endl;
   gout << "Local address: " << getLocalAddress() << endl;
@@ -275,7 +272,6 @@ int main() {
     doClient(oRate, iRate, port);
   }
 
-  delete sDisplay;
   return 0;
 }
 
@@ -284,17 +280,19 @@ void doServer(int outRate, int inRate, int port) {
   //Generate debugging logs to server.log if in debug mode.
   initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL5, "server.log");
 #endif
-  OurListener server(inRate, outRate);
-  if (server.open(port))
+  OurListener::sptr server = OurListener::create(inRate, outRate);
+  if (server->open(port))
     errorExit("Cannot open server socket.");
-  if (server.listen())
+  if (server->listen())
     errorExit("Cannot listen on server socket.");
 
-  gout << "Server is listening on: " << server.getLocalAddress() << endl;
+  gout << "Server is listening on: " << server->getLocalAddress() << endl;
   gout << "Press a key to shutdown server." << endl;
   sDisplay->startDisplay();
   getch();
-  //When the server class is destructed, it will stop listening and shutdown.
+
+  //This is mostly optional.
+  server->close();
 }
 
 void doClient(int outRate, int inRate, int port) {
@@ -312,18 +310,19 @@ void doClient(int outRate, int inRate, int port) {
   gout << "Connecting to: " << address << endl;
   gout << "Press a key except r to stop the testing.  Press r to change rates." << endl;
 
-  PerfTester* tester = new PerfTester();
+  PerfTester::sptr tester = PerfTester::create();
   ConnectionParams params( tester );
   params.setRates(outRate, inRate);
   params.setFeeder( tester );
-  ClientConnection client;
-  if (client.open(address, params))
+
+  ClientConnection::sptr client = ClientConnection::create();
+  if (client->open(address, params))
     errorExit("Cannot open client socket.");
 
-  client.connect();
-  client.join();
+  client->connect();
+  client->join();
 
-  if (client.isConnected()) {
+  if (client->isConnected()) {
     
     sDisplay->startDisplay();
     //We allow the client to change the incoming and outgoing datarate on the
@@ -337,17 +336,17 @@ void doClient(int outRate, int inRate, int port) {
       //is because the cursor moving around constantly.
       mlprintf(0, 21,
         "Pick a new requested outgoing rate (0 == no limit, -1 == no change):",
-        client.stream().getRemoteOutLimit());
+        client->stream().getRemoteOutLimit());
       lgetString(0, 22, newRateStr, 10);
       sscanf(newRateStr, "%d", &newRate);
-      client.stream().setRates(newRate, -1);
+      client->stream().setRates(newRate, -1);
       
       mlprintf(0, 23,
         "Pick a new maximum incoming rate (0 == no limit, -1 == no change):",
-        client.stream().getRemoteOutLimit());
+        client->stream().getRemoteOutLimit());
       lgetString(0, 24, newRateStr, 10);
       sscanf(newRateStr, "%d", &newRate);
-      client.stream().setRates(-1, newRate);
+      client->stream().setRates(-1, newRate);
       
       //Now we clear these lines so the user doesn't think they are still
       //inputting data.
@@ -358,8 +357,8 @@ void doClient(int outRate, int inRate, int port) {
     }
     
     //Turn off the PacketFeeder so when we disconnect we won't wait forever.
-    client.stream().setFeeder(NULL);
-    client.disconnectSendAll();
+    client->stream().setFeeder( PacketFeeder::sptr() );
+    client->disconnectSendAll();
   
   } else {
     gout << "An error occured while connecting.  Press a key." << endl;

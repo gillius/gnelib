@@ -24,7 +24,7 @@
  * wait the better the feedback to the user.
  */
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 
 using namespace std;
 using namespace GNE;
@@ -34,28 +34,39 @@ using namespace GNE::Console;
 //This keeps track of some screen positions when can write to.
 //Essentially makes tiles out of the screen.
 struct Pos {
+  Pos( int x, int y ) : x(x), y(y), packetsIn(NULL), packetsOut(NULL) {}
+
   int x, y;
-  Connection* conn;
+  Connection::sptr conn;
   int* packetsIn;
   int* packetsOut;
 };
-static Pos gpos = {0, 10, NULL}; //global stats position
+static Pos gpos(0, 10); //global stats position
 static int positionsLength = 3;
 static Pos positions[] = {
-  {0, 15, NULL}, {0, 22, NULL}, {0, 29, NULL}, {0, 36, NULL}
+  Pos(0, 15), Pos(0, 22), Pos(0, 29), Pos(0, 36)
 };
 
 class StatsDisplay : public TimerCallback {
 public:
+  typedef SmartPtr<StatsDisplay> sptr;
+  typedef WeakPtr<StatsDisplay> wptr;
+
+protected:
+  StatsDisplay() {
+  }
+
+public:
   /**
    * Sets up a StatsDisplay that updates the screen every "rate" milliseconds.
    */
-  StatsDisplay(int rate) {
-    timer = new Timer(this, rate, false);
+  static sptr create( int rate ) {
+    sptr ret( new StatsDisplay() );
+    ret->timer = Timer::create(ret, rate);
+    return ret;
   }
 
   virtual ~StatsDisplay() {
-    delete timer;
   }
 
   /**
@@ -76,15 +87,16 @@ public:
    * Adds a connection to the display list, returning true if there is not
    * enough screen space left.  In this case, the connection was not added
    * and stats will not be displayed.
+   *
    * @param conn the connection to add.
    * @param packetsIn a pointer to a place to get high-level packets in
    * @param packetsOut similar to packetsIn
    */
-  bool addConn(Connection* conn, int* packetsIn, int* packetsOut) {
+  bool addConn(const Connection::sptr& conn, int* packetsIn, int* packetsOut) {
     //Since we have multiple exit points, we use this convience class.
     LockMutex lock(sync);
 
-    Pos* pos = findPos(NULL);
+    Pos* pos = findPos( Connection::sptr() );
     if (pos != NULL) {
       pos->conn = conn;
       pos->packetsIn = packetsIn;
@@ -99,11 +111,11 @@ public:
    * Deletes a connection from the display list.  If the connection is not in
    * the list, this function has no effect.
    */
-  void delConn(Connection* conn) {
+  void delConn(const Connection::sptr& conn) {
     sync.acquire();
     Pos* pos = findPos(conn);
     if (pos != NULL) {
-      pos->conn = NULL;
+      pos->conn.reset();
       pos->packetsIn = pos->packetsOut = NULL;
 
       //Notify the user that the current screen location has finished its job
@@ -121,7 +133,7 @@ public:
   void timerCallback() {
     sync.acquire();
     for (int c = 0; c < positionsLength; ++c)
-      if (positions[c].conn != NULL)
+      if (positions[c].conn)
         updateStats(positions[c]);
     updateGlobalStats();
     sync.release();
@@ -131,7 +143,7 @@ public:
    * Redraws the stats for one connection.
    */
   void updateStats(const Pos& ourPos) {
-    Connection* conn = ourPos.conn;
+    const Connection::sptr& conn = ourPos.conn;
 
     ConnectionStats all = conn->getStats(-1);
     ConnectionStats rel = conn->getStats(1);
@@ -180,7 +192,7 @@ private:
    * OK -- it will find the first empty position.  Returns NULL on error.
    * sync should already be aquired here so we don't reacquire it.
    */
-  Pos* findPos(Connection* conn) {
+  Pos* findPos(const Connection::sptr& conn) {
     for (int c = 0; c < positionsLength; ++c)
       if (positions[c].conn == conn)
         return &positions[c];
@@ -188,7 +200,7 @@ private:
     return NULL;
   }
 
-  Timer* timer;
+  Timer::sptr timer;
 
   Mutex sync;
 };
