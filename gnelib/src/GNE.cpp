@@ -50,6 +50,8 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
         return true;
       nlEnable(NL_BLOCKING_IO);
       nlEnable(NL_TCP_NO_DELAY);
+      //GNE sends its data in little endian format.
+      nlEnable(NL_LITTLE_ENDIAN_DATA);
       nlDisable(NL_SOCKET_STATS);
       eGen = new ConnectionEventGenerator();
       eGen->start();
