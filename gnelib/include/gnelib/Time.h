@@ -102,6 +102,7 @@ public:
    * Returns a string representation of this time in seconds, for example
    * this might return 5.002052 if there was 5 seconds and 2052 microseconds.
    */
+  //##ModelId=3C6729280041
   std::string toString() const;
 
   /**

@@ -39,26 +39,33 @@ class Connection;
  * or more packets have been received.  If multiple onReceive or
  * onDoneWriting occur, they will probably be combined.  Error events will
  * always have first priority, and if the error leads to a disconnect,
- * pending events after taht will not be called (except for onDisconnect).\n
- * EventThread was created to solve several things:\n
- * = Complexities due to multiple threads calling the ConnectionListener at
- *   the same time.\n
- * = Serialized events and all events executing in the same thread is easy to
- *   control and eliminates lots of previous ways for syncronization errors
- *   to creep in.\n
- * = Events taking a while to execute or block (although this is an error),
+ * pending events after that will not be called (except for onDisconnect).
+ *
+ * EventThread was created to solve several things:
+ * <ul>
+ * <li>Complexities due to multiple threads calling the ConnectionListener at
+ *   the same time.</li>
+ * <li>Serialized events and all events executing in the same thread is easy
+ *   to control and eliminates lots of previous ways for syncronization errors
+ *   to creep in.</li>
+ * <li>Events taking a while to execute or block (although this is an error),
  *   won't stop the rest of GNE from functioning, but will only stop a single
- *   Connection.\n
- * = Multiple event threads take better advantage of multiprocessor machines.
+ *   Connection.</li>
+ * <li>Multiple event threads take better advantage of multiprocessor
+ *   machines.</li>
+ * </ul>
  */
 //##ModelId=3C106F0202CD
 class EventThread : public Thread {
 public:
   /**
    * Initializes this class as a event thread for listener.
+   * The conn pointer is ONLY used to call disconnect when an onFailure
+   * event is finally processed.  This is to assure that disconnect is called
+   * from a safe thread that won't lead to deadlock when a failure occurs.
    */
   //##ModelId=3C106F0203D4
-  EventThread(ConnectionListener* listener = NULL);
+  EventThread(ConnectionListener* listener, Connection* conn);
 
   //##ModelId=3C106F0203D6
   virtual ~EventThread();
@@ -144,6 +151,10 @@ protected:
   void run();
 
 private:
+  //See the ctor for more information about ourConn.
+  //##ModelId=3C6729270312
+  Connection* ourConn;
+
   //The listener for our events.  All on* events go here.  This is protected
   //so ClientConnection can send events as well.
   //##ModelId=3C106F1903BE

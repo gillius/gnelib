@@ -76,6 +76,7 @@ Time Time::diff(const Time& rhs) const {
   return ret;
 }
 
+//##ModelId=3C6729280041
 std::string Time::toString() const {
   std::stringstream ret;
   ret << sec << '.' << std::setfill('0') << std::setw(6) << microsec;

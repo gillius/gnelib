@@ -28,8 +28,8 @@
 namespace GNE {
 
 //##ModelId=3C106F0203D4
-EventThread::EventThread(ConnectionListener* listener)
-: Thread("EventThr"), eventListener(listener),
+EventThread::EventThread(ConnectionListener* listener, Connection* conn)
+: Thread("EventThr"), ourConn(conn), eventListener(listener),
 started(false), onReceiveEvent(false), onDoneWritingEvent(false),
 onDisconnectEvent(false), failure(NULL) {
   gnedbgo(5, "created");
@@ -149,6 +149,7 @@ void EventThread::run() {
         listenSync.acquire();
         eventListener->onFailure(*failure);
         listenSync.release();
+        ourConn->disconnect();
         delete failure;
         failure = NULL;
       } else if (onDisconnectEvent) {

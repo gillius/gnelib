@@ -35,7 +35,7 @@ namespace GNE {
 //##ModelId=3B0753810073
 Connection::Connection(ConnectionListener* listener)
 : ps(NULL), connecting(false), connected(false), rlistener(NULL), ulistener(NULL) {
-  eventListener = new EventThread(listener);
+  eventListener = new EventThread(listener, this);
 }
 
 //##ModelId=3B0753810076
@@ -206,6 +206,10 @@ void Connection::onReceive(bool reliable) {
   }
 }
 
+/**
+ * \bug we can still get multiple failures if the read fails then PacketStream
+ *      fails.
+ */
 //##ModelId=3BB4208C0280
 void Connection::processError(const Error& error) {
   switch(error.getCode()) {
@@ -214,7 +218,12 @@ void Connection::processError(const Error& error) {
     break;
   default:
     onFailure(error);
-    disconnect();
+    //The EventThread will call disconnect.  This will prevent a deadlock
+    //where PacketStream and another thread is trying to disconnect at the
+    //same time.
+    //But if we don't disconnect we generate endless error messages because
+    //we need to unregister immediately.  So we do that.
+    unreg(true, true);
     break;
   }
 }

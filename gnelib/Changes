@@ -1,4 +1,11 @@
 GNE 0.45 to current
+  Fixed a bug in ConnectionEventGenerator where it can try to start an event
+    on a listener that was just unregistered, and this would cause an access
+    violation as unregistration invalidates the iterator.
+  Fixed a bug where a deadlock was likely to occur when a write failed.
+  exrawtest updated to test endianness of the RawPacket.
+  Due to a new feature in HawkNL, GNE now sends all data in little endian
+    format which is consistant with the GNE protocol spec.
   Added Time::toString and the ability to output it to an ostream.
   New example exping to show and test PingPacket.
   Added ID attribute to every GNE Packet class.
