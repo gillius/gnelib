@@ -1,2 +1,2 @@
-mkdir include\src
-copy src\*.h include\src
+mkdir include\gnelib
+copy src\*.h include\gnelib
