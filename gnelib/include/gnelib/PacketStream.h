@@ -171,6 +171,11 @@ private:
   //##ModelId=3B075381018F
   int outRate;
 
+  /**
+   * These are set to be mutable because of the const functions need
+   * non-const access to these objects, but they can still be called const
+   * because the object's state is the same before and after the method.
+   */
   //##ModelId=3B0753810196
   mutable Mutex inQCtrl;
 
