@@ -38,6 +38,10 @@
 #include <windows.h>
 #endif
 
+//Standard C includes -- for Console class
+#include <stdio.h>
+#include <stdarg.h>
+
 //Include the HawkNL library
 #include <nl.h>
 
