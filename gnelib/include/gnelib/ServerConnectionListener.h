@@ -211,7 +211,7 @@ private:
   //performs the actual close operation w/o removing from list.
   void rawClose();
 
-  //These methods relay the message on, locking the sync mutex.
+  //These methods relay the message on.
   void processOnListenFailure( const Error& error, const Address& from,
                                const SmartPtr<ConnectionListener>& listener);
 
