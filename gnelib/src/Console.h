@@ -23,6 +23,7 @@
 #include "gneintern.h"
 #include "Mutex.h"
 
+namespace GNE {
 /**
  * Functions for providing very basic console support, meant for use in the
  * example and test programs, and in console-only servers using GNE.  These
@@ -38,7 +39,6 @@
  * keyboard to be used ;).  It is okay, however, to be using the console
  * output functions at the same time you are using the input functions.
  */
-namespace GNE {
 namespace Console {
   /**
    * Initalizes the console part of GNE.  This may be called multiple times.
