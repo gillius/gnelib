@@ -242,6 +242,10 @@ SOURCE=.\doxygen.cfg
 # End Source File
 # Begin Source File
 
+SOURCE=.\examples\examples.txt
+# End Source File
+# Begin Source File
+
 SOURCE=.\docs\gnereq.doc
 # End Source File
 # Begin Source File

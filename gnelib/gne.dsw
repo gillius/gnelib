@@ -3,6 +3,30 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
+Project: "buildall"=".\buildall.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name exthreads
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name extimer
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name exuptime
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name gne
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "exthreads"=".\EXAMPLES\exthreads\exthreads.dsp" - Package Owner=<4>
 
 Package=<5>
@@ -14,6 +38,33 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name gne
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "extimer"=".\EXAMPLES\extimer\extimer.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name gne
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "exuptime"=".\EXAMPLES\exuptime\exuptime.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
