@@ -152,7 +152,7 @@ public:
   }
 
   PositionedText( int objId, string msg, int x, int y )
-    : NetworkObject( objId ), dead(false), drawn(false), msg(msg), x(x), y(y) {
+    : NetworkObject( objId ), dead(false), drawn(false), x(x), y(y), msg(msg) {
   }
 
   static NetworkObject* createFromPacket( int objId, const Packet& packet ) {
