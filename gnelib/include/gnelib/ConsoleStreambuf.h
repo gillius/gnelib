@@ -63,6 +63,13 @@ public:
   //##ModelId=3BF8444503CE
   ~goutbuf();
 
+  /**
+   * If set, the next output will be an mlprintf instead of a mprintf, with
+   * the specified coordinates.
+   */
+  //##ModelId=3BF8BBF902E6
+  void setNextWriteLoc(int x, int y);
+
 protected:
   //##ModelId=3BF8444503CF
   int sync();
@@ -76,6 +83,11 @@ protected:
 private:
   //##ModelId=3BF8444503CC
   char* buf;
+
+  //##ModelId=3BF8BBF902BE
+  int x; //the next coords to write to, if not -1.
+  //##ModelId=3BF8BBF902D2
+  int y;
 };
 
 }

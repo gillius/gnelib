@@ -72,10 +72,10 @@ ginbuf::int_type ginbuf::underflow() {
 //    goutbuf implementation
 //
 //--------------------------------
-const int OBUF_LEN = 128;
+const int OBUF_LEN = 256;
 
 //##ModelId=3BF8444503CD
-goutbuf::goutbuf() {
+goutbuf::goutbuf() : x(-1), y(-1) {
   buf = new char[OBUF_LEN];
   setp(buf, buf + OBUF_LEN - 1);
   //We want to leave ourselves a character at the end, so that we may null
@@ -88,6 +88,12 @@ goutbuf::~goutbuf() {
   //output.
   flush_output();
   delete[] buf;
+}
+
+//##ModelId=3BF8BBF902E6
+void goutbuf::setNextWriteLoc(int xLoc, int yLoc) {
+  x = xLoc;
+  y = yLoc;
 }
 
 //##ModelId=3BF8444503CF
@@ -103,7 +109,12 @@ void goutbuf::flush_output() {
   //this function.
   if (pptr() > pbase()) {
     *pptr() = '\0';
-    Console::mprintf(pbase());
+    if (x != -1) { //Do a mlprintf if a location was set.
+      assert(y != -1);
+      Console::mlprintf(x, y, pbase());
+      x = y = -1;  //Unset last location.
+    } else
+      Console::mprintf(pbase());
     setp(buf, buf + OBUF_LEN - 1);
   }
 }

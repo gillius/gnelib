@@ -70,7 +70,12 @@ int main(int argc, char* argv[]) {
   gin >> url;
   gout << url << " resolves to: " << Address(url) << endl;
   gout << Address(url) << " reverses to " << Address(url).getNameByAddress() << endl;
-  gout << "Press a key to continue." << endl;
+
+  //Do a little Console testing here too.  Note since there is only one
+  //thread doing any I/O acquires and releases are not needed.
+  int x, y;
+  Console::mgetPos(&x, &y);
+  gout << moveTo(10, y+1) << "Press a key to continue." << flush;
   getch();
 
   return 0;
