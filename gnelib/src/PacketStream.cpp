@@ -265,6 +265,9 @@ void PacketStream::run() {
     } else {
       //Waiting loop for when there are no packets
       while (numPackets == 0 && !shutdown) {
+        //Notify any threads waiting on waitToSendAll
+        outQCtrl.broadcast();
+
         onLowPackets(numPackets);
         //Reevaluate numPackets because onLowPackets may add more packets.
         numPackets = (int)(outRel.size() + outUnrel.size());
