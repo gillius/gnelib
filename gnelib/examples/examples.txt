@@ -49,7 +49,9 @@ expong -- It's console pong.  Over the internet.  What kind of nonsense is
 exconsole -- shows off the new ConsoleBuffer/TextConsole classes, and acts
   also as a partial test of these classes.
   
-exbroker --
+exbroker --  Test of ObjectBrokerServer and ObjectBrokerClient classes.  Not
+  much of an example because this usage is far from the practical usage, but
+  it does show and track the state of the ObjectBrokers while they interact.
 
 expointers -- A test for the new SmartPtr and WeakPtr reference counted
   smart pointer classes.
