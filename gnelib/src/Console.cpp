@@ -19,8 +19,8 @@
 
 #include "gneintern.h"
 #include "Console.h"
-#include "gstreambufs.h"
-#include "ConsoleMutex.h"
+#include "ConsoleStreambuf.h"
+#include "ConsoleStream.h"
 #include "Mutex.h"
 #include <ostream>
 #include <istream>

@@ -18,18 +18,18 @@
  */
 
 #include "gneintern.h"
-#include "gstreambufs.h"
+#include "ConsoleStreambuf.h"
 #include "Console.h"
 #include <streambuf>
 
 namespace GNE {
 namespace Console {
 
-//********************************
+//--------------------------------
 //
 //    ginbuf implementation
 //
-//********************************
+//--------------------------------
 const int IBUF_LEN = 128;
 
 //##ModelId=3BF8444503C9
@@ -67,11 +67,11 @@ ginbuf::int_type ginbuf::underflow() {
   return traits_type::to_int_type(*buf);
 }
 
-//********************************
+//--------------------------------
 //
 //    goutbuf implementation
 //
-//********************************
+//--------------------------------
 const int OBUF_LEN = 128;
 
 //##ModelId=3BF8444503CD

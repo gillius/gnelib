@@ -1,5 +1,5 @@
-#ifndef _CONSOLEMUTEX_H_
-#define _CONSOLEMUTEX_H_
+#ifndef _CONSOLESTREAM_H_
+#define _CONSOLESTREAM_H_
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
  * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)

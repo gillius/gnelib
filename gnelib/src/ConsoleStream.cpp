@@ -18,9 +18,14 @@
  */
 
 #include "gneintern.h"
-#include "ConsoleMutex.h"
+#include "ConsoleStream.h"
 #include "Mutex.h"
 
+//--------------------------------
+//
+//  ConsoleMutex implementation
+//
+//--------------------------------
 std::ostream& operator << (std::ostream& o, GNE::Console::ConsoleMutex& cm) {
   cm.action();
   return o;

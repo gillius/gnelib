@@ -1,5 +1,5 @@
-#ifndef _GSTREAMBUFS_H_
-#define _GSTREAMBUFS_H_
+#ifndef _CONSOLESTREAMBUF_H_
+#define _CONSOLESTREAMBUF_H_
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
  * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
@@ -81,4 +81,4 @@ private:
 }
 }
 
-#endif //#ifndef _GSTREAMBUFS_H_
+#endif //#ifndef _CONSOLESTREAMBUF_H_

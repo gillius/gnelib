@@ -31,7 +31,7 @@
 #include "gnelib/Console.h"
 #include "gnelib/Counter.h"
 #include "gnelib/GNE.h"
-#include "gnelib/ConsoleMutex.h"
+#include "gnelib/ConsoleStream.h"
 #include "gnelib/ListServerConnection.h"
 #include "gnelib/Mutex.h"
 #include "gnelib/Packet.h"
