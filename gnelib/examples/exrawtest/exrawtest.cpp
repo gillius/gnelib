@@ -28,26 +28,28 @@
 
 using namespace std;
 using namespace GNE;
+using namespace GNE::Console;
 
 int main(int argc, char* argv[]) {
   initGNE(NO_NET, atexit);
+  initConsole(atexit);
   Console::setTitle("GNE RawPacket Test");
 
-  cout << "Now writing a RawPacket..." << endl;
+  gout << "Now writing a RawPacket..." << endl;
   char block[16] = {'a', 'b', 'a', 'a', 'c', 'a', 'd', 'a', 'e', '1', 'a',
     'a', 'a', '4', 'a', 'a'};
   RawPacket raw(NULL); //same as RawPacket raw().
   raw << (int)56 << "superlala" << (NLubyte)124 << (short)26 << (float)12.5 << (double)123.4;
   raw.writeRaw(block, 16);
   
-  cout << "Raw length: " << raw.getPosition() << endl;
-  cout << " should be: " << (sizeof(int) + 10 + sizeof(NLubyte) + sizeof(short) +
+  gout << "Raw length: " << raw.getPosition() << endl;
+  gout << " should be: " << (sizeof(int) + 10 + sizeof(NLubyte) + sizeof(short) +
                              sizeof(float) + sizeof(double) + 16) << endl;
 
   NLbyte* buffer = new NLbyte[raw.getPosition()];
   memcpy(buffer, raw.getData(), raw.getPosition());
   RawPacket raw2(buffer);
-  cout << "Now reading from the same data..." << endl;
+  gout << "Now reading from the same data..." << endl;
 
   int a;
   string b;
@@ -60,14 +62,17 @@ int main(int argc, char* argv[]) {
   raw2 >> a >> b >> c >> d >> e >> f;
   raw2.readRaw(block, 16);
 
-  cout << a << endl << b << endl << (int)c << endl << d << endl << e << endl << f << endl;
+  gout << a << endl << b << endl << (int)c << endl << d << endl << e << endl << f << endl;
   for (int count=0; count<16; count++) {
-    cout << block[count] << ' ';
+    gout << block[count] << ' ';
   }
-  cout << endl;
-  cout << "Data was of length: " << raw2.getPosition() << " (should be as above)" << endl;
-  cout << "String length: " << b.length() << " (should be 9)" << endl;
+  gout << endl;
+  gout << "Data was of length: " << raw2.getPosition() << " (should be as above)" << endl;
+  gout << "String length: " << b.length() << " (should be 9)" << endl;
   
+  gout << "Press a key to continue: " << endl;
+  getch();
+
   return 0;
 }
 
