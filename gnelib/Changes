@@ -1,4 +1,7 @@
 GNE 0.002 to 0.003
+  New example expacket.
+  New example exhello.
+  Implemented the RawPacket class.
   Major API changes/additions/deletions in the Connection classes.
     This API is still very much in developement and working, so do
     not rely upon it being fixed right now.
