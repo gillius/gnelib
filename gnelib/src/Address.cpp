@@ -51,9 +51,14 @@ void Address::setAddressByName(std::string address) {
 
 //##ModelId=3BBA41220208
 std::string Address::getNameByAddress() const {
-  char buf[NL_MAX_STRING_LENGTH];
-  nlGetNameFromAddr(&const_cast<Address*>(this)->addr, (NLbyte*)buf);
-  return std::string(buf);
+  if (isValid()) {
+    char buf[NL_MAX_STRING_LENGTH];
+    nlGetNameFromAddr(&const_cast<Address*>(this)->addr, (NLbyte*)buf);
+    return std::string(buf);
+
+  } else {
+    return "invalid address";
+  }
 }
 
 //##ModelId=3BB9282B0336

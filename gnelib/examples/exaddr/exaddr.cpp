@@ -68,8 +68,9 @@ int main(int argc, char* argv[]) {
 
   gout << "Try picking your own address: ";
   gin >> url;
-  gout << url << " resolves to: " << Address(url) << endl;
-  gout << Address(url) << " reverses to " << Address(url).getNameByAddress() << endl;
+  addr.setAddressByName(url);
+  gout << url << " resolves to: " << addr << endl;
+  gout << addr << " reverses to " << addr.getNameByAddress() << endl;
 
   //Do a little Console testing here too.  Note since there is only one
   //thread doing any I/O acquires and releases are not needed.
