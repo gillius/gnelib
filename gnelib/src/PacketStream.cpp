@@ -134,7 +134,7 @@ void PacketStream::shutDown() {
 }
 
 /**
- * \todo combine packets, do throttling, call onDoneWriting
+ * \todo combine packets, do throttling, optimize
  */
 //##ModelId=3B07538101FA
 void PacketStream::run() {
@@ -154,6 +154,15 @@ void PacketStream::run() {
 				owner.processError(Error::Write);
 			}
 			delete next;
+
+			//Optimize this code later
+			bool done = false;
+			outQCtrl.acquire();
+			if (out.empty())
+				done = true;
+			outQCtrl.release();
+			if (done)
+				owner.onDoneWriting();
     }
   }
 }
