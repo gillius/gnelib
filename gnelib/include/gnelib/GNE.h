@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string>
+#include "gneintern.h"
 #include "ConnectionStats.h"
 #include "Error.h"
 #include "gnetypes.h"
@@ -32,7 +32,6 @@
  */
 namespace GNE {
   class Address;
-  class ConnectionEventGenerator;
 
   /**
    * Initalizes GNE and HawkNL.  Call this before using any HawkNL or GNE
@@ -189,13 +188,6 @@ namespace GNE {
    * @see initGNE
    */
   const NLenum NO_NET = 128;
-
-  /**
-   * The global event generator.  The library uses this internally to
-   * register and unregister connections.  The end-user will not have to use
-   * this object under any normal cirumstances.
-   */
-  extern ConnectionEventGenerator* eGen;
 }
 
 #endif /* GNE_H_INCLUDED_C51DF1DD */

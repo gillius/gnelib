@@ -145,9 +145,15 @@ class moveTo;
    * Initalizes the console part of GNE.  This may be called multiple times.
    * Pass it your atexit function so the console will be shutdown
    * automatically on program exit.
+   *
+   * Set the clearOnExit variable to true if after the program is finished the
+   * console should clear the screen and move the cursor back to the top.
+   * Set to false to preserve the screen contents and cursor position after
+   * Console close if possible.
+   *
    * @return true if the console could not be initalized.
    */
-  bool initConsole(int (*atexit_ptr)(void (*func)(void)));
+  bool initConsole(int (*atexit_ptr)(void (*func)(void)), bool clearOnExit = true );
 
   /**
    * Shuts down the console part of GNE.  This may be called multiple times.
@@ -155,9 +161,19 @@ class moveTo;
   void shutdownConsole();
 
   /**
+   * Clears the console screen.  The cursor's position remains unchanged after
+   * the clear.
+   */
+  void mclearConsole();
+
+  /**
    * Returns non-zero if a key is waiting in the buffer to be received by
    * getch.  You cannot use this call while an lgetstring is being processed.
    * You can use this function while output is being displayed.
+   *
+   * None of the input routines are thread safe.  If you access them from more
+   * than one thread at a time then results are undefined.
+   *
    * @see getch
    * @see lgetString
    */
@@ -168,6 +184,10 @@ class moveTo;
    * ready to be returned.  You cannot use this call while an lgetstring
    * is being processed, but you can use this while output is being written
    * (getch does not echo to the screen).
+   *
+   * None of the input routines are thread safe.  If you access them from more
+   * than one thread at a time then results are undefined.
+   *
    * @return the next character
    * @see kbhit
    * @see lgetString
@@ -206,6 +226,10 @@ class moveTo;
    * however, to be using the console output functions at the same time you
    * are using this function.  When the user presses enter the input is
    * complete.
+   *
+   * None of the input routines are thread safe.  If you access them from more
+   * than one thread at a time then results are undefined.
+   *
    * @param str a char* with size maxlen+1 where input will be stored.
    * @param maxlen the maximum number of characters the user can input.
    * @return the length of the string returned, from 0 <= x <= maxlen
@@ -217,6 +241,10 @@ class moveTo;
   /**
    * Same as lgetString(int, int, char*, int), but uses the current cursor
    * position as obtained from mgetpos for the positions.
+   *
+   * None of the input routines are thread safe.  If you access them from more
+   * than one thread at a time then results are undefined.
+   *
    * @see lgetString
    * @see mgetpos
    */

@@ -60,18 +60,16 @@ ServerConnection::ServerConnection(const ConnectionParams& p,
   params->doJoin = true;
 }
 
+ServerConnection::sptr
+ServerConnection::create(const ConnectionParams& p, NLsocket rsocket,
+                         ServerConnectionListener* creator) {
+  sptr ret( new ServerConnection( p, rsocket, creator ) );
+  ret->Thread::setThisPointer( ret );
+  ret->Connection::setThisPointer( ret );
+  return ret;
+}
+
 ServerConnection::~ServerConnection() {
-  //If this is the current thread, we did a detach(true) because we failed 
-  //before onNewConn.  Else this is another thread (likely our event thread)
-  //and therefore we call join to wait for run to complete if it is still
-  //running (as it would be if an error occured after onNewConn but before
-  //run finished), and join will also release thread resources.
-  //We have to rely on params because Thread::currentThread is not valid in
-  //the dtor when we do detach(true).  When an error occurs, params was not
-  //deleted, so if it was deleted we know we did not call detach(true) because
-  //we did not catch an error.
-  if (params == NULL)
-    join();
   delete params;
   gnedbgo(5, "destroyed");
 }
@@ -98,9 +96,7 @@ void ServerConnection::run() {
     doHandshake();
   } catch (Error& e) {
     params->creator->onListenFailure(e, rAddr, origListener);
-    //We delete ourselves when we terminate since we were never seen by the
-    //user and no one has seen us yet.
-    detach(true);
+    //We'll get deleted from the SmartPtr cleanup
     return;
   }
   gnedbgo(2, "GNE Protocol Handshake Successful.");
@@ -112,7 +108,7 @@ void ServerConnection::run() {
     sConn.startConnect();
     ps->start();
     connecting = true;
-    eventListener->start();
+    startEventThread();
     reg(true, (sockets.u != NL_INVALID));
 
     //Setup the packet feeder
@@ -139,9 +135,7 @@ void ServerConnection::run() {
     if (!onNewConnFinished) {
       sConn.endConnect(false);
       params->creator->onListenFailure(e, rAddr, origListener);
-      //We delete ourselves when we terminate since we were never seen by the
-      //user and no one has seen us yet.
-      detach(true);
+      //We'll get deleted from the SmartPtr cleanup
       return;
     }
   }
@@ -213,7 +207,7 @@ void ServerConnection::getCRP() {
   params->cp.setUnrel(unreliable && params->cp.getUnrel());
 
   //Now that we know the versions are OK, make the PacketStream
-  ps = new PacketStream(params->cp.getOutRate(), maxOutRate, *this);
+  ps = PacketStream::create(params->cp.getOutRate(), maxOutRate, *this);
 }
 
 void ServerConnection::sendRefusal() {

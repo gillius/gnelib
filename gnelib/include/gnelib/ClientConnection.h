@@ -23,6 +23,8 @@
 #include "Connection.h"
 #include "Thread.h"
 #include "Address.h"
+#include "SmartPtr.h"
+#include "WeakPtr.h"
 
 namespace GNE {
 class ConnectionListener;
@@ -34,12 +36,21 @@ class ConnectionParams;
  * A class that can connect to a remote target.
  */
 class ClientConnection : public Connection, public Thread {
-public:
+protected:
   /**
    * Initializes this ClientConnection.  The listener is passed in the open
    * method.
    */
   ClientConnection();
+
+public:
+  typedef SmartPtr<ClientConnection> sptr;
+  typedef WeakPtr<ClientConnection> wptr;
+
+  /**
+   * Creates a new ClientConnection object, managed by a SmartPtr.
+   */
+  static sptr create();
 
   virtual ~ClientConnection();
 
@@ -47,6 +58,7 @@ public:
    * Opens the socket, ready for connect, but does not yet connect.  All of
    * the relvant parameters for establishing the connection are passed into
    * this function.  If there is already an error, the function returns true.
+   *
    * @param dest the destination address.
    */
   bool open(const Address& dest, const ConnectionParams& p);
@@ -59,9 +71,6 @@ public:
    * during onConnect or it chooses to reject the connection,
    * onConnectFailure will also be called.
    *
-   * You must call either detach(false) or join on this object after calling
-   * connect, depending if you want to wait for the connection to complete.
-   *
    * You can call join after connect to wait until the connection is
    * finished, when onConnect or onConnectFailure will be called.  When the
    * called function exits, the thread will stop and join will return.  If
@@ -73,7 +82,7 @@ public:
    * checked during this phase.  If either protocol versions mismatch,
    * onConnectFailure() will be triggered.
    *
-   * If sConn is not null, then there is currently a SyncConnection wrapped
+   * If wrapped is not null, then there is currently a SyncConnection wrapped
    * around this connection.  This is only the case when a user is using only
    * SyncConnections, and in this case the user should call
    * SyncConnection::connect(), so in your code you should never need to pass
@@ -89,7 +98,7 @@ protected:
    * Connection starts a new thread lasting only while it is connecting.
    * @see Thread#run()
    */
-  void run();
+  virtual void run();
 
 private:
   /**

@@ -25,6 +25,10 @@ namespace GNE {
 Counter::Counter() : count(0) {
 }
 
+Counter::sptr Counter::create() {
+  return sptr( new Counter() );
+}
+
 Counter::~Counter() {
 }
 

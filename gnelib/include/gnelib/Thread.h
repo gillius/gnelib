@@ -21,40 +21,42 @@
  */
 
 #include "Mutex.h"
+#include "SmartPtr.h"
+#include "WeakPtr.h"
 #include <string>
 
 namespace GNE {
 
 /**
  * A class resembling a thread.
- * Derive your own classes from this class that implement the run function.
+ * Derive your own classes from this class that implements the run function.
  * Execution begins in the run method.  All methods of this class are thread-
  * safe.
- *
- * NOTE: All threads must either be detached or joined.  If you choose to
- * detach a thread you may not access that Thread object again.  If you need
- * to access it at a later time, keep a pointer, then at a later time call
- * join on this pointer, then delete at some later time.
  *
  * \todo Priorities are not yet implemented.
  */
 class Thread {
+public: //typedefs
+  typedef SmartPtr<Thread> sptr;
+  typedef WeakPtr<Thread> wptr;
+
 public:
   /**
    * Creates a new thread, ready to run but not yet running.
-   * @param name2 the name of this thread
-   * @param priority2 the priority this thread has
+   * @param name the name of this thread
+   * @param priority the priority this thread has
    */
-  Thread(std::string name2 = DEF_NAME, int priority2 = DEF_PRI);
+  Thread(std::string name = DEF_NAME, int priority = DEF_PRI);
 
   virtual ~Thread();
 
   /**
-   * Returns the Thread object that represents this calling thread.
-   * @return the currently running thread, or NULL if no Thread object
-   *         resembles this thread.
+   * Returns the Thread object that represents this calling thread.  This will
+   * return a SmartPtr to the calling thread, or an empty SmartPtr if the
+   * calling thread is the main thread or another thread created outside of
+   * the %GNE API.
    */
-  static Thread* currentThread();
+  static sptr currentThread();
 
   /**
    * The currently running thread sleeps for the time given in milliseconds.
@@ -72,8 +74,8 @@ public:
    * response, but most of the time you are likely wanting to use a
    * ConditionVariable to wait for an event or a Timer.  You should never use
    * yielding as mitigation for a busy-wait, because you will still use 100%
-   * CPU and essentially you will perform a busy-wait and just lower the
-   * scheduling priority of your thread/process.
+   * CPU and essentially you will perform a busy-wait and just effectively
+   * lower the scheduling priority of your thread/process.
    */
   static void yield();
 
@@ -81,27 +83,39 @@ public:
    * This method will wait for all threads that the user can control or see
    * to end.  All of the threads created implicitly have a deterministic end
    * so that when you destruct objects the threads associated with them are
-   * deleted.  Therefore only threads that you have directly created and
-   * detached (rather than joined) might still be running.  You can use this
-   * static method to wait for and therefore verify their completion, since
-   * when main exits, your threads will be terminated forcefully if they are
-   * running.
+   * deleted.  Therefore only threads that you have directly created might
+   * still be running.  You can use this static method to wait for and 
+   * therefore verify their completion, since when main exits, your threads
+   * will be terminated forcefully if they are running.
    *
    * The implementation of this method is simple and therefore not intended
    * to be used to create a program where you create detached threads and
    * then use the main thread to sit in this function until the "real"
    * program completes.  It is meant solely as a method of definitvely
-   * verifying the completion of detached threads, and waiting short times
+   * verifying the completion of temporary threads, and waiting short times
    * for these threads to finish if needed.  If you need to wait a long time,
    * use join on the threads you've made, as this method is more efficient.
+   *
+   * You may want to execute the requestAllShutdown method before calling
+   * this method.
    *
    * @param ms the amount of time to wait for the threads before giving up.
    *           This is used so a stalled or crashed thread will still allow
    *           you to terminate the program.
    * @return true if all threads have completed, or false if there are still
    *              some threads running and the method timed out.
+   *
+   * @see requestAllShutdown
    */
   static bool waitForAllThreads(int ms);
+
+  /**
+   * Calls the shutDown method of all running threads.  This is simply a
+   * request to the thread that it should shut down, it is up to the
+   * implementation whether to ignore or heed this advice, and how quickly.
+   */
+  //TODO: implement this
+  //static void requestAllShutdown();
 
   /**
    * Returns the name of this thread.
@@ -109,6 +123,7 @@ public:
   std::string getName() const;
 
   /**
+   * Makes a request that this thread should shutdown.
    * Tells this thread to shutdown, if it is in an infinite loop.  You will
    * probably want to call join right after calling this to wait for the
    * shutdown to complete which is dependant on the thread you are shutting
@@ -128,49 +143,30 @@ public:
 
   /**
    * A blocking call that returns when this thread terminates, or returns
-   * immediately if the thread has terminated.  A thread must always either
-   * be joined or detached if system resources are to be recovered.  A
-   * thread may not be joined after being detached.
-   * @see detach
+   * immediately if the thread has terminated.
    */
   void join();
 
   /**
-   * Detaches a running thread.  A thread must always either
-   * be joined or detached if system resources are to be recovered.  A
-   * thread may not be joined after being detached.  After detaching a
-   * thread, with delThis set to true, it
-   * is undefined to access it any longer outside of its own actual thread.
-   * In other words, at any moment after detach the Thread instance could be
-   * be deleted because the thread terminated (or has already terminated).
-   * But, of course a running thread could still access itself as it clearly
-   * has not stopped and is still running.
-   *
-   * If you care about reading the data from a thread after its completion,
-   * do not use detach and instead use join.  It is useful to do this if you
-   * want to release OS thread resources
-   * and still keep the class running (as in the Connection classes).
-   *
-   * Pass false if the the thread should not auto-destruct when it ends --
-   * this is useful when you declared a thread on the stack, or you want to
-   * poll for completion.
-   *
-   * @param delThis true if the thread should delete itself when it
-   *                finishes executing.
-   * @see join
+   * Returns true if this Thread has ever been started.  This remains true if
+   * even after the Thread has stopped running.
    */
-  void detach(bool delThis);
+  bool hasStarted() const;
 
   /**
-   * Determine the running state of the thread.
+   * Determine the running state of the thread.  If running is true, then
+   * started must be true.
    */
   bool isRunning() const;
 
   /**
    * Starts this thread running.  The thread will be marked as running before
-   * this function completes.
+   * this function completes.  Once a thread has stopped it can never be
+   * restarted, so only one call to start can ever be made.
+   *
+   * @pre hasStarted returns false
    */
-  virtual void start();
+  void start();
   
   /**
    * Returns the priority of this class.
@@ -214,6 +210,27 @@ public:
 
 protected:
   /**
+   * IMPORTANT: call this method in your static create function.
+   * Unfortunately there is no way to force an object to be managed by
+   * a smart pointer, so when you derive from Thread you must do this
+   * yourself, preferably through a public static create method.  See the
+   * threading examples for this.
+   *
+   * IF YOU DO NOT SET THIS YOUR PROGRAM WILL CRASH!  You must set it before
+   * any Thread methods are called (excluding the Thread constructor).
+   *
+   * @see getThisPointer
+   */
+  void setThisPointer( const wptr& thisPtr );
+
+  /**
+   * Returns a SmartPtr to this object.
+   *
+   * @see setThisPointer
+   */
+  sptr getThisPointer() const;
+
+  /**
    * This variable is set to true when this thread should exit.  Users that
    * implement a Thread class must respond to this if the thread wants to
    * wait in an infinite loop.  Threads that will eventually stop can respond
@@ -241,22 +258,29 @@ private:
 #endif
 
   /**
+   * Detaches the thread if it wasn't joined on when it is destructed.
+   */
+  void detach();
+
+  /**
    * This function is called internally and automatically after run ends and
    * is used for internal library cleanup.
    */
   void end();
 
-  static void remove(Thread*);
+  static void remove( const ThreadIDData& d );
+
+  wptr thisThread;
 
   std::string name;
 
+  bool started;
+
   bool running;
 
-  bool deleteThis;
+  bool joined;
 
   int priority;
-
-  Mutex sync;
 };
 
 }

@@ -17,18 +17,31 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../../include/gnelib.h"
-#include <assert.h>
+#include <gnelib.h>
+#include <cassert>
 
+using namespace std;
 using namespace GNE;
 using namespace Console;
 
 class TimeClass : public TimerCallback {
-public:
-  TimeClass(int x2, int y2, std::string ourName)
-    : lastTime(Timer::getCurrentTime()), callNum(0), x(x2), y(y2), name(ourName) {}
+protected:
+  TimeClass(int x, int y, std::string ourName)
+    : lastTime(Timer::getCurrentTime()), callNum(0), x(x), y(y), name(ourName) {
+    gnedbgo( 5, "TimeClass created" );
+  }
 
-  virtual ~TimeClass() {}
+public:
+  typedef SmartPtr<TimeClass> sptr;
+  typedef WeakPtr<TimeClass> wptr;
+
+  static sptr create( int x, int y, std::string ourName ) {
+    return sptr( new TimeClass( x, y, ourName ) );
+  }
+
+  virtual ~TimeClass() {
+    gnedbgo( 5, "TimeClass destroyed" );
+  }
 
   void timerCallback() {
     Time currTime = Timer::getCurrentTime();
@@ -45,36 +58,49 @@ private:
   std::string name;
 };
 
+/**
+ * This is a strange, atypical class.  It's a TimerCallback that starts up a
+ * Timer and listens to that.
+ */
 class CounterWatcher : public TimerCallback {
+protected:
+  CounterWatcher(int x, int y, int counterRate)
+    : x(x), y(y) {
+    counter = Counter::create();
+    timer = Timer::create( counter, counterRate );
+    timer->startTimer();
+    gnedbgo( 5, "CounterWatcher created" );
+  }
+
 public:
-  CounterWatcher(int x2, int y2, int counterRate)
-    : x(x2), y(y2), timer(&counter, counterRate, false) {
-    //false == don't let Timer kill the callback (counter)
-    timer.startTimer();
+  typedef SmartPtr<CounterWatcher> sptr;
+  typedef WeakPtr<CounterWatcher> wptr;
+
+  static sptr create( int x, int y, int counterRate ) {
+    return sptr( new CounterWatcher( x, y, counterRate ) );
   }
 
   virtual ~CounterWatcher() {
     //Setting true here causes stopTimer to wait until the callbacks are
-    //done, whereas setting false will not wait.  But at this point the value
-    //passed is irrelevant since when timer is destroyed in this function it
-    //would block regardless.  See the Timer documentation for more details.
-    timer.stopTimer(true);
+    //done, whereas setting false will not wait.
+    timer->stopTimer(true);
+    gnedbgo( 5, "CounterWatcher destroyed" );
   }
 
   void timerCallback() {
-    mlprintf(x, y, "Count: %i", counter.getCount());
+    mlprintf(x, y, "Count: %i", counter->getCount());
   }
-
 private:
   int x, y;
-  Counter counter;
-  Timer timer;
+  Counter::sptr counter;
+  Timer::sptr timer;
 };
   
 int main() {
   initGNE(NO_NET, atexit);
   initConsole(atexit);
   setTitle("GNE Timers Example");
+  //GNE::initDebug( DLEVEL1 | DLEVEL5, "debug.txt" );
 
   //Doing some tests on Time class
   mprintf("Time class tests:\n");
@@ -88,38 +114,33 @@ int main() {
   mprintf("%is, %ius\n", t.getSec(), t.getuSec());
   mprintf("Timer class tests, press a key to quit:\n");
 
-  //Create the timers, and pass true to allow our timer objects to
-  //also destroy their callbacks when they die.
-  Timer t1(new TimeClass(3, 8, "Bob"), 1000, true);
-  Timer t2(new TimeClass(5, 10, "Sally"), 1250, true);
-  Timer t3(new TimeClass(1, 12, "Joe"), 200, true);
-  Timer t4(new CounterWatcher(40, 3, 10), 500, true);
+  //Create the timers, which will destroy their callbacks when they die, since
+  //we aren't keeping a SmartPtr to them.
+  Timer::sptr t1 = Timer::create( TimeClass::create(3, 8, "Bob"), 1000 );
+  Timer::sptr t2 = Timer::create( TimeClass::create(5, 10, "Sally"), 1250 );
+  Timer::sptr t3 = Timer::create( TimeClass::create(1, 12, "Joe"), 200 );
+  Timer::sptr t4 = Timer::create( CounterWatcher::create(40, 3, 10), 500 );
 
   //Start the timers
-  t1.startTimer();
-  assert(t1.isRunning());
-  t2.startTimer();
-  assert(t2.isRunning());
-  t3.startTimer();
-  assert(t3.isRunning());
-  t4.startTimer();
-  assert(t4.isRunning());
+  t1->startTimer();
+  assert(t1->isRunning());
+  t2->startTimer();
+  assert(t2->isRunning());
+  t3->startTimer();
+  assert(t3->isRunning());
+  t4->startTimer();
+  assert(t4->isRunning());
 
   getch(); //Wait for a keypress.
 
   mlprintf(0, 14, "Shutting down timers, please wait...");
-  //Passing false will cause stopTimer to request a shutdown but not wait for
-  //the callbacks to finish.  But when t1-t4 are destroyed, they must wait
-  //if the calls had not finished, so the shutdown will take as long as the
-  //longest timer.  Were we to pass true, the shutdown would take t1+t2+t3+t4
-  //amount of time to shutdown, because the request for t2 to shutdown
-  //wouldn't start until after t1 had completely finished its final callback.
-  t1.stopTimer(false);
-  t2.stopTimer(false);
-  t3.stopTimer(false);
-  t4.stopTimer(false);
+
+  t1->stopTimer(false);
+  t2->stopTimer(false);
+  t3->stopTimer(false);
+  t4->stopTimer(false);
+
+  Thread::waitForAllThreads( 3000 );
 
   return 0;
 }
-
-

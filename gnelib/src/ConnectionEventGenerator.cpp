@@ -34,6 +34,12 @@ ConnectionEventGenerator::ConnectionEventGenerator()
   gnedbgo(5, "created");
 }
 
+ConnectionEventGenerator::sptr ConnectionEventGenerator::create() {
+  sptr ret( new ConnectionEventGenerator() );
+  ret->setThisPointer( ret );
+  return ret;
+}
+
 ConnectionEventGenerator::~ConnectionEventGenerator() {
   nlGroupDestroy(group);
   delete[] sockBuf;
@@ -61,7 +67,7 @@ void ConnectionEventGenerator::run() {
         numsockets--;
         for (; numsockets >= 0; numsockets--) {
           mapCtrl.acquire();
-          std::map<NLsocket, ReceiveEventListener*>::iterator iter = connections.find(sockBuf[numsockets]);
+          ConnectionsMapIter iter = connections.find(sockBuf[numsockets]);
           //Check to make sure the listener didn't unregister while we were waiting.
           if (iter != connections.end()) {
             //I'm 99.5% sure this won't cause deadlocks anymore, and onReceive
@@ -83,7 +89,7 @@ void ConnectionEventGenerator::run() {
   }
 }
 
-void ConnectionEventGenerator::reg(NLsocket socket, ReceiveEventListener* conn) {
+void ConnectionEventGenerator::reg(NLsocket socket, const ReceiveEventListener::sptr& conn) {
   assert(socket != NL_INVALID);
   mapCtrl.acquire();
   nlGroupAddSocket(group, socket);

@@ -60,6 +60,12 @@ reqOutRate(reqOutRate2), feeder(NULL), feederTimeout(0), lowPacketsThreshold(0) 
   gnedbgo(5, "created");
 }
 
+PacketStream::sptr PacketStream::create(int reqOutRate, int maxOutRate, Connection& ourOwner) {
+  sptr ret( new PacketStream( reqOutRate, maxOutRate, ourOwner ) );
+  ret->setThisPointer( ret );
+  return ret;
+}
+
 PacketStream::~PacketStream() {
   //We can't do assert(shutdown) in case PacketStream was never started.
   assert(!isRunning());

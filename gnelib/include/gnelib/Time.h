@@ -127,9 +127,19 @@ public:
   bool operator<(const Time& rhs) const;
 
   /**
+   * Less-or-equal-than operator that works as expected.
+   */
+  bool operator <= (const Time& rhs) const;
+
+  /**
    * Greater-than operator that works as expected.
    */
   bool operator>(const Time& rhs) const;
+
+  /**
+   * Greater-or-equal-than operator that works as expected.
+   */
+  bool operator >= (const Time& rhs) const;
 
   /**
    * Time addition, adding microseconds of time.

@@ -48,6 +48,13 @@ ClientConnection::ClientConnection()
   gnedbgo(5, "created");
 }
 
+ClientConnection::sptr ClientConnection::create() {
+  sptr ret( new ClientConnection() );
+  ret->Thread::setThisPointer( ret );
+  ret->Connection::setThisPointer( ret );
+  return ret;
+}
+
 ClientConnection::~ClientConnection() {
   delete params;
   gnedbgo(5, "destroyed");
@@ -126,7 +133,7 @@ void ClientConnection::run() {
         sConn.startConnect();
       ps->start();
       connecting = true;
-      eventListener->start();
+      startEventThread();
       reg(true, (sockets.u != NL_INVALID));
 
       //Setup the packet feeder
@@ -248,7 +255,7 @@ Address ClientConnection::getCAP() {
     cap >> maxOutRate;
 
     //Now we have enough info to create our PacketStream.
-    ps = new PacketStream(params->cp.getOutRate(), maxOutRate, *this);
+    ps = PacketStream::create(params->cp.getOutRate(), maxOutRate, *this);
 
     //Get the unreliable connection information.  A port of less than 0 means
     //we didn't request an unreliable conn, or it we refused to us.

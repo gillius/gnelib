@@ -22,6 +22,8 @@
 
 #include "Connection.h"
 #include "Thread.h"
+#include "SmartPtr.h"
+#include "WeakPtr.h"
 
 namespace GNE {
 class ConnectionListener;
@@ -36,17 +38,25 @@ class ConnectionParams;
  * ServerConnectionListener when incoming connections are comming in.
  */
 class ServerConnection : public Connection, public Thread {
+protected:
+  ServerConnection(const ConnectionParams& p, NLsocket rsocket,
+                   ServerConnectionListener* creator);
+
 public:
+  typedef SmartPtr<ServerConnection> sptr;
+  typedef WeakPtr<ServerConnection> wptr;
+
   /**
    * Intializes this class.  Note that you won't create a ServerConnection
    * directly.  The ServerConnectionListener does that for you.
-   * @see ServerConnectionListener
+   *
    * @param rsocket2 the reliable socket received from the accept command.
    * @param creator the ServerConnectionListener that created us, so that we
    *                may call its onListenFailure event.
+   * @see ServerConnectionListener
    */
-  ServerConnection(const ConnectionParams& p, NLsocket rsocket2,
-                   ServerConnectionListener* creator);
+  static sptr create(const ConnectionParams& p, NLsocket rsocket,
+                     ServerConnectionListener* creator);
 
   /**
    * Destructs this ServerConnection object.  The user need not worry about

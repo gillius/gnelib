@@ -99,12 +99,20 @@ bool Time::operator !=(const Time& rhs) const {
   return (microsec != rhs.microsec || sec != rhs.microsec);
 }
 
-bool Time::operator<(const Time& rhs) const {
+bool Time::operator < (const Time& rhs) const {
   return (sec < rhs.sec || ((sec == rhs.sec) && (microsec < rhs.microsec)));
 }
 
-bool Time::operator>(const Time& rhs) const {
+bool Time::operator <= (const Time& rhs) const {
+  return operator < (rhs) || operator == (rhs);
+}
+
+bool Time::operator > (const Time& rhs) const {
   return (sec > rhs.sec || ((sec == rhs.sec) && (microsec > rhs.microsec)));
+}
+
+bool Time::operator >= (const Time& rhs) const {
+  return operator > (rhs) || operator == (rhs);
 }
 
 Time Time::operator+(int rhs) const {

@@ -31,18 +31,11 @@
 namespace GNE {
 
 ServerConnectionListener::ServerConnectionListener()
-: listening(false), listener(NULL) {
-  listener = new ServerListener(*this);
+: listening(false) {
   gnedbgo(5, "created");
 }
 
 ServerConnectionListener::~ServerConnectionListener() {
-  if (listening) {
-    gnedbgo1(3, "Unregistering listen socket %i", socket);
-    GNE::eGen->unreg(socket);
-    nlClose(socket);
-  }
-  delete listener;
   gnedbgo(5, "destroyed");
 }
 
@@ -51,11 +44,24 @@ bool ServerConnectionListener::open(int port) {
   return (socket == NL_INVALID);
 }
 
+void ServerConnectionListener::close() {
+  LockMutex lock(sync);
+
+  if (listening) {
+    gnedbgo1(3, "Unregistering listen socket %i", socket);
+    GNE::eGen->unreg(socket);
+    nlClose(socket);
+    listening = false;
+  }
+}
+
 bool ServerConnectionListener::listen() {
+  LockMutex lock(sync);
+
   NLboolean ret = nlListen(socket);
   if (ret == NL_TRUE) {
     gnedbgo1(3, "Registering listen socket %i", socket);
-    GNE::eGen->reg(socket, listener);
+    GNE::eGen->reg(socket, ServerListener::sptr( new ServerListener( this_.lock() ) ) );
     listening = true;
     return false;
   }
@@ -67,6 +73,8 @@ bool ServerConnectionListener::isListening() const {
 }
 
 void ServerConnectionListener::onReceive() {
+  LockMutex lock(sync);
+
   NLsocket sock = nlAcceptConnection(socket);
   if (sock != NL_INVALID) {
     ConnectionParams params;
@@ -74,7 +82,7 @@ void ServerConnectionListener::onReceive() {
 
     if (!params) {
       //If the params were valid
-      ServerConnection* newConn = new ServerConnection(params, sock, this);
+      ServerConnection::sptr newConn = ServerConnection::create(params, sock, this);
       gnedbgo2(4, "Spawning a new ServerConnection %x on socket %i",
         newConn, sock);
       newConn->start();
@@ -92,17 +100,32 @@ void ServerConnectionListener::onReceive() {
 }
 
 Address ServerConnectionListener::getLocalAddress() const {
-  assert(socket != NL_INVALID);
-  NLaddress ret;
-  nlGetLocalAddr(socket, &ret);
-  return Address(ret);
+  LockMutex lock(sync);
+
+  if (socket != NL_INVALID) {
+    NLaddress ret;
+    nlGetLocalAddr(socket, &ret);
+    return Address(ret);
+  } else {
+    return Address();
+  }
+}
+
+void ServerConnectionListener::processOnListenFailure( const Error& error, const Address& from, ConnectionListener* listener) {
+  LockMutex lock( sync );
+  onListenFailure( error, from, listener );
+}
+
+void ServerConnectionListener::processOnListenSuccess( ConnectionListener* listener ) {
+  LockMutex lock( sync );
+  onListenSuccess( listener );
 }
 
 void ServerConnectionListener::onListenSuccess(ConnectionListener* listener) {
   //The default behavior for this event is to do nothing.
 }
 
-ServerConnectionListener::ServerListener::ServerListener(ServerConnectionListener& listener)
+ServerConnectionListener::ServerListener::ServerListener(const ServerConnectionListener::sptr& listener)
 : conn(listener) {
 }
 
@@ -110,7 +133,7 @@ ServerConnectionListener::ServerListener::~ServerListener() {
 }
 
 void ServerConnectionListener::ServerListener::onReceive() {
-  conn.onReceive();
+  conn->onReceive();
 }
 
 }

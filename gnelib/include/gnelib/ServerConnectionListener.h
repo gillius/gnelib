@@ -22,6 +22,9 @@
 
 #include "ReceiveEventListener.h"
 #include "Connection.h"
+#include "SmartPtr.h"
+#include "WeakPtr.h"
+#include "Mutex.h"
 
 namespace GNE {
 class Address;
@@ -33,17 +36,24 @@ class ConnectionParams;
  * A connection that listens for other connections.  Inherit from this class,
  * overriding the functions from Connection and ClientConnection based on the
  * events you wish to respond to.
+ *
+ * You need to create a static "create" method like other classes in GNE since
+ * ServerConnectionListener is managed by a SmartPtr.
  */
 class ServerConnectionListener {
 public:
+  typedef SmartPtr<ServerConnectionListener> sptr;
+  typedef WeakPtr<ServerConnectionListener> wptr;
+
+protected:
   /**
    * Initalizes this class.
    */
   ServerConnectionListener();
 
+public:
   /**
-   * The destructor will close down a listening object, so when you are done
-   * listening, just destroy this object.
+   * Destructor.
    */
   virtual ~ServerConnectionListener();
 
@@ -55,9 +65,15 @@ public:
   bool open(int port);
 
   /**
+   * Closes the listening connection.
+   */
+  void close();
+
+  /**
    * Starts this socket listening.  onNewConn will be called when a new
    * connection has been negotiated and error checked.  When you are
    * finished, delete this object and the dtor will clean things up.
+   *
    * @see onListenFailure
    * @return true, if there was an error.
    */
@@ -69,12 +85,17 @@ public:
   bool isListening() const;
 
   /**
-   * Returns the address of the listening socket.  The socket must be opened
-   * when this function is called, but does not have to be listening.
+   * Returns the address of the listening socket.  If the listener has not
+   * been opened or is not listening, an invalid address is returned.
    */
   Address getLocalAddress() const;
 
 protected:
+  /**
+   * You must call this from your create function BEFORE exiting it.
+   */
+  void setThisPointer( const sptr& thisPointer );
+
   /**
    * There was a failure when trying to listen on this socket.  This is not
    * called when the actual low-level listen fails (that error is returned
@@ -133,30 +154,43 @@ protected:
   virtual void getNewConnectionParams(ConnectionParams& params) = 0;
 
 private:
-  //This is simply so that ServerConnection can call onListenFailure when it fails.
+  //interface functions solely for ServerConnection
   friend class ServerConnection;
 
+  //These methods relay the message on, locking the sync mutex.
+  void processOnListenFailure( const Error& error, const Address& from,
+                               ConnectionListener* listener);
+
+  void processOnListenSuccess( ConnectionListener* listener );
+
+private:
   class ServerListener : public ReceiveEventListener {
   public:
-    ServerListener(ServerConnectionListener& listener);
+    typedef SmartPtr<ServerListener> sptr;
+    typedef WeakPtr<ServerListener> wptr;
+
+  public:
+    ServerListener(const ServerConnectionListener::sptr& listener);
 
     virtual ~ServerListener();
 
     void onReceive();
 
   private:
-    ServerConnectionListener& conn;
+    ServerConnectionListener::sptr conn;
 
   };
   friend class ServerListener;
 
   void onReceive();
 
+  wptr this_;
+
   bool listening;
 
-  ServerListener* listener;
-
   NLsocket socket;
+
+  mutable Mutex sync;
 };
 
 }

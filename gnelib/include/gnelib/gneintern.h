@@ -73,6 +73,18 @@
 //Define debugging functions
 #include "GNEDebug.h"
 
+namespace GNE {
+  class ConnectionEventGenerator;
+  template <class T> class SmartPtr;
+
+  /**
+   * The global event generator.  The library uses this internally to
+   * register and unregister connections.  The end-user will not have to use
+   * this object under any normal cirumstances.
+   */
+  extern SmartPtr<ConnectionEventGenerator> eGen;
+};
+
 #endif // _GNEINTERN_H_
 
 

@@ -31,6 +31,8 @@ class ConnectionListener;
 class Connection;
 
 /**
+ * Internal class used by GNE to manage Connection events.
+ *
  * Each Connection has an EventThread.  This is used internally by the
  * Connection class to act as a proxy to dispatch events to the
  * ConnectionListener.  Because of this, only one event per Connection will
@@ -57,14 +59,25 @@ class Connection;
  * </ul>
  */
 class EventThread : public Thread {
+protected:
+  /**
+   * @see create
+   */
+  EventThread(ConnectionListener* listener, SmartPtr<Connection> conn);
+
 public:
+  typedef SmartPtr<EventThread> sptr;
+  typedef WeakPtr<EventThread> wptr;
+
   /**
    * Initializes this class as a event thread for listener.
-   * The conn pointer is ONLY used to call disconnect when an onFailure
+   * The conn pointer is used to call disconnect when an onFailure
    * event is finally processed.  This is to assure that disconnect is called
    * from a safe thread that won't lead to deadlock when a failure occurs.
+   *
+   * The SmartPtr also keeps the Connection alive if it is still active.
    */
-  EventThread(ConnectionListener* listener, Connection* conn);
+  static sptr create(ConnectionListener* listener, SmartPtr<Connection> conn);
 
   virtual ~EventThread();
 
@@ -122,16 +135,6 @@ public:
    */
   void shutDown();
 
-  /**
-   * Returns true if this EventThread was ever started at least once.
-   */
-  bool hasStarted();
-
-  /**
-   * Starts this EventThread.
-   */
-  void start();
-
 protected:
   /**
    * This thread serializes events for a Connection.
@@ -154,7 +157,7 @@ private:
   void onTimeout();
 
   //See the ctor for more information about ourConn.
-  Connection* ourConn;
+  SmartPtr<Connection> ourConn;
 
   //The listener for our events.  All on* events go here.  This is protected
   //so ClientConnection can send events as well.
@@ -168,9 +171,6 @@ private:
   Mutex timeSync;
   Time timeout;
   Time nextTimeout;
-
-  //True if this EventThread was ever started at least one time.
-  bool started;
 
   bool onReceiveEvent;
   bool onTimeoutEvent;

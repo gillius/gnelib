@@ -20,6 +20,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "SmartPtr.h"
+#include "WeakPtr.h"
 
 namespace GNE {
 
@@ -29,6 +31,9 @@ namespace GNE {
  */
 class TimerCallback {
 public:
+  typedef SmartPtr<TimerCallback> sptr;
+  typedef WeakPtr<TimerCallback> wptr;
+
   TimerCallback();
 
   virtual ~TimerCallback();

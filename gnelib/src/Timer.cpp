@@ -25,15 +25,18 @@
 
 namespace GNE {
 
-Timer::Timer(TimerCallback* callback, int rate, bool destroy)
+Timer::Timer(const SmartPtr<TimerCallback>& callback, int rate)
 : Thread("Timer", Thread::HIGHER_PRI), callbackRate(rate*1000),
-  listener(callback), destroyListener(destroy) {
+  listener(callback) {
+}
+
+Timer::sptr Timer::create(const SmartPtr<TimerCallback>& callback, int rate) {
+  sptr ret( new Timer( callback, rate ) );
+  ret->setThisPointer( ret );
+  return ret;
 }
 
 Timer::~Timer() {
-  stopTimer(true);
-  if (destroyListener)
-    delete listener;
 }
 
 #ifndef WIN32
@@ -71,26 +74,36 @@ Time Timer::getAbsoluteTime() {
 #endif
 }
 
+TimerCallback::sptr Timer::getCallback() const {
+  LockMutex lock( sync );
+
+  return listener;
+}
+
 void Timer::startTimer() {
-  sync.acquire();
   if (!isRunning()) {
     nextTime = getCurrentTime();
     nextTime += callbackRate;
     start();
   }
-  sync.release();
 }
 
+/**
+ * \bug if called from multiple threads, if any thread has called
+ *      stopTimer(true) and another thread calls stopTimer(false) it will
+ *      wait until the join completes.
+ */
 void Timer::stopTimer(bool waitForEnd) {
-  sync.acquire();
+  LockMutex lock( sync );
+
   if (isRunning()) {
     shutDown();
     if (waitForEnd) {
-      assert(Thread::currentThread() != this);
-      join();
+      assert(Thread::currentThread().get() != this);
+      if ( Thread::currentThread().get() != this )
+        join();
     }
   }
-  sync.release();
 }
 
 void Timer::run() {

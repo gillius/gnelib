@@ -35,50 +35,46 @@
 
 namespace GNE {
 
-Connection::Connection(ConnectionListener* listener)
-: ps(NULL), connecting(false), connected(false), rlistener(NULL),
-ulistener(NULL), exiting(false) {
-  eventListener = new EventThread(listener, this);
+Connection::Connection()
+: connecting(false), connected(false), exiting(false) {
 }
 
 Connection::~Connection() {
-  disconnect();
-  if (eventListener->hasStarted()) {
-    //disconnect calls onDisconnect, which should shut down the EventThread,
-    //and allow detach and join to work as we expect.
-    if (Thread::currentThread() == eventListener) {
-      //This section of code allows the ConnectionListeners to delete their
-      //associated Connections.
-      eventListener->detach(true);
-    } else {
-      eventListener->join();
-      delete eventListener;
-    }
-  } else {
-    //If it was never started, we just delete it.
-    delete eventListener;
-  }
-  delete ps;
+  //no need to disconnect here because we should never have been started or
+  //have been disconnected.
+  assert( !connecting && !connected );
 }
 
 ConnectionListener* Connection::getListener() const {
-  return eventListener->getListener();
+  EventThread::sptr et = eventThread.lock();
+  if ( et )
+    return et->getListener();
+  else
+    return NULL;
 }
 
 void Connection::setListener(ConnectionListener* listener) {
-  eventListener->setListener(listener);
+  EventThread::sptr et = eventThread.lock();
+  if ( et )
+    et->setListener( listener );
 }
 
 int Connection::getTimeout() {
-  return eventListener->getTimeout();
+  EventThread::sptr et = eventThread.lock();
+  if ( et )
+    return et->getTimeout();
+  else
+    return 0;
 }
 
 void Connection::setTimeout(int ms) {
-  eventListener->setTimeout(ms);
+  EventThread::sptr et = eventThread.lock();
+  if ( et )
+    et->setTimeout(ms);
 }
 
 PacketStream& Connection::stream() {
-  assert(ps != NULL);
+  assert(ps);
   return *ps;
 }
 
@@ -99,7 +95,7 @@ bool Connection::isConnected() const {
 }
 
 void Connection::disconnect() {
-  sync.acquire();
+  LockMutex lock( sync );
   if (connecting || connected) {
     //This is necessary because we can't join on ps if it has already been
     //  shutdown and/or never started
@@ -107,27 +103,38 @@ void Connection::disconnect() {
     gnedbgo2(2, "disconnecting r: %i, u: %i", sockets.r, sockets.u);
     ps->shutDown(); //PacketStream will try to send the required ExitPacket.
     ps->join();
-    //Once we call onDisconnect we can be deleted at anytime.  But it is OK
-    //to call this here because sync must be acquired and released until the
-    //destructor completes therefore this function will complete before we
-    //can be possibly deleted.
-    eventListener->onDisconnect();
+
     //This will also shutdown the EventThread, and we will join on it in the
     //destructor (because this could be our EventThread, and you can't join
     //on yourself).
+    EventThread::sptr et = eventThread.lock();
+    assert( et ); //if we are connected we HAVE to have a valid EventThread
+    et->onDisconnect();
+
     connected = connecting = false;
   }
   //We always call the low-level disconnect in case errors happened while
   //opening before connecting or for some other reason they are left open --
   //and calling disconnect multiple times does not hurt.
   sockets.disconnect();
-  sync.release();
 }
 
 void Connection::disconnectSendAll(int waitTime) {
+  LockMutex lock( sync );
   if (isConnected())
     ps->waitToSendAll(waitTime);
   disconnect();
+}
+
+void Connection::setThisPointer( const wptr& weakThis ) {
+  this_ = weakThis;
+  eventThreadTemp = EventThread::create( NULL, weakThis.lock() );
+  eventThread = eventThreadTemp;
+}
+
+void Connection::startEventThread() {
+  eventThreadTemp->start();
+  eventThreadTemp.reset();
 }
 
 void Connection::addHeader(RawPacket& raw) {
@@ -177,18 +184,20 @@ void Connection::checkVersions(RawPacket& raw) {
 }
 
 void Connection::onReceive() {
-  eventListener->onReceive();
+  EventThread::sptr et = eventThread.lock();
+  assert( et );
+  et->onReceive();
 }
 
 void Connection::finishedConnecting() {
-  sync.acquire();
+  LockMutex lock( sync );
+
   if (connecting && !connected) {
     //If this was not true, then we were disconnected before this (and before
     //the connecting code knows about it).
     connected = true;
     connecting = false;
   }
-  sync.release();
 }
 
 void Connection::onReceive(bool reliable) {
@@ -223,7 +232,9 @@ void Connection::onReceive(bool reliable) {
       //We want to intercept ExitPackets, else we just add it.
       if (next->getType() == ExitPacket::ID) {
         exiting = true;
-        eventListener->onExit();
+        EventThread::sptr et = eventThread.lock();
+        assert( et );
+        et->onExit();
       } else
         ps->addIncomingPacket(next);
     }
@@ -251,8 +262,11 @@ void Connection::processError(const Error& error) {
   //because the socket will fail when we disconnect.
   switch(error.getCode()) {
   case Error::UnknownPacket:
-    if (!exiting)
-      eventListener->onError(error);
+    if (!exiting) {
+      EventThread::sptr et = eventThread.lock();
+      assert( et );
+      et->onError(error);
+    }
     break;
   default:
     //The EventThread will call disconnect.  This will prevent a deadlock
@@ -263,13 +277,16 @@ void Connection::processError(const Error& error) {
     unreg(true, true);
     //We call onFailure after unreg because a deadlock will occur if the
     //EventThread tries to disconnect before we unreg.
-    if (!exiting)
-      eventListener->onFailure(error);
+    if (!exiting) {
+      EventThread::sptr et = eventThread.lock();
+      assert( et );
+      et->onFailure(error);
+    }
     break;
   }
 }
 
-Connection::Listener::Listener(Connection& listener, bool isReliable) 
+Connection::Listener::Listener(const Connection::sptr& listener, bool isReliable) 
 : conn(listener), reliable(isReliable) {
 }
 
@@ -277,41 +294,39 @@ Connection::Listener::~Listener() {
 }
 
 void Connection::Listener::onReceive() {
-  conn.onReceive(reliable);
+  conn->onReceive(reliable);
 }
 
 void Connection::reg(bool reliable, bool unreliable) {
-  regSync.acquire();
-  if (reliable && rlistener == NULL) {
+  LockMutex lock( regSync );
+
+  if (reliable && rlistener.expired()) {
     assert(sockets.r != NL_INVALID);
-    rlistener = new Listener(*this, true);
-    eGen->reg(sockets.r, rlistener);
+    Listener::sptr temp = Listener::sptr( new Listener( this_.lock(), true ) );
+    rlistener = temp;
+    eGen->reg( sockets.r, temp );
     gnedbgo1(3, "Registered reliable socket %i", sockets.r);
   }
-  if (unreliable && ulistener == NULL) {
+  if (unreliable && rlistener.expired()) {
     assert(sockets.u != NL_INVALID);
-    ulistener = new Listener(*this, false);
-    eGen->reg(sockets.u, ulistener);
+    Listener::sptr temp = Listener::sptr( new Listener( this_.lock(), false ) );
+    ulistener = temp;
+    eGen->reg( sockets.u, temp );
     gnedbgo1(3, "Registered unreliable socket %i", sockets.u);
   }
-  regSync.release();
 }
 
 void Connection::unreg(bool reliable, bool unreliable) {
-  regSync.acquire();
-  if (reliable && rlistener != NULL) {
+  LockMutex lock( regSync );
+
+  if (reliable && rlistener.lock()) {
     eGen->unreg(sockets.r);
-    delete rlistener;
-    rlistener = NULL;
     gnedbgo1(3, "Unregistered reliable socket %i", sockets.r);
   }
-  if (unreliable && ulistener != NULL) {
+  if (unreliable && ulistener.lock()) {
     eGen->unreg(sockets.u);
-    delete ulistener;
-    ulistener = NULL;
     gnedbgo1(3, "Unregistered unreliable socket %i", sockets.u);
   }
-  regSync.release();
 }
 
 } //Namespace GNE

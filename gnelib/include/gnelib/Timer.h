@@ -23,11 +23,15 @@
 #include "Thread.h"
 #include "Time.h"
 #include "Mutex.h"
+#include "SmartPtr.h"
+#include "WeakPtr.h"
 
 namespace GNE {
 class TimerCallback;
 
 /**
+ * \ingroup Threading
+ *
  * The timer class is used to get the current time and to provide callbacks.
  * A timer object calls its listeners back every so often based on the time
  * given.
@@ -40,32 +44,26 @@ class TimerCallback;
  * its callbacks are suitable for short, quick tasks.
  */
 class Timer : public Thread {
+protected:
+  Timer(const SmartPtr<TimerCallback>& callback, int rate);
+
 public:
+  typedef SmartPtr<Timer> sptr;
+  typedef WeakPtr<Timer> wptr;
+
   /**
-   * Initalize a timer callback.  The first call to the callback will occur
+   * Create a timer callback.  The first call to the callback will occur
    * after "rate" milliseconds, so this class is suitable for setting
    * timeouts for your operations.  Use the startTimer method to start this
    * timer.
    *
    * @param callback A newly allocated object to perform callbacks on.
    * @param rate the callback rate in milliseconds.
-   * @param destroy should the callback be destroyed when this object is
-   *        destroyed (this is done with the delete operator)?
    */
-  Timer(TimerCallback* callback, int rate, bool destroy);
+  static sptr create(const SmartPtr<TimerCallback>& callback, int rate);
 
   /**
-   * Destroys this timer object.  If the timer is running, it will be stopped,
-   * and this destructor will block for at most the time of the callback rate
-   * plus the time it takes for the callback function to complete.
-   *
-   * If you chose when you created this object to call delete on the
-   * TimerCallback, it will be done in the destructor.
-   *
-   * The callback function itself CANNOT destroy its Timer since the callback
-   * is actually using the Thread this class represents.  A TimerCallback
-   * object could delete a Timer, but not from the same thread the callback
-   * function is called in (see exnetperf's StatsDisplay for an example).
+   * Destructor.
    */
   virtual ~Timer();
 
@@ -85,8 +83,14 @@ public:
   static Time getAbsoluteTime();
 
   /**
+   * Returns the TimerCallback set in the constructor.
+   */
+  SmartPtr<TimerCallback> getCallback() const;
+
+  /**
    * Starts the timer running and calling the callback.  If the timer has
-   * already started, this call will have no effect.
+   * already started, this call will have no effect.  You cannot restart a
+   * Timer once you have stopped it, you need to create a new Timer.
    */
   void startTimer();
 
@@ -123,17 +127,12 @@ private:
    */
   int callbackRate;
 
-  TimerCallback* listener;
-
-  /**
-   * Should listener be destroyed with this object?
-   */
-  bool destroyListener;
+  SmartPtr<TimerCallback> listener;
 
   /**
    * Provides syncronization for some functions to make them thread safe.
    */
-  Mutex sync;
+  mutable Mutex sync;
 
 };
 

@@ -16,9 +16,10 @@
 void conio_init (int* enterKey, int* backspaceKey) {
   *enterKey = 13;
   *backspaceKey = 8;
-  system("cls");
+  conio_clear();
+  conio_gotoxy( 0, 0 );
 }
-void conio_exit () { system("cls"); }
+void conio_exit () { }
 int conio_kbhit () { return kbhit(); }
 int conio_getch () { return getch(); }
 
@@ -35,6 +36,28 @@ void conio_getxy(int* x, int* y) {
   } else {
     *x = *y = -1;
   }
+}
+
+void conio_clear() {
+  int curX, curY, sizeX, sizeY;
+  int numChars;
+  COORD writeStart;
+  DWORD dummy;
+
+  conio_getxy( &curX, &curY );
+  conio_getsize( &sizeX, &sizeY );
+
+  numChars = sizeX * sizeY;
+
+  writeStart.X = writeStart.Y = 0;
+  FillConsoleOutputCharacter(
+    GetStdHandle( STD_OUTPUT_HANDLE ),
+    (TCHAR)' ',
+    (DWORD)numChars,
+    writeStart,
+    &dummy );
+
+  conio_gotoxy( curX, curY );
 }
 
 //conio_getsize returns x == y == -1 if it cannot get the size
@@ -120,6 +143,10 @@ void conio_getxy(int* x, int* y) {
 }
 
 //Following functions by Jason Winnebeck
+
+void conio_clear() {
+#error implement this function
+}
 
 void conio_getsize(int* x, int* y) {
   getmaxyx(stdscr, *y, *x);

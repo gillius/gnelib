@@ -20,11 +20,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "gneintern.h"
 #include "ConditionVariable.h"
 #include "Mutex.h"
 #include "Thread.h"
 #include "Time.h"
-#include <queue>
+#include "SmartPtr.h"
+#include "WeakPtr.h"
 
 namespace GNE {
 class Packet;
@@ -41,18 +43,28 @@ class PacketFeeder;
  *       between calls, if another thread changes its state.
  */
 class PacketStream : public Thread {
+protected:
+  /**
+   * @see create
+   */
+  PacketStream(int reqOutRate, int maxOutRate, Connection& ourOwner);
+
 public:
+  typedef SmartPtr<PacketStream> sptr;
+  typedef WeakPtr<PacketStream> wptr;
+
   /**
    * Creates a new PacketStream with the given flow control parameters.
    * Passing a value 0 for a rate is interpreted as "unlimited" or
    * unrestricted rates.  Passing a value less than 0 is not allowed.
+   *
    * @param reqOutRate2 This is the out rate that we are requesting, or in
    *                    other words, the maximum rate we are willing to send.
    * @param maxOutRate2 The maximum rate the remote machine is letting us
    *                    send.  The actual outgoing rate, therefore, is the
    *                    minimum of the two outgoing rate values.
    */
-  PacketStream(int reqOutRate2, int maxOutRate2, Connection& ourOwner);
+  static sptr create(int reqOutRate, int maxOutRate, Connection& ourOwner);
 
   /**
    * Destroys this object.  Any data left remaining in the in or out queues

@@ -28,6 +28,8 @@
 #include "SocketPair.h"
 #include "Address.h"
 #include "ConnectionStats.h"
+#include "SmartPtr.h"
+#include "WeakPtr.h"
 
 namespace GNE {
 class ConnectionListener;
@@ -40,29 +42,49 @@ class SyncConnection;
  *
  * When you create a new Connection, you will want to register a
  * ConnectionListener for it so you can receive its events.
+ *
+ * You should never create Connection objects directly.  You want to create
+ * a ClientConnection (ServerConnection objects are created internally by
+ * the library).
+ *
+ * @see ClientConnection::create
  */
 class Connection {
-public:
+protected:
   /**
-   * Intializes this class, given the flow control parameters.
-   * @param listener the ConnectionListener instance that will be setup as
-   *        the initial listener for the events.  It can be NULL to start
-   *        with but must be set before performing any other operations on
-   *        this Connection instance.
+   * Intializes this class with a NULL listener, which must be set before any
+   * operations are performed on this instance.
+   *
+   * THE CHILD CLASS IS RESPONSIBLE FOR SETTING THE THISPOINTER.  This is
+   * because the EventThread needs a SmartPtr to this Connection, which is
+   * unknown during construction.
+   *
+   * @see setThisPointer()
    */
-  Connection(ConnectionListener* listener = NULL);
+  Connection();
+
+public:
+  typedef SmartPtr<Connection> sptr;
+  typedef WeakPtr<Connection> wptr;
+
+public:
 
   /**
-   * A Connection will automatically disconnect if it is connected when it
-   * is destructed.  Connections won't allocate or deallocate their listeners,
-   * so you may want to delete your listener that was registered
+   * Destructor.
    */
   virtual ~Connection();
 
   /**
-   * Returns the currently registered event Listener.  This can be useful to
-   * delete your registered user right after disconnection, so you won't have
-   * to keep track of the pointer after you allocate it.
+   * Returns the currently registered event Listener.  After GNE 0.55 this
+   * method changed so that the return value of this method is either the
+   * listener you have set or an empty SmartPtr.  It will return an empty
+   * SmartPtr if the Connection has been disconnected, but since this can
+   * happen at any moment, it can return an empty SmartPtr at any time.
+   *
+   * @deprecated The semantics of method have changed to pretty much make it
+   *             useless.  It's probably dangerous to provide this, so I'm
+   *             considering removing it.  If you have a strong case to
+   *             leave it in, please tell me.
    */
   ConnectionListener* getListener() const;
 
@@ -89,8 +111,14 @@ public:
   void setListener(ConnectionListener* listener);
 
   /**
-   * Returns the timeout for this connection.
+   * Returns the timeout for this connection.  Returns 0 at any time if the
+   * Connection was disconnected.
+   *
    * @see setTimeout
+   * @deprecated The semantics have changed to make this method useless
+   *             except perhaps to print it out for purposes of diagnostics.
+   *             I might consider undeprecating it if I can find a good reason
+   *             to keep it.
    */
   int getTimeout();
 
@@ -101,13 +129,16 @@ public:
    * An onTimeout event occurs ms milliseconds after the last onReceive event,
    * the last onTimeout event, or since setTimeout occured.  Any of these
    * events sets the "timeout counter" back to zero to say it another way.
+   *
    * @see GNE::ConnectionListener::onTimeout
    */
   void setTimeout(int ms);
 
   /**
    * Returns the PacketStream associated with this class.  Writing and
-   * reading through this Connection is done through this PacketStream.
+   * reading through this Connection is done through this PacketStream.  You
+   * should not keep a reference to this PacketStream object any longer than
+   * you keep the reference to the Connection object.
    */
   PacketStream& stream();
 
@@ -127,6 +158,9 @@ public:
   /**
    * Returns the local address of this connection.  If the requested socket
    * has not been opened, the returned Address will be invalid (!isValid()).
+   * An invalid address is also returned if the Connection was disconnected,
+   * which can happen at any time.
+   *
    * @param reliable sometimes two sockets are used for reliable and
    *                 unreliable data.  Specify which low-level socket you
    *                 want the address of.
@@ -137,6 +171,9 @@ public:
   /**
    * Returns the remote address of this connection.  If the requested socket
    * is not connected, the returned Address will be invalid (!isValid()).
+   * An invalid address is also returned if the Connection was disconnected,
+   * which can happen at any time.
+   *
    * @param reliable sometimes two sockets are used for reliable and
    *                 unreliable data.  Specify which low-level socket you
    *                 want the address of.
@@ -146,6 +183,8 @@ public:
 
   /**
    * Returns true if this Connection is active and ready to send/recieve.
+   * A Connection may become disconnected at any time, as another thread or
+   * an event may cause a disconnect.
    */
   bool isConnected() const;
 
@@ -153,9 +192,14 @@ public:
    * Immediately disconnects this socket.  No more data will be recieved or
    * sent on this socket.  If you want to disconnect more nicely, use
    * disconnectSendAll.  It is okay to call this function even when this
-   * Connection is already disconnected.\n
+   * Connection is already disconnected.  Note that even though the
+   * connection is disconnected immediately, it is still a graceful close
+   * such that an onExit event will be generated on the remote connection if
+   * possible, but any packets pending to be sent won't get sent.
+   *
    * NOTE: You may not reconnect this connection object after calling
    * disconnect.
+   *
    * @see #disconnectSendAll()
    */
   void disconnect();
@@ -165,14 +209,27 @@ public:
    * disconnect, except that all data waiting to be sent will be sent if
    * possible.  If the connection is already disconnected, this function does
    * nothing.
+   *
    * @param waitTime the max amount of time in ms to wait for the outgoing
    *        packet queue to clear.
+   *
    * @see #disconnect()
    */
   void disconnectSendAll(int waitTime = 10000);
 
 protected:
-  EventThread* eventListener;
+  /**
+   * This method must be called and set to a weak pointer referencing this
+   * object before the end of the static create function of the child class.
+   * This is needed since some things Connection registers with requires a
+   * SmartPtr to itself.
+   */
+  void setThisPointer( const wptr& weakThis );
+
+  /**
+   * Starts the EventThread running.
+   */
+  void startEventThread();
 
   /**
    * A utility function for ServerConnection and ClientConnection to add the
@@ -224,7 +281,7 @@ protected:
    * The PacketStream associated with this Connection.  This object also
    * contains information about the in and out connection rates.
    */
-  PacketStream* ps;
+  PacketStream::sptr ps;
 
   /**
    * The connecting has just finished and the flags need to be changed.
@@ -248,13 +305,17 @@ protected:
    * Register this Connection object's sockets with the
    * ConnectionEventGenerator.  Pass true to register each socket type.
    * Usually both will be registered, but in the future there may exist a
-   * new connection type that only uses one of the sockets.\n
+   * new connection type that only uses one of the sockets.
+   *
    * The internal class ConnectionListener will be used to trigger the proper
-   * onReceive(bool) event.\n
+   * onReceive(bool) event.
+   *
    * The sockets will be unregistered automatically when the object is
    * destroyed, but they may be unregistered explicitly at an earlier time
-   * through unreg(bool, bool).\n
+   * through unreg(bool, bool).
+   *
    * Registering a socket already registered will have no effect.
+   *
    * @see #onReceive(bool)
    * @see #unreg(bool, bool)
    */
@@ -272,18 +333,40 @@ protected:
 private:
   class Listener : public ReceiveEventListener {
   public:
-    Listener(Connection& listener, bool isReliable);
+    typedef SmartPtr<Listener> sptr;
+    typedef WeakPtr<Listener> wptr;
+
+  public:
+    Listener(const Connection::sptr& listener, bool isReliable);
 
     virtual ~Listener();
 
     void onReceive();
 
   private:
-    Connection& conn;
+    Connection::sptr conn;
 
     bool reliable;
 
   };
+
+  /**
+   * A weak pointer to this own object.
+   */
+  wptr this_;
+
+  /**
+   * A weak reference to the EventThread that will we will keep forever, that
+   * comes from eventListenerTemp.
+   */
+  WeakPtr<EventThread> eventThread;
+
+  /**
+   * We can't have any cycles, but we at least have to keep the EventThread
+   * alive temporarily until it starts.  We will call reset on this as soon as
+   * we start that thread.
+   */
+  SmartPtr<EventThread> eventThreadTemp;
 
   /**
    * Make Listener a friend so it can call our onRecieve(bool)
@@ -298,10 +381,8 @@ private:
   //Used for reg and unreg functions.
   Mutex regSync;
 
-  //Possible ReceiveEventListeners that may or may not exist, but if they do
-  //we need to kill them on exit.
-  Listener* rlistener;
-  Listener* ulistener;
+  Listener::wptr rlistener;
+  Listener::wptr ulistener;
 
   //PacketStream might call our processError function.
   friend class PacketStream;

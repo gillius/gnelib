@@ -20,9 +20,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "gneintern.h"
 #include "ConditionVariable.h"
 #include "Thread.h"
-#include <map>
+#include "SmartPtr.h"
+#include "WeakPtr.h"
 
 namespace GNE {
 class ReceiveEventListener;
@@ -33,8 +35,18 @@ class ReceiveEventListener;
  * nlPollGroup to check for events comming in on sockets.
  */
 class ConnectionEventGenerator : public Thread {
-public:
+protected:
   ConnectionEventGenerator();
+
+public:
+  typedef SmartPtr<ConnectionEventGenerator> sptr;
+  typedef WeakPtr<ConnectionEventGenerator> wptr;
+
+  /**
+   * Creates a new instance of a ConnectionEventGenerator managed by a
+   * SmartPtr.
+   */
+  static sptr create();
 
   virtual ~ConnectionEventGenerator();
 
@@ -43,7 +55,7 @@ public:
    * @param socket the low-level HawkNL socket for this connection.
    * @param conn the Connection class associated with the socket.
    */
-  void reg(NLsocket socket, ReceiveEventListener* conn);
+  void reg(NLsocket socket, const SmartPtr<ReceiveEventListener>& conn);
 
   /**
    * Removes a Connection.
@@ -66,7 +78,10 @@ protected:
 private:
   NLint group;
 
-  std::map<NLsocket, ReceiveEventListener*> connections;
+  typedef std::map<NLsocket, SmartPtr<ReceiveEventListener> > ConnectionsMap;
+  typedef ConnectionsMap::iterator ConnectionsMapIter;
+
+  ConnectionsMap connections;
 
   NLsocket* sockBuf;
 

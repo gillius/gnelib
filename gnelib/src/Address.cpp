@@ -27,6 +27,10 @@ std::ostream& operator << (std::ostream& o, const GNE::Address& addr) {
 
 namespace GNE {
 
+Address::Address() {
+  addr.valid = NL_FALSE;
+}
+
 Address::Address(std::string address) {
   setAddressByName(address);
 }

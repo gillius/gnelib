@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 #ifdef OLD_CPP
 #include <iostream>
 #else
@@ -35,8 +35,7 @@ int main() {
   
   gout << "The time in seconds, is:" << endl;
   gout << "Time is from some arbitrary point in the past." << endl;
-  gout << "In Windows, this is actually the system uptime, as it uses the rdtsc" << endl
-       << "  instruction." << endl;
+  gout << "In Windows, this is usually the system uptime." << endl;
   while (!kbhit()) {
     Time t = Timer::getCurrentTime();
     //The move operation will be "executed" when the stream is next flushed,

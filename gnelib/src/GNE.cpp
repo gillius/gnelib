@@ -41,7 +41,7 @@ namespace GNE {
 
 char gameNameBuf[32] = {0};
 guint32 userVersion = 0;
-ConnectionEventGenerator* eGen = NULL;
+ConnectionEventGenerator::sptr eGen;
 
 static bool initialized = false;
 
@@ -50,6 +50,7 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
     gnedbg(1, "GNE initalized");
     PacketParser::registerGNEPackets();
     ObjectBrokerClient::staticInit();
+
     if (networkType != NO_NET) {
       if (nlInit() == NL_FALSE)
         return true;
@@ -60,10 +61,11 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
       //GNE sends its data in little endian format.
       nlEnable(NL_LITTLE_ENDIAN_DATA);
       nlDisable(NL_SOCKET_STATS);
-      eGen = new ConnectionEventGenerator();
+      eGen = ConnectionEventGenerator::create();
       eGen->start();
       initialized = true; //We need only to set this to true if we are using HawkNL
     }
+
 #ifndef WIN32
     signal(SIGPIPE, SIG_IGN);
 #endif
@@ -74,17 +76,21 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
 }
 
 void shutdownGNE() {
-  if (initialized) {
+  if ( eGen ) {
     eGen->shutDown();
     eGen->join();
-    delete eGen;
+    eGen.reset();
+  }
+
+  if (initialized) {
     nlShutdown();
     initialized = false;
-    gnedbg(1, "Closed GNE");
-#ifdef _DEBUG
-    killDebug(); //closes debugging if it was opened
-#endif
   }
+
+  gnedbg(1, "Closed GNE");
+#ifdef _DEBUG
+  killDebug(); //closes debugging if it was opened
+#endif
 }
 
 Address getLocalAddress() {

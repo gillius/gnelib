@@ -49,9 +49,15 @@ public:
   ~WeakPtr() {}
 
   template<class Y> WeakPtr( const boost::shared_ptr<Y>& o ) : boost::weak_ptr<T>( o ) {}
-  template<class Y> WeakPtr( const boost::weak_ptr<T>& o ) : boost::weak_ptr<T>( o ) {}  
+  template<class Y> WeakPtr( const boost::weak_ptr<T>& o ) : boost::weak_ptr<T>( o ) {}
 
   template<class Y> WeakPtr& operator =( const boost::weak_ptr<Y>& r ) {
+    boost::weak_ptr<T>& this_ = *this;
+    this_ = r;
+    return *this;
+  }
+
+  template<class Y> WeakPtr& operator =( const boost::shared_ptr<Y>& r ) {
     boost::weak_ptr<T>& this_ = *this;
     this_ = r;
     return *this;

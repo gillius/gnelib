@@ -18,17 +18,16 @@
  */
 
 //NOTES ON THREADS:
-// All threads should be placed on the heap (new operator)
-// All threads must either be detached or joined at some point.
-// Detached threads will delete themselves when they die.
-// When you detach a thread, you should never access that thread
-//   object again.
-// If you need to access a thread object later, keep the pointer
-//   to it so you can access/join it later.  When you join, access
-//   whatever data you want from it then delete it.
+// Threads will manage their own memory, so they will be deleted when they
+//  have stopped running and you don't have references to it anymore.
+// You MUST call the "setThisPointer" method in your static creation
+//  function.
+// Threads MUST be managed by a SmartPtr.
+// If you get an assert failure of "this_" it is because you didn't call
+//  the "setThisPointer" method.
 
-#include "../../include/gnelib.h"
-#include <assert.h>
+#include <gnelib.h>
+#include <cassert>
 
 #include <sys/timeb.h>
 
@@ -37,10 +36,27 @@ using namespace GNE::Console;
 
 class HelloWorld : public Thread {
 public:
-  HelloWorld(std::string myName, Mutex& mutexToTest)
+  //define these typedefs just for convienence
+  typedef SmartPtr<HelloWorld> sptr;
+  typedef WeakPtr<HelloWorld> wptr;
+
+protected:
+  //we can't allow straight construction of this object
+  HelloWorld( std::string myName, Mutex& mutexToTest )
     : Thread(myName), testMutex(mutexToTest) {
     mprintf("%s is born\n", myName.c_str());
   }
+
+public:
+  /**
+   * Creates a new HelloWorld thread.
+   */
+  static sptr create( std::string myName, Mutex& mutexToTest ) {
+    sptr ret( new HelloWorld( myName, mutexToTest ) );
+    ret->setThisPointer( ret );
+    return ret;
+  }
+
   virtual ~HelloWorld() {
     mprintf("%s dies.\n", getName().c_str());
   }
@@ -64,11 +80,12 @@ protected:
     testMutex.acquire();
 
     mprintf("Hello World!  My name is %s.\n", getName().c_str());
-    Thread::sleep(50);
+    Thread::sleep(50);  //sleep(50) will work too, Thread:: is not needed...
 
     mprintf(" %s Ref: %x %x\n", getName().c_str(), Thread::currentThread(), this);
 
-    assert(Thread::currentThread() == this);
+    assert(Thread::currentThread().get() == this);
+    assert(Thread::currentThread() == getThisPointer() );
 
     testMutex.release();
   }
@@ -80,7 +97,22 @@ private:
 };
 
 class WaitingThread : public Thread {
+public:
+  //define these typedefs just for convienence
+  typedef SmartPtr<WaitingThread> sptr;
+  typedef WeakPtr<WaitingThread> wptr;
+
+  virtual ~WaitingThread() {}
+
+  static sptr create() {
+    sptr ret( new WaitingThread() );
+    ret->setThisPointer( ret );
+    return ret;
+  }
+
 protected:
+  WaitingThread() {}
+
   void run() {
     sleep(1000);
   }
@@ -123,16 +155,22 @@ int main(int argc, char* argv[]) {
   //of Sally's statements should come before or after all of Joe's.  Bob uses
   //a different mutex so his statements will be mixed in with Sally's and
   //Joe's.
-  HelloWorld* bob = new HelloWorld("Bob", test);
+  HelloWorld::sptr bob = HelloWorld::create("Bob", test);
+  assert( !bob->hasStarted() );
+  assert( !bob->isRunning() );
   bob->start();      //Tells bob to start his job.
-  bob->detach(true); //we don't want to see bob again.
+  bob.reset();
+  //There is never a need to reset explicitly, but we do this to show that
+  //you don't need to keep any pointers to Threads after you start them.
+  //In the old GNE API, this was equivalent to detach(true)
 
-  HelloWorld* sally = new HelloWorld("Sally", test2);
+  HelloWorld::sptr sally = HelloWorld::create("Sally", test2);
   sally->start();
 
-  HelloWorld* joe = new HelloWorld("Joe", test2);
+  HelloWorld::sptr joe = HelloWorld::create("Joe", test2);
   joe->start();
 
+  assert(sally->hasStarted());
   assert(sally->isRunning()); //Sally should be running.  Note this is true
                               //because sally->start() was called, and not
                               //because the thread has ACTUALLY started
@@ -142,13 +180,17 @@ int main(int argc, char* argv[]) {
   sally->join(); //we must either join or detach every thread.
   mprintf("Sally ended.  Killing Sally.\n");
   assert(!sally->isRunning());
-  delete sally;  //in the join case, we must delete the thread after joining.
+  //In the old API, you used to have to manually delete Sally, but no need to
+  //anymore.  We test deleting her explicitly through a reset call, but it is
+  //not needed.
+  sally.reset();
 
   mprintf("Sally died.  Now waiting for Joe to end.\n");
+
+  //A busy wait is a very bad idea.  You should always use join, but isRunning
+  //is possibly if you want to check for when joe dies while doing other stuff.
   while (joe->isRunning()) {}
-  mprintf("Joe has ended.  Detaching Joe.\n");
-  joe->detach(true); //But even if we detach after a thread ends it will
-                     //still destroy itself.
+  mprintf("Joe has ended.\n");
 
   //Sleep, measuring our sleep time
   Time lastTime = Timer::getCurrentTime();
@@ -162,9 +204,7 @@ int main(int argc, char* argv[]) {
   mprintf("GNE timers report sleeping time of %i microseconds (us)\n", diffTime.getTotaluSec());
   
   mprintf("Now testing Thread::waitForAllThreads.\n");
-  WaitingThread waiter;
-  waiter.start();
-  waiter.detach(false);
+  WaitingThread::create()->start();
   //this should timeout as the waiter thread waits for 1000 ms.
   bool timeout = Thread::waitForAllThreads(150);
   if (timeout)
@@ -179,13 +219,18 @@ int main(int argc, char* argv[]) {
   else
     mprintf("Thread::waitForAllThreads 2nd call completed successfully.\n");
   
-  mprintf("Press a key to continue.\n");
+  mprintf( "You should see joe die after you press a key (when main ends), if you have\n" );
+  mprintf( " the window stay open after the program exits.\n" );
+  mprintf("Press a key to continue.");
   getch();
 
   //At this point, all threads that are running will be terminated.  When
   //main exits, everything goes.  Use join if you want to guarantee your
   //threads have exited, or use waitForAllThreads to definitively verify that
   //detached threads have ended.
+  //The threads will be FORCEFULLY terminated so this would be an abnormal
+  //program close if any threads are still running, and their destructors
+  //won't get called!
   return 0;
 }
 

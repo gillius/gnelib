@@ -36,6 +36,7 @@ namespace Console {
 
 static Mutex outSync;
 static bool initialized = false;
+static bool clearOnEnd = true;
 
 //Global iostreams to replace cout/cin
 ConsoleMutex acquire(true);
@@ -79,31 +80,50 @@ GOut& GOut::operator << ( GOFType f ) {
   return *this;
 }
 
-bool initConsole(int (*atexit_ptr)(void (*func)(void))) {
+bool initConsole(int (*atexit_ptr)(void (*func)(void)), bool clearOnExit) {
+  LockMutex lock( outSync );
+
   if (!initialized) {
     conio_init(&ENTER, &BACKSPACE);
     assert(atexit_ptr);
     atexit_ptr(shutdownConsole);
     gin.tie(&gout); //tie the input and output together.
     initialized = true;
+    clearOnEnd = clearOnExit;
   }
   return false;
 }
 
 void shutdownConsole() {
+  assert(initialized);
+  LockMutex lock( outSync );
+
   if (initialized) {
     gout.flush();
+
+    if ( clearOnEnd ) {
+      mclearConsole();
+      conio_gotoxy( 0, 0 );
+    }
+
     conio_exit();
     initialized = false;
   }
 }
 
+void mclearConsole() {
+  LockMutex lock( outSync );
+  conio_clear();
+}
+
 int kbhit() {
+  //We don't lock here since only one thread can ever do input
   assert(initialized);
   return conio_kbhit();
 }
 
 int getch() {
+  //We don't lock here since only one thread can ever do input
   assert(initialized);
   return conio_getch();
 }

@@ -20,6 +20,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "SmartPtr.h"
+#include "WeakPtr.h"
 
 namespace GNE {
 
@@ -28,6 +30,10 @@ namespace GNE {
  * listeners.
  */
 class ReceiveEventListener {
+public:
+  typedef SmartPtr<ReceiveEventListener> sptr;
+  typedef WeakPtr<ReceiveEventListener> wptr;
+
 public:
   virtual ~ReceiveEventListener();
 

@@ -31,13 +31,22 @@ namespace GNE {
  * can be accessing the Counter at the same time.
  */
 class Counter : public TimerCallback {
-public:
-  /**
-   * Initalize this Counter.  Pass this Counter into a Timer class to use it.
-   * @see TimerCallback
-   */
+protected:
   Counter();
 
+public:
+  typedef SmartPtr<Counter> sptr;
+  typedef WeakPtr<Counter> wptr;
+
+  /**
+   * Create a Counter.  Pass this Counter into a Timer class to use it.
+   * @see TimerCallback
+   */
+  static sptr create();
+
+  /**
+   * Destructor.
+   */
   virtual ~Counter();
 
   /**

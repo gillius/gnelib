@@ -70,6 +70,7 @@ namespace GNE {
  * <li>public destructor</li>
  * <li>copy constructor</li>
  * <li>operator =</li>
+ * <li>get</li>
  * <li>reset</li>
  * <li>reset( T* )</li>
  * <li>reset( T*, deleter )</li>

@@ -1,4 +1,8 @@
 GNE 0.55 to current
+  optional clearOnExit param to Console::initConsole
+  Thread::waitForAllThreads didn't work right at all.  How did I miss that?!
+  Major API changes, see http://www.rit.edu/~jpw9607/gne/apichanges.htm
+  Added Console::mclearConsole method.
   Added ObjectBroker, ObjectBrokerClient, ObjectBrokerServer.
   Added ChannelProvider and ChannelPacket to add in channel functionality into
     GNE.

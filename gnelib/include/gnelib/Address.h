@@ -33,17 +33,24 @@ namespace GNE {
 class Address {
 public:
   /**
+   * Constructs an invalid address.
+   */
+  Address();
+
+  /**
    * Creates a new Address, resolving the name in address if necessary.  The
    * format is the same as HawkNL's nlGetAddrFromName, for IP this format is
    * xxx.xxx.xxx.xxx:ppppp where ppppp is the optional port and
-   * xxx.xxx.xxx.xxx can be a hostname, i.e.: n
-   * localhost:1678\n
-   * 129.21.138.180:5555\n
-   * www.mozilla.com:80
-   * www.hawksoft.com  (when port is empty, resulting port will be 0).\n
+   * xxx.xxx.xxx.xxx can be a hostname, i.e.:<br>
+   * localhost:1678<br>
+   * 129.21.138.180:5555<br>
+   * www.mozilla.com:80<br>
+   * www.hawksoft.com  (when port is empty, resulting port will be 0).
+   *
    * If no string is supplied, the default is 0.0.0.0:0.  Note that the name
    * resolution may take some time and this constructor will block.  If the
    * resolution failed, then the Address is not valid (!isValid()).
+   *
    * @see isValid()
    */
   Address(std::string address);
@@ -51,7 +58,7 @@ public:
   /**
    * Alternate version for better implicit conversion
    */
-  Address(const char* address = "0.0.0.0:0");
+  Address(const char* address);
 
   /**
    * Creates a new Address with the HawkNL NLaddress.

@@ -29,11 +29,17 @@
 
 namespace GNE {
 
-EventThread::EventThread(ConnectionListener* listener, Connection* conn)
+  EventThread::EventThread(ConnectionListener* listener, Connection::sptr conn)
 : Thread("EventThr", Thread::HIGH_PRI), ourConn(conn), eventListener(listener),
-started(false), onReceiveEvent(false), onTimeoutEvent(false),
+onReceiveEvent(false), onTimeoutEvent(false),
 onDisconnectEvent(false), onExitEvent(false), failure(NULL) {
   gnedbgo(5, "created");
+}
+
+EventThread::sptr EventThread::create(ConnectionListener* listener, Connection::sptr conn) {
+  sptr ret( new EventThread( listener, conn ) );
+  ret->setThisPointer( ret );
+  return ret;
 }
 
 EventThread::~EventThread() {
@@ -142,15 +148,6 @@ void EventThread::shutDown() {
   eventSync.acquire();
   eventSync.signal();
   eventSync.release();
-}
-
-bool EventThread::hasStarted() {
-  return started;
-}
-
-void EventThread::start() {
-  Thread::start();
-  started = true;
 }
 
 void EventThread::run() {

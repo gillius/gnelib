@@ -75,7 +75,7 @@ void doTrace(int level, const char* fn, int lineno, const char* msg, ...) {
     va_start(arg, msg);
 
     //Get the current thread's name:
-    Thread* currThr = Thread::currentThread();
+    Thread::sptr currThr = Thread::currentThread();
     std::string thrName;
     if (currThr) {
       thrName = currThr->getName();

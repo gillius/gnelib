@@ -14,6 +14,10 @@ int conio_getch ();
 void conio_gotoxy (int x, int y);
 void conio_getxy(int* x, int* y);
 
+//clears the console window.  The cursor position after this operation is
+//unchanged.
+void conio_clear();
+
 //conio_getsize returns x == y == 0 if it cannot get the size
 void conio_getsize(int* x, int* y);
 

@@ -33,7 +33,10 @@ namespace GNE {
   typedef pthread_t ID;
 #endif
 
-static std::map<ID, Thread*> threads;
+typedef std::map<ID, Thread::sptr> ThreadMap;
+typedef ThreadMap::iterator ThreadMapIter;
+
+static ThreadMap threads;
 static Mutex mapSync;
 
 const int Thread::DEF_PRI = 0;
@@ -55,13 +58,13 @@ struct Thread::ThreadIDData {
 };
 
 //The thread entry point -- two prototypes, one for Win32, the other for
-//POSIX.
+//POSIX.  The parameter passed in is a pointer to a WeakPtr to the thread.
 #ifdef WIN32
 unsigned __stdcall Thread::threadStart(void* thread) {
 #else
 void* Thread::threadStart(void* thread) {
 #endif
-  Thread* thr = ( (Thread*)(thread) );
+  Thread::sptr thr = ((Thread::wptr*)thread)->lock();
   //Makes sure the map has been updated before we start.
   mapSync.acquire();
   mapSync.release();
@@ -77,23 +80,39 @@ void* Thread::threadStart(void* thread) {
   //is started by throwing an exception, and placing a catch all here will
   //keep the debugger from starting.
 
+  gnedbg2( 5, "%x: Thread %s Ending", thr.get(), thr->getName().c_str() );
+  ThreadIDData idData = *(thr->id);
+  thr.reset();
+  //We don't want to keep a reference to the Thread, so we can be certain that
+  //remove will kill if it the program is shutting down, because otherwise
+  //after a waitForAllThreads the program can quit before thr has a chance to
+  //die.
+  Thread::remove( idData );
+
   return 0;
 }
 
 Thread::Thread(std::string name2, int priority2) : shutdown(false), name(name2),
-running(false), deleteThis(false), priority(priority2) {
+started(false), running(false), joined(false), priority(priority2) {
   id = new ThreadIDData();
+  gnedbgo( 5, "Thread created" );
 }
 
 Thread::~Thread() {
   assert(!isRunning());
+
+  if ( started && !joined )
+    detach();
+
 #ifdef WIN32
   CloseHandle( id->hThread );
 #endif
   delete id;
+
+  gnedbgo( 5, "Thread destroyed" );
 }
 
-Thread* Thread::currentThread() {
+Thread::sptr Thread::currentThread() {
   mapSync.vanillaAcquire();
 #ifdef WIN32
   ID id = GetCurrentThreadId();
@@ -101,19 +120,19 @@ Thread* Thread::currentThread() {
   ID id = pthread_self();
 #endif
 
-  std::map< ID, Thread* >::iterator iter = threads.find( id );
+  ThreadMapIter iter = threads.find( id );
   if ( iter != threads.end() ) {
-    Thread* ret = (*iter).second;
+    Thread::sptr ret = (*iter).second;
     mapSync.vanillaRelease();
     return ret;
   } else {
     mapSync.vanillaRelease();
-    return NULL;
+    return Thread::sptr();
   }
 }
 
 void Thread::sleep(int ms) {
-  assert(ms > 0);
+  assert(ms >= 0);
   if (ms > 0) {
 #ifdef WIN32
     Sleep(ms);
@@ -123,7 +142,8 @@ void Thread::sleep(int ms) {
     sleeper.timedWait(ms);
     sleeper.release();
 #endif
-  }
+  } else if ( ms == 0 )
+    yield();
 }
 
 void Thread::yield() {
@@ -144,7 +164,7 @@ bool Thread::waitForAllThreads(int ms) {
   bool ret = false;
   bool timeout = false;
   while (!ret) {
-    ret = timeout = (Timer::getCurrentTime() < t);
+    ret = timeout = (Timer::getCurrentTime() >= t);
     if (!timeout) {
       mapSync.acquire();
       //Take into accout the CEG thread.
@@ -166,43 +186,35 @@ void Thread::shutDown() {
   shutdown = true;
 }
 
+/**
+ * \bug only works for 1 thread in pthreads.
+ * \todo allow multiple threads to do join.
+ */
 void Thread::join() {
-  assert( !deleteThis );
+  assert( !joined && started );
+  if ( started ) {
+    joined = true;
 #ifdef WIN32
-  valassert(WaitForSingleObject( id->hThread, INFINITE ), WAIT_OBJECT_0);
+    valassert(WaitForSingleObject( id->hThread, INFINITE ), WAIT_OBJECT_0);
 #else
-  valassert(pthread_join( id->thread_id, NULL ), 0);
+    valassert(pthread_join( id->thread_id, NULL ), 0);
 #endif
+  }
 }
 
-void Thread::detach(bool delThis) {
-  assert( !deleteThis );
+void Thread::detach() {
 #ifndef WIN32
   //We only need to detach on POSIX systems
   valassert(pthread_detach( thread_id ), 0);
 #endif
-  if (delThis) {
-    //Only set deleteThis true if we want to delete ourselves on exit.
-    sync.vanillaAcquire();
-    deleteThis = true;
-    if (!running) {       //delete this if we are already stopped.
-      sync.vanillaRelease();
-      delete this;
-    } else                //else all we want to do is mark deleteThis.
-      sync.vanillaRelease();
-  }
 }
 
 void Thread::end() {
-  sync.vanillaAcquire();
   running = false;
-  Thread::remove(this);
-  if (deleteThis) {
-    //If we were detached with delThis set, we delete ourselves now.
-    sync.vanillaRelease();
-    delete this;
-  } else
-    sync.vanillaRelease();
+}
+
+bool Thread::hasStarted() const {
+  return started;
 }
 
 bool Thread::isRunning() const {
@@ -210,14 +222,22 @@ bool Thread::isRunning() const {
 }
 
 void Thread::start() {
+  assert( !started );
+
+  Thread::sptr this_ = thisThread.lock();
+  assert( this_ ); //thisThread must have been set.
+
   shutdown = false;
   running = true;
-  mapSync.acquire();
+  started = true;
+  LockMutex lock( mapSync );
 
 #ifdef WIN32
   id->hThread = (HANDLE)_beginthreadex(
-    NULL, 0, &threadStart, (void*)this, 0,
+    NULL, 0, &threadStart, (void*)&thisThread, 0,
     reinterpret_cast<unsigned*>(&id->thread_id) );
+
+  assert( id->hThread != 0 );
 
   //Set the thread priority
   switch (priority) {
@@ -235,21 +255,33 @@ void Thread::start() {
       break;
   };
 #else
-  pthread_create( &id->thread_id, NULL, Thread::threadStart, this );
+  pthread_create( &id->thread_id, NULL, Thread::threadStart, (void*)&thisThread );
 #endif
 
-  threads[ id->thread_id ] = this;
-  mapSync.release();
+  //Important note: because after start is called the caller can lose the
+  //reference at any time, the sptr we store here may be the only sptr ref to
+  //this object.
+  threads[ id->thread_id ] = this_;
+
+  gnedbgo1( 5, "Starting Thread %s", name.c_str() );
 }
 
 int Thread::getPriority() const {
   return priority;
 }
 
-void Thread::remove(Thread* thr) {
-  assert(!thr->isRunning());
+void Thread::setThisPointer( const wptr& thisPtr ) {
+  thisThread = thisPtr;
+}
+
+Thread::sptr Thread::getThisPointer() const {
+  return thisThread.lock();
+}
+
+void Thread::remove( const ThreadIDData& d ) {
   mapSync.vanillaAcquire();
-  threads.erase(thr->id->thread_id);
+  assert( threads.find( d.thread_id) != threads.end() );
+  threads.erase(d.thread_id);
   mapSync.vanillaRelease();
 }
 
