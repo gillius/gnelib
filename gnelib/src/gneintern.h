@@ -61,9 +61,9 @@
 
 //Define a custom "assert" macro
 #ifdef _DEBUG
-#define valassert(CALL, VAL)   assert((CALL) == (VAL))
+#define valassert(CALL, VAL)        assert((CALL) == (VAL))
 #else
-#define valassert(CALL, VAL)   CALL
+#define valassert(CALL, VAL)        CALL
 #endif
 
 #endif // _GNEINTERN_H_
