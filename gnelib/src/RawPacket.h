@@ -99,7 +99,7 @@ public:
   //##ModelId=3B05F59901AE
   RawPacket& operator << (signed char x);
   //##ModelId=3B05F59902BC
-  RawPacket& operator << (NLbyte x);
+  RawPacket& operator << (NLubyte x);
   //##ModelId=3B05F59A001E
   RawPacket& operator << (NLshort x);
   //##ModelId=3B05F59A0136
@@ -122,7 +122,7 @@ public:
   //##ModelId=3B05F59C00E6
   RawPacket& operator >> (signed char& x);
   //##ModelId=3B05F59C0230
-  RawPacket& operator >> (NLbyte& x);
+  RawPacket& operator >> (NLubyte& x);
   //##ModelId=3B05F59C037A
   RawPacket& operator >> (NLshort& x);
   //##ModelId=3B05F59D00DC

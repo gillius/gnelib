@@ -77,7 +77,7 @@ RawPacket& RawPacket::operator << (signed char x) {
 }
 
 //##ModelId=3B05F59902BC
-RawPacket& RawPacket::operator << (NLbyte x) {
+RawPacket& RawPacket::operator << (NLubyte x) {
   writeByte(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
@@ -140,7 +140,7 @@ RawPacket& RawPacket::operator >> (signed char& x) {
   return *this;
 }
 
-RawPacket& RawPacket::operator >> (NLbyte& x) {
+RawPacket& RawPacket::operator >> (NLubyte& x) {
   readByte(data, currLoc, x);
   assert(currLoc <= RAW_PACKET_LEN);
   return *this;
