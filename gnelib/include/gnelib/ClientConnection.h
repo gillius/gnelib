@@ -38,7 +38,6 @@ public:
   /**
    * Initializes this ClientConnection.  The listener is passed in the open
    * method.
-   * @see Connection#Connection(ConnectionListener*)
    */
   ClientConnection();
 
