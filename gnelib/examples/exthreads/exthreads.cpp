@@ -53,8 +53,8 @@ int main(int argc, char* argv[]) {
   Console::setTitle("GNE Threads Example");
 
   HelloWorld* bob = new HelloWorld("Bob");
-  bob->start();  //Tells bob to start his job.
-  bob->detach(); //we don't want to see bob again.
+  bob->start();      //Tells bob to start his job.
+  bob->detach(true); //we don't want to see bob again.
 
   HelloWorld* sally = new HelloWorld("Sally");
   sally->start();
@@ -75,8 +75,8 @@ int main(int argc, char* argv[]) {
   Console::mprintf("Sally died.  Now waiting for Joe to end.\n");
   while (!joe->hasEnded()) {}
   Console::mprintf("Joe has ended.  Detaching Joe.\n");
-  joe->detach(); //But even if we detach after a thread ends it will still
-                 //destroy itself.
+  joe->detach(true); //But even if we detach after a thread ends it will
+                     //still destroy itself.
 
   //Sleep, measuring our sleep time two ways
   clock_t start = clock();
