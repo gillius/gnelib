@@ -2,13 +2,12 @@
 //belongs to George foot gfoot@users.sourceforge.net.  The Windows portion
 //of this code is public domain.
 
-#include <stdlib.h>
-
 #include "../include/gnelib/conioport.h"
 
 #ifdef WIN32
 // *** WINDOWS API CONSOLE CODE ***
 
+#include <stdlib.h>
 #include <conio.h>
 #include <windows.h>
 #include <stdio.h>
