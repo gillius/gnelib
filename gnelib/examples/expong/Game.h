@@ -34,7 +34,7 @@ const int SCRY_MID = SCRY / 2;
 class Ball {
 public:
   Ball() : oldx(SCRX_MID), oldy(SCRY_MID),
-           x(SCRX_MID), y(SCRY_MID),
+           x((float)SCRX_MID), y((float)SCRY_MID),
            dx(1.0), dy(0.5) {
   }
 

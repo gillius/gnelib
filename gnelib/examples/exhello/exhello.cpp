@@ -63,7 +63,7 @@ public:
     mprintf("Server gracefully disconnected.\n");
   }
 
-  void onConnect(SyncConnection& conn2) throw (Error) {
+  void onConnect(SyncConnection& conn2) {
     conn = conn2.getConnection();
     mprintf("Connection to server successful.\n");
     mprintf("  From us at %s/TCP to server at %s/TCP.\n",
@@ -145,7 +145,7 @@ public:
     mprintf("Client gracefully disconnected.\n");
   }
 
-  void onNewConn(SyncConnection& conn2) throw (Error) {
+  void onNewConn(SyncConnection& conn2) {
     conn = conn2.getConnection();
     mprintf("Connection received; waiting for message...\n");
     mprintf("  From us at %s/TCP to client at %s/TCP.\n",

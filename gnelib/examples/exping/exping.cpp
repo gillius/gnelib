@@ -50,11 +50,11 @@ public:
     delete this;
   }
 
-  void onConnect(SyncConnection& conn2) throw (Error) {
+  void onConnect(SyncConnection& conn2) {
     conn = conn2.getConnection();
   }
 
-  void onNewConn(SyncConnection& conn2) throw (Error) {
+  void onNewConn(SyncConnection& conn2) {
     conn = conn2.getConnection();
   }
 

@@ -107,7 +107,7 @@ bool Thread::waitForAllThreads(int ms) {
     if (!timeout) {
       mapSync.acquire();
       //Take into accout the CEG thread.
-      ret = (threads.size() <= ((GNE::eGen) ? 1 : 0) );
+      ret = (threads.size() <= (unsigned int)((GNE::eGen) ? 1 : 0) );
       mapSync.release();
     }
     if (!ret)

@@ -58,7 +58,7 @@ public:
     mlprintf(0, 24, "Remote player quit.  Press q to exit.");
   }
 
-  void onConnect(SyncConnection& conn2) throw (Error) {
+  void onConnect(SyncConnection& conn2) {
     conn = conn2.getConnection();
 
     //Do connection negotiation here.  If it fails, onConnectFailure will be
@@ -95,7 +95,7 @@ public:
     //Now we are ready to play pong!
   }
 
-  void onNewConn(SyncConnection& conn2) throw (Error) {
+  void onNewConn(SyncConnection& conn2) {
     conn = conn2.getConnection();
 
     CustomPacket buf;
@@ -188,7 +188,7 @@ private:
  */
 class RefuseClient : public ConnectionListener {
 public:
-  void onNewConn(SyncConnection& conn2) throw (Error) {
+  void onNewConn(SyncConnection& conn2) {
     CustomPacket buf;
     //Tell the client that they have been refused
     buf.getData() << gFalse;

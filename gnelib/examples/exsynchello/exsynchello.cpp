@@ -54,7 +54,7 @@ public:
     delete this;
   }
 
-  void onNewConn(SyncConnection& conn) throw (Error) {
+  void onNewConn(SyncConnection& conn) {
     ourConn = conn.getConnection();
     gout << acquire << "Connection received from "
          << conn.getConnection()->getRemoteAddress(true)

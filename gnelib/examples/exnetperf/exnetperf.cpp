@@ -87,14 +87,14 @@ public:
     delete this;
   }
 
-  void onConnect(SyncConnection& conn2) throw (Error) {
+  void onConnect(SyncConnection& conn2) {
     serverSide = false;
     conn = conn2.getConnection();
     writePackets(); //Send an initial batch of data.
     sDisplay->addConn(conn, &packetsIn, &packetsOut);
   }
 
-  void onNewConn(SyncConnection& conn2) throw (Error) {
+  void onNewConn(SyncConnection& conn2) {
     serverSide = true;
     conn = conn2.getConnection();
     writePackets();
