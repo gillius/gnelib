@@ -72,7 +72,7 @@ Time Timer::getAbsoluteTime() {
 void Timer::startTimer() {
   assert(running == false);
   nextTime = getCurrentTime();
-  nextTime.setuSec(nextTime.getuSec() + callbackRate * 1000);
+  nextTime += callbackRate * 1000;
   running = true;
   start();
 }
@@ -91,9 +91,15 @@ void Timer::stopTimer() {
 //##ModelId=3AE868A30294
 void Timer::run() {
   while (running) {
-    while (nextTime > getCurrentTime()) {}
+    Time currTime, sleepTime;
+    currTime = getCurrentTime();
+    while (nextTime > currTime) {
+      sleepTime = nextTime - currTime;
+      Thread::sleep(sleepTime.getTotaluSec() / 1000);
+      currTime = getCurrentTime();
+    }
     listener->timerCallback();
-    nextTime.setuSec(nextTime.getuSec() + callbackRate * 1000);
+    nextTime += callbackRate * 1000;
   }
 }
 
