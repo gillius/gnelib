@@ -24,6 +24,8 @@ EXAMPLE_CPP          = $(wildcard examples/*/*.cpp)
 
 EXAMPLE_O            = $(EXAMPLE_CPP:.cpp=.o)
 
+EXE_MASK             = examples/%.exe
+
 EXAMPLE_EXE          = $(addprefix examples/,$(notdir $(EXAMPLE_O:.o=.exe)))
 
 LIB_CPP              = $(wildcard src/*.cpp)
