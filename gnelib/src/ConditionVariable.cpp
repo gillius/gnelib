@@ -25,6 +25,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ConditionVariable.h"
 #include "../include/gnelib/Mutex.h"
+#include "../include/gnelib/MutexData.h"
 #include "../include/gnelib/Time.h"
 #include "../include/gnelib/Timer.h"
 
