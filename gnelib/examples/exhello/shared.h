@@ -78,7 +78,7 @@ public:
 
   void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) {
     mprintf("Connection error: %s\n", error.toString().c_str());
-    mprintf("  Error received from %s", from.toString().c_str());
+    mprintf("  Error received from %s\n", from.toString().c_str());
     delete listener;
   }
 
