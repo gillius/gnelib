@@ -90,6 +90,7 @@ public:
    * notify itself to shutdown, for example if it is waiting for some event on
    * a ConditionVariable.
    */
+  //##ModelId=3B0C5919012C
   virtual void shutDown();
 
   /**
@@ -191,6 +192,7 @@ protected:
    * all threads may take awhile.  Responding to this flag usually takes
    * nothing more than a while (!shutdown) {} loop.
    */
+  //##ModelId=3B0C591802EE
   bool shutdown;
 
 private:

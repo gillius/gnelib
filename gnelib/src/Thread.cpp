@@ -93,6 +93,7 @@ std::string Thread::getName() const {
   return name;
 }
 
+//##ModelId=3B0C5919012C
 void Thread::shutDown() {
   shutdown = true;
 }
