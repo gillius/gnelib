@@ -36,27 +36,29 @@
 
 using namespace std;
 
+using GNE::Console::gout;
+
 class Base {
 public:
   int x;
 
   Base( int x ) : x(x) {
-    cout << "Base ctor: " << x << endl;
+    gout << "Base ctor: " << x << endl;
   }
 
   virtual ~Base() {
-    cout << "Base dtor: " << x << endl;
+    gout << "Base dtor: " << x << endl;
   }
 };
 
 class Derived : public Base {
 public:
   Derived( int x ) : Base( x ) {
-    cout << "Derived ctor: " << x << endl;
+    gout << "Derived ctor: " << x << endl;
   }
 
   virtual ~Derived() {
-    cout << "Derived dtor: " << x << endl;
+    gout << "Derived dtor: " << x << endl;
   }
 
 };
@@ -68,7 +70,7 @@ template<class T>
 class CustomDeleter {
 public:
   void operator()( T* t ) const {
-    cout << "Custom deleter called!" << endl;
+    gout << "Custom deleter called!" << endl;
     delete t;
   }
 };
@@ -115,7 +117,7 @@ void testStrong() {
   DerivedPtr dPtr;
   dPtr = GNE::static_pointer_cast<Derived>( bPtr );
 
-  cout << dPtr << "->x = " << dPtr->x << endl;
+  gout << dPtr << "->x = " << dPtr->x << endl;
 
   DerivedPtr dPtr2( dPtr );
   assert( dPtr == dPtr2 );
@@ -131,12 +133,12 @@ void testStrong() {
   //Testing with multiple objects
   bPtr.reset( new Base( 15 ) );
   bPtr2.reset( new Base( 20 ) );
-  cout << "bPtr = " << bPtr << "->x = " << bPtr->x << endl;
-  cout << "bPtr2 = " << bPtr2 << "->x = " << bPtr2->x << endl;
-  cout << "swapping" << endl;
+  gout << "bPtr = " << bPtr << "->x = " << bPtr->x << endl;
+  gout << "bPtr2 = " << bPtr2 << "->x = " << bPtr2->x << endl;
+  gout << "swapping" << endl;
   bPtr.swap( bPtr2 );
-  cout << "bPtr = " << bPtr << "->x = " << bPtr->x << endl;
-  cout << "bPtr2 = " << bPtr2 << "->x = " << bPtr2->x << endl;
+  gout << "bPtr = " << bPtr << "->x = " << bPtr->x << endl;
+  gout << "bPtr2 = " << bPtr2 << "->x = " << bPtr2->x << endl;
 
   //Hidden functions that should be used for debugging purposes ONLY!
   assert( bPtr.use_count() == 1 );
@@ -147,7 +149,7 @@ void testStrong() {
   //Test use of the CustomDeleter.  There's no reason why we need one here.
   GNE::SmartPtr<int> intPtr( new int, CustomDeleter<int>() );
   *intPtr = 5;
-  cout << *intPtr << endl;
+  gout << *intPtr << endl;
 
   //Superficial test placing objects in an STL container
   std::vector<BasePtr> bPtrs;
@@ -158,13 +160,13 @@ void testStrong() {
   assert( bPtr.use_count() > 1 );
   assert( !bPtr.unique() );
 
-  cout << "Strong pointer tests completed.  You should see destructors after this." << endl;
-  cout << "  Press any key to continue" << endl;
+  gout << "Strong pointer tests completed.  You should see destructors after this." << endl;
+  gout << "  Press any key to continue" << endl;
   GNE::Console::getch();
 }
 
 void testWeak() {
-  cout << endl << "Weak pointer test begin:" << endl;
+  gout << endl << "Weak pointer test begin:" << endl;
   BasePtr bPtr( new Base( 100 ) );
   BaseWeakPtr bwPtr( bPtr );
 
@@ -185,6 +187,6 @@ void testWeak() {
   bPtr = bwPtr.lock();
   assert( !bPtr );
 
-  cout << "Weak pointer tests completed.  Press any key to continue.";
+  gout << "Weak pointer tests completed.  Press any key to continue." << endl;
   GNE::Console::getch();
 }
