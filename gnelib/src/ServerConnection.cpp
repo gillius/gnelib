@@ -26,7 +26,7 @@ namespace GNE {
 ServerConnection::ServerConnection(int outRate, int inRate, NLsocket rsocket2)
 : Connection(outRate, inRate) {
 	gnedbgo(5, "created");
-  rsocket = rsocket2;
+  sockets.r = rsocket2;
 }
 
 //##ModelId=3B075381027E
@@ -39,11 +39,11 @@ ServerConnection::~ServerConnection() {
  */
 //##ModelId=3B0753810280
 void ServerConnection::run() {
-  assert(rsocket != NL_INVALID);
+  assert(sockets.r != NL_INVALID);
 	//Do connection negotiaion here
 	reg(true, false);
 	ps->start();
-	gnedbgo2(2, "connection r: %i, u: %i", rsocket, usocket);
+	gnedbgo2(2, "connection r: %i, u: %i", sockets.r, sockets.u);
 	connected = true;
   onNewConn();
 }

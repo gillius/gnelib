@@ -25,6 +25,7 @@
 #include "PacketStream.h"
 #include "ConnectionEventListener.h"
 #include "ErrorGne.h"
+#include "SocketPair.h"
 
 namespace GNE {
 
@@ -86,6 +87,10 @@ public:
   Stats getStats() const;
 
   /**
+	 * \bug result is undefined when the underlying socket isn't connected,
+	 *      but the user has no way to know if this function failed due to
+	 *      this case, unless the user has an intimate understanding of the
+	 *      implementation of Connection.
    * Returns the local address of this connection.
    * @param reliable sometimes two sockets are used for reliable and
    *                 unreliable data.  Specify which low-level socket you
@@ -95,6 +100,10 @@ public:
   NLaddress getLocalAddress(bool reliable) const;
 
   /**
+	 * \bug result is undefined when the underlying socket isn't connected,
+	 *      but the user has no way to know if this function failed due to
+	 *      this case, unless the user has an intimate understanding of the
+	 *      implementation of Connection.
    * Returns the remote address of this connection, if it is connected.
    * @param reliable sometimes two sockets are used for reliable and
    *                 unreliable data.  Specify which low-level socket you
@@ -165,17 +174,11 @@ public:
   virtual void onDoneWriting();
 
 protected:
-  /**
-   * The reliable socket.
-   */
-  //##ModelId=3B08920B01C2
-  NLsocket rsocket;
-
-  /**
-   * The unreliable socket.
-   */
-  //##ModelId=3B0891DB000A
-  NLsocket usocket;
+	/**
+	 * The pair of sockets.
+	 */
+  //##ModelId=3BB2CB410263
+	SocketPair sockets;
 
   /**
    * The PacketStream associated with this Connection.  This object also
@@ -251,11 +254,6 @@ private:
   //##ModelId=3B6E14AC0100
 	ConnectionListener* ulistener;
 
-  //Functions for PacketStream and parsing packets
-  //##ModelId=3B6B302400CA
-  int rawRead(bool reliable, const NLbyte* buf, int bufSize);
-  //##ModelId=3B6B302401D6
-  int rawWrite(bool reliable, const NLbyte* buf, int bufSize);
   friend class PacketStream;
 
 	/**

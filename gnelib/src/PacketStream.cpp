@@ -148,7 +148,7 @@ void PacketStream::run() {
 			RawPacket raw;
 			next->packet->writePacket(raw);
 			raw << PacketParser::END_OF_PACKET;
-      owner.rawWrite(next->reliable, raw.getData(), raw.getPosition());
+      owner.sockets.rawWrite(next->reliable, raw.getData(), raw.getPosition());
 			delete next;
     }
   }

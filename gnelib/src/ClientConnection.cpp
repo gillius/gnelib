@@ -39,12 +39,12 @@ ClientConnection::~ClientConnection() {
  */
 //##ModelId=3B07538003BA
 void ClientConnection::run() {
-  NLboolean check = nlConnect(rsocket, &address);
+  NLboolean check = nlConnect(sockets.r, &address);
   if (check == NL_TRUE) {
 		reg(true, false);
     connected = true;
 		ps->start();
-		gnedbgo2(2, "connection r: %i, u: %i", rsocket, usocket);
+		gnedbgo2(2, "connection r: %i, u: %i", sockets.r, sockets.u);
     onConnect();
   } else {
     onConnectFailure(Error::ConnectionTimeOut);
@@ -61,8 +61,8 @@ bool ClientConnection::open(std::string dest, int port) {
 //##ModelId=3B07538003BE
 bool ClientConnection::open(NLaddress dest, int port) {
   address = dest;
-  rsocket = nlOpen(port, NL_RELIABLE_PACKETS);
-  return (rsocket == NL_INVALID);
+  sockets.r = nlOpen(port, NL_RELIABLE_PACKETS);
+  return (sockets.r == NL_INVALID);
 }
 
 //##ModelId=3B07538003C1

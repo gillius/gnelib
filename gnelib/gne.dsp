@@ -161,6 +161,10 @@ SOURCE=.\src\ServerConnectionListener.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\SocketPair.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Thread.cpp
 # End Source File
 # Begin Source File
@@ -262,6 +266,10 @@ SOURCE=.\include\gnelib\ServerConnectionCreator.h
 # Begin Source File
 
 SOURCE=.\include\gnelib\ServerConnectionListener.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\gnelib\SocketPair.h
 # End Source File
 # Begin Source File
 

@@ -1,9 +1,12 @@
 GNE 0.003 to 0.004
+  A few bug fixes.
+  Added the SocketPair class to separate shared properties between Connection
+    and SyncConnection.
   Removed the OnReceiveEventClass.  onReceive events are now forced to be
     "non-blocking" as there is now only a single event thread.  Multiple
-	event threads were found to be overly confusing and complex to the
-	developers and users, with very little to no potential benefits.  If you
-	need to "block" in an event (other than onNewConn), spawn a new thread.
+    event threads were found to be overly confusing and complex to the
+    developers and users, with very little to no potential benefits.  If you
+    need to "block" in an event (other than onNewConn), spawn a new thread.
   Created a new class, Error, that replaces the Connection::FailureType enum,
     and allows the user some shortcuts and a better way to get a textual
     description of the error.
@@ -13,8 +16,8 @@ GNE 0.002 to 0.003
     standard header file time.h.
   Implemented an internal debugging system that is started and configured on
     the user's demands.  The user can also use functions to write to this
-	conditionally generated log file.  Each message has a type/level number
-	assigned to it, so you can phase out certain messages.
+    conditionally generated log file.  Each message has a type/level number
+    assigned to it, so you can phase out certain messages.
   Fixed deadlock bug in event handlers.
   More work on error codes and error reporting.
   ConnectionEventGenerator now creates threads for onReceive events

@@ -23,14 +23,14 @@
 #include "PacketParser.h"
 #include "ConnectionEventGenerator.h"
 #include "ErrorGne.h"
+#include "SocketPair.h"
 #include "GNE.h"
 
 namespace GNE {
 
 //##ModelId=3B0753810073
 Connection::Connection(int outRate, int inRate)
-: rsocket(NL_INVALID), usocket(NL_INVALID), connected(false), 
-rlistener(NULL), ulistener(NULL) {
+: connected(false), rlistener(NULL), ulistener(NULL) {
 	ps = new PacketStream(outRate, inRate, *this);
 }
 
@@ -52,28 +52,12 @@ Connection::Stats Connection::getStats() const {
 
 //##ModelId=3B075381007B
 NLaddress Connection::getLocalAddress(bool reliable) const {
-  NLaddress ret;
-  if (reliable) {
-    assert(rsocket != NL_INVALID);
-    nlGetLocalAddr(rsocket, &ret);
-  } else {
-    assert(usocket != NL_INVALID);
-    nlGetLocalAddr(usocket, &ret);
-  }
-  return ret;
+  return sockets.getLocalAddress(reliable);
 }
 
 //##ModelId=3B075381007E
 NLaddress Connection::getRemoteAddress(bool reliable) const {
-  NLaddress ret;
-  if (reliable) {
-    assert(rsocket != NL_INVALID);
-    nlGetRemoteAddr(rsocket, &ret);
-  } else {
-    assert(usocket != NL_INVALID);
-    nlGetRemoteAddr(usocket, &ret);
-  }
-  return ret;
+  return sockets.getRemoteAddress(reliable);
 }
 
 //##ModelId=3B0753810081
@@ -92,17 +76,10 @@ void Connection::disconnect() {
 		//This is nessacary because we can't join on ps if it has already been
 		//  shutdown and/or never started
 		unreg(true, true);
-		gnedbgo2(2, "disconnecting r: %i, u: %i", rsocket, usocket);
+		gnedbgo2(2, "disconnecting r: %i, u: %i", sockets.r, sockets.u);
 		ps->shutDown();
 		ps->join();
-		if (rsocket != NL_INVALID) {
-			nlClose(rsocket);
-			rsocket = NL_INVALID;
-		}
-		if (usocket != NL_INVALID) {
-			nlClose(usocket);
-			rsocket = NL_INVALID;
-		}
+		sockets.disconnect();
 		connected = false;
 	}
 }
@@ -133,7 +110,7 @@ void Connection::onDoneWriting() {
 void Connection::onReceive(bool reliable) {
 	//Create buffer into a RawPacket
 	NLbyte* buf = new NLbyte[RawPacket::RAW_PACKET_LEN];
-	int temp = rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
+	int temp = sockets.rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
 	if (temp == NL_INVALID) {
 		if (nlGetError() == NL_MESSAGE_END) {
 			//in HawkNL 1.4b4 and later, this means that the connection was
@@ -191,58 +168,33 @@ void Connection::ConnectionListener::onReceive() {
 //##ModelId=3B6E14AC0104
 void Connection::reg(bool reliable, bool unreliable) {
 	if (reliable && rlistener == NULL) {
-		assert(rsocket != NL_INVALID);
+		assert(sockets.r != NL_INVALID);
 		rlistener = new ConnectionListener(*this, true);
-		eGen->reg(rsocket, rlistener);
-		gnedbgo1(3, "Registered reliable socket %i", rsocket);
+		eGen->reg(sockets.r, rlistener);
+		gnedbgo1(3, "Registered reliable socket %i", sockets.r);
 	}
 	if (unreliable && ulistener == NULL) {
-		assert(usocket != NL_INVALID);
+		assert(sockets.u != NL_INVALID);
 		ulistener = new ConnectionListener(*this, false);
-		eGen->reg(usocket, ulistener);
-		gnedbgo1(3, "Registered unreliable socket %i", usocket);
+		eGen->reg(sockets.u, ulistener);
+		gnedbgo1(3, "Registered unreliable socket %i", sockets.u);
 	}
 }
 
 //##ModelId=3B6E14AC01D6
 void Connection::unreg(bool reliable, bool unreliable) {
 	if (reliable && rlistener != NULL) {
-		eGen->unreg(rsocket);
+		eGen->unreg(sockets.r);
 		delete rlistener;
 		rlistener = NULL;
-		gnedbgo1(3, "Unregistered reliable socket %i", rsocket);
+		gnedbgo1(3, "Unregistered reliable socket %i", sockets.r);
 	}
 	if (unreliable && ulistener != NULL) {
-		eGen->unreg(usocket);
+		eGen->unreg(sockets.u);
 		delete ulistener;
 		ulistener = NULL;
-		gnedbgo1(3, "Unregistered unreliable socket %i", usocket);
+		gnedbgo1(3, "Unregistered unreliable socket %i", sockets.u);
 	}
 }
 
-//##ModelId=3B6B302400CA
-int Connection::rawRead(bool reliable, const NLbyte* buf, int bufSize) {
-  NLsocket act;
-  if (reliable)
-    act = rsocket;
-  else
-    act = usocket;
-	assert(act != NL_INVALID);
-  return int(nlRead(act, (NLvoid*)buf, (NLint)bufSize));
 }
-
-//##ModelId=3B6B302401D6
-int Connection::rawWrite(bool reliable, const NLbyte* buf, int bufSize) {
-  NLsocket act;
-  if (reliable)
-    act = rsocket;
-  else
-    act = usocket;
-	assert(act != NL_INVALID);
-	gnedbgo2(1, "First bytes are %i and %i", (int)buf[0], (int) buf[1]);
-  return int(nlWrite(act, (NLvoid*)buf, (NLint)bufSize));
-}
-
-}
-
-
