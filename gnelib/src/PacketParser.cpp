@@ -27,6 +27,7 @@
 #include "../include/gnelib/CustomPacket.h"
 #include "../include/gnelib/ExitPacket.h"
 #include "../include/gnelib/PingPacket.h"
+#include "../include/gnelib/RateAdjustPacket.h"
 
 namespace GNE {
 namespace PacketParser {
@@ -52,6 +53,7 @@ void registerGNEPackets() {
   packets[0] = Packet::create;
   packets[1] = CustomPacket::create;
   packets[2] = ExitPacket::create;
+  packets[3] = RateAdjustPacket::create;
   packets[4] = PingPacket::create;
 }
 

@@ -54,6 +54,8 @@ reqOutRate(reqOutRate2) {
   //Set the last calculation time:
   lastTime = Timer::getCurrentTime();
 
+  gnedbgo2(2, "PacketStream negotiated: max: %d requested: %d",
+    maxOutRate, reqOutRate);
   gnedbgo(5, "created");
 }
 
@@ -144,18 +146,23 @@ void PacketStream::writePacket(const Packet& packet, bool reliable) {
 }
 
 //##ModelId=3B07538101F7
-int PacketStream::getOutRate() const {
+int PacketStream::getCurrOutRate() const {
   return currOutRate;
+}
+
+//##ModelId=3C7AB4C501C1
+int PacketStream::getReqOutRate() const {
+  return reqOutRate;
+}
+
+//##ModelId=3C7AB4C501CB
+int PacketStream::getRemoteOutLimit() const {
+  return maxOutRate;
 }
 
 //##ModelId=3C783ACF0264
 void PacketStream::setRates(int reqOutRate2, int maxInRate2) {
-  //0 is reserved for "unlimited" in the future.  Negative values mean
-  //"leave unchanged."
-  assert(reqOutRate2 != 0);
-  assert(maxInRate2 != 0);
-
-  if (reqOutRate2 > 0) {
+  if (reqOutRate2 >= 0) {
     outQCtrl.acquire();
     reqOutRate = reqOutRate2;
     setupCurrRate();
@@ -163,7 +170,7 @@ void PacketStream::setRates(int reqOutRate2, int maxInRate2) {
   }
 
   //Now handle the inRate changes, sending a notice if needed.
-  if (maxInRate2 > 0) {
+  if (maxInRate2 >= 0) {
     RateAdjustPacket notice;
     notice.rate = maxInRate2;
     writePacket(notice, true);
@@ -270,9 +277,18 @@ void PacketStream::run() {
 
 //##ModelId=3B07538101FB
 void PacketStream::addIncomingPacket(Packet* packet) {
-  inQCtrl.acquire();
-  in.push(packet);
-  inQCtrl.release();
+  if (packet->getType() != RateAdjustPacket::ID) {
+    inQCtrl.acquire();
+    in.push(packet);
+    inQCtrl.release();
+  } else {
+    //We want to "intercept" RateAdjustPackets
+    outQCtrl.acquire();
+    maxOutRate = ((RateAdjustPacket*)packet)->rate;
+    gnedbgo1(2, "Received new outgoing rate limit of %d", maxOutRate);
+    setupCurrRate();
+    outQCtrl.release();
+  }
 }
 
 //##ModelId=3C7867230185
@@ -293,7 +309,8 @@ void PacketStream::prepareSend(std::queue<Packet*>& q, RawPacket& raw) {
 void PacketStream::setupCurrRate() {
   //Precalculate the current outgoing rate, keeping in mind that the value of
   //is the "largest" and means unlimited rate (or "unchecked").  Unlimited is
-  //OK only if they are both at 0.
+  //OK only if they are both at 0.  outQCtrl should be acquired when this
+  //function is running.
   if (reqOutRate == 0)
     currOutRate = maxOutRate;
   else if (maxOutRate == 0)
@@ -304,6 +321,8 @@ void PacketStream::setupCurrRate() {
   //Discover the rate stepping.
   outRateStep = currOutRate / TIME_STEPS_PER_SEC;
 
+  gnedbgo2(2, "  Negotiated current rate: %d, rate step: %d",
+    currOutRate, outRateStep);
 }
 
 //##ModelId=3C783ACF028C

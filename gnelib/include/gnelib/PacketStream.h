@@ -113,11 +113,36 @@ public:
   /**
    * Returns the actual outgoing data rate, which may be the same or less
    * that what was originally requested on connection.  This value is the
-   * minimum between the max requested rate from the remote computer, and our
-   * maximum outgoing rate.
+   * minimum between the max rate limit from the remote computer, and our
+   * maximum outgoing rate.  A value of 0 means there is no outgoing rate
+   * limit.
+   *
+   * If the requested rate changes, or if the remote computer changes its
+   * max allowed limit, this number will change to the new minimum between
+   * these rates.
    */
   //##ModelId=3B07538101F7
-  int getOutRate() const;
+  int getCurrOutRate() const;
+
+  /**
+   * Returns the maximum outgoing rate that we are requesting.  The value 0
+   * means that no rate limit was requested.
+   * @see getCurrOutRate
+   * @see setRates
+   */
+  //##ModelId=3C7AB4C501C1
+  int getReqOutRate() const;
+
+  /**
+   * Returns the maximum outgoing rate that the remote computer is allowing
+   * us to send to it.  This value can change if the remote machine changes
+   * its rates through the setRates function.  The value 0 means that no
+   * limit was requested.
+   * @see getCurrOutRate
+   * @see setRates
+   */
+  //##ModelId=3C7AB4C501CB
+  int getRemoteOutLimit() const;
 
   /**
    * Sets new values that we are willing to send or receive.  See the

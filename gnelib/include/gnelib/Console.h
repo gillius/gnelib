@@ -51,18 +51,22 @@ class ConsoleMutex;
    * Normally cout doesn't work after the console has been initalized.  Note
    * if you have redirected stdin or stdout then cout and cin will still work
    * -- just not if they are writing or reading to the screen/keyboard.  This
-   * is why I opted to create a separate stream from cout and cin.\n
+   * is why I opted to create a separate stream from cout and cin.
+   *
    * Also, gout is not "quite" thread safe.  There is no way to know when you
    * ended, plus the basic_ostream that uses the streambuf may not be thread
    * safe so, use acquire and release like a mutex if you will be using gout
    * from multiple threads.  These are not needed if using gout from a single
-   * threaded context:\n
+   * threaded context:
+   *
    * gout << acquire << "Hello World!" << x << y << endl << release;
    */
   extern std::ostream gout;
 
   /**
-   * Similar thing with gout.
+   * Similar thing with gout, but unlike gout, gin does not work in a
+   * multithreaded context.  You should use lgetString if you are doing
+   * output and input at the same time.
    * @see gout
    */
   extern std::istream gin;
