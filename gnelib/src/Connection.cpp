@@ -140,7 +140,7 @@ void Connection::onReceive(bool reliable) {
   NLbyte* buf = new NLbyte[RawPacket::RAW_PACKET_LEN];
   int temp = sockets.rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
   if (temp == NL_INVALID) {
-    NLint error = nlGetError();
+    NLenum error = nlGetError();
     if (error == NL_MESSAGE_END) {
       //in HawkNL 1.4b4 and later, this means that the connection was
       //closed on the network-level because the client disconnected or
@@ -166,7 +166,7 @@ void Connection::onReceive(bool reliable) {
     }
     delete[] buf;
 		
-		//Start the event
+    //Start the event
     if (errorCheck == false) {
       //These are level 4 since the explicit event log is generated in onFailure
       gnedbgo1(4, "Unknown packet encountered in a message that has %i bytes", temp);
