@@ -79,7 +79,7 @@ public:
   /**
    * Returns the current time from the system clock.
    *
-   * The time returned is an absolute time, usually relative to midnight,
+   * The time returned is an absolute time, relative to midnight,
    * Jan 1, 1970.
    */
   static Time getAbsoluteTime();
