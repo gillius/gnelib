@@ -20,10 +20,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ConnectionListener.h"
+#include "SmartPointers.h"
 
 namespace GNE {
 class PacketFeeder;
+class ConnectionListener;
 
 /**
  * @ingroup midlevel
@@ -52,7 +53,7 @@ public:
    * setting the listener property.  A non-NULL listener is always
    * needed by the time it comes active, so it is almost always specified.
    */
-  ConnectionParams( const ConnectionListener::sptr& Listener );
+  ConnectionParams( const SmartPtr<ConnectionListener>& Listener );
 
   /**
    * Returns true if any of the parameters are invalid or out of range.
@@ -68,12 +69,12 @@ public:
    * The ConnectionListener that will receive events from the Connection.
    * Valid value is any non-NULL pointer.
    */
-  void setListener( const ConnectionListener::sptr& Listener);
+  void setListener( const SmartPtr<ConnectionListener>& Listener);
 
   /**
    * Returns the value set by getListener.
    */
-  const ConnectionListener::sptr& getListener() const;
+  const SmartPtr<ConnectionListener>& getListener() const;
 
   /**
    * The PacketFeeder receives onLowPackets events which are entirely
@@ -81,12 +82,12 @@ public:
    * ConnectionListener.  The default is NULL, and any point is valid.
    * @see PacketStream::setFeeder
    */
-  void setFeeder(PacketFeeder* Feeder);
+  void setFeeder(const SmartPtr<PacketFeeder>& Feeder);
 
   /**
    * Returns the value set by setFeeder.
    */
-  PacketFeeder* getFeeder() const;
+  const SmartPtr<PacketFeeder>& getFeeder() const;
 
   /**
    * Sets the timeout of the PacketFeeder for this Connection.  Default is 0
@@ -191,9 +192,9 @@ public:
   bool getUnrel() const;
 
 private:
-  ConnectionListener::sptr listener;
+  SmartPtr<ConnectionListener> listener;
 
-  PacketFeeder* feeder;
+  SmartPtr<PacketFeeder> feeder;
 
   int feederTimeout;
 

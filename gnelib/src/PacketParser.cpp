@@ -21,6 +21,7 @@
 #include "../include/gnelib/PacketParser.h"
 #include "../include/gnelib/RawPacket.h"
 #include "../include/gnelib/Mutex.h"
+#include "../include/gnelib/Lock.h"
 
 //Packet type includes used for registration.
 #include "../include/gnelib/Packet.h"

@@ -19,16 +19,18 @@
 
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ConnectionParams.h"
+#include "../include/gnelib/PacketFeeder.h"
+#include "../include/gnelib/ConnectionListener.h"
 
 namespace GNE {
 
 ConnectionParams::ConnectionParams()
-: feeder(NULL), feederTimeout(0), feederThresh(0),
+: feederTimeout(0), feederThresh(0),
 timeout(0), outRate(0), inRate(0), localPort(0), unrel(false) {
 }
 
 ConnectionParams::ConnectionParams(const ConnectionListener::sptr& Listener)
-: listener(Listener), feeder(NULL), feederTimeout(0), feederThresh(0),
+: listener(Listener), feederTimeout(0), feederThresh(0),
 timeout(0), outRate(0), inRate(0), localPort(0), unrel(false) {
 }
 
@@ -46,11 +48,11 @@ const ConnectionListener::sptr& ConnectionParams::getListener() const {
   return listener;
 }
 
-void ConnectionParams::setFeeder(PacketFeeder* Feeder) {
+void ConnectionParams::setFeeder(const PacketFeeder::sptr& Feeder) {
   feeder = Feeder;
 }
 
-PacketFeeder* ConnectionParams::getFeeder() const {
+const PacketFeeder::sptr& ConnectionParams::getFeeder() const {
   return feeder;
 }
 

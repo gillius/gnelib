@@ -23,6 +23,7 @@
 #include "Mutex.h"
 #include "SmartPtr.h"
 #include "WeakPtr.h"
+
 #include <string>
 
 namespace GNE {

@@ -24,6 +24,7 @@
 #include "../include/gnelib/Timer.h"
 #include "../include/gnelib/Time.h"
 #include "../include/gnelib/GNE.h"
+#include "../include/gnelib/Lock.h"
 
 namespace GNE {
 
@@ -179,13 +180,28 @@ bool Thread::waitForAllThreads(int ms) {
 }
 
 void Thread::requestAllShutdown( ThreadType threadType ) {
-  LockMutex lock( mapSync );
+  //We need to make a copy, because when mapSync is locked, ALL mutexes are
+  //locked because of the debug code.  That and it's unhealthy to leave
+  //mapSync locked for long, and this is causing deadlocks due to code in
+  //shutdown...
 
-  ThreadMapIter iter = threads.begin();
-  for ( ; iter != threads.end(); ++iter ) {
-    if ( threadType == ALL || iter->second->type == threadType )
-      iter->second->shutDown();
+  //Thank GOD we have sptr's now!  Without them I don't think this would be
+  //possible because threads may die after we copy them out.
+  std::vector< sptr > threadsCopy;
+
+  {
+    LockMutex lock( mapSync );
+
+    ThreadMapIter iter = threads.begin();
+    for ( ; iter != threads.end(); ++iter ) {
+      if ( threadType == ALL || iter->second->type == threadType )
+        threadsCopy.push_back( iter->second );
+    }
   }
+
+  std::vector< sptr >::iterator iter = threadsCopy.begin();
+  for ( ; iter != threadsCopy.end(); ++iter )
+    (*iter)->shutDown();
 }
 
 std::string Thread::getName() const {

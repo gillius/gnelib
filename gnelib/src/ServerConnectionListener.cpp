@@ -27,6 +27,7 @@
 #include "../include/gnelib/GNE.h"
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/Errors.h"
+#include "../include/gnelib/Lock.h"
 
 namespace GNE {
 

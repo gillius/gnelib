@@ -362,6 +362,9 @@
 				RelativePath=".\include\gnelib\ListServerConnection.h">
 			</File>
 			<File
+				RelativePath="include\gnelib\Lock.h">
+			</File>
+			<File
 				RelativePath=".\include\gnelib\Mutex.h">
 			</File>
 			<File
@@ -423,6 +426,9 @@
 			</File>
 			<File
 				RelativePath=".\include\gnelib\ServerConnectionListener.h">
+			</File>
+			<File
+				RelativePath="include\gnelib\SmartPointers.h">
 			</File>
 			<File
 				RelativePath="include\gnelib\SmartPtr.h">

@@ -28,7 +28,7 @@ ConnectionListener::~ConnectionListener() {
 
 ConnectionListener::sptr ConnectionListener::getNullListener() {
   static ConnectionListener nullListener;
-  return sptr( &nullListener, null_deleter() );
+  return sptr( &nullListener, NullDeleter() );
 }
 
 void ConnectionListener::onConnect(SyncConnection& conn) {

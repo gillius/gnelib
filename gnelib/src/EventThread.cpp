@@ -26,6 +26,7 @@
 #include "../include/gnelib/Time.h"
 #include "../include/gnelib/Error.h"
 #include "../include/gnelib/ConditionVariable.h"
+#include "../include/gnelib/Lock.h"
 
 namespace GNE {
 

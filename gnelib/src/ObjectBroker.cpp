@@ -20,6 +20,7 @@
 #include "../include/gnelib/gneintern.h"
 #include "../include/gnelib/ObjectBroker.h"
 #include "../include/gnelib/NetworkObject.h"
+#include "../include/gnelib/Lock.h"
 
 namespace GNE {
 

@@ -1,5 +1,5 @@
-#ifndef _PACKETFEEDER_H_
-#define _PACKETFEEDER_H_
+#ifndef PACKETFEEDER_H_KOP131
+#define PACKETFEEDER_H_KOP131
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
  * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
@@ -20,8 +20,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "SmartPointers.h"
 
 namespace GNE {
+  class PacketStream;
 
 /**
  * @ingroup midlevel
@@ -39,10 +41,14 @@ namespace GNE {
  * allows the PacketStream to never run out of data and therefore take
  * advantage of optimizing the packet stream through packet combining.  Since
  * the callback takes place in the writing thread itself, it cannot be
- * writing therefor you can send out a batch of packets with a better
+ * writing therefore you can send out a batch of packets with a better
  * assurance they will be combined and optimized.
  */
 class PacketFeeder {
+public: //typedefs
+  typedef SmartPtr<PacketFeeder> sptr;
+  typedef WeakPtr<PacketFeeder> wptr;
+
 public:
   virtual ~PacketFeeder() {}
 
@@ -62,6 +68,6 @@ public:
   virtual void onLowPackets(PacketStream& ps) = 0;
 };
 
-}
+} //namespace GNE
 
 #endif

@@ -20,13 +20,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 #include "ConditionVariable.h"
 #include "Mutex.h"
 #include "Thread.h"
 #include "Time.h"
-#include "SmartPtr.h"
-#include "WeakPtr.h"
+#include "SmartPointers.h"
+
+#include <queue>
 
 namespace GNE {
 class Packet;
@@ -39,7 +39,8 @@ class PacketFeeder;
  *
  * This class resembles a packet stream through a connection.  This class
  * is maintained by the Connection class, and you shouldn't have to create
- * your own PacketStreams.
+ * your own PacketStreams.  You should always retrieve it through the
+ * Connection::stream method.
  *
  * NOTE: all functions in this class are thread safe, since this class uses
  *       its own mutexes internally.  Note that data in the class may change
@@ -61,11 +62,13 @@ public:
    * Passing a value 0 for a rate is interpreted as "unlimited" or
    * unrestricted rates.  Passing a value less than 0 is not allowed.
    *
-   * @param reqOutRate2 This is the out rate that we are requesting, or in
-   *                    other words, the maximum rate we are willing to send.
-   * @param maxOutRate2 The maximum rate the remote machine is letting us
-   *                    send.  The actual outgoing rate, therefore, is the
-   *                    minimum of the two outgoing rate values.
+   * By default no PacketFeeder is set.
+   *
+   * @param reqOutRate This is the out rate that we are requesting, or in
+   *                   other words, the maximum rate we are willing to send.
+   * @param maxOutRate The maximum rate the remote machine is letting us
+   *                   send.  The actual outgoing rate, therefore, is the
+   *                   minimum of the two outgoing rate values.
    */
   static sptr create(int reqOutRate, int maxOutRate, Connection& ourOwner);
 
@@ -86,7 +89,7 @@ public:
    * knowning when the queues are starting to fill up.
    *
    * @param reliable true for the outgoing reliable packet queue.<br>
-   *                 false for the incoming reliable packet queue.
+   *                 false for the outgoing unreliable packet queue.
    */
   int getOutLength(bool reliable) const;
 
@@ -104,17 +107,21 @@ public:
    *
    * The passed newFeeder may be NULL in which case onLowPackets events will
    * not be generated.
+   *
+   * After the connection has been disconnected, the reference to the feeder
+   * is dropped to prevent cycles.  After disconnection, this method no longer
+   * has any effect.
    */
-  void setFeeder(PacketFeeder* newFeeder);
+  void setFeeder(const SmartPtr<PacketFeeder>& newFeeder);
 
   /**
    * When the number of packets in this PacketStream falls below limit, at
    * least one onLowPackets event is generated.  If this value is 0, then the
    * event will only be generated when the queue empties entirely.
    *
-   * The conditions for an onLowPackets event will be reevaluated without
-   * regard to the timeout, and an onLowPacket event will be generated if the
-   * conditions are proper.
+   * The conditions for an onLowPackets event will be reevaluated when this
+   * method is called without regard to the timeout, and an onLowPackest event
+   * will be generated if the conditions are proper.
    */
   void setLowPacketThreshold(int limit);
 
@@ -133,7 +140,8 @@ public:
    * an external thread.  A value less than 0 is invalid.  There is no
    * guarantee made about how accurate the callback rate will actually be,
    * except that one will eventually happen with a non-zero timeout and that
-   * it will likely be called too soon rather than too late.
+   * it will likely be called too soon rather than too late, since some method
+   * invocations on PacketStream will trigger a premature timeout.
    */
   void setFeederTimeout(int ms);
 
@@ -323,7 +331,8 @@ private:
 
   //These 3 variables syncronized by outQCtrl, and must be since the writer
   //thread has to wait on conditions of the feeder.
-  PacketFeeder* feeder;
+  SmartPtr<PacketFeeder> feeder;
+  bool feederAllowed; //set false after thread dies so feeder is never set again.
   bool onLowPacketsEvent;
   int feederTimeout;
   int lowPacketsThreshold;
@@ -339,7 +348,6 @@ private:
    * non-const access to these objects, but they can still be called const
    * because the object's state is the same before and after the method.
    */
-  mutable Mutex feederLock;
   mutable Mutex inQCtrl;
 
   mutable ConditionVariable outQCtrl;

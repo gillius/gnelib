@@ -21,6 +21,7 @@
 #include "../include/gnelib/Timer.h"
 #include "../include/gnelib/Time.h"
 #include "../include/gnelib/Mutex.h"
+#include "../include/gnelib/Lock.h"
 #include "../include/gnelib/TimerCallback.h"
 
 namespace GNE {

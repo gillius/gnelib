@@ -20,11 +20,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
 #include "ConditionVariable.h"
 #include "Thread.h"
-#include "SmartPtr.h"
-#include "WeakPtr.h"
+#include "SmartPointers.h"
+
+#include <nl.h>
+#include <map>
 
 namespace GNE {
 class ReceiveEventListener;

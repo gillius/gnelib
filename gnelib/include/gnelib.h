@@ -47,6 +47,7 @@
 #include "gnelib/GNE.h"
 #include "gnelib/GNEDebug.h"
 #include "gnelib/ListServerConnection.h"
+#include "gnelib/Lock.h"
 #include "gnelib/Mutex.h"
 #include "gnelib/NetworkObject.h"
 #include "gnelib/ObjectBroker.h"

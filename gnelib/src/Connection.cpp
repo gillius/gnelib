@@ -32,6 +32,7 @@
 #include "../include/gnelib/Address.h"
 #include "../include/gnelib/GNE.h"
 #include "../include/gnelib/EventThread.h"
+#include "../include/gnelib/Lock.h"
 
 namespace GNE {
 

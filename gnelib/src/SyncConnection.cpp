@@ -29,6 +29,7 @@
 #include "../include/gnelib/ConnectionListener.h"
 #include "../include/gnelib/Packet.h"
 #include "../include/gnelib/RawPacket.h"
+#include "../include/gnelib/Lock.h"
 
 namespace GNE {
 

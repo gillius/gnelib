@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "gneintern.h"
+#include <boost/shared_ptr.hpp>
 
 namespace GNE {
 
@@ -48,12 +48,12 @@ namespace GNE {
  * when using the default deleter.
  *
  * Very simple example usage (see expointers example for more):
- * <code>
+ * <pre>
  * void func() {
  *   SmartPtr<MyObject> oPtr ( new MyObject() );
  *   oPtr->method();
  * } //oPtr will automatically destroy its object.
- * </code>
+ * </pre>
  *
  * The reason for not using boost::shared_ptr directly is because I wanted to
  * abstract the implementation of the pointer.  Right now it uses a passive
@@ -88,6 +88,7 @@ namespace GNE {
  * <li>dynamic_pointer_cast</li></ul>
  *
  * @see GNE::WeakPtr
+ * @see NullDeleter
  */
 template <class T>
 class SmartPtr : public boost::shared_ptr<T> {
@@ -134,7 +135,7 @@ template<class T, class U> SmartPtr<T> dynamic_pointer_cast(SmartPtr<U> const & 
  * Deleter that does nothing for the SmartPtr.  Useful for making SmartPtrs to
  * static variables.
  */
-class null_deleter {
+class NullDeleter {
 public:
   void operator() (void const *) const {
   }

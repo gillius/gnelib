@@ -131,6 +131,11 @@ class moveTo;
    * A manipulator for gout to lock the gout output.  This does not lock
    * other threads from writing with other Console class functions, only for
    * writing with gout.
+   *
+   * acquire is provided mostly for backwards compatibility, but it is not
+   * deprecated.  Creating a LockObject object is the prefered method as it
+   * is safer.
+   *
    * @see release
    * @see gout
    */
@@ -138,6 +143,11 @@ class moveTo;
 
   /**
    * A manipulator to release the gout output.
+   *
+   * release is provided mostly for backwards compatibility, but it is not
+   * deprecated.  Creating a LockObject object is the prefered method as it
+   * is safer.
+   *
    * @see acquire
    * @see gout
    */

@@ -26,6 +26,7 @@
 #include "../include/gnelib/NetworkObject.h"
 #include "../include/gnelib/Mutex.h"
 #include "../include/gnelib/Error.h"
+#include "../include/gnelib/Lock.h"
 
 namespace GNE {
 

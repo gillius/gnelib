@@ -23,9 +23,9 @@
  * class.
  */
 
-#include "../../include/gnelib.h"
+#include <gnelib.h>
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
 using namespace std;
 using namespace GNE;
@@ -43,14 +43,22 @@ void doLocalTest();
 //The PingTest class works on both the client and the server side.
 class PingTest : public ConnectionListener {
 public:
-  PingTest() : conn(NULL) {}
+  typedef SmartPtr<PingTest> sptr;
+  typedef WeakPtr<PingTest> wptr;
+
+protected:
+  PingTest() {}
+
+public:
+  static sptr create() {
+    return sptr( new PingTest() );
+  }
+
   ~PingTest() {}
 
   void onDisconnect() {
     //Get any packets that are left and shut down.
     receivePackets();
-    delete conn;
-    delete this;
   }
 
   void onConnect(SyncConnection& conn2) {
@@ -66,6 +74,7 @@ public:
   }
 
   void onTimeout() {
+    LockObject lock( gout );
     //The timeout is called when nothing has been received for our specified
     //timeout, or since the last onTimeout event.
     gout << "A connection is active and no message received or timeout in "
@@ -73,16 +82,21 @@ public:
   }
 
   void onFailure(const Error& error) {
+    LockObject lock( gout );
     gout << "Socket failure: " << error << endl;
     //No need to disconnect, this has already happened on a failure.
   }
 
   void onError(const Error& error) {
-    gout << "Socket error: " << error << endl;
+    {
+      LockObject lock( gout );
+      gout << "Socket error: " << error << endl;
+    }
     conn->disconnect();//For simplicity we treat even normal errors as fatal.
   }
 
   void onConnectFailure(const Error& error) {
+    LockObject lock( gout );
     gout << "Connection to server failed.   " << endl;
     gout << "  GNE reported error: " << error << endl;
   }
@@ -90,46 +104,64 @@ public:
   void receivePackets() {
     //We check for PingPackets.  Anything else we get is an error though.
     Packet* next = conn->stream().getNextPacket();
+
     while (next != NULL) {
+
       if (next->getType() == PingPacket::ID) {
         PingPacket* ping = (PingPacket*)next;
+
         if (ping->isRequest()) {
           ping->makeReply();
           conn->stream().writePacket(*ping, true);
+
         } else {
           PingInformation info = ((PingPacket*)next)->getPingInformation();
+          LockObject lock( gout );
           gout << "Ping response: round-trip: " << info.pingTime
             << ", clock offset: " << info.clockOffset << endl;
         }
+
       } else {
+        LockObject lock( gout );
         gout << "We got a packet type (" << next->getType() <<
           ") that we aren't expecting!" << endl;
       }
+
       delete next;
       next = conn->stream().getNextPacket();
     }
   }
 
 private:
-  Connection* conn;
+  Connection::sptr conn;
 };
 
 class OurListener : public ServerConnectionListener {
 public:
-  OurListener() 
-    : ServerConnectionListener() {
+  typedef SmartPtr<OurListener> sptr;
+  typedef WeakPtr<OurListener> wptr;
+
+protected:
+  OurListener() {
+  }
+
+public:
+  static sptr create() {
+    sptr ret( new OurListener() );
+    ret->setThisPointer( ret );
+    return ret;
   }
 
   virtual ~OurListener() {}
 
-  void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) {
+  void onListenFailure(const Error& error, const Address& from, const ConnectionListener::sptr& listener) {
+    LockObject lock( gout );
     gout << "Connection error: " << error;
     gout << "  Error received from " << from;
-    delete listener;
   }
 
   void getNewConnectionParams(ConnectionParams& params) {
-    params.setListener(new PingTest());
+    params.setListener( PingTest::create() );
     params.setTimeout(TIMEOUT);
   }
 
@@ -160,7 +192,7 @@ int main() {
 
   setGameInformation("GNE exping", 1);
 
-  if (initConsole(atexit)) {
+  if (initConsole()) {
     cout << "Unable to initialize GNE Console" << endl;
     exit(3);
   }
@@ -179,10 +211,12 @@ int main() {
     gout << "Reminder: ports <= 1024 on UNIX can only be used by the superuser." << endl;
     port = getPort("listen on");
     doServer(0, 0, port);
+
   } else if (type == 1) {
     setTitle("GNE Net Performance Tester -- Client");
     port = getPort("connect to");
     doClient(0, 0, port);
+
   } else {
     doLocalTest();
   }
@@ -195,16 +229,21 @@ void doServer(int outRate, int inRate, int port) {
   //Generate debugging logs to server.log if in debug mode.
   initDebug(DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL5, "server.log");
 #endif
-  OurListener server;
-  if (server.open(port))
+  OurListener::sptr server = OurListener::create();
+  if (server->open(port))
     errorExit("Cannot open server socket.");
-  if (server.listen())
+  if (server->listen())
     errorExit("Cannot listen on server socket.");
 
-  gout << "Server is listening on: " << server.getLocalAddress() << endl;
-  gout << "Press a key to shutdown server." << endl;
+  {
+    LockObject lock(gout);
+    gout << "Server is listening on: " << server->getLocalAddress() << endl;
+    gout << "Press a key to shutdown server." << endl;
+  }
   getch();
-  //When the server class is destructed, it will stop listening and shutdown.
+  
+  //optional operation -- server will also shutdown when GNE is shutdown
+  server->close();
 }
 
 void doClient(int outRate, int inRate, int port) {
@@ -220,14 +259,13 @@ void doClient(int outRate, int inRate, int port) {
   if (!address)
     errorExit("Invalid address.");
   gout << "Connecting to: " << address << endl;
-  gout << "Press a key to stop the testing. " << endl;
 
   //We allocate it on the heap because PingTest deletes this connection.
-  ConnectionParams params(new PingTest());
+  ConnectionParams params( PingTest::create() );
   params.setOutRate(outRate);
   params.setInRate(inRate);
   params.setTimeout(TIMEOUT);
-  ClientConnection* client = new ClientConnection();
+  ClientConnection::sptr client = ClientConnection::create();
   if (client->open(address, params))
     errorExit("Cannot open client socket.");
 
@@ -235,9 +273,13 @@ void doClient(int outRate, int inRate, int port) {
   client->join();
 
   if (client->isConnected()) {
+    gout << "Press a key to stop the testing. " << endl;
     gout << "Press s to send a ping, u to send a ping over unreliable, and q to quit." << endl;
+
     int ch = 0;
-    while (ch != (int)'q') {
+    while (client->isConnected() && ch != (int)'q') {
+      //while we block on getch we can't look for disconnects until a key is
+      //pressed.  If we cared we could sleep-spin using kbhit...
       ch = getch();
       if (ch == (int)'s') {
         PingPacket req;
@@ -247,6 +289,12 @@ void doClient(int outRate, int inRate, int port) {
         client->stream().writePacket(req, false);
       }
     }
+
+    if ( !client->isConnected() ) {
+      gout << "Server dropped us . . . Exiting." << endl;
+      Thread::sleep( 1000 );
+    }
+
   } else {
     gout << "An error occured while connecting.  Press a key." << endl;
     getch();

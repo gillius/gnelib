@@ -29,6 +29,7 @@
 #include "../include/gnelib/Time.h"
 #include "../include/gnelib/Timer.h"
 #include "../include/gnelib/Errors.h"
+#include "../include/gnelib/Lock.h"
 
 const int BUF_LEN = 1024;
 
@@ -40,11 +41,12 @@ const int TIME_STEPS_PER_SEC = 1000000 / TIME_STEP;
 
 namespace GNE {
 
-PacketStream::PacketStream(int reqOutRate2, int maxOutRate2, Connection& ourOwner)
-: Thread("PktStrm", Thread::HIGH_PRI), owner(ourOwner), maxOutRate(maxOutRate2),
-reqOutRate(reqOutRate2), feeder(NULL), feederTimeout(0), lowPacketsThreshold(0) {
-  assert(reqOutRate2 >= 0);
-  assert(maxOutRate2 >= 0);
+PacketStream::PacketStream(int reqOutRate, int maxOutRate, Connection& ourOwner)
+: Thread("PktStrm", Thread::HIGH_PRI), owner(ourOwner), maxOutRate(maxOutRate),
+reqOutRate(reqOutRate), feederAllowed(true), feederTimeout(0),
+lowPacketsThreshold(0) {
+  assert(reqOutRate >= 0);
+  assert(maxOutRate >= 0);
 
   setType( CONNECTION );
 
@@ -95,31 +97,24 @@ PacketStream::~PacketStream() {
 }
 
 int PacketStream::getInLength() const {
-  int ret;
-  inQCtrl.acquire();
-  ret = in.size();
-  inQCtrl.release();
-  return ret;
+  LockMutex lock( inQCtrl );
+  return in.size();
 }
 
 int PacketStream::getOutLength(bool reliable) const {
-  int ret;
-  outQCtrl.acquire();
-
-  ret = reliable ? outRel.size() : outUnrel.size();
-
-  outQCtrl.release();
-  return ret;
+  LockCV lock( outQCtrl );
+  return reliable ? outRel.size() : outUnrel.size();
 }
 
-void PacketStream::setFeeder(PacketFeeder* newFeeder) {
-  outQCtrl.acquire();
-  feeder = newFeeder;
-
-  //The broadcasts in this function and the next few are to wake up the
-  //thread so it will reevaluate if it will generate an onLowPackets event.
-  outQCtrl.broadcast();
-  outQCtrl.release();
+void PacketStream::setFeeder(const PacketFeeder::sptr& newFeeder) {
+  LockCV lock( outQCtrl );
+  if ( feederAllowed ) {
+    feeder = newFeeder;
+  
+    //The broadcasts in this function and the next few are to wake up the
+    //thread so it will reevaluate if it will generate an onLowPackets event.
+    outQCtrl.broadcast();
+  }
 }
 
 void PacketStream::setLowPacketThreshold(int limit) {
@@ -325,6 +320,11 @@ void PacketStream::run() {
   } else {
     gnedbgo1(4, "ExitPacket not sent (%d).", ret);
   }
+
+  //Now that we have finished, release the PacketFeeder.
+  LockCV lock( outQCtrl );
+  feeder.reset();
+  feederAllowed = false;
 }
 
 void PacketStream::addIncomingPacket(Packet* packet) {

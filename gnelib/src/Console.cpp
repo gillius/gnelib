@@ -22,6 +22,8 @@
 #include "../include/gnelib/ConsoleStreambuf.h"
 #include "../include/gnelib/ConsoleStream.h"
 #include "../include/gnelib/Mutex.h"
+#include "../include/gnelib/Lock.h"
+
 #ifndef OLD_CPP
 #include <ostream>
 #include <istream>
