@@ -13,14 +13,7 @@ AR                   = ar
 
 EXAMPLE_LIBS         = $(LIB_STATIC) -lNL
 
-LDFLAGS              = -mthreads
-
-ifdef DEBUGMODE
-LIB_STATIC_NAME      = libgned.a
-else
-LDFLAGS             += -s
-LIB_STATIC_NAME      = libgne.a
-endif
+LDFLAGS             += -mthreads
 
 LIB_STATIC           = lib/mingw/$(LIB_STATIC_NAME)
 
@@ -28,6 +21,6 @@ EXE_MASK             = examples/%.exe
 
 EXAMPLE_EXE          = $(addprefix examples/,$(notdir $(EXAMPLE_O:.o=.exe)))
 
-LIBDIR               = $(MINGDIR)/lib/
+LIBDIR               = $(MINGDIR)\lib\\
 
-INCDIR               = $(MINGDIR)/include/
+INCDIR               = $(MINGDIR)\include\\

@@ -10,9 +10,24 @@ OPTIMIZEFLAGS        = $(COMMONFLAGS) -O3 -s
 ifdef DEBUGMODE
 CPPFLAGS             = $(DEBUGFLAGS)
 CFLAGS               = $(DEBUGFLAGS)
+LIB_STATIC_NAME      = libgned.a
 else
+LDFLAGS             += -s
+LIB_STATIC_NAME      = libgne.a
 CPPFLAGS             = $(OPTIMIZEFLAGS)
 CFLAGS               = $(OPTIMIZEFLAGS)
+endif
+
+ifdef BOOST_INCLUDE_PATH
+CPPFLAGS            += -I$(BOOST_INCLUDE_PATH)
+endif
+
+ifdef HAWKNL_INCLUDE_PATH
+CPPFLAGS            += -I$(HAWKNL_INCLUDE_PATH)
+endif
+
+ifdef HAWKNL_LIBRARY_PATH
+LDFLAGS             = -L$(HAWKNL_LIBRARY_PATH)
 endif
 
 ifdef OLD_CPP

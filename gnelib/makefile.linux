@@ -19,7 +19,6 @@ EXAMPLES_DIR         = examples/bin
 
 EXAMPLE_EXE          = $(addprefix examples/bin/,$(notdir $(basename $(EXAMPLE_O))))
 
-LIB_STATIC_NAME      = libgnelib.a
 LIB_STATIC           = lib/linux/$(LIB_STATIC_NAME)
 
 LIBDIR               = /usr/local/lib/

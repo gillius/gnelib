@@ -6,6 +6,7 @@ all: makefile.os lib examples
 makefile.os:
 	@echo Run one of the fix* scripts to set up the makefile to your OS.
 
+include LibPaths.mak
 include makefile.os
 
 lib: $(LIB_STATIC)
@@ -51,3 +52,5 @@ install: $(LIB_STATIC)
 uninstall:
 	$(RM) $(LIBDIR)$(LIB_STATIC_NAME)
 	$(RM) $(INCDIR)gnelib.h
+	$(RM) $(INCDIR)gnelib/*
+	$(RMDIR) $(INCDIR)gnelib
