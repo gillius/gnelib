@@ -1,4 +1,6 @@
 GNE 0.002 to 0.003
+  Implemented code in Connection to parse packets and use PacketStream
+  Implemented the PacketStream class
   Added PacketParser namespace with packet parsing functions, which will be
     used internally by GNE, but the user could use them too (but won't need to).
   New example exrawtest.
