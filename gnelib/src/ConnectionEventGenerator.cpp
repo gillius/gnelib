@@ -28,7 +28,7 @@ namespace GNE {
 
 //##ModelId=3B07538100B9
 ConnectionEventGenerator::ConnectionEventGenerator() 
-: Thread("EventGen"), group(NL_INVALID) {
+: Thread("EventGen", Thread::HIGH_PRI), group(NL_INVALID) {
   group = nlGroupCreate();
   assert(group != NL_INVALID);
   sockBuf = new NLsocket[NL_MAX_GROUP_SOCKETS];

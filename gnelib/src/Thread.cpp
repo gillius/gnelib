@@ -33,8 +33,11 @@ std::map<Thread::ID, Thread*> Thread::threads;
 Mutex Thread::mapSync;
 //##ModelId=3B0753810334
 const int Thread::DEF_PRI = 0;
+const int Thread::LOW_PRI = -1;
+const int Thread::LOWER_PRI = -2;
 //##ModelId=3B0753810335
 const int Thread::HIGH_PRI = 1;
+const int Thread::HIGHER_PRI = 2;
 //##ModelId=3AE1F1CA00DC
 const std::string Thread::DEF_NAME = "Thread";
 
@@ -198,6 +201,21 @@ void Thread::start() {
 #ifdef WIN32
   hThread = (HANDLE)_beginthreadex( NULL, 0, &threadStart, (void*)this, 0,
                                     reinterpret_cast<unsigned*>(&thread_id) );
+  //Set the thread priority
+  switch (priority) {
+    case LOWER_PRI:
+      SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
+      break;
+    case LOW_PRI:
+      SetThreadPriority(hThread, THREAD_PRIORITY_BELOW_NORMAL);
+      break;
+    case HIGH_PRI:
+      SetThreadPriority(hThread, THREAD_PRIORITY_ABOVE_NORMAL);
+      break;
+    case HIGHER_PRI:
+      SetThreadPriority(hThread, THREAD_PRIORITY_HIGHEST);
+      break;
+  };
 #else
   pthread_create( &thread_id, NULL, Thread::threadStart, this );
 #endif

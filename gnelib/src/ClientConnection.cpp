@@ -52,7 +52,7 @@ public:
 
 //##ModelId=3B075380037F
 ClientConnection::ClientConnection(ConnectionListener* listener)
-  : Connection(listener), Thread("CliConn"), params(NULL) {
+: Connection(listener), Thread("CliConn", Thread::HIGH_PRI), params(NULL) {
   gnedbgo(5, "created");
 }
 

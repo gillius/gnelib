@@ -27,7 +27,8 @@ namespace GNE {
 
 //##ModelId=3B0753820030
 Timer::Timer(TimerCallback* callback, int rate, bool destroy)
-: callbackRate(rate*1000), listener(callback), destroyListener(destroy) {
+: Thread("Timer", Thread::HIGHER_PRI), callbackRate(rate*1000),
+  listener(callback), destroyListener(destroy) {
 }
 
 //##ModelId=3B0753820034

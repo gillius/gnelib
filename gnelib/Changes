@@ -1,4 +1,5 @@
 GNE 0.49 to current
+  Implemented thread priorities for Win32.
   Ported the threading implementation from pthreads-win32 to use native win32
     threads.  That in conjuction with HawkNL's NL_WIN_THREADS option means
     pthreads-win32 is NO LONGER needed for GNE!

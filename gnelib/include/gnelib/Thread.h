@@ -187,12 +187,30 @@ public:
   static const std::string DEF_NAME;
 
   /**
+   * A lowered priority for a thread.  Might be good for background
+   * operations like loading and saving files or something so it does not
+   * interfer with the user interface (be it a GUI or a game or whatever).
+   */
+  static const int LOW_PRI;
+
+  /**
+   * A lower priority for a thread than LOW_PRI.
+   */
+  static const int LOWER_PRI;
+
+  /**
    * A "boosted priority" for a thread.  This is optimized to give some extra
    * priority for the network threads to reduce network latency in favor of a
    * little in-game fps.
    */
   //##ModelId=3B0753810335
   static const int HIGH_PRI;
+
+  /**
+   * Even higher priority thread than HIGH_PRI.  Used typically for the timer
+   * threads.
+   */
+  static const int HIGHER_PRI;
 
 protected:
   /**
