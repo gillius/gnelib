@@ -12,8 +12,8 @@ RMDIR                = rm -rf
 
 EXAMPLE_LIBS         = $(LIB_STATIC) -lNL -lcurses -lpthread -lsocket -lnsl -lrt
 
-DEBUGFLAGS           = -g -D_DEBUG -Wall
-OPTIMIZEFLAGS        = -Wall -O3 -s
+DEBUGFLAGS           = -g -D_REENTRANT -D_DEBUG -Wall
+OPTIMIZEFLAGS        = -Wall -D_REENTRANT -O3 -s
 
 ifdef DEBUGMODE
 CPPFLAGS             = $(DEBUGFLAGS)
