@@ -29,10 +29,10 @@ namespace GNE {
  * A class resembling a thread.
  * Derive your own classes from this class that implement the run function.
  * Execution begins in the run method.  All methods of this class are thread-
- * safe, excluding run(), which should never be called directly by the user.
+ * safe.\n
  * This class is a wrapper for pthreads, so please read man pages or other
  * documentation for the equivalent pthreads functions if you need to
- * understand the specifics on the semantics of these functions.
+ * understand the specifics on the semantics of these functions.\n
  * NOTE: All threads must either be detached or joined.  If you choose to
  * detach a thread you may not access that Thread object again.  If you need
  * to access it at a later time, keep a pointer, then at a later time call
@@ -74,7 +74,7 @@ public:
   std::string getName() const;
 
   /**
-   * Tells this thread to shutdown, if it in an infinite loop.  You will
+   * Tells this thread to shutdown, if it is in an infinite loop.  You will
    * probably want to call join right after calling this to wait for the
    * shutdown to complete which is dependant on the thread you are shutting
    * down.\n
@@ -82,7 +82,9 @@ public:
    * notify itself to shutdown, for example if it is waiting for some event on
    * a ConditionVariable.\n
 	 * You will want to call this function from the override to make sure that
-	 * shutdown is set to true.
+	 * shutdown is set to true.\n
+   * This function is safe to call multiple times, but you cannot undo a
+   * shutdown once it call this once.
    */
   //##ModelId=3B0C5919012C
   virtual void shutDown();
