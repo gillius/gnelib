@@ -231,8 +231,11 @@ int main() {
   }
   enableStats();     //By default, stats are disabled.  This turns stat
                      //collection on.
-  setUserVersion(1); //Sets our user protocol version number, used in
-                     //the connection process by GNE to version check.
+
+  //Set our user version and "game" name both of which are used during the
+  //connection process to verify our identity.
+  setGameInformation("Net Perf Example", 1);
+
   if (initConsole(atexit)) {
     cout << "Unable to initialize GNE Console" << endl;
     exit(3);

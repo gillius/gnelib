@@ -194,11 +194,9 @@ void ClientConnection::doHandshake() throw (Error) {
 
 //##ModelId=3C5CED05016E
 void ClientConnection::sendCRP() throw (Error) {
-  GNEProtocolVersionNumber ver = GNE::getGNEProtocolVersion();
-
   RawPacket crp;
-  crp << ver.version << ver.subVersion << ver.build;
-  crp << GNE::getUserVersion();
+  addHeader(crp);
+  addVersions(crp);
   crp << (guint32)params->inRate;
   crp << ((params->unrel) ? gTrue : gFalse);
 
@@ -208,45 +206,36 @@ void ClientConnection::sendCRP() throw (Error) {
     throw Error::createLowLevelError(Error::Write);
 }
 
-const int REFLEN = sizeof(gbool) + sizeof(guint8) + sizeof(guint8) +
-                   sizeof(guint16) + sizeof(guint32);
-
-const int CAPLEN = sizeof(gbool) + sizeof(guint32);
+const int MINLEN = 8;
+const int REFLEN = 44;
+const int CAPLEN = 12;
 
 //##ModelId=3C5CED05016F
 Address ClientConnection::getCAP() throw (Error) {
-  gbyte* capBuf = new gbyte[RawPacket::RAW_PACKET_LEN];
-  int check = sockets.rawRead(true, capBuf, RawPacket::RAW_PACKET_LEN);
-  if (check == NL_INVALID) {
-    delete[] capBuf;
+  gbyte capBuf[64];
+  int check = sockets.rawRead(true, capBuf, 64);
+  if (check == NL_INVALID)
     throw Error::createLowLevelError(Error::Read);
-  }
 
   //The packet must be at least as large to check if it is a CAP or a
   //refusal packet.
-  if (check < (int)sizeof(gbool)) {
-    delete[] capBuf;
+  if (check < MINLEN) {
     gnedbgo1(1, "Response to CRP is too small (size is %d).", check);
     throw Error(Error::ProtocolViolation);
   }
 
   //Now parse the CAP (or refusal packet)
   RawPacket cap(capBuf);
+  checkHeader(cap);
+
   gbool isCAP;
   cap >> isCAP;
 
   if (isCAP) {
     //Check to make sure packet sizes match.
-    //The size should be CAPLEN if we are not expecting the unreliable info.
-    //but if we are expecting it we'll get another guint16.
-    int expecting = CAPLEN;
-    if (params->unrel)
-      expecting += (int)sizeof(guint16);
-
-    if (check != expecting){
-      delete[] capBuf;
+    if (check != CAPLEN){
       gnedbgo2(1, "Expected a CAP of size %d but got %d bytes instead.",
-        expecting, check);
+        CAPLEN, check);
       throw Error(Error::ProtocolViolation);
     }
 
@@ -257,45 +246,41 @@ Address ClientConnection::getCAP() throw (Error) {
     //Now we have enough info to create our PacketStream.
     ps = new PacketStream(params->outRate, maxOutRate, *this);
 
+    //Get the unreliable connection information.  A port of less than 0 means
+    //we didn't request an unreliable conn, or it we refused to us.
+    gint32 portNum;
+    cap >> portNum;
     Address ret = params->dest;
-    if (params->unrel) {
-      //Get the unreliable connection information
-      guint16 portNum;
-      cap >> portNum;
-      ret.setPort((int)portNum);
-    }
-    //else the result of the returned Address is undefined.
 
-    delete[] capBuf;
+    if (portNum > 65535) {
+      gnedbgo1(1, "Invalid port number %d given.", portNum);
+      throw Error(Error::ProtocolViolation);
+
+    } else if (portNum > 0) {
+      ret.setPort((int)portNum);
+
+    } else {
+      params->unrel = false;
+    }
+
     return ret;
   }
+
   //else we got a refusal packet
   if (check != REFLEN) {
-    delete[] capBuf;
     gnedbgo2(1, "Expected a refusal of size %d but got %d bytes instead.",
       REFLEN, check);
     throw Error(Error::ProtocolViolation);
   }
 
-  //Get the version numbers
-  GNEProtocolVersionNumber them;
-  cap >> them.version >> them.subVersion >> them.build;
-
-  guint32 themUser;
-  cap >> themUser;
-
-  //We are done with the CAP packet
-  delete[] capBuf;
-
-  //Check the GNE version numbers.  This will throw the right exception if
-  //the versions do not match.
-  GNE::checkVersions(them, themUser);
+  //We got a refusal packet, so let's check the versions.
+  checkVersions(cap);
 
   //If the version numbers are all the same our connection was simply
   //just refused.
   throw Error(Error::ConnectionRefused);
 
-  //We should never reach this point.
+  //We should never reach this point
   assert(false);
   return Address();
 }
@@ -308,22 +293,22 @@ void ClientConnection::setupUnreliable(const Address& dest) throw (Error) {
     throw Error::createLowLevelError(Error::CouldNotOpenSocket);
   NLaddress temp = dest.getAddress();
   nlSetRemoteAddr(sockets.u, &temp);
+  assert( sockets.getLocalAddress(false) );
 
   //Now send back our local info, and send a dummy packet out first to open
   //up any possible firewalls or gateways.
   int check = 0;
 
-  guint16 ourPort = (guint16)sockets.getLocalAddress(false).getPort();
   RawPacket resp;
-  resp << ourPort;
+  resp << sockets.getLocalAddress(false).getPort();
   check = sockets.rawWrite(true, resp.getData(), resp.getPosition());
-  if (check != resp.getPosition())
+  if (check != resp.getPosition() || check != sizeof(gint32))
     throw Error::createLowLevelError(Error::Write);
 
   resp.reset();
   resp << PacketParser::END_OF_PACKET;
   check = sockets.rawWrite(false, resp.getData(), resp.getPosition());
-  if (check != resp.getPosition())
+  if (check != resp.getPosition() || check != sizeof(PacketParser::END_OF_PACKET))
     throw Error::createLowLevelError(Error::Write);
 }
 

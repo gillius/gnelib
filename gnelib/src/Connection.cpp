@@ -133,6 +133,55 @@ void Connection::disconnectSendAll(int waitTime) {
   }
 }
 
+//##ModelId=3C82ADDA0093
+void Connection::addHeader(RawPacket& raw) {
+  raw << (gbyte)'G' << (gbyte)'N' << (gbyte)'E';
+}
+
+//##ModelId=3C82ADDA00A7
+void Connection::addVersions(RawPacket& raw) {
+  GNEProtocolVersionNumber us = GNE::getGNEProtocolVersion();
+  //Write the GNE version numbers.
+  raw << us.version << us.subVersion << us.build;
+
+  //Write the whole game name buffer
+  raw.writeRaw((const gbyte*)GNE::getGameName(), GNE::MAX_GAME_NAME_LEN + 1);
+
+  //Write the user version
+  raw << GNE::getUserVersion();
+}
+
+//##ModelId=3C82ABA50326
+void Connection::checkHeader(RawPacket& raw) throw (Error) {
+  gbyte headerG, headerN, headerE;
+  raw >> headerG >> headerN >> headerE;
+
+  if (headerG != 'G' || headerN != 'N' || headerE != 'E')
+    throw Error(Error::ProtocolViolation);
+}
+
+//##ModelId=3C82ABA5036C
+void Connection::checkVersions(RawPacket& raw) throw (Error) {
+  //Get the version numbers
+  GNEProtocolVersionNumber them;
+  raw >> them.version >> them.subVersion >> them.build;
+
+  //Read the game name
+  gbyte rawName[GNE::MAX_GAME_NAME_LEN + 1];
+  raw.readRaw(rawName, GNE::MAX_GAME_NAME_LEN + 1);
+  //And convert it to a string, making sure it is of the proper length and
+  //NULL-terminated.
+  char gameName[GNE::MAX_GAME_NAME_LEN + 1];
+  strncpy(gameName, (const char*)rawName, GNE::MAX_GAME_NAME_LEN);
+
+  //Read the user version number
+  guint32 themUser;
+  raw >> themUser;
+
+  //This will throw an Error of the versions are wrong.
+  GNE::checkVersions(them, gameName, themUser);
+}
+
 //##ModelId=3B07538100AC
 void Connection::onReceive() {
   eventListener->onReceive();

@@ -42,6 +42,7 @@ public:
     ProtocolViolation,
     GNETheirVersionLow,
     GNETheirVersionHigh,
+    WrongGame,
     UserVersionMismatch,
     CouldNotOpenSocket,
     ConnectionTimeOut,

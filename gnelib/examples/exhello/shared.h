@@ -109,8 +109,12 @@ void doMain(const char* connType) {
   if (initGNE(NL_IP, atexit)) {
     exit(1);
   }
-  setUserVersion(1); //sets our user protocol version number, used in
-                     //the connection process by GNE to version check.
+
+  //sets our game info, used in the connection process by GNE to error check.
+  //We give exhello and exsynchello the same name because they are compatable
+  //with each other.
+  setGameInformation("hello examples", 1);
+
   initConsole(atexit);
   setTitle("GNE Basic Connections Example");
   registerPacket(MIN_USER_ID, HelloPacket::create);

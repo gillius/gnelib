@@ -176,15 +176,13 @@ void ServerConnection::doHandshake() throw (Error) {
   }
 }
 
-const int CRPLEN = sizeof(guint8) + sizeof(guint8) + sizeof(guint16) +
-                   sizeof(guint32) + sizeof(guint32) + sizeof(gbool);
+const int CRPLEN = 48;
 
 //##ModelId=3C5CED0502CD
 void ServerConnection::getCRP() throw (Error) {
-  gbyte* crpBuf = new gbyte[RawPacket::RAW_PACKET_LEN];
-  int check = sockets.rawRead(true, crpBuf, RawPacket::RAW_PACKET_LEN);
+  gbyte crpBuf[64];
+  int check = sockets.rawRead(true, crpBuf, 64);
   if (check != CRPLEN) {
-    delete[] crpBuf;
     if (check == NL_INVALID) {
       gnedbgo(1, "nlRead error when trying to get CRP.");
       throw Error::createLowLevelError(Error::Read);
@@ -198,12 +196,10 @@ void ServerConnection::getCRP() throw (Error) {
   //Now parse the CRP
   RawPacket crp(crpBuf);
 
-  //Get the version numbers
-  GNEProtocolVersionNumber them;
-  crp >> them.version >> them.subVersion >> them.build;
-
-  guint32 themUser;
-  crp >> themUser;
+  //Check the header and versions.  These will throw exceptions if there is
+  //a problem.
+  checkHeader(crp);
+  checkVersions(crp);
 
   guint32 maxOutRate;
   crp >> maxOutRate;
@@ -212,39 +208,38 @@ void ServerConnection::getCRP() throw (Error) {
   crp >> unreliable;
   params->unrel = (unreliable != 0);
 
-  //We are done with the CRP packet
-  delete[] crpBuf;
-
-  //This will throw an Error of the versions are wrong.
-  GNE::checkVersions(them, themUser);
-
   //Now that we know the versions are OK, make the PacketStream
   ps = new PacketStream(params->outRate, maxOutRate, *this);
 }
 
 //##ModelId=3C5CED0502CE
 void ServerConnection::sendRefusal() {
-  GNEProtocolVersionNumber us = GNE::getGNEProtocolVersion();
   RawPacket ref;
+  addHeader(ref);
   ref << gFalse;
-  ref << us.version << us.subVersion << us.build;
-  ref << GNE::getUserVersion();
+  addVersions(ref);
 
-  sockets.rawWrite(true, ref.getData(), (NLint)ref.getPosition());
+  int check = sockets.rawWrite(true, ref.getData(), (NLint)ref.getPosition());
   //We don't check for error because if there we don't really care since we
-  //are refusing the connection and there is nothing else we can do.
+  //are refusing the connection there is nothing else we can do, but we will
+  //do it just for the logs.
+  if (check != ref.getPosition()) {
+    gnedbgo1(1, "Writing the refusal packet failed, got a return of %d",
+      check);
+  }
 }
 
 //##ModelId=3C5CED0502D7
 void ServerConnection::sendCAP() throw (Error) {
   RawPacket cap;
+  addHeader(cap);
   cap << gTrue;
   cap << params->inRate;
   if (params->unrel) {
     //If the client requested it, open an unreliable port and send the port
     //number to the client.
     sockets.u = nlOpen(0, NL_UNRELIABLE);
-    cap << (guint16)(sockets.getLocalAddress(false).getPort());
+    cap << sockets.getLocalAddress(false).getPort();
   }
 
   int check = sockets.rawWrite(true, cap.getData(), (NLint)cap.getPosition());
@@ -256,9 +251,9 @@ void ServerConnection::sendCAP() throw (Error) {
 
 //##ModelId=3C5CED0502D8
 void ServerConnection::getUnreliableInfo() throw (Error) {
-  gbyte* buf = new gbyte[RawPacket::RAW_PACKET_LEN];
-  int check = sockets.rawRead(true, buf, RawPacket::RAW_PACKET_LEN);
-  if (check != sizeof(guint16)) {
+  gbyte* buf = new gbyte[64];
+  int check = sockets.rawRead(true, buf, 64);
+  if (check != sizeof(gint32)) {
     delete[] buf;
     if (check == NL_INVALID) {
       gnedbgo(1, "nlRead error when trying to get unreliable info.");
@@ -271,8 +266,12 @@ void ServerConnection::getUnreliableInfo() throw (Error) {
   }
 
   RawPacket raw(buf);
-  guint16 portNum;
+  gint32 portNum;
   raw >> portNum;
+  if (portNum < 0 || portNum > 65535) {
+    gnedbgo1(1, "Protocol violation: invalid port %d received", portNum);
+    throw Error(Error::ProtocolViolation);
+  }
 
   Address uDest = sockets.getRemoteAddress(true);
   uDest.setPort((int)portNum);

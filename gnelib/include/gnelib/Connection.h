@@ -169,6 +169,46 @@ public:
 protected:
   EventThread* eventListener;
 
+  /**
+   * A utility function for ServerConnection and ClientConnection to add the
+   * standard header onto the connection packets.
+   */
+  //##ModelId=3C82ADDA0093
+  void addHeader(RawPacket& raw);
+
+  /**
+   * A utility function for ServerConnection and ClientConnection to add the
+   * version information to a packet.
+   */
+  //##ModelId=3C82ADDA00A7
+  void addVersions(RawPacket& raw);
+
+  /**
+   * A utility function for ServerConnection and ClientConnection to check to
+   * verify the %GNE header of the connecting packets.  The RawPacket is read
+   * from so this function will move the reading position to the next element
+   * after the header.  If it throws an exception, the read position is
+   * undefined.
+   *
+   * @throw ProtocolViolation if the next bytes of the RawPacket is not the
+   *                          proper %GNE header.
+   */
+  //##ModelId=3C82ABA50326
+  void checkHeader(RawPacket& raw) throw (Error);
+
+  /**
+   * A utility function for ServerConnection and ClientConnection to check
+   * the GNE version, game name, and user versions in the RawPacket.  This
+   * function behaves similarly to checkHeader.
+   *
+   * @throw Error with a code of Error::GNETheirVersionHigh or
+   *   Error::GNETheirVersionLow if the GNE protocol versions do not match.
+   * @throw WrongGame if the game names don't match.
+   * @throw UserVersionMismatch if the user version numbers don't match.
+   */
+  //##ModelId=3C82ABA5036C
+  void checkVersions(RawPacket& raw) throw (Error);
+
   //For information about events, see the ConnectionListener class.
   //##ModelId=3B07538100AC
   void onReceive();

@@ -124,28 +124,46 @@ namespace GNE {
   GNEProtocolVersionNumber getGNEProtocolVersion();
 
   /**
-   * Returns the user specified protocol number.
-   * @see setUserVersion
+   * This function is used internally by GNE to get the name that you set in
+   * setGameInformation.
+   */
+  const char* getGameName();
+
+  /**
+   * This function is used internally by GNE to get the version that you set
+   * in setGameInformation.
    */
   guint32 getUserVersion();
 
   /**
-   * The user's own protocol version number, 0 by default.  If you set this
-   * number, GNE will version check not only its own library version, but
-   * your application version as well on connect, and produce the appropriate
-   * error if there is a mismatch.
+   * The user's game information.  This information is used during the
+   * connection process to check if the versions and games match.  This
+   * function should only be called once before making any connections.
+   *
+   * @param gameName the name of your game, or any other unique string
+   *        identifier in ASCII format with a length not exceeding
+   *        MAX_GAME_NAME_LEN ASCII characters.
+   * @param version a 4-byte value with the current game version in any
+   *        format.
    */
-  void setUserVersion(guint32 version);
+  void setGameInformation(std::string gameName, guint32 version);
+
+  /**
+   * The maximum number of ASCII characters in game name that is passed into
+   * the setGameInformation function.
+   */
+  const int MAX_GAME_NAME_LEN = 31;
 
   /**
    * Compares other versions against this library.  This is used internally
    * by GNE to compare versions.  It throws Error::GNETheirVersionHigh,
-   * Error::GNETheirVersionLow, or Error::GNEUserVersionMismatch if the
+   * Error::GNETheirVersionLow, WrongGame, or UserVersionMismatch if the
    * versions are different, else if the versions are both the same it
-   * returns nor throws anything.  It checks the GNE version numbers first.
+   * returns nor throws anything.  It checks the GNE version numbers first,
+   * then the game name, then the user versions.
    */
   void checkVersions(const GNEProtocolVersionNumber& otherGNE,
-                     guint32 otherUser) throw (Error);
+    std::string otherName, guint32 otherUser) throw (Error);
 
   /**
    * A numeric representation of the current version of this library.

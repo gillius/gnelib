@@ -33,6 +33,7 @@ namespace GNE {
     void registerGNEPackets();
   }
 
+char gameNameBuf[32] = {0};
 guint32 userVersion = 0;
 ConnectionEventGenerator* eGen = NULL;
 
@@ -130,9 +131,13 @@ GNEProtocolVersionNumber getGNEProtocolVersion() {
   GNEProtocolVersionNumber ret;
   ret.version = 0;
   ret.subVersion = 0;
-  ret.build = 3;
+  ret.build = 4;
 
   return ret;
+}
+
+const char* getGameName() {
+  return gameNameBuf;
 }
 
 guint32 getUserVersion() {
@@ -140,13 +145,18 @@ guint32 getUserVersion() {
   return userVersion;
 }
 
-void setUserVersion(guint32 version) {
+void setGameInformation(std::string gameName, guint32 version) {
   assert(initialized);
+  assert(gameName.length() <= GNE::MAX_GAME_NAME_LEN);
+  //We do this assert since this function should only be called once.
+  assert(gameNameBuf[0] = 0);
+
   userVersion = version;
+  strncpy(gameNameBuf, gameName.c_str(), MAX_GAME_NAME_LEN);
 }
 
 void checkVersions(const GNEProtocolVersionNumber& otherGNE,
-                     guint32 otherUser) throw (Error) {
+                   std::string otherName, guint32 otherUser) throw (Error) {
   GNEProtocolVersionNumber us = getGNEProtocolVersion();
 
   //Check the GNE version numbers
@@ -161,10 +171,13 @@ void checkVersions(const GNEProtocolVersionNumber& otherGNE,
       throw Error(Error::GNETheirVersionLow);
   }
 
+  //Check the game name
+  if (otherName != gameNameBuf)
+    throw Error(Error::WrongGame);
+
   //Check the user version numbers
-  if (userVersion != otherUser) {
+  if (userVersion != otherUser)
     throw Error(Error::UserVersionMismatch);
-  }
 }
 
 }
