@@ -19,7 +19,7 @@
 
 #ifdef WIN32
 //We have a special version of the threading API for Win32
-#include "ConditionVariableWin32.cpp"
+#include "ConditionVariableWin32.inc"
 #else
 
 #include "../include/gnelib/gneintern.h"

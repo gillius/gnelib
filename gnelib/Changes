@@ -1,4 +1,7 @@
 GNE 0.49 to current
+  Ported the threading implementation from pthreads-win32 to use native win32
+    threads.  That in conjuction with HawkNL's NL_WIN_THREADS option means
+    pthreads-win32 is NO LONGER needed for GNE!
   Added MSVC.NET support by adding solution and project files.
 
 GNE 0.45 to 0.49
