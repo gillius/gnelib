@@ -215,6 +215,7 @@ void doLocalTest() {
   //from this point until we get it back.
   gout << "Creating a PingPacket." << endl;
   PingPacket test;
+  assert(PingPacket::reqsPending() == 1);
 
   //Then the other side normally would receive a packet.  No reason why we
   //can't reply to ourselves!
@@ -227,15 +228,30 @@ void doLocalTest() {
   //a 0 ping time.
   gout << "The ping time is: " << test.getPing()
     << " seconds. (should be VERY small)" << endl;
+  assert(PingPacket::reqsPending() == 0);
   gout << "An invalid ping packet ping time (should be 0): "
     << test.getPing() << endl;
 
+  gout << "Creating 3 PingPackets which we will let be 'late'" << endl;
+  PingPacket l1, l2, l3;
+  assert(PingPacket::reqsPending() == 3);
+
   gout << "Creating another PingPacket." << endl;
   PingPacket longTest;
+  assert(PingPacket::reqsPending() == 4);
   gout << "Waiting 350 ms." << endl;
   Thread::sleep(350);
   longTest.makeReply(); //It really doesn't matter when we call makeReply.
   gout << "Ping time: " << longTest.getPing() << endl;
+  assert(PingPacket::reqsPending() == 3);
+
+  gout << "Waiting another 200ms." << endl;
+  Thread::sleep(200);
+  gout << "Declaring requests older than 500ms as 'late'.  Found: "
+    << PingPacket::recoverLostRequests(Time(0, 500000)) << '.' << endl;
+  assert(PingPacket::reqsPending() == 0);
+  gout << "Ping for one of those late, removed, requests (should be 0): "
+    << l1.getPing() << endl;
 
   gout << "Press a key to continue." << endl;
   getch();
