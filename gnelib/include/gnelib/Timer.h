@@ -62,9 +62,8 @@ public:
    * timeouts for your operations.  Use the startTimer method to start this
    * timer.
    *
-   * The callback should not contain a SmartPtr reference to its Timer,
-   * because this would create a cycle.  It can contain a WeakPtr to its
-   * Timer, however.
+   * The callback is released when the Timer is stopped.  This allows the
+   * callback to contain a reference to the Timer.
    *
    * @param callback A newly allocated object to perform callbacks on.
    * @param rate the callback rate in milliseconds.
@@ -92,7 +91,9 @@ public:
   static Time getAbsoluteTime();
 
   /**
-   * Returns the TimerCallback set in the constructor.
+   * Returns the TimerCallback set in the constructor.  After the timer has
+   * stopped, an empty SmartPtr is returned since the listener is released
+   * when the timer stops.
    */
   SmartPtr<TimerCallback> getCallback() const;
 

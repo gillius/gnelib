@@ -133,6 +133,9 @@ void Timer::run() {
     listener->timerCallback();
     nextTime += callbackRate;
   }
+
+  LockMutex lock( sync );
+  listener.reset();
 }
 
 }
