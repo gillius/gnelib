@@ -52,6 +52,13 @@ public:
   static void shutdown();
 
   /**
+   * Use this function to get the address of the default networking device on
+   * this system, if possible.
+   */
+  //##ModelId=3AFF79890208
+  static NLaddress getLocalAddress();
+
+  /**
    * Exits from your main() function.  This should be used if you want any
    * detached threads to continue running.  All threads must either be
    * detached or joined.
@@ -59,13 +66,12 @@ public:
    * @see Thread::join()
    * @param status the return code
    */
-  //##ModelId=3AEDEDE100AA
   //static void exit(int status);
 
   /**
    * Returns how many total bytes GNE has read on all sockets.
    */
-  //##ModelId=3AE4C97C0244
+  //##ModelId=3AEDEDE100AA
   static int getBytesRead();
 
   /**
@@ -86,12 +92,25 @@ public:
    */
   //##ModelId=3AE4CA2803AC
   static void disableStats();
+
+  /**
+   * Clears all global stats.
+   */
+  //##ModelId=3AFF64290316
+  static void clearStats();
   
   /**
    * Returns the number of open low-level connections GNE has opened.
    */
   //##ModelId=3AE4D10803CA
   static int getOpenConnections();
+
+  /**
+   * Sets the user application protocol version number.
+   * @see userVersion
+   */
+  //##ModelId=3AFF642A000A
+  static void setUserVersion(int version);
 
   /**
    * A numeric representation of the current version of this library.
@@ -106,8 +125,33 @@ public:
   //##ModelId=3AE26FC000A0
   static const std::string VER_STR;
 
+  /**
+   * The low-level header size of a UDP header, which is used with the HawkNL
+   * internet driver that GNE uses.  A number that I always have trouble
+   * finding and might be useful in getting stats or calculating actual
+   * bandwith.
+   */
   //##ModelId=3AE4DF7A03AC
   static const int UDP_HEADER_SIZE;
+
+  /**
+   * Normally you would pass a network type to GNE::init, but passing this
+   * value means that no network should be initalized.  This is useful only
+   * in the example programs that don't use networking and do not need to
+   * initalize everything.
+   * @see init
+   */
+  //##ModelId=3AFF3E3500FA
+  static const NLenum NO_NET;
+
+  /**
+   * The user's own protocol version number, 0 by default.  If you set this
+   * number, GNE will version check not only its own library version, but
+   * your application version as well on connect, and produce the appropriate
+   * error if there is a mismatch.
+   */
+  //##ModelId=3AFF6429023A
+  static int userVersion;
 
 private:
   //##ModelId=3AF8D89F00E6
@@ -115,6 +159,7 @@ private:
 
   //##ModelId=3AE34D930316
   ConnectionEventGenerator *eGen;
+
 };
 
 #endif /* GNE_H_INCLUDED_C51DF1DD */
