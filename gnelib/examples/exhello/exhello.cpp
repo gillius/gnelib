@@ -78,11 +78,12 @@ public:
 
 	void onFailure(const Error& error) {
 		mprintf("Socket failure: %s\n", error.toString().c_str());
+    //No need to disconnect, this has already happened on a failure.
 	}
 
 	void onError(const Error& error) {
 		mprintf("Socket error: %s\n", error.toString().c_str());
-		conn->disconnect();
+		conn->disconnect();//For simplicity we treat even normal errors as fatal.
 	}
 
   void onConnectFailure(const Error& error) {
