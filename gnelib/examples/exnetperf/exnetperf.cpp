@@ -36,97 +36,56 @@ using namespace GNE;
 using namespace GNE::PacketParser;
 using namespace GNE::Console;
 
-class OurClient : public ConnectionListener {
+//The PerfTester class works on both the client and the server side.
+class PerfTester : public ConnectionListener {
 public:
-	OurClient() : conn(NULL) {
-		mprintf("Client listener created.\n");
-	}
-
-	~OurClient() {
-		mprintf("Client listener destroyed.\n");
-	}
+	PerfTester() : conn(NULL) {}
+  ~PerfTester() {}
 
 	void onDisconnect() { 
-		mprintf("Client just disconnected.\n");
-    //This is an iffy practice.  If we do this, we have to be careful to
-    //always note that each new connection we use this listener with gets
-    //its own new copy which we don't destroy later.
 		delete this;
 	}
 
   void onConnect(SyncConnection& conn2) {
 		conn = conn2.getConnection();
-    mprintf("Connection to server successful.\n");
+    writePackets(); //Send an initial batch of data.
+  }
+
+  void onNewConn(SyncConnection& conn2) {
+		conn = conn2.getConnection();
+    writePackets();
   }
 
 	void onReceive() {
-		Packet* message = conn->stream().getNextPacket();
-		if (message->getType() == MIN_USER_ID) {
-			HelloPacket* helloMessage = (HelloPacket*)message;
-			mprintf("got message: \"");
-			mprintf(helloMessage->getMessage().c_str());
-			mprintf("\"\n");
-		} else
-			mprintf("got bad packet.\n");
-		delete message;
+		delete conn->stream().getNextPacket();
+    //We don't need to do anything to the data we are being sent.  The low-
+    //level routines will keep track of the stats for us.
 	}
 
 	void onFailure(const Error& error) {
 		mprintf("Socket failure: %s\n", error.toString().c_str());
+    //No need to disconnect, this has already happened on a failure.
 	}
 
 	void onError(const Error& error) {
 		mprintf("Socket error: %s\n", error.toString().c_str());
-		conn->disconnect();
+		conn->disconnect();//For simplicity we treat even normal errors as fatal.
 	}
 
   void onConnectFailure(const Error& error) {
     mprintf("Connection to server failed.\n");
-		mprintf("GNE reported error: %s\n", error.toString().c_str());
+		mprintf("  GNE reported error: %s\n", error.toString().c_str());
+  }
+
+  void onDoneWriting() {
+    writePackets();
+  }
+
+  //Try to send out some more packets.
+  void writePackets() {
   }
 private:
 	Connection* conn;
-};
-
-class OurServer : public ConnectionListener {
-public:
-  OurServer() : conn(NULL), received(false) {
-		mprintf("Server instance created\n");
-	}
-
-  virtual ~OurServer() {
-		mprintf("ServerConnection instance killed\n");
-	}
-
-	void onDisconnect() { 
-		mprintf("ServerConnection just disconnected.\n");
-		if (!received)
-			mprintf("No message received.\n");
-		delete this;
-	}
-
-  void onNewConn(SyncConnection& conn2) {
-		conn = conn2.getConnection();
-    mprintf("Connection received from %s; waiting for message...\n", conn->getRemoteAddress(true).toString().c_str());
-  }
-
-	void onReceive() {
-		Packet* message = conn->stream().getNextPacket();
-		delete message;
-	}
-
-	void onFailure(const Error& error) {
-		gout << acquire << "Socket failure: " << error << endl << release;
-	}
-
-	void onError(const Error& error) {
-		mprintf("Socket error: %s\n", error.toString().c_str());
-		conn->disconnect();
-	}
-
-private:
-	Connection* conn;
-	bool received;
 };
 
 class OurListener : public ServerConnectionListener {
@@ -138,14 +97,14 @@ public:
   virtual ~OurListener() {}
 
   void onListenFailure(const Error& error, const Address& from, ConnectionListener* listener) {
-    mprintf("Connection error: %s\n", error.toString().c_str());
-    mprintf("  Error received from %s", from.toString().c_str());
+    mlprintf(0, 0, "Connection error: %s   ", error.toString().c_str());
+    mlprintf(0, 1, "  Error received from %s   ", from.toString().c_str());
     delete listener;
   }
 
   void getNewConnectionParams(int& inRate, int& outRate, ConnectionListener*& listener) {
     inRate = outRate = 0; //0 meaning no limits on rates.
-    listener = new OurServer();
+    listener = new PerfTester();
   }
 
 private:
