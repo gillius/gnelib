@@ -38,7 +38,7 @@ class Connection;
  *       between calls, if another thread changes its state.
  */
 //##ModelId=3B075380030D
-class PacketStream : protected Thread {
+class PacketStream : public Thread {
 public:
   /**
    * Creates a new PacketStream with the given flow control parameters.
@@ -103,6 +103,12 @@ public:
    */
   //##ModelId=3B07538101F9
   void waitToSendAll();
+
+	/**
+	 * Overrides Thread::shutDown so that the PacketStream daemon thread will
+	 * be woken up since it might be waiting on a ConditionVariable.
+	 */
+	void shutDown();
 
   /**
    * Internal function -- Do not call.  This thread handles throttled writes

@@ -88,7 +88,9 @@ public:
    * down.\n
    * This function is virtual if the thread needs any additional actions to
    * notify itself to shutdown, for example if it is waiting for some event on
-   * a ConditionVariable.
+   * a ConditionVariable.\n
+	 * You will want to call this function from the override to make sure that
+	 * shutdown is set to true.
    */
   //##ModelId=3B0C5919012C
   virtual void shutDown();

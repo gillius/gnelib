@@ -25,9 +25,25 @@
 #include "GNE.h"
 
 namespace GNE {
+/*
+	  enum FailureType {
+    NoError = 0,
+    GNEHostVersionLow = 1,
+    GNEHostVersionHigh = 2,
+    UserHostVersionLow = 3,
+    UserHostVersionHigh = 4,
+    CouldNotOpenSocket = 5,
+    ConnectionTimeOut = 6,
+		ConnectionDropped = 7,
+		Read = 8,
+		Write = 9,
+		UnknownPacket = 10,
+		OtherGNELevelError = 11,
+    OtherLowLevelError = 12
+*/
 
 //##ModelId=3AE5BA8F038E
-static const std::string FailureStrings[] = {
+const std::string Connection::FailureStrings[] = {
   "No error.",
   "The host has an earlier version of GNE than this one.",
   "The host has a later version of GNE than this one.",
@@ -35,6 +51,11 @@ static const std::string FailureStrings[] = {
   "The host has a later version of this game.",
   "Could not open a network connection, check to make sure you are connected to the network.",
   "Could not contact the host due to connection timeout.",
+	"Remote computer suddenly disconnected without warning, or dropped (TCP)",
+	"Network error when trying to read from connection.",
+	"Network error when trying to write to connection.",
+	"Unknown packet type encountered or corrupted data received.",
+	"Other GNE (not a low-level network) error.",
   "Other low-level HawkNL error."
 };
 
@@ -47,11 +68,7 @@ rlistener(NULL), ulistener(NULL) {
 
 //##ModelId=3B0753810076
 Connection::~Connection() {
-	unreg(true, true);
-  if (rsocket != NL_INVALID)
-    nlClose(rsocket);
-  if (usocket != NL_INVALID)
-    nlClose(usocket);
+	disconnect();
   delete ps;
 }
 
@@ -96,12 +113,30 @@ bool Connection::isConnected() const {
   return connected;
 }
 
+/**
+ * \bug I think because of the PacketStream thread, if you disconnect, you
+ *      cannot reconnect because you cannot restart threads.  If the Thread
+ *      class is restartable, then this will be fine.
+ */
 //##ModelId=3B0753810083
 void Connection::disconnect() {
-  if (rsocket != NL_INVALID)
-    nlClose(rsocket);
-  if (usocket != NL_INVALID)
-    nlClose(usocket);
+	if (connected) {
+		//This is nessacary because we can't join on ps if it has already been
+		//  shutdown and/or never started
+		unreg(true, true);
+		gnedbgo2(2, "disconnecting r: %i, u: %i", rsocket, usocket);
+		ps->shutDown();
+		ps->join();
+		if (rsocket != NL_INVALID) {
+			nlClose(rsocket);
+			rsocket = NL_INVALID;
+		}
+		if (usocket != NL_INVALID) {
+			nlClose(usocket);
+			rsocket = NL_INVALID;
+		}
+		connected = false;
+	}
 }
 
 //##ModelId=3B0753810084
@@ -112,6 +147,8 @@ void Connection::disconnectSendAll() {
 
 //##ModelId=3B0753810085
 void Connection::onFailure(FailureType errorType) {
+	gnedbgo1(1, "onFailure Event: %s", FailureStrings[errorType].c_str());
+	disconnect();
 }
 
 //##ModelId=3B07538100AC
@@ -126,19 +163,35 @@ void Connection::onDoneWriting() {
 void Connection::onReceive(bool reliable) {
 	//Create buffer into a RawPacket
 	NLbyte* buf = new NLbyte[RawPacket::RAW_PACKET_LEN];
-	rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
-	RawPacket raw(buf);
-
-	//parse the packets and add them to the PacketStream
-	bool dummy;
-	Packet* next = NULL;
-	while ((next = PacketParser::parseNextPacket(dummy, raw)) != NULL) {
-		ps->addIncomingPacket(next);
+	int temp = rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
+	if (temp == NL_INVALID) {
+		onFailure(Read);
+	} else if (temp == 0) {
+		//This means the connection was closed on the network-level because
+		//remote computer has purposely closed or has dropped.
+		onFailure(ConnectionDropped);
+	} else {
+		RawPacket raw(buf);
+		
+		//parse the packets and add them to the PacketStream
+		bool errorCheck;
+		Packet* next = NULL;
+		while ((next = PacketParser::parseNextPacket(errorCheck, raw)) != NULL) {
+			ps->addIncomingPacket(next);
+		}
+		delete[] buf;
+		
+		//Start the event
+		if (errorCheck == false) {
+			//These are level 4 since the explicit event log is generated in onFailure
+			gnedbgo1(4, "Unknown packet encountered in a message that has %i bytes", temp);
+			gnedbgo2(4, "First bytes are %i and %i", (int)buf[0], (int) buf[1]);
+			onFailure(UnknownPacket);
+		} else {
+			gnedbgo1(4, "onReceive event triggered, %i bytes recv", temp);
+			onReceive();
+		}
 	}
-	delete[] buf;
-
-	//Start the event
-  onReceive();
 }
 
 //##ModelId=3B075381004E
@@ -157,27 +210,33 @@ void Connection::ConnectionListener::onReceive() {
 
 //##ModelId=3B6E14AC0104
 void Connection::reg(bool reliable, bool unreliable) {
-	if (rlistener == NULL) {
+	if (reliable && rlistener == NULL) {
+		assert(rsocket != NL_INVALID);
 		rlistener = new ConnectionListener(*this, true);
 		eGen->reg(rsocket, rlistener);
+		gnedbgo1(3, "Registered reliable socket %i", rsocket);
 	}
-	if (ulistener == NULL) {
+	if (unreliable && ulistener == NULL) {
+		assert(usocket != NL_INVALID);
 		ulistener = new ConnectionListener(*this, false);
 		eGen->reg(usocket, ulistener);
+		gnedbgo1(3, "Registered unreliable socket %i", usocket);
 	}
 }
 
 //##ModelId=3B6E14AC01D6
 void Connection::unreg(bool reliable, bool unreliable) {
-	if (rlistener != NULL) {
+	if (reliable && rlistener != NULL) {
 		eGen->unreg(rsocket);
 		delete rlistener;
 		rlistener = NULL;
+		gnedbgo1(3, "Unregistered reliable socket %i", rsocket);
 	}
-	if (ulistener != NULL) {
+	if (unreliable && ulistener != NULL) {
 		eGen->unreg(usocket);
 		delete ulistener;
 		ulistener = NULL;
+		gnedbgo1(3, "Unregistered unreliable socket %i", usocket);
 	}
 }
 
@@ -188,12 +247,10 @@ int Connection::rawRead(bool reliable, const NLbyte* buf, int bufSize) {
     act = rsocket;
   else
     act = usocket;
+	assert(act != NL_INVALID);
   return int(nlRead(act, (NLvoid*)buf, (NLint)bufSize));
 }
 
-/**
- * \todo if an error occurs in the rawWrite/Read functions, call onFailure.
- */
 //##ModelId=3B6B302401D6
 int Connection::rawWrite(bool reliable, const NLbyte* buf, int bufSize) {
   NLsocket act;
@@ -201,6 +258,8 @@ int Connection::rawWrite(bool reliable, const NLbyte* buf, int bufSize) {
     act = rsocket;
   else
     act = usocket;
+	assert(act != NL_INVALID);
+	gnedbgo2(1, "First bytes are %i and %i", (int)buf[0], (int) buf[1]);
   return int(nlWrite(act, (NLvoid*)buf, (NLint)bufSize));
 }
 

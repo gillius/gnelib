@@ -21,7 +21,6 @@
  */
 
 #include "gneintern.h"
-#include "Packet.h"
 
 namespace GNE {
 class RawPacket;

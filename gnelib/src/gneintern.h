@@ -38,9 +38,9 @@
 #include <windows.h>
 #endif
 
-//Standard C includes -- for Console class
-#include <stdio.h>
-#include <stdarg.h>
+//Standard C includes -- for Console class and debugging functions
+#include <cstdio>
+#include <cstdarg>
 
 //Include the HawkNL library
 #include <nl.h>
@@ -64,6 +64,24 @@
 #define valassert(CALL, VAL)        assert((CALL) == (VAL))
 #else
 #define valassert(CALL, VAL)        CALL
+#endif
+
+//Define debugging functions
+#ifdef _DEBUG
+#include "GNEDebug.h"
+#define gnedbg(LEVEL, MESSAGE)           GNE::doTrace(LEVEL, __FILE__, __LINE__, MESSAGE)
+#define gnedbg1(LEVEL, MESSAGE, P1)      GNE::doTrace(LEVEL, __FILE__, __LINE__, MESSAGE, P1)
+#define gnedbg2(LEVEL, MESSAGE, P1, P2)  GNE::doTrace(LEVEL, __FILE__, __LINE__, MESSAGE, P1, P2)
+#define gnedbgo(LEVEL, MESSAGE)          GNE::doTrace(LEVEL, __FILE__, __LINE__, "%x: "MESSAGE, this)
+#define gnedbgo1(LEVEL, MESSAGE, P1)     GNE::doTrace(LEVEL, __FILE__, __LINE__, "%x: "MESSAGE, this, P1)
+#define gnedbgo2(LEVEL, MESSAGE, P1, P2) GNE::doTrace(LEVEL, __FILE__, __LINE__, "%x: "MESSAGE, this, P1, P2)
+#else
+#define gnedbg(LEVEL, MESSAGE)           (void(0))
+#define gnedbg1(LEVEL, MESSAGE, P1)      (void(0))
+#define gnedbg2(LEVEL, MESSAGE, P1, P2)  (void(0))
+#define gnedbgo(LEVEL, MESSAGE)          (void(0))
+#define gnedbgo1(LEVEL, MESSAGE, P1)     (void(0))
+#define gnedbgo2(LEVEL, MESSAGE, P1, P2) (void(0))
 #endif
 
 #endif // _GNEINTERN_H_

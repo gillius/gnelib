@@ -22,6 +22,7 @@
 #include "ConnectionEventListener.h"
 #include "ConditionVariable.h"
 #include "Connection.h"
+#include "OnReceiveEventThread.h"
 
 namespace GNE {
 
@@ -31,18 +32,23 @@ ConnectionEventGenerator::ConnectionEventGenerator()
   group = nlGroupCreate();
   assert(group != NL_INVALID);
   sockBuf = new NLsocket[NL_MAX_GROUP_SOCKETS];
+	gnedbgo(5, "created");
 }
 
 //##ModelId=3B07538100BA
 ConnectionEventGenerator::~ConnectionEventGenerator() {
   nlGroupDestroy(group);
   delete[] sockBuf;
+	gnedbgo(5, "destroyed");
 }
 
 /**
  * \bug I think it might be possible for a syncronization error to occur
- *      where an event can be generated on a Connection that was JUST
- *      shutdown.
+ *      where an event can be generated on a Connection that is shutting
+ *      down.
+ * \bug If nlPollGroup fails, the error is not reported.  Instead the results
+ *      are ignored, and the call is made again (or in debug mode, the
+ *      assert fails).
  */
 //##ModelId=3B07538100BC
 void ConnectionEventGenerator::run() {
@@ -51,13 +57,34 @@ void ConnectionEventGenerator::run() {
     while (connections.empty() && !shutdown) {
       mapCtrl.wait();
     }
+		mapCtrl.release();
     if (!shutdown) {
       int numsockets = nlPollGroup(group, NL_READ_STATUS, sockBuf, NL_MAX_GROUP_SOCKETS, 250);
-      for (numsockets--; numsockets >= 0; numsockets--) {
-        connections[sockBuf[numsockets]]->onReceive();
-      }
+			if (numsockets != NL_INVALID) {
+				numsockets--;
+				for (; numsockets >= 0; numsockets--) {
+					mapCtrl.acquire();
+					std::map<NLsocket, ConnectionEventListener*>::iterator iter = connections.find(sockBuf[numsockets]);
+					//Check to make sure the listener didn't unregister while we were waiting.
+					if (iter != connections.end()) {
+						mapCtrl.release();
+						OnReceiveEventThread event(*iter->second);
+						event.start();
+						event.join();
+					} else
+						mapCtrl.release();
+				}
+			} else {
+				if (!(nlGetError() == NL_SOCKET_ERROR && nlGetSystemError() == 10004)) {
+					gnedbgo2(1, "nlPollGroup Error %i: %s", nlGetError(), nlGetErrorStr(nlGetError()));
+					gnedbgo2(1, "System Error %i: %s", nlGetSystemError(), nlGetSystemErrorStr(nlGetError()));
+					assert(false);
+				} else
+					gnedbgo(1, "nlPollGroup call canceled (perhaps to do low-level socket close).  Trying again.");
+					//Else the call was canceled.  This is a bug in HawkNL I think, since cancellation
+				  //is different from an error.
+			}
     }
-    mapCtrl.release();
   }
 }
 
@@ -67,7 +94,8 @@ void ConnectionEventGenerator::reg(NLsocket socket, ConnectionEventListener* con
   nlGroupAddSocket(group, socket);
   connections[socket] = conn;
   mapCtrl.release();
-  mapCtrl.signal();
+  mapCtrl.signal(); //This will wake up the daemon thread if this is the first
+	                  // registered, and it is sleeping.
 }
 
 //##ModelId=3B07538100DD

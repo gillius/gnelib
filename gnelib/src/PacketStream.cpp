@@ -22,6 +22,7 @@
 #include "Packet.h"
 #include "Connection.h"
 #include "RawPacket.h"
+#include "PacketParser.h"
 
 const int BUF_LEN = 1024;
 
@@ -67,7 +68,7 @@ Packet* PacketStream::getNextPacket() {
     ret = in.front();
     in.pop();
   }
-  outQCtrl.release();
+  inQCtrl.release();
   return ret;
 }
 
@@ -111,12 +112,26 @@ int PacketStream::getOutRate() const {
   return outRate;
 }
 
+/**
+ * \todo write this function for real.
+ */
 //##ModelId=3B07538101F9
 void PacketStream::waitToSendAll() {
+	//Only temporary for now
+	Thread::sleep(2000);
+}
+
+void PacketStream::shutDown() {
+	Thread::shutDown();
+	//We acquire the mutex to avoid the possiblity of a deadlock between the
+	// test for the shutdown variable and the wait.
+	outQCtrl.acquire();
+	outQCtrl.signal();
+	outQCtrl.release();
 }
 
 /**
- * \todo combine packets, do throttling
+ * \todo combine packets, do throttling, call onDoneWriting
  */
 //##ModelId=3B07538101FA
 void PacketStream::run() {
@@ -131,6 +146,7 @@ void PacketStream::run() {
 			PacketStreamData* next = getNextPacketToSend();
 			RawPacket raw;
 			next->packet->writePacket(raw);
+			raw << PacketParser::END_OF_PACKET;
       owner.rawWrite(next->reliable, raw.getData(), raw.getLength());
 			delete next;
     }

@@ -37,6 +37,9 @@ static Mutex mapSync;
 extern "C" {
   /**
    * C helper function to start the thread.
+	 * \todo I think we can make the run function private, as it should be, by
+	 *       passing this function a pointer to that function.  Thanks to
+	 *       stevieo from EFNet for the idea.
    */
   static void* threadStart( void* thread ) {
     Thread* thr = ( ( Thread* )( thread ) );
@@ -102,7 +105,6 @@ void Thread::shutDown() {
 void Thread::join() {
   assert( !deleteThis );
   valassert(pthread_join( thread_id, NULL ), 0);
-  running = false;
 }
 
 //##ModelId=3B0753810383

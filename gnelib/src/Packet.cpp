@@ -25,6 +25,7 @@ namespace GNE {
 
 //##ModelId=3B0753810151
 Packet::Packet(int id) : type((NLubyte)id) {
+	timestamp = 0;
 }
 
 //##ModelId=3B0753810153

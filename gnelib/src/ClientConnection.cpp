@@ -25,20 +25,25 @@ namespace GNE {
 //##ModelId=3B075380037F
 ClientConnection::ClientConnection(int outRate, int inRate)
 : Connection(outRate, inRate) {
+	gnedbgo(5, "created");
 }
 
 //##ModelId=3B07538003B8
 ClientConnection::~ClientConnection() {
+	gnedbgo(5, "destroyed");
 }
 
 /**
- * \todo time sync with server
+ * \todo time sync with server, and do negotiations.
  */
 //##ModelId=3B07538003BA
 void ClientConnection::run() {
   NLboolean check = nlConnect(rsocket, &address);
   if (check == NL_TRUE) {
+		reg(true, false);
     connected = true;
+		ps->start();
+		gnedbgo2(2, "connection r: %i, u: %i", rsocket, usocket);
     onConnect();
   } else {
     onConnectFailure(ConnectionTimeOut);
@@ -55,7 +60,7 @@ bool ClientConnection::open(std::string dest, int port) {
 //##ModelId=3B07538003BE
 bool ClientConnection::open(NLaddress dest, int port) {
   address = dest;
-  rsocket = nlOpen(port, NL_RELIABLE);
+  rsocket = nlOpen(port, NL_RELIABLE_PACKETS);
   return (rsocket == NL_INVALID);
 }
 

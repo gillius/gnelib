@@ -26,6 +26,11 @@
 namespace GNE {
 class ConnectionEventListener;
 
+/**
+ * A class used internally by ConnectionEventGenerator to start each
+ * onReceive event in a new thread, so that it can continue processing data
+ * for other connections.
+ */
 //##ModelId=3B6E14D10258
 class OnReceiveEventThread : public Thread {
 public:

@@ -25,24 +25,26 @@ namespace GNE {
 //##ModelId=3B075381027A
 ServerConnection::ServerConnection(int outRate, int inRate, NLsocket rsocket2)
 : Connection(outRate, inRate) {
+	gnedbgo(5, "created");
   rsocket = rsocket2;
 }
 
 //##ModelId=3B075381027E
 ServerConnection::~ServerConnection() {
+	gnedbgo(5, "destroyed");
 }
 
 /**
  * \todo implement negotiation
- * \bug this function relies on the fact that mutexes are recursive, which is
- *      not true over all pthreads implementations.  When
- *      ConnectionEventGenerator lauches each onReceive event in a new thread,
- *      then this problem will go away.
  */
 //##ModelId=3B0753810280
 void ServerConnection::run() {
   assert(rsocket != NL_INVALID);
-	//Do connection negotiaion here, and create the PacketStream
+	//Do connection negotiaion here
+	reg(true, false);
+	ps->start();
+	gnedbgo2(2, "connection r: %i, u: %i", rsocket, usocket);
+	connected = true;
   onNewConn();
 }
 

@@ -69,7 +69,12 @@ public:
     UserHostVersionHigh = 4,
     CouldNotOpenSocket = 5,
     ConnectionTimeOut = 6,
-    OtherLowLevelError = 7
+		ConnectionDropped = 7,
+		Read = 8,
+		Write = 9,
+		UnknownPacket = 10,
+		OtherGNELevelError = 11,
+    OtherLowLevelError = 12
   };
 
   /**
@@ -133,7 +138,8 @@ public:
   /**
    * Immediately disconnects this socket.  No more data will be recieved or
    * sent on this socket.  If you want to disconnect more nicely, use
-   * disconnectSendAll.
+   * disconnectSendAll.  It is okay to call this function even when this
+	 * Connection is already disconnected.
    * @see #disconnectSendAll()
    */
   //##ModelId=3B0753810083
@@ -157,7 +163,10 @@ public:
   virtual void onFailure(FailureType errorType);
 
   /**
-   * Event triggered when one or more packets have been recieved.
+   * Event triggered when one or more packets have been recieved.  Note that
+	 * it is possible for multiple threads to be firing onRecieve on this class
+	 * at the same time, so if you need a "serial order" of processing, use a
+	 * mutex or condition variable.
    */
   //##ModelId=3B07538100AC
   virtual void onReceive();

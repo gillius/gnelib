@@ -36,6 +36,7 @@ static bool initialized = false;
 
 bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void))) {
   if (!initialized) {
+		gnedbg(1, "GNE initalized");
     atexit_ptr(shutdownGNE);
     PacketParser::registerGNEPackets();
     if (networkType != NO_NET) {
@@ -59,8 +60,13 @@ void shutdownGNE() {
   if (initialized) {
     eGen->shutDown();
     eGen->join();
+		delete eGen;
     nlShutdown();
     initialized = false;
+		gnedbg(1, "Closed GNE");
+#ifdef _DEBUG
+		killDebug(); //closes debugging if it was opened
+#endif
   }
 }
 

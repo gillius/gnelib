@@ -128,7 +128,7 @@ class ConnectionEventGenerator;
    * value means that no network should be initalized.  This is useful only
    * in the example programs that don't use networking and do not need to
    * initalize everything.
-   * @see init
+   * @see initGNE
    */
   const NLenum NO_NET = 128;
 

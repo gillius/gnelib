@@ -69,7 +69,8 @@ public:
 
   /**
    * Returns the length of the internal buffer in bytes.  This buffer is what
-   * you get from getData().
+   * you get from getData().  This method only works if you are writing to
+	 * the RawPacket.
    */
   //##ModelId=3B0753810230
   int getLength() const;
