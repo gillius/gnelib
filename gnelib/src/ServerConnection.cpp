@@ -58,6 +58,7 @@ ServerConnection::ServerConnection(const ConnectionParams& p,
   assert(!p);
   sockets.r = rsocket2;
   setListener(p.getListener());
+  setTimeout(p.getTimeout());
   params = new ServerConnectionParams;
   params->cp = p;
   params->creator = creator;

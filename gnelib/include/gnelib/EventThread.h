@@ -23,7 +23,9 @@
 #include "gneintern.h"
 #include "Thread.h"
 #include "Error.h"
+#include "Mutex.h"
 #include "ConditionVariable.h"
+#include "Time.h"
 
 namespace GNE {
 class ConnectionListener;
@@ -81,6 +83,18 @@ public:
    */
   //##ModelId=3C106F0203DA
   void setListener(ConnectionListener* listener);
+
+  /**
+   * Use GNE::Connection::getTimeout.
+   */
+  //##ModelId=3CC4E3380110
+  int getTimeout();
+
+  /**
+   * Use GNE::Connection::setTimeout.
+   */
+  //##ModelId=3CC4E338011A
+  void setTimeout(int ms);
 
   /**
    * For more information about these events, see ConnectionListener.  The
@@ -148,6 +162,23 @@ protected:
   void run();
 
 private:
+  /**
+   * Checks for timeout, triggering an onTimeout event and handling the time
+   * variables, if needed.
+   */
+  //##ModelId=3CC4E3380124
+  void checkForTimeout();
+
+  /**
+   * Resets the timeout counter by making nextTimeout be the current absolute
+   * time + the timeout interval.
+   */
+  //##ModelId=3CC4E338012E
+  void resetTimeout();
+
+  //##ModelId=3CC4E3380138
+  void onTimeout();
+
   //See the ctor for more information about ourConn.
   //##ModelId=3C6729270312
   Connection* ourConn;
@@ -163,6 +194,14 @@ private:
   //##ModelId=3C4116C301A9
   ConditionVariable listenSync;
 
+  //Variables for handling onTimeout events.
+  //##ModelId=3CC4E33800F2
+  Mutex timeSync;
+  //##ModelId=3CC4E33800FD
+  Time timeout;
+  //##ModelId=3CC4E3380107
+  Time nextTimeout;
+
   //True if this EventThread was ever started at least one time.
   //##ModelId=3C106F0203CB
   bool started;
@@ -171,6 +210,8 @@ private:
   bool onReceiveEvent;
   //##ModelId=3C106F0203CD
   bool onDoneWritingEvent;
+  //##ModelId=3CC4E338010B
+  bool onTimeoutEvent;
 
   //If this is true, we should not receive any more events.  It should be the
   //next event called, and everything else should stop.

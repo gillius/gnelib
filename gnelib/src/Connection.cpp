@@ -73,6 +73,16 @@ void Connection::setListener(ConnectionListener* listener) {
   eventListener->setListener(listener);
 }
 
+//##ModelId=3CC4E33800A1
+int Connection::getTimeout() {
+  return eventListener->getTimeout();
+}
+
+//##ModelId=3CC4E33800A2
+void Connection::setTimeout(int ms) {
+  eventListener->setTimeout(ms);
+}
+
 //##ModelId=3B0753810078
 PacketStream& Connection::stream() {
   assert(ps != NULL);

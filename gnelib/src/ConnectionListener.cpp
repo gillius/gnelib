@@ -52,6 +52,10 @@ void ConnectionListener::onDisconnect() {
 void ConnectionListener::onExit() {
 }
 
+//##ModelId=3CC4E33800BF
+void ConnectionListener::onTimeout() {
+}
+
 //##ModelId=3BCA83C600B4
 void ConnectionListener::onError(const Error& error) {
 }

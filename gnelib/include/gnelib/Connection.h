@@ -95,6 +95,25 @@ public:
   void setListener(ConnectionListener* listener);
 
   /**
+   * Returns the timeout for this connection.
+   * @see setTimeout
+   */
+  //##ModelId=3CC4E33800A1
+  int getTimeout();
+
+  /**
+   * Sets the timeout for this connection in milliseconds.  A value of 0
+   * signifies that no timeouts should occur.  Values less than 0 are invalid.
+   *
+   * An onTimeout event occurs ms milliseconds after the last onReceive event,
+   * the last onTimeout event, or since setTimeout occured.  Any of these
+   * events sets the "timeout counter" back to zero to say it another way.
+   * @see GNE::ConnectionListener::onTimeout
+   */
+  //##ModelId=3CC4E33800A2
+  void setTimeout(int ms);
+
+  /**
    * Returns the PacketStream associated with this class.  Writing and
    * reading through this Connection is done through this PacketStream.
    */

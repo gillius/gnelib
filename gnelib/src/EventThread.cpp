@@ -22,6 +22,8 @@
 #include "../include/gnelib/ConnectionListener.h"
 #include "../include/gnelib/Connection.h"
 #include "../include/gnelib/Thread.h"
+#include "../include/gnelib/Timer.h"
+#include "../include/gnelib/Time.h"
 #include "../include/gnelib/Error.h"
 #include "../include/gnelib/ConditionVariable.h"
 
@@ -31,7 +33,8 @@ namespace GNE {
 EventThread::EventThread(ConnectionListener* listener, Connection* conn)
 : Thread("EventThr", Thread::HIGH_PRI), ourConn(conn), eventListener(listener),
 started(false), onReceiveEvent(false), onDoneWritingEvent(false),
-onDisconnectEvent(false), onExitEvent(false), failure(NULL) {
+onTimeoutEvent(false), onDisconnectEvent(false), onExitEvent(false),
+failure(NULL) {
   gnedbgo(5, "created");
 }
 
@@ -66,6 +69,27 @@ void EventThread::setListener(ConnectionListener* listener) {
   eventSync.release();
 
   listenSync.release();
+}
+
+//##ModelId=3CC4E3380110
+int EventThread::getTimeout() {
+  return (timeout.getuSec() / 1000);
+}
+
+//##ModelId=3CC4E338011A
+void EventThread::setTimeout(int ms) {
+  timeSync.acquire();
+  if (ms != 0) {
+    timeout = Time(0, ms * 1000);
+    nextTimeout = Timer::getAbsoluteTime() + timeout;
+  } else {
+    nextTimeout = timeout = Time();
+  }
+  timeSync.release();
+
+  //Wake up the event thread if it is sleeping, which is needed if there is
+  //no timeout currently and the event thread is waiting forever on eventSync.
+  eventSync.signal();
 }
 
 //##ModelId=3C106F0203DC
@@ -115,6 +139,9 @@ void EventThread::onError(const Error& error) {
 void EventThread::onReceive() {
   gnedbgo(4, "onReceive event triggered.");
 
+  //reset the timeout counter
+  resetTimeout();
+
   eventSync.acquire();
   onReceiveEvent = true;
   eventSync.signal();
@@ -159,11 +186,22 @@ void EventThread::run() {
     while (eventListener == NULL || 
            (!onReceiveEvent && !onDoneWritingEvent && !failure
            && !onDisconnectEvent && eventQueue.empty() && !shutdown
-           && !onExitEvent) ) {
-      eventSync.wait();
+           && !onExitEvent && !onTimeoutEvent) ) {
+      //Calculate the time to wait
+      if ( timeout == Time() ) {
+        //wait "forever"
+        eventSync.wait();
+      } else {
+        //wait until a timeout would occur
+        eventSync.timedWait(nextTimeout);
+        checkForTimeout();
+      }
     }
     eventSync.release();
     if (!shutdown) {
+      checkForTimeout();
+
+      //Check for events, processing them if events are pending
       if (failure) {
         listenSync.acquire();
         eventListener->onFailure(*failure);
@@ -202,6 +240,12 @@ void EventThread::run() {
         eventListener->onDoneWriting();
         listenSync.release();
 
+      } else if (onTimeoutEvent) {
+        onTimeoutEvent = false;
+        listenSync.acquire();
+        eventListener->onTimeout();
+        listenSync.release();
+
       } else {
         eventSync.acquire();
 
@@ -218,6 +262,38 @@ void EventThread::run() {
       }
     }
   }
+}
+
+//##ModelId=3CC4E3380124
+void EventThread::checkForTimeout() {
+  timeSync.acquire();
+  Time t = nextTimeout;
+  timeSync.release();
+
+  if ( Timer::getAbsoluteTime() > t )
+    onTimeout();
+}
+
+//##ModelId=3CC4E338012E
+void EventThread::resetTimeout() {
+  timeSync.acquire();
+  if ( timeout != Time() ) {
+    nextTimeout = Timer::getAbsoluteTime() + timeout;
+  }
+  timeSync.release();
+}
+
+//##ModelId=3CC4E3380138
+void EventThread::onTimeout() {
+  gnedbgo(4, "onTimeout event triggered.");
+
+  //reset the timeout counter
+  resetTimeout();
+
+  eventSync.acquire();
+  onTimeoutEvent = true;
+  eventSync.signal();
+  eventSync.release();
 }
 
 } //namespace GNE

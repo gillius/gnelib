@@ -66,6 +66,20 @@ public:
   ConnectionListener* getListener() const;
 
   /**
+   * Sets the timeout for this connection in milliseconds.  A value of 0
+   * signifies that no timeouts should occur.  Values less than 0 are invalid.
+   * @see GNE::Connection::setTimeout
+   */
+  //##ModelId=3CC4E33800D3
+  void setTimeout(int ms);
+
+  /**
+   * Gets the timeout.
+   */
+  //##ModelId=3CC4E33800D5
+  int getTimeout() const;
+
+  /**
    * The maximum rate we will transmit in bytes per second.  If this is 0,
    * then the rate is unlimited.  Valid values are 0 or a positive integer.
    *
@@ -130,6 +144,9 @@ public:
 private:
   //##ModelId=3CBE05D4034F
   ConnectionListener* listener;
+
+  //##ModelId=3CC4E33800C9
+  int timeout;
 
   //##ModelId=3CBE05D40358
   int outRate;

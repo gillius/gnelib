@@ -24,13 +24,14 @@ namespace GNE {
 
 //##ModelId=3CBE05D4035C
 ConnectionParams::ConnectionParams(ConnectionListener* Listener)
-: listener(Listener), outRate(0), inRate(0), localPort(0), unrel(false) {
+: listener(Listener), timeout(0), outRate(0), inRate(0), localPort(0),
+unrel(false) {
 }
 
 //##ModelId=3CBE05D4035E
 bool ConnectionParams::checkParams() const {
   return (outRate < 0 || inRate < 0 || localPort < 0 || localPort > 65535
-    || listener == NULL);
+    || listener == NULL || timeout < 0);
 }
 
 //##ModelId=3CBE05D40362
@@ -41,6 +42,16 @@ void ConnectionParams::setListener(ConnectionListener* Listener) {
 //##ModelId=3CBE05D40364
 ConnectionListener* ConnectionParams::getListener() const {
   return listener;
+}
+
+//##ModelId=3CC4E33800D3
+void ConnectionParams::setTimeout(int ms) {
+  timeout = ms;
+}
+
+//##ModelId=3CC4E33800D5
+int ConnectionParams::getTimeout() const {
+  return timeout;
 }
 
 //##ModelId=3CBE05D40366

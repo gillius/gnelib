@@ -83,6 +83,16 @@ std::string Time::toString() const {
   return ret.str();
 }
 
+//##ModelId=3CC4E33801BA
+bool Time::operator ==(const Time& rhs) const {
+  return (microsec == rhs.microsec && sec == rhs.sec);
+}
+
+//##ModelId=3CC4E33801CE
+bool Time::operator !=(const Time& rhs) const {
+  return (microsec != rhs.microsec || sec != rhs.microsec);
+}
+
 //##ModelId=3B07538103E7
 bool Time::operator<(const Time& rhs) const {
   return (sec < rhs.sec || ((sec == rhs.sec) && (microsec < rhs.microsec)));

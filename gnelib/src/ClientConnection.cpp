@@ -69,6 +69,7 @@ bool ClientConnection::open(const Address& dest,
     params->dest = dest;
     params->cp = p;
     setListener(p.getListener());
+    setTimeout(p.getTimeout());
 
     sockets.r = nlOpen(p.getLocalPort(), NL_RELIABLE_PACKETS);
   }

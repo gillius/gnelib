@@ -205,6 +205,28 @@ public:
   virtual void onExit();
 
   /**
+   * An onTimeout event occurs ms milliseconds after the last onReceive event,
+   * or the last onTimeout event.  The value of ms is set by calling
+   * Connection::setTimeout.  This allows you a way to detect idle
+   * connections that have become unresponsive due to loss of network
+   * connection, or to send out keep alive packets.
+   *
+   * If your programs are constantly sending data back and forth, then on the
+   * first onTimeout you might want to declare the connection lost and call
+   * disconnect and clean up.  If there is normally idle time during your
+   * connection you may want to send out a PingPacket and see if you get a
+   * response before the onTimeout event occurs again before declaring the
+   * connection lost.
+   *
+   * Remember that GNE does not automatically send PingPackets to give you the
+   * choice for measuring ping times, so if you want to use PingPackets to
+   * keep onTimeout events from occuring, you have to send them yourself and
+   * respond to them yourself as well.
+   */
+  //##ModelId=3CC4E33800BF
+  virtual void onTimeout();
+
+  /**
    * This event is triggered when a non-fatal error occurs in a connection
    * that does not force the connection to close, for example an unknown
    * packet encounted is an error, but the connection can still proceed.

@@ -106,6 +106,18 @@ public:
   std::string toString() const;
 
   /**
+   * Equality operator that works as expected.
+   */
+  //##ModelId=3CC4E33801BA
+  bool operator == (const Time& rhs) const;
+
+  /**
+   * Inequality operator that works as expected.
+   */
+  //##ModelId=3CC4E33801CE
+  bool operator != (const Time& rhs) const;
+
+  /**
    * Less-than operator that works as expected.
    */
   //##ModelId=3B07538103E7
