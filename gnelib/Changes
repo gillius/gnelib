@@ -1,4 +1,6 @@
 GNE 0.45 to current
+  Added the ability to wait on a counter and decrement it, so that it is
+    suitable to use to control or throttle the timing of another thread.
   Modified the examples a little to use the rate controls more/better.
   Implemented bandwidth control as per the GNE protocol spec.
   Modified the PacketStream API to fit the new rate control scheme.
