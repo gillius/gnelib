@@ -36,6 +36,7 @@ using namespace GNE;
 using namespace GNE::PacketParser;
 using namespace GNE::Console;
 
+void updateGlobalStats();
 void errorExit(const char* error);
 int getPort(const char* prompt);
 void doServer(int outRate, int inRate, int port);
@@ -47,7 +48,8 @@ struct Pos {
   int x, y;
   bool taken;
 };
-static Pos positions[] = {{0, 8, false}};
+static Pos gpos = {0, 8, false}; //global stats position
+static Pos positions[] = {{0, 17, false}};
 
 const Pos& getNextPos() {
   return positions[0];
@@ -56,7 +58,7 @@ const Pos& getNextPos() {
 //The PerfTester class works on both the client and the server side.
 class PerfTester : public ConnectionListener {
 public:
-  PerfTester(const Pos& ourPos2) : ourPos(ourPos2), conn(NULL) {}
+  PerfTester(const Pos& ourPos2) : packets(0), ourPos(ourPos2), conn(NULL) {}
   ~PerfTester() {}
 
   void onDisconnect() { 
@@ -64,13 +66,11 @@ public:
   }
 
   void onConnect(SyncConnection& conn2) {
-    mlprintf(ourPos.x, ourPos.y, "Connection accepted");
     conn = conn2.getConnection();
     writePackets(); //Send an initial batch of data.
   }
 
   void onNewConn(SyncConnection& conn2) {
-    mlprintf(ourPos.x, ourPos.y, "Connection accepted");
     conn = conn2.getConnection();
     writePackets();
   }
@@ -79,6 +79,7 @@ public:
     delete conn->stream().getNextPacket();
     //We don't need to do anything to the data we are being sent.  The low-
     //level routines will keep track of the stats for us.
+    updateStats();
   }
 
   void onFailure(const Error& error) {
@@ -92,8 +93,8 @@ public:
   }
 
   void onConnectFailure(const Error& error) {
-    mprintf(0, 0, "Connection to server failed.   ");
-    mprintf(0, 1, "  GNE reported error: %s   ", error.toString().c_str());
+    mlprintf(0, 0, "Connection to server failed.   ");
+    mlprintf(0, 1, "  GNE reported error: %s   ", error.toString().c_str());
   }
 
   void onDoneWriting() {
@@ -102,8 +103,28 @@ public:
 
   //Try to send out some more packets.
   void writePackets() {
+    packets++;
+    CustomPacket temp;
+    temp.getData() << "Hello World!";
+    conn->stream().writePacket(temp, true);
+
+    updateStats();
+  }
+
+  //write the stats out to our position.
+  void updateStats() {
+    updateGlobalStats();
+    ConnectionStats all = conn->getStats(-1);
+    ConnectionStats rel = conn->getStats(1);
+    ConnectionStats unrel = conn->getStats(0);
+    //Printfs are so much nicer in this case, eh?
+    mlprintf(ourPos.x, ourPos.y, "%-20s%10s%10s%10s",
+      conn->getRemoteAddress(true).toString().c_str(), "tot =" , "rel +", "unrel");
+    mlprintf(ourPos.x, ourPos.y+1, "%-20s%10d%10d%10d",
+      "bytesin", packets, rel.bytesRecv, unrel.bytesRecv);
   }
 private:
+  int packets;
   Pos ourPos;
   Connection* conn;
 };
@@ -130,6 +151,12 @@ public:
 private:
 };
 
+void updateGlobalStats() {
+  ConnectionStats all = GNE::getGlobalStats();
+  mlprintf(gpos.x, gpos.y, "%-20s%10s", "global", "tot");
+  mlprintf(gpos.x, gpos.y+1, "%-20s%10d", "bytesin", all.bytesRecv);
+}
+
 void errorExit(const char* error) {
   gout << "Error: " << error << endl;
   exit(1);
@@ -151,7 +178,9 @@ int main() {
     cout << "Unable to initialize GNE" << endl;
     exit(2);
   }
-  setUserVersion(1); //sets our user protocol version number, used in
+  enableStats();     //By default, stats are disabled.  This turns stat
+                     //collection on.
+  setUserVersion(1); //Sets our user protocol version number, used in
                      //the connection process by GNE to version check.
   if (initConsole(atexit)) {
     cout << "Unable to initialize GNE Console" << endl;
