@@ -130,7 +130,7 @@ GNEProtocolVersionNumber getGNEProtocolVersion() {
   GNEProtocolVersionNumber ret;
   ret.version = 0;
   ret.subVersion = 0;
-  ret.build = 1;
+  ret.build = 2;
 
   return ret;
 }
@@ -150,20 +150,20 @@ void checkVersions(const GNEProtocolVersionNumber& otherGNE,
   GNEProtocolVersionNumber us = getGNEProtocolVersion();
 
   //Check the GNE version numbers
-  if (otherGNE.version != us.version &&
-      otherGNE.subVersion != us.subVersion &&
+  if (otherGNE.version != us.version ||
+      otherGNE.subVersion != us.subVersion ||
       otherGNE.build != us.build) {
     if ((otherGNE.version > us.version) ||
         (otherGNE.version == us.version && otherGNE.subVersion > us.subVersion) ||
         (otherGNE.subVersion == us.subVersion && otherGNE.build > us.build))
-      throw new Error(Error::GNETheirVersionHigh);
+      throw Error(Error::GNETheirVersionHigh);
     else
-      throw new Error(Error::GNETheirVersionLow);
+      throw Error(Error::GNETheirVersionLow);
   }
 
   //Check the user version numbers
   if (userVersion != otherUser) {
-    throw new Error(Error::UserVersionMismatch);
+    throw Error(Error::UserVersionMismatch);
   }
 }
 
