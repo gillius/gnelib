@@ -37,5 +37,6 @@
 #include "src/TimerCallback.h"
 #include "src/Counter.h"
 #include "src/Time.h"
+#include "src/Console.h"
 
 #endif
