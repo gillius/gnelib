@@ -44,6 +44,18 @@ namespace GNE {
  */
 namespace Console {
   /**
+   * An ostream that works after the console part of GNE has been initialized.
+   * Normally cout doesn't work after the console has been initalized.
+   */
+  extern std::ostream gout;
+
+  /**
+   * Similar thing with gout.
+   * @see gout
+   */
+  extern std::istream gin;
+
+  /**
    * Initalizes the console part of GNE.  This may be called multiple times.
    * Pass it your atexit function so the console will be shutdown
    * automatically on program exit.
@@ -117,7 +129,7 @@ namespace Console {
   int lgetString(int x, int y, char* str, int maxlen);
 
   /**
-   * Same as lgetString(int, int, char*, int), but uses the current curson
+   * Same as lgetString(int, int, char*, int), but uses the current cursor
    * position as obtained from mgetpos for the positions.
    * @see lgetString
    * @see mgetpos

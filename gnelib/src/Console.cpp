@@ -19,6 +19,9 @@
 
 #include "gneintern.h"
 #include "Console.h"
+#include "gstreambufs.h"
+#include <ostream>
+#include <istream>
 
 #include "conioport.h"
 
@@ -27,6 +30,12 @@ namespace Console {
 
 static Mutex outSync;
 static bool initialized = false;
+
+//Global iostreams to replace cout/cin
+static goutbuf outbuf;
+std::ostream gout(&outbuf);
+static ginbuf inbuf;
+std::istream gin(&inbuf);
 
 //Our global key codes for enter and backspace
 int ENTER;
@@ -37,6 +46,7 @@ bool initConsole(int (*atexit_ptr)(void (*func)(void))) {
     conio_init(&ENTER, &BACKSPACE);
     assert(atexit_ptr);
     atexit_ptr(shutdownConsole);
+    gin.tie(&gout); //tie the input and output together.
     initialized = true;
   }
   return false;
@@ -44,20 +54,24 @@ bool initConsole(int (*atexit_ptr)(void (*func)(void))) {
 
 void shutdownConsole() {
   if (initialized) {
+    gout.flush();
     conio_exit();
     initialized = false;
   }
 }
 
 int kbhit() {
+  assert(initialized);
   return conio_kbhit();
 }
 
 int getch() {
+  assert(initialized);
   return conio_getch();
 }
 
 int mprintf(const char* format, ...) {
+  assert(initialized);
   va_list arg;
   
   va_start(arg, format);
@@ -70,6 +84,7 @@ int mprintf(const char* format, ...) {
 }
 
 int mlprintf(int x, int y, const char* format, ...) {
+  assert(initialized);
   va_list arg;
   
   va_start(arg, format);
@@ -83,12 +98,14 @@ int mlprintf(int x, int y, const char* format, ...) {
 }
 
 void mputchar(int ch) {
+  assert(initialized);
   outSync.acquire();
   conio_putchar(ch);
   outSync.release();
 }
 
 void mlputchar(int x, int y, int ch) {
+  assert(initialized);
   outSync.acquire();
   conio_gotoxy(x, y);
   conio_putchar(ch);
@@ -96,6 +113,7 @@ void mlputchar(int x, int y, int ch) {
 }
 
 int lgetString(int x, int y, char* str, int maxlen) {
+  assert(initialized);
   int currpos = 0;          //The next char to be typed
   bool exit = false;
   while (!exit) {
@@ -122,17 +140,27 @@ int lgetString(int x, int y, char* str, int maxlen) {
   return currpos;
 }
 
+int getString(char* str, int maxlen) {
+  assert(initialized);
+  int x, y;
+  mgetPos(&x, &y);
+  return lgetString(x, y, str, maxlen);
+}
+
 void setTitle(const char* title) {
+  assert(initialized);
   conio_settitle(title);
 }
 
 void mgetConsoleSize(int* width, int* height) {
+  assert(initialized);
   outSync.acquire();
   conio_getsize(width, height);
   outSync.release();
 }
 
 void mgetPos(int* x, int* y) {
+  assert(initialized);
   outSync.acquire();
   conio_getxy(x, y);
   outSync.release();

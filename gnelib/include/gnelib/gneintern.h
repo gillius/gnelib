@@ -46,8 +46,11 @@
 #include <nl.h>
 
 //Standard C++ includes
+//We don't include the iostream includes because not all compilers support
+//pre-compiled headers, and the iostream library is quite large, and is used
+//very sparsely (mainly just for the streambuf replacements in
+//gstreambufs.cpp)
 #include <string>
-#include <sstream>
 #include <map>
 #include <queue>
 

@@ -33,47 +33,49 @@ void displayAddress(const Address& addr);
 
 int main(int argc, char* argv[]) {
   if (initGNE(NL_IP, atexit)) {
-		exit(1);
-	}
+    exit(1);
+  }
   initConsole(atexit);
   setTitle("GNE Address Class Test/Example");
 
-	string url = "www.microsoft.com:80";
+  string url = "www.microsoft.com:80";
 
-	//Explicit url resolving
-	cout << url << " resolves to: " << Address(url).toString() << endl;
-	//Test implicit conversion from string to Address
-	cout << "localhost:1234 resolves to: ";
-	displayAddress("localhost:1234");
-	cout << endl;
+  //Explicit url resolving
+  gout << url << " resolves to: " << Address(url).toString() << endl;
+  //Test implicit conversion from string to Address
+  gout << "localhost:1234 resolves to: ";
+  displayAddress("localhost:1234");
+  gout << endl;
 
-	//Test other functions
-	Address addr("145.64.129.123");
-	cout << "145.64.129.123 resolves to: " << addr << endl;
-	cout << "Port is: " << addr.getPort() << endl;
-	cout << "Setting port to 15:";
-	addr.setPort(15);
-	cout << " address is now: " << addr << endl;
+  //Test other functions
+  Address addr("145.64.129.123");
+  gout << "145.64.129.123 resolves to: " << addr << endl;
+  gout << "Port is: " << addr.getPort() << endl;
+  gout << "Setting port to 15:";
+  addr.setPort(15);
+  gout << " address is now: " << addr << endl;
 
-	cout << "Trying to set port to -516 (invalid)";
-	addr.setPort(-516);
-	if (addr)
-		cout << " address still valid (NOT CORRECT)." << endl;
-	else
-		cout << " address no longer valid (this is correct)." << endl;
+  gout << "Trying to set port to -516 (invalid)";
+  addr.setPort(-516);
+  if (addr)
+    gout << " address still valid (NOT CORRECT)." << endl;
+  else
+    gout << " address no longer valid (this is correct)." << endl;
 
-	Address rTest("www.yahoo.com:80");
-	cout << "Testing reverse DNS: www.yahoo.com:80 resolves to " << rTest << endl;
-	cout << rTest << " reverses to " << rTest.getNameByAddress() << endl;
+  Address rTest("www.yahoo.com:80");
+  gout << "Testing reverse DNS: www.yahoo.com:80 resolves to " << rTest << endl;
+  gout << rTest << " reverses to " << rTest.getNameByAddress() << endl;
 
-	cout << "Try picking your own address: ";
-	cin >> url;
-	cout << url << " resolves to: " << Address(url) << endl;
-	cout << Address(url) << " reverses to " << Address(url).getNameByAddress() << endl;
+  gout << "Try picking your own address: ";
+  gin >> url;
+  gout << url << " resolves to: " << Address(url) << endl;
+  gout << Address(url) << " reverses to " << Address(url).getNameByAddress() << endl;
+  gout << "Press a key to continue." << endl;
+  getch();
 
-	return 0;
+  return 0;
 }
 
 void displayAddress(const Address& addr) {
-	cout << addr;
+  gout << addr;
 }
