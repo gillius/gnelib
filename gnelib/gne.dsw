@@ -44,6 +44,12 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name exnetperf
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name exping
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name expong
+    End Project Dependency
 }}}
 
 ###############################################################################
