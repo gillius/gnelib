@@ -112,13 +112,6 @@ public:
 	void shutDown();
 
   /**
-   * Internal function -- Do not call.  This thread handles throttled writes
-   * to the socket.
-   */
-  //##ModelId=3B07538101FA
-  void run();
-
-  /**
    * Add the given packet to the incoming queue.  This is normalled used
    * internally by the Connection class to add the packets, but it is safe
    * for the user to call, if they want to delay processing of the packets
@@ -131,6 +124,13 @@ public:
    */
   //##ModelId=3B07538101FB
   void addIncomingPacket(Packet* packet);
+
+protected:
+  /**
+   * This thread handles throttled writes to the socket.
+   */
+  //##ModelId=3B07538101FA
+  void run();
 
 private:
 

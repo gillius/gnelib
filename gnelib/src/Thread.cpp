@@ -25,6 +25,8 @@ namespace GNE {
 
 //##ModelId=3AE11D5F023A
 std::map<pthread_t, Thread*> Thread::threads;
+//##ModelId=3BB805C6014B
+Mutex Thread::mapSync;
 //##ModelId=3B0753810334
 const int Thread::DEF_PRI = 0;
 //##ModelId=3B0753810335
@@ -32,23 +34,14 @@ const int Thread::HIGH_PRI = 1;
 //##ModelId=3AE1F1CA00DC
 const std::string Thread::DEF_NAME = "Thread";
 
-static Mutex mapSync;
-
-extern "C" {
-  /**
-   * C helper function to start the thread.
-	 * \todo I think we can make the run function private, as it should be, by
-	 *       passing this function a pointer to that function.  Thanks to
-	 *       stevieo from EFNet for the idea.
-   */
-  static void* threadStart( void* thread ) {
-    Thread* thr = ( ( Thread* )( thread ) );
-    mapSync.acquire(); //This is to make sure the map is updated before we
-    mapSync.release(); //start running
-    thr->run();
-    thr->end();
-    return NULL;
-  }
+//##ModelId=3BB805C60186
+void* Thread::threadStart( void* thread ) {
+	Thread* thr = ( ( Thread* )( thread ) );
+	mapSync.acquire(); //This is to make sure the map is updated before we
+	mapSync.release(); //start running
+	thr->run();
+	thr->end();
+	return NULL;
 }
 
 //##ModelId=3B0753810375
@@ -149,7 +142,7 @@ bool Thread::isRunning() const {
 void Thread::start() {
   running = true;
   mapSync.acquire();
-  pthread_create( &thread_id, NULL, threadStart, this );
+  pthread_create( &thread_id, NULL, Thread::threadStart, this );
   threads[ thread_id ] = this;
   mapSync.release();
 }

@@ -46,14 +46,6 @@ public:
   virtual ~ClientConnection();
 
   /**
-   * Don't call this method.  Connection starts a new thread lasting only
-   * while it is connecting.
-   * @see Thread#run()
-   */
-  //##ModelId=3B07538003BA
-  void run();
-
-  /**
    * Opens the socket, ready for connect, but does not yet connect.
 	 * Normally this function does not block, but if you give a hostname that
 	 * needs to be resolved, a delay (possibly long) will occur while the
@@ -120,6 +112,14 @@ public:
    */
   //##ModelId=3B07538003C4
   virtual void onConnectFailure(const Error& error) = 0;
+
+protected:
+  /**
+   * Connection starts a new thread lasting only while it is connecting.
+   * @see Thread#run()
+   */
+  //##ModelId=3B07538003BA
+  void run();
 
 private:
   /**

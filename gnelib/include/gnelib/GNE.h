@@ -107,13 +107,13 @@ class ConnectionEventGenerator;
   /**
    * A numeric representation of the current version of this library.
    */
-  const double VER = 0.003;
+  const double VER = 0.4;
 
   /**
    * A string representation of the name of the library and the current
    * version.
    */
-  const std::string VER_STR = "GNE v0.003 pre-alpha";
+  const std::string VER_STR = "GNE v0.4 alpha";
 
   /**
    * The low-level header size of a UDP header, which is used with the HawkNL

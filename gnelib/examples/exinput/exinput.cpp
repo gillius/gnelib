@@ -55,6 +55,11 @@ public:
   virtual ~Star() {
   }
 
+  void stop() {
+    running = false;
+  }
+
+protected:
   void run() {
     srand(randSeed); //See above on why I do this.
     while (running) {
@@ -64,10 +69,6 @@ public:
       if (running)
         Thread::sleep(rand() % 1000);
     }
-  }
-
-  void stop() {
-    running = false;
   }
 
 private:

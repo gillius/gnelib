@@ -130,21 +130,6 @@ public:
   void detach(bool delThis);
 
   /**
-   * This function is the starting point for this thread.
-   * Derive your own class from Thread, and implement this function.
-   * When this function returns, the thread ends.
-   */
-  //##ModelId=3B0753810385
-  virtual void run() = 0;
-
-  /**
-   * This function is called internally and automatically after run ends and
-   * is used for internal library cleanup.  Do not call it directly.
-   */
-  //##ModelId=3B0753810387
-  void end();
-
-  /**
    * Determine the running state of the thread.
    */
   //##ModelId=3B0753810388
@@ -200,7 +185,29 @@ protected:
   //##ModelId=3B0C591802EE
   bool shutdown;
 
+  /**
+   * This function is the starting point for this thread.
+   * Derive your own class from Thread, and implement this function.
+   * When this function returns, the thread ends.
+   */
+  //##ModelId=3B0753810385
+  virtual void run() = 0;
+
 private:
+	/**
+	 * Internal Thread function for the pthread_start callback to start a new
+	 * thread and call run().
+	 */
+  //##ModelId=3BB805C60186
+	static void* threadStart(void* thread);
+
+  /**
+   * This function is called internally and automatically after run ends and
+   * is used for internal library cleanup.
+   */
+  //##ModelId=3B0753810387
+  void end();
+
   /**
    * This is an internal-only function called by the underlying pthreads
    * functions -- do not call.
@@ -223,12 +230,17 @@ private:
   //##ModelId=3AE11D5F023A
   static std::map<pthread_t, Thread*> threads;
 
+	/**
+	 * Mutex for syncronizing threads
+	 */
+  //##ModelId=3BB805C6014B
+  static Mutex mapSync;
+
   //##ModelId=3B0753810339
   int priority;
 
   //##ModelId=3B075381033B
   Mutex sync;
-
 };
 
 }

@@ -44,6 +44,7 @@ public:
     mprintf("%s dies.\n", getName().c_str());
   }
 
+protected:
   void run() {
     //Note that if we were sitting in an infinite loop, we would have to
     //respond to the shutdown variable, as shown in comments.  The commented

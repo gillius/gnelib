@@ -121,7 +121,7 @@ public:
 	}
 
   void onNewConn() {
-    mprintf("Connection received; waiting for message...\n");
+    mprintf("Connection received from %s; waiting for message...\n", getAddressString(getRemoteAddress(true)).c_str());
 		quit.acquire();
 		quit.timedWait(5000);
 		quit.release();
@@ -189,6 +189,7 @@ int main(int argc, char* argv[]) {
 
   //It's okay to use iostreams instead of the Console functions when we are
   //only accessing the console from one thread.
+	cout << "GNE Basic Connections Example for " << GNE::VER_STR << endl;
   displayAddress();
   cout << "Should we act as the server, or the client?" << endl;
   cout << "Type 1 for client, 2 for server: ";

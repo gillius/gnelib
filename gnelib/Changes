@@ -1,4 +1,7 @@
-GNE 0.003 to 0.004
+GNE 0.003 to 0.4
+  Fixed C callback in Thread so that Thread::run is now protected rather than
+    public as it should be, and Thread::end is now private rather than
+    public, as it very definately should be.
   Made ClientConnection::open a little more friendly.
   Modifications to the event system, onDisconnect event, and error events
     split into two categories.  Error objects now passed by const reference.

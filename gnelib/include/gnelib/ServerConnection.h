@@ -46,13 +46,6 @@ public:
   virtual ~ServerConnection();
 
   /**
-   * Don't call this function directly.  This thread performs the connection
-   * process.  The thread will have finished before onNewConn is called.
-   */
-  //##ModelId=3B0753810280
-  void run();
-
-  /**
    * Event triggered when a new connection has been negotiated and error
    * checked.  This object is a newly allocated object created from your
    * ServerConnectionCreator object, and this function will be the first time
@@ -76,6 +69,14 @@ public:
    */
   //##ModelId=3B0753810283
   virtual void onConnFailure(const Error& error) = 0;
+
+protected:
+  /**
+   * This thread performs the connection process.  The thread will have
+	 * finished before onNewConn is called.
+   */
+  //##ModelId=3B0753810280
+  void run();
 
 };
 

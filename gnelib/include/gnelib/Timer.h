@@ -83,9 +83,9 @@ public:
   //##ModelId=3B0753820068
   void stopTimer();
 
+protected:
   /**
-   * Don't call this function.  This is the thread that will perform the
-   * callbacks.
+   * This is the thread that will perform the callbacks.
    */
   //##ModelId=3B0753820069
   void run();
