@@ -39,7 +39,7 @@ class ConnectionParams;
  * its base class -- a Connection.  This class is created by
  * ServerConnectionListener when incoming connections are comming in.
  */
-class ServerConnection : public Connection, public Thread {
+class ServerConnection : public Connection, private Thread {
 protected:
   /**
    * We need information gained from setThisPointer to initialize, so the real
@@ -76,6 +76,11 @@ public:
    */
   virtual ~ServerConnection();
 
+  /**
+   * Starts the connection process.
+   */
+  using Thread::start;
+
 protected:
   /**
    * This thread performs the connection process.  If an error occurs:
@@ -93,6 +98,8 @@ protected:
    * ServerConnectionListener::onListenSuccess is called.
    */
   void run();
+
+  void shutDown();
 
 private:
   /**
@@ -120,8 +127,23 @@ private:
    */
   void getUnreliableInfo();
 
+  /**
+   * calls onConnectFailure, checking shutdown
+   */
+  void doFailure( const SmartPtr< ServerConnectionListener >& l,
+                                  const Error& e,
+                                  const Address& addr,
+                                  const SmartPtr< ConnectionListener >& listener );
+
   //Temporary storage to hold variables before and during connecting.
-  ServerConnectionParams* params;
+  typedef SmartPtr< ServerConnectionParams > ParamsSPtr;
+  ParamsSPtr params;
+
+  //sigh.  Perhaps requiring inheritance from Thread was a bad idea.
+  friend class boost::weak_ptr< Thread >;
+  friend class boost::shared_ptr< Thread >;
+  friend class boost::weak_ptr< Connection >;
+  friend class boost::shared_ptr< Connection >;
 };
 
 }

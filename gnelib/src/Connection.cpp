@@ -37,7 +37,7 @@
 namespace GNE {
 
 Connection::Connection()
-: connecting(false), connected(false) {
+: state( NeedsInitialization ), timeout_copy( 0 ) {
 }
 
 void Connection::disconnectAll() {
@@ -45,9 +45,10 @@ void Connection::disconnectAll() {
 }
 
 Connection::~Connection() {
-  //no need to disconnect here because we should never have been started or
-  //have been disconnected.
-  assert( !connecting && !connected );
+  if ( state == ReadyToConnect ) //if only ClientConnection::open
+    disconnect();
+
+  assert( state == NeedsInitialization || state == Disconnected );
 }
 
 ConnectionListener::sptr Connection::getListener() const {
@@ -72,7 +73,7 @@ int Connection::getTimeout() {
   if ( eventThread )
     return eventThread->getTimeout();
   else
-    return 0;
+    return timeout_copy;
 }
 
 void Connection::setTimeout(int ms) {
@@ -80,6 +81,7 @@ void Connection::setTimeout(int ms) {
 
   if ( eventThread )
     eventThread->setTimeout(ms);
+  timeout_copy = ms;
 }
 
 PacketStream& Connection::stream() {
@@ -102,31 +104,46 @@ Address Connection::getRemoteAddress(bool reliable) const {
   return Address(sockets.getRemoteAddress(reliable));
 }
 
+Connection::State Connection::getState() const {
+  return state;
+}
+
 bool Connection::isConnected() const {
-  return connected;
+  return state == Connected;
 }
 
 void Connection::disconnect() {
   LockMutex lock( sync );
-  if (connecting || connected) {
-    //This is necessary because we can't join on ps if it has already been
-    //  shutdown and/or never started
-    unreg(true, true);
-    gnedbgo2(2, "disconnecting r: %i, u: %i", sockets.r, sockets.u);
-    ps->shutDown(); //PacketStream will try to send the required ExitPacket.
-    ps->join();
 
-    //Shutdown the EventThread.
-    assert( eventThread ); //if we are connected we HAVE to have a valid EventThread
+  unreg(true, true);
+
+  if ( state != Disconnected && state != Disconnecting ) {
+    state = Disconnecting;
+
+    gnedbgo2(2, "disconnecting r: %i, u: %i", sockets.r, sockets.u);
+
+    if ( ps && ps->hasStarted() ) {
+      ps->shutDown(); //PacketStream will try to send the required ExitPacket.
+
+      //we have to release sync to prevent deadlock in case PacketStream decides
+      //to lock sync (from processError).
+      sync.release();
+      ps->join(); //we have to join to wait for the ExitPacket to go out.
+      sync.acquire();
+    }
+  }
+
+  //Shutdown the EventThread.
+  if ( eventThread ) {
     eventThread->onDisconnect();
     eventThread.reset(); //Kill the cycle we participate in
-
-    connected = connecting = false;
   }
-  //We always call the low-level disconnect in case errors happened while
-  //opening before connecting or for some other reason they are left open --
-  //and calling disconnect multiple times does not hurt.
+
+  //Even if the PS or ET aren't running, the low-level stuff in the connection
+  //threads should get an error when we disconnect the actual sockets.
   sockets.disconnect();
+
+  state = Disconnected;
 }
 
 void Connection::disconnectSendAll(int waitTime) {
@@ -137,12 +154,9 @@ void Connection::disconnectSendAll(int waitTime) {
 }
 
 void Connection::setThisPointer( const wptr& weakThis ) {
+  assert( this_.expired() );
   this_ = weakThis;
   eventThread = EventThread::create( weakThis.lock() );
-}
-
-void Connection::startEventThread() {
-  eventThread->start();
 }
 
 void Connection::addHeader(RawPacket& raw) {
@@ -198,15 +212,31 @@ void Connection::onReceive() {
     eventThread->onReceive();
 }
 
+void Connection::finishedInit() {
+  assert( state == NeedsInitialization );
+  state = ReadyToConnect;
+}
+
+void Connection::startConnecting() {
+  assert( state == ReadyToConnect );
+  state = Connecting;
+}
+
+void Connection::startThreads() {
+  LockMutex lock( sync );
+
+  assert( state == Connecting );
+  ps->start();
+  eventThread->start();
+}
+
 void Connection::finishedConnecting() {
   LockMutex lock( sync );
 
-  if (connecting && !connected) {
-    //If this was not true, then we were disconnected before this (and before
-    //the connecting code knows about it).
-    connected = true;
-    connecting = false;
-  }
+  assert( state != NeedsInitialization );
+  assert( state != ReadyToConnect );
+  if ( state == Connecting )
+    state = Connected;
 }
 
 template <typename T>
@@ -232,7 +262,7 @@ void Connection::onReceive(bool reliable) {
   //disconnected at any time.
   {
     LockMutex lock( sync );
-    if ( connected || connecting )
+    if ( state == Connected || state == Connecting )
       temp = sockets.rawRead(reliable, buf, RawPacket::RAW_PACKET_LEN);
     else
       return; //ignore the event.

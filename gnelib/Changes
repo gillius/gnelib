@@ -1,4 +1,8 @@
 GNE 0.55 to current
+  Major reworking of the connecting code, and added a state to Connection to
+    help keep track of things.  These changes fixed some bugs including at
+    least one deadlock, and increased robustness when GNE is shutdown while
+    a Connection is connecting (so it can fail and quit early).
   Complete reexamination and major overhaul of event generation to listeners,
     and the synchronization that occured as a result.  Hopefully this will
     get rid of the deadlocks and hopefully most if not all of the remaining

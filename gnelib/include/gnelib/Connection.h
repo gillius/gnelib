@@ -75,6 +75,18 @@ public: //static methods
    */
   static void disconnectAll();
 
+  /**
+   * Represents the states a Connection object can be in.
+   */
+  enum State {
+    NeedsInitialization, /**< Connection was just created but needs initializing. */
+    ReadyToConnect, /**< Connection is ready to connect. */
+    Connecting,     /**< Connection is in the middle of connecting. */
+    Connected,      /**< Connection is connected. */
+    Disconnecting,  /**< Connection is in the middle of disconnecting. */
+    Disconnected    /**< Connection has finished and cannot be restarted. */
+  };
+
 public:
 
   /**
@@ -119,14 +131,9 @@ public:
   void setListener( const SmartPtr<ConnectionListener>& listener);
 
   /**
-   * Returns the timeout for this connection.  Returns 0 at any time if the
-   * Connection was disconnected.
+   * Returns the timeout for this connection.
    *
    * @see setTimeout
-   * @deprecated The semantics have changed to make this method useless
-   *             except perhaps to print it out for purposes of diagnostics.
-   *             I might consider undeprecating it if I can find a good reason
-   *             to keep it.
    */
   int getTimeout();
 
@@ -190,9 +197,23 @@ public:
   Address getRemoteAddress(bool reliable) const;
 
   /**
+   * Returns the state this Connection is in.  Note that the state of the
+   * connection can change at any moment after this call by %GNE if the state
+   * is Connecting or Connected.
+   *
+   * @see State
+   */
+  State getState() const;
+
+  /**
    * Returns true if this Connection is active and ready to send/recieve.
    * A Connection may become disconnected at any time, as another thread or
    * an event may cause a disconnect.
+   *
+   * This method returns true if the state is currently "Connected", false if
+   * any other state.
+   *
+   * @see getState
    */
   bool isConnected() const;
 
@@ -204,6 +225,9 @@ public:
    * connection is disconnected immediately, it is still a graceful close
    * such that an onExit event will be generated on the remote connection if
    * possible, but any packets pending to be sent won't get sent.
+   *
+   * It is valid to call disconnect while the Connection object is still
+   * connecting -- this can be used to "abort" or cancel a connection attempt.
    *
    * NOTE: You may not reconnect this connection object after calling
    * disconnect.
@@ -238,11 +262,6 @@ protected:
    * A weak pointer to this own object.
    */
   wptr this_;
-
-  /**
-   * Starts the EventThread running.
-   */
-  void startEventThread();
 
   /**
    * A utility function for ServerConnection and ClientConnection to add the
@@ -297,22 +316,29 @@ protected:
   PacketStream::sptr ps;
 
   /**
-   * The connecting has just finished and the flags need to be changed.
-   * Since this needs a mutex, we make a function to handle this.
+   * The Connection has finished initializing and the state now can change
+   * to ReadyToConnect.
+   *
+   * @pre state is now NeedsInitialization
+   */
+  void finishedInit();
+
+  /**
+   * Moves from ReadyToConnect to Connecting state.
+   */
+  void startConnecting();
+
+  /**
+   * Does the work needed to start up the PacketStream and EventThread thrads.
+   *
+   * @pre state must be Connecting.
+   */
+  void startThreads();
+
+  /**
+   * The connecting has just finished and the state needs to be changed.
    */
   void finishedConnecting();
-
-  /**
-   * Is this connecting?  We need to know this so we don't report as ready
-   * for communications, but still want to disconnect.  This will be set
-   * after the sockets are registered and the PacketStream is active.
-   */
-  bool connecting;
-
-  /**
-   * Is this Connection active and ready for communications?
-   */
-  bool connected;
 
   /**
    * Register this Connection object's sockets with the
@@ -362,6 +388,12 @@ private:
     bool reliable;
 
   };
+
+  volatile State state;
+
+  //a copy of the information set in setTimeout so we can return a value after
+  //eventThread is reset.
+  int timeout_copy;
 
   /**
    * This SmartPtr participates in a cycle, so we have to be careful to reset

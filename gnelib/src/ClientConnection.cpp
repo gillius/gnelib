@@ -43,8 +43,7 @@ public:
   SmartPtr<SyncConnection> sConnPtr;
 };
 
-ClientConnection::ClientConnection()
-: Thread("CliConn", Thread::HIGH_PRI), params(NULL) {
+ClientConnection::ClientConnection() : Thread("CliConn", Thread::HIGH_PRI) {
   gnedbgo(5, "created");
   setType( CONNECTION );
 }
@@ -57,16 +56,17 @@ ClientConnection::sptr ClientConnection::create() {
 }
 
 ClientConnection::~ClientConnection() {
-  delete params;
   gnedbgo(5, "destroyed");
 }
 
 bool ClientConnection::open(const Address& dest,
                             const ConnectionParams& p) {
+  assert( getState() == NeedsInitialization );
+
   if (!dest || p)
     return true;
   else {
-    params = new ClientConnectionParams;
+    params = ParamsSPtr( new ClientConnectionParams );
     params->dest = dest;
     params->cp = p;
     setListener(p.getListener());
@@ -74,7 +74,12 @@ bool ClientConnection::open(const Address& dest,
 
     sockets.r = nlOpen(p.getLocalPort(), NL_RELIABLE_PACKETS);
   }
-  return (sockets.r == NL_INVALID);
+  if ( sockets.r == NL_INVALID ) {
+    return true;
+  } else {
+    finishedInit();
+    return false;
+  }
 }
 
 void ClientConnection::connect() {
@@ -82,20 +87,31 @@ void ClientConnection::connect() {
 }
 
 void ClientConnection::connect( const SyncConnection::sptr& wrapped ) {
-  assert(sockets.r != NL_INVALID);
-  assert(params != NULL);
-  assert(params->dest);
-  assert(!params->cp);
+  assert( sockets.r != NL_INVALID );
+  assert( params );
+  assert( params->dest );
+  assert( !params->cp );
+  assert( getState() == ReadyToConnect );
 
   params->sConnPtr = wrapped;
+  startConnecting();
   start();
 }
 
+Error ClientConnection::waitForConnect() {
+  join();
+  return connError;
+}
+
 /**
- * \bug if GNE shuts down while connecting... well that's just bad news.
+ * \todo check to see how well things work if GNE is shutdown while a connection
+ *       is in progress.
+ *
  * \bug The PacketFeeder is set after onNewConn, so it is possible that if
  *      the user sets a different PacketFeeder right after connecting, it
  *      might "get lost" and if set during onNewConn, is definitely lost.
+ *      I do provide a check do this is only a problem if a feeder is set
+ *      in the ConnectionParams AND in onNewConn.
  */
 void ClientConnection::run() {
   assert( getListener() );
@@ -114,7 +130,7 @@ void ClientConnection::run() {
       doHandshake();
     } catch (Error& e) {
       gnedbgo1(1, "Connection failure during GNE handshake: %s", e.toString().c_str());
-      origListener->onConnectFailure(e);
+      doFailure( origListener, e );
       return;
     }
     gnedbgo(2, "GNE Protocol Handshake Successful.");
@@ -137,9 +153,7 @@ void ClientConnection::run() {
       //SyncConnection::connect() will throw an error.
       if (ourSConn)
         sConn.startConnect();
-      ps->start();
-      connecting = true;
-      startEventThread();
+      startThreads();
       reg(true, (sockets.u != NL_INVALID));
 
       //Setup the packet feeder
@@ -157,33 +171,31 @@ void ClientConnection::run() {
       }
 
       //Setup the packet feeder
-      ps->setFeeder( params->cp.getFeeder() );
-
-      //We are done using the ClientConnectionParams.
-      delete params;
-      params = NULL;
+      if ( params->cp.getFeeder() )
+        ps->setFeeder( params->cp.getFeeder() );
 
     } catch (Error& e) {
       if (!onConnectFinished) {
-        if (ourSConn) {
+        if (ourSConn)
           sConn.endConnect(false);
-        }
         
-        origListener->onConnectFailure(e);
+        doFailure( origListener, e );
       }
-
-      if (e.getCode() == Error::ConnectionRefused)
-        sConn.disconnect();
-
-      //We are done using the ClientConnectionParams.
-      delete params;
-      params = NULL;
     }
-  } else {
+
+  } else { //nlConnect failed
     LowLevelError err = LowLevelError(Error::ConnectionTimeOut);
     gnedbgo1(1, "Connection failure: %s", err.toString().c_str());
-    origListener->onConnectFailure(err);
+    doFailure( origListener, err );
   }
+
+  //Save some memory by doing an early explicit reset.
+  params.reset();
+}
+
+void ClientConnection::shutDown() {
+  Thread::shutDown();
+  disconnect();
 }
 
 void ClientConnection::doHandshake() {
@@ -325,6 +337,18 @@ void ClientConnection::setupUnreliable(const Address& dest) {
   check = sockets.rawWrite(false, resp.getData(), resp.getPosition());
   if (check != resp.getPosition() || check != sizeof(PacketParser::END_OF_PACKET))
     throw LowLevelError(Error::Write);
+}
+
+void ClientConnection::doFailure( const SmartPtr< ConnectionListener >& l, const Error& e ) {
+  if ( shutdown ) {
+    Error err( Error::ConnectionAborted );
+    l->onConnectFailure( err );
+    connError = err;
+
+  } else { 
+    l->onConnectFailure( e );
+    connError = e;
+  }
 }
 
 }

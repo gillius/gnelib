@@ -38,11 +38,10 @@ class SyncConnection;
  *
  * A class that can connect to a remote target.
  */
-class ClientConnection : public Connection, public Thread {
+class ClientConnection : public Connection, private Thread {
 protected:
   /**
-   * Initializes this ClientConnection.  The listener is passed in the open
-   * method.
+   * Initializes this ClientConnection.
    */
   ClientConnection();
 
@@ -51,7 +50,8 @@ public:
   typedef WeakPtr<ClientConnection> wptr;
 
   /**
-   * Creates a new ClientConnection object, managed by a SmartPtr.
+   * Creates a new ClientConnection object, managed by a SmartPtr.  The listener
+   * is passed in the open method.
    */
   static sptr create();
 
@@ -60,7 +60,10 @@ public:
   /**
    * Opens the socket, ready for connect, but does not yet connect.  All of
    * the relvant parameters for establishing the connection are passed into
-   * this function.  If there is already an error, the function returns true.
+   * this function.  If there is an error, the function returns true.
+   *
+   * @pre Connection's state is NeedsInitialization
+   * @post Connection's state is ReadyToConnect
    *
    * @param dest the destination address.
    */
@@ -74,21 +77,39 @@ public:
    * during onConnect or it chooses to reject the connection,
    * onConnectFailure will also be called.
    *
-   * You can call join after connect to wait until the connection is
+   * You can call waitForConnect after connect to wait until the connection is
    * finished, when onConnect or onConnectFailure will be called.  When the
-   * called function exits, the thread will stop and join will return.  If
-   * you do not need asyncronous sockets, you do not need to overload these
-   * functions and can rely on the isConnected method.  You still need to
-   * overload onConnectFailure to get a description of the error, however.
+   * called function exits, the thread will stop and waitForConnect will return.
    *
    * The version number for the library and your own version number will be
    * checked during this phase.  If either protocol versions mismatch,
    * onConnectFailure() will be triggered.
    *
+   * @pre Connection's state is ReadyToConnect
+   * @pre Connection's state is Connecting (but may change immedately after to
+   *   another state).
+   * @pre the open method succeeded.
+   *
    * @see ConnectionListener#onConnect()
    * @see ConnectionListener#onConnectFailure()
    */
   void connect();
+
+  /**
+   * Waits indefinitely for the connection attempt started by connect to
+   * finish.  When the attempt finishes, the result of the connection attempt
+   * is returned.  If the connection was successful, an error code of
+   * Error::NoError is returned.
+   *
+   * This is the same Error that is passed to onConnectFailure.
+   *
+   * Multiple threads may call this method at any time, even after connection
+   * completes (and the return will always be the same).  If the connection
+   * has already completed this method will return instantly.
+   *
+   * @pre connect has been called on this object successfully.
+   */
+  Error waitForConnect();
   
 private:
   friend class SyncConnection;
@@ -97,12 +118,17 @@ private:
   //is guaranteed to be valid through the whole connect process.
   void connect( const SmartPtr<SyncConnection>& );
 
-protected:
+private: //thread functions
   /**
    * Connection starts a new thread lasting only while it is connecting.
-   * @see Thread#run()
    */
   virtual void run();
+
+  /**
+   * This will disconnect the connection in progress, to cause the connection
+   * process to fail.  This method is called when %GNE shuts down.
+   */
+  virtual void shutDown();
 
 private:
   /**
@@ -129,8 +155,25 @@ private:
    */
   void setupUnreliable(const Address& dest);
 
+  /**
+   * calls onConnectFailure then sets connError.
+   */
+  void doFailure( const SmartPtr< ConnectionListener >& l, const Error& e );
+
+  /**
+   * What error occured while connecting?
+   */
+  Error connError;
+
   //Temp storage of connection params.
-  ClientConnectionParams* params;
+  typedef SmartPtr< ClientConnectionParams > ParamsSPtr;
+  ParamsSPtr params;
+
+  //sigh.  Perhaps requiring inheritance from Thread was a bad idea.
+  friend class boost::weak_ptr< Thread >;
+  friend class boost::shared_ptr< Thread >;
+  friend class boost::weak_ptr< Connection >;
+  friend class boost::shared_ptr< Connection >;
 };
 
 }

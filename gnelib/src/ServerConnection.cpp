@@ -50,18 +50,24 @@ ServerConnection::ServerConnection()
   gnedbgo(5, "created");
 }
 
-void ServerConnection::init( const ConnectionParams& p,
-                        NLsocket rsocket2,
-                        const SmartPtr<ServerConnectionListener>& creator ) {
+void ServerConnection::init(
+    const ConnectionParams& p, NLsocket rsocket2,
+    const SmartPtr<ServerConnectionListener>& creator ) {
+
   setType( CONNECTION );
   assert(!p);
   sockets.r = rsocket2;
+  finishedInit();  //we move right to ReadyToConnect
+
   setListener(p.getListener());
   setTimeout(p.getTimeout());
-  params = new ServerConnectionParams;
+
+  params = ParamsSPtr( new ServerConnectionParams );
   params->cp = p;
   params->creator = creator;
   params->doJoin = true;
+
+  startConnecting(); //we move right into Connecting state
 }
 
 ServerConnection::sptr
@@ -75,16 +81,17 @@ ServerConnection::create(const ConnectionParams& p, NLsocket rsocket,
 }
 
 ServerConnection::~ServerConnection() {
-  delete params;
   gnedbgo(5, "destroyed");
 }
 
 /**
- * \bug if GNE shuts down while connecting... well that's just bad news.  This
- *      thread may not connect and end in time, causing undefined behavior.
+ * \todo better test GNE shutting down while connection is being made.
+ *
  * \bug The PacketFeeder is set after onNewConn, so it is possible that if
  *      the user sets a different PacketFeeder right after connecting, it
  *      might "get lost" and if set during onNewConn, is definitely lost.
+ *      I do provide a check do this is only a problem if a feeder is set
+ *      in the ConnectionParams AND in onNewConn.
  */
 void ServerConnection::run() {
   assert(sockets.r != NL_INVALID);
@@ -102,8 +109,7 @@ void ServerConnection::run() {
   try {
     doHandshake();
   } catch (Error& e) {
-    params->creator->onListenFailure(e, rAddr, origListener);
-    //We'll get deleted from the SmartPtr cleanup
+    doFailure( params->creator, e, rAddr, origListener );
     return;
   }
   gnedbgo(2, "GNE Protocol Handshake Successful.");
@@ -112,11 +118,10 @@ void ServerConnection::run() {
   bool onNewConnFinished = false;
   SyncConnection::sptr sConnPtr = SyncConnection::create( this_.lock() );
   SyncConnection& sConn = *sConnPtr;
+
   try {
     sConn.startConnect();
-    ps->start();
-    connecting = true;
-    startEventThread();
+    startThreads();
     reg(true, true);
 
     //Setup the packet feeder
@@ -127,9 +132,9 @@ void ServerConnection::run() {
     getListener()->onNewConn(sConn); //SyncConnection will relay this
     onNewConnFinished = true;
 
-    params->creator->onListenSuccess(origListener);
+    finishedConnecting(); //move state to Connected
 
-    finishedConnecting();
+    params->creator->onListenSuccess(origListener);
 
     //Start bringing connection to normal state.  SyncConnection will make
     //sure onDisconnect gets called starting with endConnect().
@@ -137,20 +142,23 @@ void ServerConnection::run() {
     sConn.release();
 
     //Setup the packet feeder
-    ps->setFeeder( params->cp.getFeeder() );
+    if ( params->cp.getFeeder() )
+      ps->setFeeder( params->cp.getFeeder() );
 
   } catch (Error& e) {
     if (!onNewConnFinished) {
       sConn.endConnect(false);
-      params->creator->onListenFailure(e, rAddr, origListener);
-      //We'll get deleted from the SmartPtr cleanup
-      return;
+      doFailure( params->creator, e, rAddr, origListener );
     }
   }
 
-  //If there were no errors, we delete our connection params:
-  delete params;
-  params = NULL;
+  //Release memory for early cleanup.
+  params.reset();
+}
+
+void ServerConnection::shutDown() {
+  Thread::shutDown();
+  disconnect();
 }
 
 void ServerConnection::doHandshake() {
@@ -285,6 +293,19 @@ void ServerConnection::getUnreliableInfo() {
   nlSetRemoteAddr(sockets.u, &temp);
 
   delete[] buf;
+}
+
+void ServerConnection::doFailure( const SmartPtr< ServerConnectionListener >& l,
+                                  const Error& e,
+                                  const Address& addr,
+                                  const SmartPtr< ConnectionListener >& listener ) {
+  if ( shutdown ) {
+    Error err( Error::ConnectionAborted );
+    l->onListenFailure( err, addr, listener );
+
+  } else {
+    l->onListenFailure( e, addr, listener );
+  }
 }
 
 }
