@@ -204,7 +204,7 @@ void doClient(int port) {
     pingTimer->stopTimer(true);
 
   } else {
-    gout << "An error occured while connecting." << endl;
+    gout << "An error occurred while connecting." << endl;
     gout << "Press a key to continue." << endl;
     getch();
   }
