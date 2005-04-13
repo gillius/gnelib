@@ -79,6 +79,8 @@ Mutex::~Mutex() {
     valassert(pthread_mutex_destroy( &data->dbgMutex ), 0);
   #endif
 #endif
+
+  delete data;
 }
 
 void Mutex::acquire() {
