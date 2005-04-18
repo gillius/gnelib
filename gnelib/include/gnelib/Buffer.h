@@ -28,17 +28,17 @@ namespace GNE {
 
 /**
  * The Buffer class provides functionality to pull data types out of a raw
- * binary data buffer.  This class is the replacement for the Buffer class
+ * binary data buffer.  This class is the replacement for the RawPacket class
  * that used to exist.  There are a few reasons for this rename.  The first
  * being that I wanted to fix up the interface -- it had changed so much I
  * didn't want people getting confused so it's a new class now.  The second
- * reason is because people were getting confused thinking Buffer was a
+ * reason is because people were getting confused thinking RawPacket was a
  * Packet type since all Packets typically are named WhateverPacket.  The
  * third reason is because I chose to somewhat base my interface off a class
  * by the same name in Java, java.nio.Buffer.
  *
- * Advantages over Buffer include easier and much much safer memory
- * allocation and management.  Previously in Buffer there was no knowledge
+ * Advantages over RawPacket include easier and much much safer memory
+ * allocation and management.  Previously in RawPacket there was no knowledge
  * about the buffer size and it was very easy to overflow or underflow the
  * buffer.
  *
