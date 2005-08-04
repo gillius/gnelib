@@ -73,9 +73,8 @@ public:
    * The position should be left at the point after your last write call.
    *
    * After a CustomPacket has been read, and you are pulling data out of it,
-   * the position and the limit will be the number of bytes stored in this
-   * CustomPacket.  You need to call rewind or flip (at this point, both are
-   * equivalent) on the buffer before pulling data from it, or a buffer
+   * the position will be the number of bytes stored in this CustomPacket.  You
+   * need to call flip on the buffer before pulling data from it, or a buffer
    * overflow exception will result.
    *
    * You can use the return from this method directly to modify the buffer, or
