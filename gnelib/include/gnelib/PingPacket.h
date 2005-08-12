@@ -121,7 +121,7 @@ public:
   /**
    * Is this PingPacket a ping request?
    */
-  bool isRequest();
+  bool isRequest() const;
 
   /**
    * Changes this PingPacket from a ping request to a ping reply.  If the

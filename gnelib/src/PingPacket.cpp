@@ -51,7 +51,7 @@ PingPacket::PingPacket(bool makeReq) : Packet(ID) {
 PingPacket::~PingPacket() {
 }
 
-bool PingPacket::isRequest() {
+bool PingPacket::isRequest() const {
   return (T2 == Time());
 }
 
