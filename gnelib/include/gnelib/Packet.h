@@ -31,7 +31,7 @@ class Buffer;
  *
  * The base packet class, used for dealing with all types of packets at a
  * fundamental level.  All types of packets must inherit from this class to
- * be recognized by %GNE.  %GNE already implmenets some types of packets.
+ * be recognized by %GNE.  %GNE already implements some types of packets.
  *
  * When you create a new packet you MUST define your own versions of all
  * virtual functions or the program will fail.
@@ -118,7 +118,7 @@ public:
    *
    * This method is allowed to throw any subclass of Error.  This can happen
    * if accessing the Packet causes a buffer underflow, but an error might
-   * occur in the format or consistancy of the data for the user's derived
+   * occur in the format or consistency of the data for the user's derived
    * class.  If you cannot construct a proper Packet of your type from the
    * data in raw, then you should throw a subclass of Error.
    */

@@ -56,7 +56,7 @@ void Packet::readPacket(Buffer& raw) {
 }
 
 Packet& Packet::operator = (const Packet& rhs) {
-  //The type should already by the same
+  //The type should already be the same
   assert(type == rhs.type);
   return *this;
 }
