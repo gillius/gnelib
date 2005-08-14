@@ -43,6 +43,7 @@
 #include "gnelib/ConsoleStream.h"
 #include "gnelib/Counter.h"
 #include "gnelib/CustomPacket.h"
+#include "gnelib/EmptyPacket.h"
 #include "gnelib/Error.h"
 #include "gnelib/Errors.h"
 #include "gnelib/GNE.h"

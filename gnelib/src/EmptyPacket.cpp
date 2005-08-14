@@ -18,45 +18,13 @@
  */
 
 #include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/Packet.h"
-#include "../include/gnelib/PacketParser.h"
-#include "../include/gnelib/Buffer.h"
+#include "../include/gnelib/EmptyPacket.h"
 
 namespace GNE {
 
-Packet::Packet(int id) : type((guint8)id) {
-}
+const int EmptyPacket::ID = 0;
 
-Packet::Packet( const Packet& o ) : type(o.type) {
-}
-
-Packet::~Packet() {
-}
-
-Packet* Packet::makeClone() const {
-  return PacketParser::clonePacket( this );
-}
-
-int Packet::getType() const {
-  return (int)type;
-}
-
-int Packet::getSize() const {
-  return Buffer::getSizeOf(type);
-}
-
-void Packet::writePacket(Buffer& raw) const {
-  raw << type;
-}
-
-void Packet::readPacket(Buffer& raw) {
-  //don't read type here, because our parser does this.
-}
-
-Packet& Packet::operator = (const Packet& rhs) {
-  //The type should already be the same
-  assert(type == rhs.type);
-  return *this;
+EmptyPacket::EmptyPacket() : Packet( ID ) {
 }
 
 }

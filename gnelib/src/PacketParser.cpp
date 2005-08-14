@@ -26,7 +26,7 @@
 #include "../include/gnelib/Errors.h"
 
 //Packet type includes used for registration.
-#include "../include/gnelib/Packet.h"
+#include "../include/gnelib/EmptyPacket.h"
 #include "../include/gnelib/CustomPacket.h"
 #include "../include/gnelib/ExitPacket.h"
 #include "../include/gnelib/PingPacket.h"
@@ -66,7 +66,7 @@ void registerGNEPackets() {
     packets[c].destroyFunc = NULL;
   }
 
-  defaultRegisterPacket<Packet>();
+  defaultRegisterPacket<EmptyPacket>();
   defaultRegisterPacket<CustomPacket>();
   defaultRegisterPacket<ExitPacket>();
   defaultRegisterPacket<RateAdjustPacket>();

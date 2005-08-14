@@ -104,7 +104,7 @@ void packetTest(const PersonPacket& jason, const PersonPacket& elias) {
 
 void parseTest(const Packet& jason, const Packet& elias) {
   gout << "Starting packet tests.  If no \"Unexpected values\" are seen, everything worked." << endl;
-  Packet packet1;
+  EmptyPacket packet1;
   MyUnknownPacket packet2;
 
   Buffer raw1;

@@ -45,33 +45,7 @@ public: //typedefs
   typedef WeakPtr<Packet> wptr;
 
 public:
-  /**
-   * Constructs a packet with the given ID.  If you pass no ID, the ID for an
-   * empty packet is assumed.  Normally sending blank packets are not useful,
-   * however.  If you are wanting to use a blank packet for some purpose such
-   * as a end-of-data marker or for sending some message that requires no
-   * data, it is suggested that you simply derive a class from Packet that
-   * adds no data, but has a unique ID so it can be "recognized" easier.
-   *
-   * @param id a number from PacketParser::MIN_USER_ID to
-   *   PacketParser::MAX_USER_ID, inclusive.  %GNE packet id's are less than
-   *   MIN_USER_ID.
-   */
-  explicit Packet(int id = 0);
-
-  /**
-   * Copy constructor.  If your Packet is using the default packet clone
-   * function in registration, remember that it uses the copy constructor so
-   * if you need to override the default implementation, you must do it.
-   */
-  Packet( const Packet& o );
-
   virtual ~Packet();
-
-  /**
-   * The ID for this type of packet.
-   */
-  static const int ID;
 
   /**
    * Returns a newly allocated exact copy of this packet, using the
@@ -124,6 +98,28 @@ public:
    */
   virtual void readPacket(Buffer& raw);
 
+protected:
+  /**
+   * Constructs a packet with the given ID.  If you pass no ID, the ID for an
+   * empty packet is assumed.  Normally sending blank packets are not useful,
+   * however.  If you are wanting to use a blank packet for some purpose such
+   * as a end-of-data marker or for sending some message that requires no
+   * data, it is suggested that you simply derive a class from Packet that
+   * adds no data, but has a unique ID so it can be "recognized" easier.
+   *
+   * @param id a number from PacketParser::MIN_USER_ID to
+   *   PacketParser::MAX_USER_ID, inclusive.  %GNE packet id's are less than
+   *   MIN_USER_ID.
+   */
+  explicit Packet( int id );
+
+  /**
+   * Copy constructor.  If your Packet is using the default packet clone
+   * function in registration, remember that it uses the copy constructor so
+   * if you need to override the default implementation, you must do it.
+   */
+  Packet( const Packet& o );
+
   /**
    * Copy operator you can use to help you in creating your own.
    * There is a debug assert in this function that checks to make sure the
@@ -141,7 +137,7 @@ private:
   /**
    * The type ID for this Packet.
    */
-  guint8 type;
+  const guint8 type;
 };
 
 }

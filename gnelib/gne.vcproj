@@ -198,6 +198,9 @@
 				RelativePath=".\src\CustomPacket.cpp">
 			</File>
 			<File
+				RelativePath=".\src\EmptyPacket.cpp">
+			</File>
+			<File
 				RelativePath=".\src\Error.cpp">
 			</File>
 			<File
@@ -365,6 +368,9 @@
 			</File>
 			<File
 				RelativePath=".\include\gnelib\CustomPacket.h">
+			</File>
+			<File
+				RelativePath=".\include\gnelib\EmptyPacket.h">
 			</File>
 			<File
 				RelativePath=".\include\gnelib\Error.h">

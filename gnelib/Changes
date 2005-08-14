@@ -1,4 +1,8 @@
 GNE 0.70 to current
+  Packet is now an uninstantiable class.  If sending an empty packet is desired,
+    use the new EmptyPacket class, that has the ID of 0.
+  Packet::type is const; it should never change during the lifetime of the
+    object.
   PingPacket::isRequest is now a const method.
   URL change to gillius.org in documents.
   Fixed a minor memory leak in Mutex.

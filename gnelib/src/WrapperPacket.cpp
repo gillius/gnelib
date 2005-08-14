@@ -24,9 +24,6 @@
 
 namespace GNE {
   
-WrapperPacket::WrapperPacket() : packet( NULL ) {
-}
-
 WrapperPacket::WrapperPacket( int id ) : Packet( id ), packet( NULL ) {
 }
 
@@ -53,6 +50,10 @@ int WrapperPacket::getSize() const {
 }
 
 const Packet* WrapperPacket::getData() const {
+  return packet;
+}
+
+Packet* WrapperPacket::getData() {
   return packet;
 }
 

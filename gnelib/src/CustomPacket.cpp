@@ -21,6 +21,7 @@
 #include "../include/gnelib/CustomPacket.h"
 #include "../include/gnelib/Buffer.h"
 #include "../include/gnelib/Packet.h"
+#include "../include/gnelib/EmptyPacket.h"
 
 namespace GNE {
 
@@ -36,7 +37,7 @@ CustomPacket::~CustomPacket() {
 }
 
 int CustomPacket::getMaxUserDataSize() {
-  Packet packet;
+  EmptyPacket packet;
   return Buffer::RAW_PACKET_LEN - packet.getSize() - Buffer::getSizeOf( guint16(0) );
 }
 
