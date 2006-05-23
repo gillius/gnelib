@@ -1,4 +1,5 @@
 GNE 0.70 to current
+  Fixed bug in operator !=
   _REENTRANT is defined as required in Linux.
   Packet is now an uninstantiable class.  If sending an empty packet is desired,
     use the new EmptyPacket class, that has the ID of 0.

@@ -96,7 +96,7 @@ bool Time::operator ==(const Time& rhs) const {
 }
 
 bool Time::operator !=(const Time& rhs) const {
-  return (microsec != rhs.microsec || sec != rhs.microsec);
+  return (microsec != rhs.microsec || sec != rhs.sec);
 }
 
 bool Time::operator < (const Time& rhs) const {
