@@ -1,4 +1,6 @@
 GNE 0.70 to current
+  Fixed security bug in ConsoleStreambuf when using gout where printf-style
+    formatting characters were being interpreted when they shouldn't.
   Updated project files to MSVC 2k5 (version 8), and fixed compile bug in
     GNEDebug.
   Fixed bug in operator !=
