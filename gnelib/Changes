@@ -1,4 +1,6 @@
 GNE 0.70 to current
+  Updated project files to MSVC 2k5 (version 8), and fixed compile bug in
+    GNEDebug.
   Fixed bug in operator !=
   _REENTRANT is defined as required in Linux.
   Packet is now an uninstantiable class.  If sending an empty packet is desired,
