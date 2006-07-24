@@ -2,7 +2,7 @@
 #define MUTEX_H_INCLUDED_C51DB1E6
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2005 Jason Winnebeck 
+ * Copyright (C) 2001-2006 Jason Winnebeck 
  * Project website: http://www.gillius.org/gne/
  *
  * This library is free software; you can redistribute it and/or
