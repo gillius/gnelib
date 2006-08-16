@@ -1,4 +1,7 @@
 GNE 0.70 to current
+  Fixed crashing bug in SyncConnection when trying to print a SmartPtr with
+    debugging macros.
+  Fixed one compile warning in Mutex when compiling in debug mode.
   Fixed security bug in ConsoleStreambuf when using gout where printf-style
     formatting characters were being interpreted when they shouldn't.
     This bug as reported by Luigi Auriemma

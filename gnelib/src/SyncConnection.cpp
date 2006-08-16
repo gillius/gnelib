@@ -37,7 +37,7 @@ SyncConnection::SyncConnection( const SmartPtr<Connection>& target )
 : currError(Error::NoError), conn(target), released(false),
 connectMode(false) {
   gnedbgo(5, "created");
-  gnedbgo1(2, "Wrapping Connection %x into a SyncConnection.", conn);
+  gnedbgo1(2, "Wrapping Connection %x into a SyncConnection.", conn.get());
   oldListener = conn->getListener();
 }
 
@@ -135,7 +135,7 @@ void SyncConnection::release() {
 void SyncConnection::doRelease() {
   if (!isReleased() && !connectMode) {
     //If we are not already released and we are not holding events
-    gnedbgo1(2, "Releasing Connection %x", conn);
+    gnedbgo1(2, "Releasing Connection %x", conn.get());
     released = true;
     
     //Notify any receivers there was an error, and set release error if there

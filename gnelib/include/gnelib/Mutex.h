@@ -56,12 +56,6 @@ public:
 
 private:
 #ifdef _DEBUG
-  //In the POSIX threads case, I can't assume a mutex is always released with
-  //its release method, because of wait on ConditionVariable.  So I need to
-  //mark my debugging info as if I released and acquired the mutex without
-  //actually performing the operation
-  friend class ConditionVariable;
-
   void markAcquired();
 
   void markReleased();
