@@ -11,8 +11,7 @@ RMDIR                = rm -rf
 
 EXAMPLE_LIBS         = $(LIB_STATIC) -lNL -lncurses -lpthread
 
-CFLAGS              += -D_REENTRANT
-CPPFLAGS            += -D_XOPEN_SOURCE=500 -D_REENTRANT
+CPPFLAGS            += -D_XOPEN_SOURCE=500
 
 EXE_MASK             = examples/bin/%
 

@@ -1,6 +1,6 @@
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2006 Jason Winnebeck 
- * Project website: http://www.gillius.org/gne/
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
+ * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,6 @@
 #include "gnelib/ConsoleStream.h"
 #include "gnelib/Counter.h"
 #include "gnelib/CustomPacket.h"
-#include "gnelib/EmptyPacket.h"
 #include "gnelib/Error.h"
 #include "gnelib/Errors.h"
 #include "gnelib/GNE.h"

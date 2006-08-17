@@ -2,8 +2,8 @@
 #define TIMER_H_INCLUDED_C517B9FE
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2006 Jason Winnebeck 
- * Project website: http://www.gillius.org/gne/
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
+ * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -76,7 +76,7 @@ public:
   virtual ~Timer();
 
   /**
-   * Returns the current time from some arbitrary point in the past.  This is
+   * Returns the current time from some arbitray point in the past.  This is
    * usually a very high precision timer that likely provides microsecond
    * or better resolution.
    */
@@ -145,7 +145,7 @@ private:
   SmartPtr<TimerCallback> listener;
 
   /**
-   * Provides synchronization for some functions to make them thread safe.
+   * Provides syncronization for some functions to make them thread safe.
    */
   mutable Mutex sync;
 

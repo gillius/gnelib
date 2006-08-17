@@ -1,6 +1,6 @@
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2006 Jason Winnebeck 
- * Project website: http://www.gillius.org/gne/
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
+ * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -103,10 +103,10 @@ void goutbuf::flush_output() {
     *pptr() = '\0';
     if (x != -1) { //Do a mlprintf if a location was set.
       assert(y != -1);
-      Console::mlprintf(x, y, "%s", pbase());
+      Console::mlprintf(x, y, pbase());
       x = y = -1;  //Unset last location.
     } else
-      Console::mprintf("%s", pbase());
+      Console::mprintf(pbase());
     setp(buf, buf + OBUF_LEN - 1);
   }
 }

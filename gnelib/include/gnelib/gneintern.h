@@ -2,8 +2,8 @@
 #define _GNEINTERN_H_
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2006 Jason Winnebeck 
- * Project website: http://www.gillius.org/gne/
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
+ * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -81,7 +81,7 @@ namespace GNE {
   /**
    * The global event generator.  The library uses this internally to
    * register and unregister connections.  The end-user will not have to use
-   * this object under any normal circumstances.
+   * this object under any normal cirumstances.
    */
   extern SmartPtr<ConnectionEventGenerator> eGen;
 };

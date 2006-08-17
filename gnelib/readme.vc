@@ -7,7 +7,7 @@ contain everything needed to compile the library and the examples.
 INSTALLATION INSTRUCTIONS:
 
 You can view detailed installation instructions at
-http://www.gillius.org/gne/tutorials/msvcinstall.htm
+http://www.rit.edu/~jpw9607/gne/tutorials/msvcinstall.htm
 
 NOTE: GNE only works under MSVC.NET or later.  MSVC6 will not work.
 

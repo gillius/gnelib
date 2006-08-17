@@ -1,6 +1,6 @@
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2006 Jason Winnebeck 
- * Project website: http://www.gillius.org/gne/
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
+ * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,7 +37,7 @@ SyncConnection::SyncConnection( const SmartPtr<Connection>& target )
 : currError(Error::NoError), conn(target), released(false),
 connectMode(false) {
   gnedbgo(5, "created");
-  gnedbgo1(2, "Wrapping Connection %x into a SyncConnection.", conn.get());
+  gnedbgo1(2, "Wrapping Connection %x into a SyncConnection.", conn);
   oldListener = conn->getListener();
 }
 
@@ -135,7 +135,7 @@ void SyncConnection::release() {
 void SyncConnection::doRelease() {
   if (!isReleased() && !connectMode) {
     //If we are not already released and we are not holding events
-    gnedbgo1(2, "Releasing Connection %x", conn.get());
+    gnedbgo1(2, "Releasing Connection %x", conn);
     released = true;
     
     //Notify any receivers there was an error, and set release error if there

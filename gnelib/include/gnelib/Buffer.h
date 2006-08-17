@@ -2,8 +2,8 @@
 #define BUFFER_H_LRP401
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2006 Jason Winnebeck 
- * Project website: http://www.gillius.org/gne/
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
+ * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,17 +28,17 @@ namespace GNE {
 
 /**
  * The Buffer class provides functionality to pull data types out of a raw
- * binary data buffer.  This class is the replacement for the RawPacket class
+ * binary data buffer.  This class is the replacement for the Buffer class
  * that used to exist.  There are a few reasons for this rename.  The first
  * being that I wanted to fix up the interface -- it had changed so much I
  * didn't want people getting confused so it's a new class now.  The second
- * reason is because people were getting confused thinking RawPacket was a
+ * reason is because people were getting confused thinking Buffer was a
  * Packet type since all Packets typically are named WhateverPacket.  The
  * third reason is because I chose to somewhat base my interface off a class
  * by the same name in Java, java.nio.Buffer.
  *
- * Advantages over RawPacket include easier and much much safer memory
- * allocation and management.  Previously in RawPacket there was no knowledge
+ * Advantages over Buffer include easier and much much safer memory
+ * allocation and management.  Previously in Buffer there was no knowledge
  * about the buffer size and it was very easy to overflow or underflow the
  * buffer.
  *
@@ -101,7 +101,7 @@ public:
    * two Buffers with the same data, position, and limit.  Changes made to one
    * will not affect the other.
    *
-   * To make this operation efficient, the backing array for this Buffer is only
+   * To make this operation efficent, the backing array for this Buffer is only
    * recreated if the capacity of the left Buffer is smaller than the capacity
    * of the right.  Thus the resulting Buffer's capacity is equal to or greater
    * than the capacities of the two Buffers before the operation.
@@ -316,7 +316,7 @@ public:
 
   /**
    * The max length of a %GNE network packet.  This constant is used mostly by
-   * %GNE's internal code to create packet combination buffers.
+   * %GNE's internal code to create packet combonation buffers.
    */
   static const int RAW_PACKET_LEN;
 

@@ -2,8 +2,8 @@
 #define _CONNECTIONPARAMS_H_
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2006 Jason Winnebeck 
- * Project website: http://www.gillius.org/gne/
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
+ * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -78,7 +78,7 @@ public:
 
   /**
    * The PacketFeeder receives onLowPackets events which are entirely
-   * independent of the serialized event queue of events sent to the
+   * independant of the serialized event queue of events sent to the
    * ConnectionListener.  The default is NULL, and any point is valid.
    * @see PacketStream::setFeeder
    */

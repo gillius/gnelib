@@ -2,8 +2,8 @@
 #define _SERVERCONNECTIONLISTENER_H_
 
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2006 Jason Winnebeck 
- * Project website: http://www.gillius.org/gne/
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
+ * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -59,7 +59,7 @@ public:
 
 protected:
   /**
-   * Initializes this class.
+   * Initalizes this class.
    */
   ServerConnectionListener();
 
@@ -100,7 +100,7 @@ public:
    * when it is shut down.
    *
    * Note that a listener can be closed while an event is being processed.
-   * This behavior was chosen because it matches the behavior of the
+   * This behaviour was chosen because it matches the behaviour of the
    * previous %GNE 0.55 API, and because it avoids using mutexes, which keep
    * the events from running in parallel even if they are capable.  This
    * should not affect the events except that the getLocalAddress method may
@@ -211,7 +211,7 @@ private:
   //performs the actual close operation w/o removing from list.
   void rawClose();
 
-  //These methods relay the message on.
+  //These methods relay the message on, locking the sync mutex.
   void processOnListenFailure( const Error& error, const Address& from,
                                const SmartPtr<ConnectionListener>& listener);
 

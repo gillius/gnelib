@@ -1,6 +1,6 @@
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2006 Jason Winnebeck 
- * Project website: http://www.gillius.org/gne/
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
+ * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -96,7 +96,7 @@ bool Time::operator ==(const Time& rhs) const {
 }
 
 bool Time::operator !=(const Time& rhs) const {
-  return (microsec != rhs.microsec || sec != rhs.sec);
+  return (microsec != rhs.microsec || sec != rhs.microsec);
 }
 
 bool Time::operator < (const Time& rhs) const {

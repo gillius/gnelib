@@ -1,6 +1,6 @@
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2006 Jason Winnebeck 
- * Project website: http://www.gillius.org/gne/
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
+ * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -51,7 +51,7 @@ PingPacket::PingPacket(bool makeReq) : Packet(ID) {
 PingPacket::~PingPacket() {
 }
 
-bool PingPacket::isRequest() const {
+bool PingPacket::isRequest() {
   return (T2 == Time());
 }
 

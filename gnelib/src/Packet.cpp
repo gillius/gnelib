@@ -1,6 +1,6 @@
 /* GNE - Game Networking Engine, a portable multithreaded networking library.
- * Copyright (C) 2001-2006 Jason Winnebeck 
- * Project website: http://www.gillius.org/gne/
+ * Copyright (C) 2001 Jason Winnebeck (gillius@mail.rit.edu)
+ * Project website: http://www.rit.edu/~jpw9607/
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@
 #include "../include/gnelib/Buffer.h"
 
 namespace GNE {
+
+const int Packet::ID = 0;
 
 Packet::Packet(int id) : type((guint8)id) {
 }
@@ -54,9 +56,14 @@ void Packet::readPacket(Buffer& raw) {
 }
 
 Packet& Packet::operator = (const Packet& rhs) {
-  //The type should already be the same
+  //The type should already by the same
   assert(type == rhs.type);
   return *this;
 }
 
 }
+
+
+
+
+
