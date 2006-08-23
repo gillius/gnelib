@@ -20,11 +20,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Thread.h"
-#include "Time.h"
-#include "Mutex.h"
-#include "SmartPtr.h"
-#include "WeakPtr.h"
+#include <gnelib/Thread.h>
+#include <gnelib/Time.h>
+#include <gnelib/Mutex.h>
+#include <gnelib/SmartPtr.h>
+#include <gnelib/WeakPtr.h>
 
 namespace GNE {
 class TimerCallback;

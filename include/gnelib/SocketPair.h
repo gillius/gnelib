@@ -20,10 +20,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ConnectionStats.h"
+#include <gnelib/ConnectionStats.h>
 #include <nl.h>
-#include "gnetypes.h"
-#include "Buffer.h"
+#include <gnelib/gnetypes.h>
+#include <gnelib/Buffer.h>
 
 namespace GNE {
 class Address;

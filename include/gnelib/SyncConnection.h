@@ -20,10 +20,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Error.h"
-#include "ConnectionListener.h"
-#include "ConditionVariable.h"
-#include "Mutex.h"
+#include <gnelib/Error.h>
+#include <gnelib/ConnectionListener.h>
+#include <gnelib/ConditionVariable.h>
+#include <gnelib/Mutex.h>
 
 namespace GNE {
 class Address;

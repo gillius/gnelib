@@ -20,11 +20,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ReceiveEventListener.h"
-#include "Connection.h"
-#include "SmartPtr.h"
-#include "WeakPtr.h"
-#include "Mutex.h"
+#include <gnelib/ReceiveEventListener.h>
+#include <gnelib/Connection.h>
+#include <gnelib/SmartPtr.h>
+#include <gnelib/WeakPtr.h>
+#include <gnelib/Mutex.h>
 
 namespace GNE {
 class Address;

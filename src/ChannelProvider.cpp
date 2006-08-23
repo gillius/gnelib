@@ -17,12 +17,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/ChannelProvider.h"
-#include "../include/gnelib/Packet.h"
-#include "../include/gnelib/ChannelPacket.h"
-#include "../include/gnelib/Connection.h"
-#include "../include/gnelib/Lock.h"
+#include "gneintern.h"
+#include <gnelib/ChannelProvider.h>
+#include <gnelib/Packet.h>
+#include <gnelib/ChannelPacket.h>
+#include <gnelib/Connection.h>
+#include <gnelib/Lock.h>
 
 namespace GNE {
 

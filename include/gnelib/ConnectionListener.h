@@ -21,8 +21,8 @@
  */
 
 
-#include "SmartPtr.h"
-#include "WeakPtr.h"
+#include <gnelib/SmartPtr.h>
+#include <gnelib/WeakPtr.h>
 
 namespace GNE {
 class Error;

@@ -17,19 +17,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/PacketStream.h"
-#include "../include/gnelib/Packet.h"
-#include "../include/gnelib/PacketFeeder.h"
-#include "../include/gnelib/Connection.h"
-#include "../include/gnelib/Buffer.h"
-#include "../include/gnelib/RateAdjustPacket.h"
-#include "../include/gnelib/ExitPacket.h"
-#include "../include/gnelib/PacketParser.h"
-#include "../include/gnelib/Time.h"
-#include "../include/gnelib/Timer.h"
-#include "../include/gnelib/Errors.h"
-#include "../include/gnelib/Lock.h"
+#include "gneintern.h"
+#include <gnelib/PacketStream.h>
+#include <gnelib/Packet.h>
+#include <gnelib/PacketFeeder.h>
+#include <gnelib/Connection.h>
+#include <gnelib/Buffer.h>
+#include <gnelib/RateAdjustPacket.h>
+#include <gnelib/ExitPacket.h>
+#include <gnelib/PacketParser.h>
+#include <gnelib/Time.h>
+#include <gnelib/Timer.h>
+#include <gnelib/Errors.h>
+#include <gnelib/Lock.h>
 
 const int BUF_LEN = 1024;
 

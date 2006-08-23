@@ -23,7 +23,7 @@
 //this is a minimum header for the smart pointers meant to be used in the
 //header files, so that gneintern.h is never included from a header file.
 
-#include "SmartPtr.h"
-#include "WeakPtr.h"
+#include <gnelib/SmartPtr.h>
+#include <gnelib/WeakPtr.h>
 
 #endif

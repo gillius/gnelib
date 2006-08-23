@@ -17,13 +17,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/ConnectionEventGenerator.h"
-#include "../include/gnelib/ReceiveEventListener.h"
-#include "../include/gnelib/ConditionVariable.h"
-#include "../include/gnelib/Connection.h"
-#include "../include/gnelib/Errors.h"
-#include "../include/gnelib/Lock.h"
+#include "gneintern.h"
+#include <gnelib/ConnectionEventGenerator.h>
+#include <gnelib/ReceiveEventListener.h>
+#include <gnelib/ConditionVariable.h>
+#include <gnelib/Connection.h>
+#include <gnelib/Errors.h>
+#include <gnelib/Lock.h>
 
 namespace GNE {
 

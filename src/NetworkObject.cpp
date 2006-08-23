@@ -17,14 +17,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/Packet.h"
-#include "../include/gnelib/ObjectBrokerServer.h"
-#include "../include/gnelib/NetworkObject.h"
-#include "../include/gnelib/Packet.h"
-#include "../include/gnelib/ObjectCreationPacket.h"
-#include "../include/gnelib/ObjectUpdatePacket.h"
-#include "../include/gnelib/ObjectDeathPacket.h"
+#include "gneintern.h"
+#include <gnelib/Packet.h>
+#include <gnelib/ObjectBrokerServer.h>
+#include <gnelib/NetworkObject.h>
+#include <gnelib/Packet.h>
+#include <gnelib/ObjectCreationPacket.h>
+#include <gnelib/ObjectUpdatePacket.h>
+#include <gnelib/ObjectDeathPacket.h>
 
 namespace GNE {
   

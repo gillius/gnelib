@@ -20,9 +20,9 @@
 #ifdef OLD_CPP
 #include "OldConsoleStreambuf.inc"
 #else
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/ConsoleStreambuf.h"
-#include "../include/gnelib/Console.h"
+#include "gneintern.h"
+#include <gnelib/ConsoleStreambuf.h>
+#include <gnelib/Console.h>
 #include <streambuf>
 
 namespace GNE {

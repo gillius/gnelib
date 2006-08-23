@@ -20,9 +20,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Packet.h"
-#include "Mutex.h"
-#include "Time.h"
+#include <gnelib/Packet.h>
+#include <gnelib/Mutex.h>
+#include <gnelib/Time.h>
 #include <map>
 
 namespace GNE {

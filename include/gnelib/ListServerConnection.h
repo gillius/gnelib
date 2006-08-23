@@ -20,8 +20,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Connection.h"
-#include "ClientConnection.h"
+#include <gnelib/Connection.h>
+#include <gnelib/ClientConnection.h>
 
 namespace GNE {
 

@@ -18,14 +18,14 @@
  */
 
 
-#include "../include/gnelib/gneintern.h"
+#include "gneintern.h"
 
 #ifdef _DEBUG
 
-#include "../include/gnelib/GNEDebug.h"
-#include "../include/gnelib/Mutex.h"
-#include "../include/gnelib/Lock.h"
-#include "../include/gnelib/Thread.h"
+#include <gnelib/GNEDebug.h>
+#include <gnelib/Mutex.h>
+#include <gnelib/Lock.h>
+#include <gnelib/Thread.h>
 #include <ctime>
 #include <cstring>
 

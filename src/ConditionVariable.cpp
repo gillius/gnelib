@@ -17,18 +17,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
+#include "gneintern.h"
 
 #ifdef WIN32
 //We have a special version of the threading API for Win32
 #include "ConditionVariableWin32.inc"
 #else
 
-#include "../include/gnelib/ConditionVariable.h"
-#include "../include/gnelib/Mutex.h"
-#include "../include/gnelib/MutexData.h"
-#include "../include/gnelib/Time.h"
-#include "../include/gnelib/Timer.h"
+#include <gnelib/ConditionVariable.h>
+#include <gnelib/Mutex.h>
+#include <gnelib/Time.h>
+#include <gnelib/Timer.h>
+
+#include "MutexData.h"
 
 namespace GNE {
 

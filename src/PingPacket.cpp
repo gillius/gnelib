@@ -17,13 +17,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/PingPacket.h"
-#include "../include/gnelib/Packet.h"
-#include "../include/gnelib/Buffer.h"
-#include "../include/gnelib/Mutex.h"
-#include "../include/gnelib/Time.h"
-#include "../include/gnelib/Timer.h"
+#include "gneintern.h"
+#include <gnelib/PingPacket.h>
+#include <gnelib/Packet.h>
+#include <gnelib/Buffer.h>
+#include <gnelib/Mutex.h>
+#include <gnelib/Time.h>
+#include <gnelib/Timer.h>
 
 namespace GNE {
 

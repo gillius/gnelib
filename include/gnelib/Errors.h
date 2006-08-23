@@ -22,10 +22,10 @@
 
 //This file contains various errors derived from Error.
 
-#include "Error.h"
+#include <gnelib/Error.h>
 #include <nl.h>
 #include <string>
-#include "gnetypes.h"
+#include <gnelib/gnetypes.h>
 
 namespace GNE {
 

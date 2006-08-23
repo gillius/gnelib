@@ -20,12 +20,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ObjectBroker.h"
-#include "ObjectBrokerPacket.h"
-#include "ObjectCreationPacket.h"
-#include "ObjectUpdatePacket.h"
-#include "ObjectDeathPacket.h"
-#include "Mutex.h"
+#include <gnelib/ObjectBroker.h>
+#include <gnelib/ObjectBrokerPacket.h>
+#include <gnelib/ObjectCreationPacket.h>
+#include <gnelib/ObjectUpdatePacket.h>
+#include <gnelib/ObjectDeathPacket.h>
+#include <gnelib/Mutex.h>
 
 namespace GNE {
   class NetworkObject;

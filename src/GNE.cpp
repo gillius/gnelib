@@ -17,20 +17,20 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/ConnectionEventGenerator.h"
-#include "../include/gnelib/ConnectionStats.h"
-#include "../include/gnelib/PacketParser.h"
-#include "../include/gnelib/GNE.h"
-#include "../include/gnelib/Address.h"
-#include "../include/gnelib/Error.h"
-#include "../include/gnelib/Errors.h"
-#include "../include/gnelib/PingPacket.h"
-#include "../include/gnelib/ObjectBrokerClient.h"
-#include "../include/gnelib/Timer.h"
-#include "../include/gnelib/Connection.h"
-#include "../include/gnelib/Console.h"
-#include "../include/gnelib/ServerConnectionListener.h"
+#include "gneintern.h"
+#include <gnelib/ConnectionEventGenerator.h>
+#include <gnelib/ConnectionStats.h>
+#include <gnelib/PacketParser.h>
+#include <gnelib/GNE.h>
+#include <gnelib/Address.h>
+#include <gnelib/Error.h>
+#include <gnelib/Errors.h>
+#include <gnelib/PingPacket.h>
+#include <gnelib/ObjectBrokerClient.h>
+#include <gnelib/Timer.h>
+#include <gnelib/Connection.h>
+#include <gnelib/Console.h>
+#include <gnelib/ServerConnectionListener.h>
 
 #ifndef WIN32
 #include <signal.h>

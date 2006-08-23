@@ -20,16 +20,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Thread.h"
-#include "PacketStream.h"
-#include "ReceiveEventListener.h"
-#include "Error.h"
-#include "Errors.h"
-#include "SocketPair.h"
-#include "Address.h"
-#include "ConnectionStats.h"
-#include "SmartPtr.h"
-#include "WeakPtr.h"
+#include <gnelib/Thread.h>
+#include <gnelib/PacketStream.h>
+#include <gnelib/ReceiveEventListener.h>
+#include <gnelib/Error.h>
+#include <gnelib/Errors.h>
+#include <gnelib/SocketPair.h>
+#include <gnelib/Address.h>
+#include <gnelib/ConnectionStats.h>
+#include <gnelib/SmartPtr.h>
+#include <gnelib/WeakPtr.h>
 
 namespace GNE {
 class ConnectionListener;

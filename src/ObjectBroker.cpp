@@ -17,10 +17,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/ObjectBroker.h"
-#include "../include/gnelib/NetworkObject.h"
-#include "../include/gnelib/Lock.h"
+#include "gneintern.h"
+#include <gnelib/ObjectBroker.h>
+#include <gnelib/NetworkObject.h>
+#include <gnelib/Lock.h>
 
 namespace GNE {
 

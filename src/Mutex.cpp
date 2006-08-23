@@ -17,10 +17,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/Mutex.h"
-#include "../include/gnelib/MutexData.h"
-#include "../include/gnelib/Thread.h"
+#include "gneintern.h"
+#include <gnelib/Mutex.h>
+#include <gnelib/Thread.h>
+
+#include "MutexData.h"
 
 namespace GNE {
 

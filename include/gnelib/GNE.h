@@ -21,9 +21,9 @@
  */
 
 #include <nl.h>
-#include "ConnectionStats.h"
-#include "Error.h"
-#include "gnetypes.h"
+#include <gnelib/ConnectionStats.h>
+#include <gnelib/Error.h>
+#include <gnelib/gnetypes.h>
 
 /**
  * The namespace in which all of GNE resides in.  The namespace consists of

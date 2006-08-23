@@ -20,8 +20,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "TimerCallback.h"
-#include "ConditionVariable.h"
+#include <gnelib/TimerCallback.h>
+#include <gnelib/ConditionVariable.h>
 
 namespace GNE {
 

@@ -23,7 +23,7 @@
 //This header file is _NOT_ meant to be included into user code!
 
 #include "gneintern.h"
-#include "Thread.h"
+#include <gnelib/Thread.h>
 
 #ifdef WIN32
   #define MUTEX_TYPE CRITICAL_SECTION

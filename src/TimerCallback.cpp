@@ -17,8 +17,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/TimerCallback.h"
+#include "gneintern.h"
+#include <gnelib/TimerCallback.h>
 
 namespace GNE {
 

@@ -21,7 +21,7 @@
  */
 
 #include <boost/weak_ptr.hpp>
-#include "SmartPtr.h"
+#include <gnelib/SmartPtr.h>
 
 namespace GNE {
 

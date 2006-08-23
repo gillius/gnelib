@@ -17,10 +17,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/RateAdjustPacket.h"
-#include "../include/gnelib/Packet.h"
-#include "../include/gnelib/Buffer.h"
+#include "gneintern.h"
+#include <gnelib/RateAdjustPacket.h>
+#include <gnelib/Packet.h>
+#include <gnelib/Buffer.h>
 
 namespace GNE {
 

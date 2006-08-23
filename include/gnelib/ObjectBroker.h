@@ -21,7 +21,7 @@
  */
 
 #include <map>
-#include "Mutex.h"
+#include <gnelib/Mutex.h>
 
 namespace GNE {
   class Packet;

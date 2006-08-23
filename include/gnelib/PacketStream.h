@@ -20,11 +20,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ConditionVariable.h"
-#include "Mutex.h"
-#include "Thread.h"
-#include "Time.h"
-#include "SmartPointers.h"
+#include <gnelib/ConditionVariable.h>
+#include <gnelib/Mutex.h>
+#include <gnelib/Thread.h>
+#include <gnelib/Time.h>
+#include <gnelib/SmartPointers.h>
 
 #include <queue>
 

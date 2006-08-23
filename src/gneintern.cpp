@@ -18,4 +18,4 @@
  */
 
 //this CPP file only for precompiled header
-#include "../include/gnelib/gneintern.h"
+#include "gneintern.h"

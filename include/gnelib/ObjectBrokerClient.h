@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ObjectBroker.h"
+#include <gnelib/ObjectBroker.h>
 
 namespace GNE {
   bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)), int);

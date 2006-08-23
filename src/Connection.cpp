@@ -17,22 +17,22 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/Connection.h"
-#include "../include/gnelib/ConnectionStats.h"
-#include "../include/gnelib/ConnectionListener.h"
-#include "../include/gnelib/Buffer.h"
-#include "../include/gnelib/Packet.h"
-#include "../include/gnelib/ExitPacket.h"
-#include "../include/gnelib/PacketParser.h"
-#include "../include/gnelib/ConnectionEventGenerator.h"
-#include "../include/gnelib/Error.h"
-#include "../include/gnelib/Errors.h"
-#include "../include/gnelib/SocketPair.h"
-#include "../include/gnelib/Address.h"
-#include "../include/gnelib/GNE.h"
-#include "../include/gnelib/EventThread.h"
-#include "../include/gnelib/Lock.h"
+#include "gneintern.h"
+#include <gnelib/Connection.h>
+#include <gnelib/ConnectionStats.h>
+#include <gnelib/ConnectionListener.h>
+#include <gnelib/Buffer.h>
+#include <gnelib/Packet.h>
+#include <gnelib/ExitPacket.h>
+#include <gnelib/PacketParser.h>
+#include <gnelib/ConnectionEventGenerator.h>
+#include <gnelib/Error.h>
+#include <gnelib/Errors.h>
+#include <gnelib/SocketPair.h>
+#include <gnelib/Address.h>
+#include <gnelib/GNE.h>
+#include <gnelib/EventThread.h>
+#include <gnelib/Lock.h>
 
 namespace GNE {
 

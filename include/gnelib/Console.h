@@ -20,8 +20,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "SynchronizedObject.h"
-#include "ConsoleStreambuf.h"
+#include <gnelib/SynchronizedObject.h>
+#include <gnelib/ConsoleStreambuf.h>
 
 #ifdef OLD_CPP
   #include <ostream.h>

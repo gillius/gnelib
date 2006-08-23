@@ -17,9 +17,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/SocketPair.h"
-#include "../include/gnelib/Address.h"
+#include "gneintern.h"
+#include <gnelib/SocketPair.h>
+#include <gnelib/Address.h>
 
 namespace GNE {
 

@@ -17,12 +17,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/Console.h"
-#include "../include/gnelib/ConsoleStreambuf.h"
-#include "../include/gnelib/ConsoleStream.h"
-#include "../include/gnelib/Mutex.h"
-#include "../include/gnelib/Lock.h"
+#include "gneintern.h"
+#include <gnelib/Console.h>
+#include <gnelib/ConsoleStreambuf.h>
+#include <gnelib/ConsoleStream.h>
+#include <gnelib/Mutex.h>
+#include <gnelib/Lock.h>
 
 #ifndef OLD_CPP
 #include <ostream>
@@ -31,7 +31,7 @@
 #include <iostream>
 #endif
 
-#include "../include/gnelib/conioport.h"
+#include <gnelib/conioport.h>
 
 namespace GNE {
 namespace Console {

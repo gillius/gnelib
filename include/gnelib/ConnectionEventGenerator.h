@@ -20,9 +20,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ConditionVariable.h"
-#include "Thread.h"
-#include "SmartPointers.h"
+#include <gnelib/ConditionVariable.h>
+#include <gnelib/Thread.h>
+#include <gnelib/SmartPointers.h>
 
 #include <nl.h>
 #include <map>

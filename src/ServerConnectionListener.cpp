@@ -17,17 +17,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/ServerConnectionListener.h"
-#include "../include/gnelib/ConnectionEventGenerator.h"
-#include "../include/gnelib/ServerConnection.h"
-#include "../include/gnelib/ConnectionListener.h"
-#include "../include/gnelib/Connection.h"
-#include "../include/gnelib/ConnectionParams.h"
-#include "../include/gnelib/GNE.h"
-#include "../include/gnelib/Address.h"
-#include "../include/gnelib/Errors.h"
-#include "../include/gnelib/Lock.h"
+#include "gneintern.h"
+#include <gnelib/ServerConnectionListener.h>
+#include <gnelib/ConnectionEventGenerator.h>
+#include <gnelib/ServerConnection.h>
+#include <gnelib/ConnectionListener.h>
+#include <gnelib/Connection.h>
+#include <gnelib/ConnectionParams.h>
+#include <gnelib/GNE.h>
+#include <gnelib/Address.h>
+#include <gnelib/Errors.h>
+#include <gnelib/Lock.h>
 
 namespace GNE {
 

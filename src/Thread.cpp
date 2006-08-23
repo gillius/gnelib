@@ -17,14 +17,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/Thread.h"
-#include "../include/gnelib/ConditionVariable.h"
-#include "../include/gnelib/Error.h"
-#include "../include/gnelib/Timer.h"
-#include "../include/gnelib/Time.h"
-#include "../include/gnelib/GNE.h"
-#include "../include/gnelib/Lock.h"
+#include "gneintern.h"
+#include <gnelib/Thread.h>
+#include <gnelib/ConditionVariable.h>
+#include <gnelib/Error.h>
+#include <gnelib/Timer.h>
+#include <gnelib/Time.h>
+#include <gnelib/GNE.h>
+#include <gnelib/Lock.h>
 
 namespace GNE {
 

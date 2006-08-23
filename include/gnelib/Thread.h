@@ -20,9 +20,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Mutex.h"
-#include "SmartPtr.h"
-#include "WeakPtr.h"
+#include <gnelib/Mutex.h>
+#include <gnelib/SmartPtr.h>
+#include <gnelib/WeakPtr.h>
 
 #include <string>
 

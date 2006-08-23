@@ -21,7 +21,7 @@
  */
 
 #ifdef OLD_CPP
-#include "OldConsoleStreambuf.h"
+#include <gnelib/OldConsoleStreambuf.h>
 #else
 #include <streambuf>
 

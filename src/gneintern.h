@@ -70,9 +70,9 @@
 #endif
 
 //GNE related includes:
-#include "gnetypes.h"
+#include <gnelib/gnetypes.h>
 //Define debugging functions
-#include "GNEDebug.h"
+#include <gnelib/GNEDebug.h>
 
 namespace GNE {
   class ConnectionEventGenerator;
