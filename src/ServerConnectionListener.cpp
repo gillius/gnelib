@@ -137,7 +137,7 @@ void ServerConnectionListener::onReceive() {
       assert( !this_.expired() );
       ServerConnection::sptr newConn = ServerConnection::create(params, sock, this_.lock());
       gnedbgo2(4, "Spawning a new ServerConnection %x on socket %i",
-        newConn, sock);
+        newConn.get(), sock);
       newConn->start();
     } else {
       //If the params are not valid, report the error
