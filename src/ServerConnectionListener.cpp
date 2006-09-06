@@ -67,7 +67,7 @@ bool ServerConnectionListener::open(int port) {
   LockMutex lock(sync);
 
   if ( socket == NL_INVALID ) {
-    socket = nlOpen(port, NL_RELIABLE_PACKETS);
+    socket = nlOpen( (NLushort)port, NL_RELIABLE_PACKETS );
     return (socket == NL_INVALID);
   } else
     return false;
@@ -191,7 +191,7 @@ void ServerConnectionListener::processOnListenSuccess( const ConnectionListener:
   onListenSuccess( listener );
 }
 
-void ServerConnectionListener::onListenSuccess(const ConnectionListener::sptr& listener) {
+void ServerConnectionListener::onListenSuccess(const ConnectionListener::sptr&) {
   //The default behavior for this event is to do nothing.
 }
 

@@ -43,7 +43,7 @@ namespace GNE {
     void registerGNEPackets();
   }
 
-char gameNameBuf[32] = {0};
+char gameNameBuf[ MAX_GAME_NAME_LEN + 1 ] = {0};
 guint32 userVersion = 0;
 ConnectionEventGenerator::sptr eGen;
 
@@ -210,6 +210,7 @@ void setGameInformation(std::string gameName, guint32 version) {
 
   userVersion = version;
   strncpy(gameNameBuf, gameName.c_str(), MAX_GAME_NAME_LEN);
+  gameNameBuf[ MAX_GAME_NAME_LEN ] = 0;
 }
 
 void checkVersions(const GNEProtocolVersionNumber& otherGNE,

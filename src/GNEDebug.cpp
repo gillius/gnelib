@@ -31,6 +31,8 @@
 
 namespace GNE {
 
+static const int BUF_SIZE = 512;
+
 static int dbgLevelMask = 0;
 static FILE* logFile = NULL;
 static Mutex sync;
@@ -42,13 +44,14 @@ bool initDebug(int levelMask, const char* fileName) {
 
   dbgLevelMask = levelMask;
 
-  buf = new char[512];
+  buf = new char[BUF_SIZE];
+  memset( buf, 0, BUF_SIZE );
   if (fileName == NULL) {
     time_t now = time(NULL);
     struct tm *t = localtime (&now);
     strftime (buf, 100, "gne%H'%M'%S.log", t);
   } else
-    strcpy(buf, fileName);
+    strncpy(buf, fileName,BUF_SIZE-1);
 
   logFile = fopen(buf, "wt");
   if (!logFile) {
@@ -95,7 +98,8 @@ void doTrace(int level, const char* fn, int lineno, const char* msg, ...) {
 
     LockMutexEx lock( sync );
     if ( initialized ) {
-      vsprintf(buf, msg, arg);
+      vsnprintf(buf, BUF_SIZE-1, msg, arg);
+      buf[ BUF_SIZE-1 ] = 0;
 
       //Remove the path to the file, to conserve line width.
       const char* temp = strrchr(fn, '\\'); //Try Microsoft style path

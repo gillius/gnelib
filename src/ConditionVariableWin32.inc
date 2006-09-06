@@ -18,11 +18,11 @@
  */
 
 #ifdef WIN32
-#include "../include/gnelib/gneintern.h"
-#include "../include/gnelib/ConditionVariable.h"
-#include "../include/gnelib/Mutex.h"
-#include "../include/gnelib/Time.h"
-#include "../include/gnelib/Timer.h"
+#include "gneintern.h"
+#include <gnelib/ConditionVariable.h>
+#include <gnelib/Mutex.h>
+#include <gnelib/Time.h>
+#include <gnelib/Timer.h>
 #ifndef OLD_CPP
 #include <limits>
 #endif

@@ -205,7 +205,7 @@ public:
   static int getSizeOf(guint32 x) { return sizeof(x); }
   static int getSizeOf(gsingle x) { return sizeof(x); }
   static int getSizeOf(gdouble x) { return sizeof(x); }
-  static int getSizeOf(const Time& x) { return sizeof(gint32)*2; }
+  static int getSizeOf(const Time&) { return sizeof(gint32)*2; }
 
   /**
    * Writes all remaining bytes in Buffer src to this Buffer.  This is the

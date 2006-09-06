@@ -1,0 +1,18 @@
+MESSAGE( "Installing doxygen files" )
+
+#We can't copy a directory with CMake.  I spent hours trying to figure
+#out how to make this proper and I can't, so this is the best hack I've got.
+#This works only for CMake 2.2 or later
+EXEC_PROGRAM( @CMAKE_COMMAND@
+    ARGS -E copy_directory
+    @CMAKE_BINARY_DIR@/docs
+    $ENV{DESTDIR}@CMAKE_INSTALL_PREFIX@/share/libgnelib-dev/docs )
+
+#If you were going to try to use CMake 2.0, try this, but it only works with
+#an unmodified doxygen configuration.
+#FILE( GLOB_RECURSE GNE_DOCFILES @CMAKE_BINARY_DIR@/docs/html/* )
+
+#FILE( INSTALL
+#    DESTINATION "@CMAKE_INSTALL_PREFIX@/share/docs/html"
+#    TYPE FILE
+#    FILES ${GNE_DOCFILES} )

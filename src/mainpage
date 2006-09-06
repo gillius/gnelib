@@ -1,7 +1,7 @@
 //This file only contains the information useful for the main page of the
 //documentation - There is no code here.
 
-/** \mainpage %GNE -- Game Networking Engine
+/** \mainpage GNE -- Game Networking Engine
 
 See the Readme file and the specific readme for your compiler (ie readme.vc
 for MSVC) for requirements and installation instructions.

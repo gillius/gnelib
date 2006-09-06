@@ -195,6 +195,7 @@ void Connection::checkVersions(Buffer& raw) {
   //And convert it to a string, making sure it is of the proper length and
   //NULL-terminated.
   char gameName[GNE::MAX_GAME_NAME_LEN + 1];
+  memset( gameName, 0, GNE::MAX_GAME_NAME_LEN + 1 );
   strncpy(gameName, (const char*)rawName, GNE::MAX_GAME_NAME_LEN);
 
   //Read the user version number
