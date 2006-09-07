@@ -697,6 +697,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\License"
+			>
+		</File>
+		<File
 			RelativePath=".\src\mainpage"
 			>
 		</File>
@@ -705,11 +709,7 @@
 			>
 		</File>
 		<File
-			RelativePath=".\readme.vc"
-			>
-		</File>
-		<File
-			RelativePath=".\status.txt"
+			RelativePath=".\readme.windows"
 			>
 		</File>
 	</Files>
