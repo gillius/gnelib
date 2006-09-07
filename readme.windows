@@ -6,12 +6,10 @@ Compilers:
   * GCC: General requirements are GCC version 3.x or higher with a modern
     libstdc++. Make is also required.  GCC version 4.0.3 and 3.4.2 were tested
     with GNE.
-  * MSVC: MSVC 2005 tested, 2002 and 2003 expected to work, MSVC6 may not
-    work.
+  * MSVC: MSVC 2005 tested, 2002 and 2003 expected to work
 
 GCC 2.9x was recently supported but is deprecated and has not been tested
-since GNE 0.70.  The define OLD_GCC was used to provide this capability.
-Setting that define may or may not work in GNE 0.75.
+since GNE 0.70.
 
 1.1 HawkNL
 
@@ -40,6 +38,10 @@ http://www.cmake.org/HTML/Download.html
 Doxygen is an OPTIONAL dependency.  Any recent version should work fine, but
 1.4.7 was tested on this release.  The file was recently upgraded with Doxygen
 1.4.7, but I don't believe that should affect backwards compatibility.
+
+You can find doxygen at:
+
+http://www.stack.nl/~dimitri/doxygen/index.html
 
 1.6 Dot
 

@@ -23,11 +23,7 @@
 #include <gnelib/SynchronizedObject.h>
 #include <gnelib/ConsoleStreambuf.h>
 
-#ifdef OLD_CPP
-  #include <ostream.h>
-#else
-  #include <ostream>
-#endif
+#include <ostream>
 
 namespace GNE {
 /**

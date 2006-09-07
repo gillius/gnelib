@@ -9,8 +9,7 @@ In Debian-based distributions, package `build-essential` gives you what you
 need. (apt-get install build-essential)
 
 GCC 2.9x was recently supported but is deprecated and has not been tested
-since GNE 0.70.  The define OLD_GCC was used to provide this capability.
-Setting that define may or may not work in GNE 0.75.
+since GNE 0.70.
 
 1.1 ncurses
 

@@ -196,13 +196,7 @@ bool Thread::waitForAllThreads( int ms ) {
     ret = timeout = (Timer::getCurrentTime() >= t);
     if (!timeout) {
       //Take into accout the CEG thread.
-#ifdef OLD_CPP
-      //DUMB workaround for GCC 2.9x.  This is insane.
-      SmartPtr<GNE::ConnectionEventGenerator> temp = eGen;
-      ret = (liveThreads <= ((temp) ? 1 : 0) );
-#else
       ret = (liveThreads <= ((eGen) ? 1 : 0 ) );
-#endif
     }
     if (!ret)
       sleep(20);

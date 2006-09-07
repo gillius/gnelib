@@ -20,9 +20,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef OLD_CPP
-#include <gnelib/OldConsoleStreambuf.h>
-#else
 #include <streambuf>
 
 namespace GNE {
@@ -99,5 +96,4 @@ private:
 }
 }
 
-#endif //#ifdef OLD_CPP #else
 #endif //#ifndef _CONSOLESTREAMBUF_H_

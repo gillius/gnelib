@@ -24,12 +24,8 @@
 #include <gnelib/Mutex.h>
 #include <gnelib/Lock.h>
 
-#ifndef OLD_CPP
 #include <ostream>
 #include <istream>
-#else //fix for old libstdc++ used traditionally with gcc 2.9x
-#include <iostream>
-#endif
 
 #include <gnelib/conioport.h>
 

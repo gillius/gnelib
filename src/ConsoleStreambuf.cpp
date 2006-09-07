@@ -17,9 +17,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef OLD_CPP
-#include "OldConsoleStreambuf.inc"
-#else
 #include "gneintern.h"
 #include <gnelib/ConsoleStreambuf.h>
 #include <gnelib/Console.h>
@@ -139,5 +136,3 @@ std::streamsize goutbuf::xsputn(const char_type *ptr, std::streamsize count) {
   
 } //namespace Console
 } //namespace GNE
-
-#endif //#ifdef OLD_CPP #else

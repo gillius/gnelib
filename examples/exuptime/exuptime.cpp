@@ -18,11 +18,7 @@
  */
 
 #include <gnelib.h>
-#ifdef OLD_CPP
-#include <iostream>
-#else
 #include <ostream> //for endl
-#endif
 
 using namespace std; //for endl
 using namespace GNE;
