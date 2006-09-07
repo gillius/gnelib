@@ -38,6 +38,7 @@ OPTION( GNE_BUILD_EXAMPLES
 
 SET( GNE_COMMON_FLAGS "" ) #make sure this is defined
 
+#Set compile flags to be used in common across all of our code.
 IF( CMAKE_COMPILER_IS_GNUCXX )
     SET( GNE_COMMON_FLAGS "-Wall" )
 ENDIF( CMAKE_COMPILER_IS_GNUCXX )
@@ -48,6 +49,13 @@ ENDIF( MSVC )
 IF( GNE_EXTRA_DEBUG_MODE )
     ADD_DEFINITIONS( -D_DEBUG )
 ENDIF( GNE_EXTRA_DEBUG_MODE )
+
+#This is probably only required on GCC or UNIX or anything using POSIX
+#threads, but to be safe I always define it, since it shouldn't hurt on
+#compilers that don't listen to this.
+IF( NOT MSVC )
+  ADD_DEFINITIONS( -D_REENTRANT )
+ENDIF( NOT MSVC )
 
 SET( GNE_LINKER_FLAGS "" ) #make sure this is defined
 
