@@ -26,9 +26,9 @@
 
 #include <limits>
 
-namespace GNE {
-
 #ifdef WIN32
+
+namespace GNE {
 
 //There appears to be a max() macro defined that is messing things up in
 //at least MSVC.NET, and we don't use a max() define in this source file.
@@ -342,10 +342,14 @@ void ConditionVariable::broadcast() {
   }
 }
 
+} //namespace GNE
+
 // ----------- BEGIN UNIX CODE -------------
 #else
 
 #include "MutexData.h"
+
+namespace GNE {
 
 struct ConditionVariable::ConditionVariableData {
   pthread_cond_t cond;
@@ -411,6 +415,7 @@ void ConditionVariable::broadcast() {
   valassert(pthread_cond_broadcast( &data->cond ), 0);
 }
 
+} //end namespace GNE
+
 #endif
 
-} //end namespace GNE
