@@ -51,7 +51,7 @@
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="../include/gnelib/gneintern.h"
+				PrecompiledHeaderThrough="gneintern.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
