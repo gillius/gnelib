@@ -32,6 +32,10 @@ using namespace GNE::Console;
 void displayAddress(const Address& addr);
 
 int main(int argc, char* argv[]) {
+  GNE::initDebug( DLEVELALL, "test.txt" );
+
+  gnedbg( 3, "testing" );
+
   if (initGNE(NL_IP, atexit)) {
     exit(1);
   }

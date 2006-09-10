@@ -17,10 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 #include "gneintern.h"
-
-#ifdef _DEBUG
 
 #include <gnelib/GNEDebug.h>
 #include <gnelib/Mutex.h>
@@ -123,9 +120,3 @@ void doTrace(int level, const char* fn, int lineno, const char* msg, ...) {
 }
 
 }
-
-#endif //_DEBUG
-
-
-
-

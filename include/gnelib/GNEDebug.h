@@ -24,13 +24,31 @@
 
 namespace GNE {
 /**
- * Debugging level constants for the levelMask.
+ * Debugging level: startup, shutdown, and explicit error messages.
  */
 const int DLEVEL1 = 1;
+/**
+ * Debugging level: connection, disconnection, and other "normal" operation.
+ */
 const int DLEVEL2 = 2;
+/**
+ * Debugging level: average level.  packet registration, socket registration
+ */
 const int DLEVEL3 = 4;
+/**
+ * Debugging level: events like onReceive and such, and some reporting.
+ */
 const int DLEVEL4 = 8;
+/**
+ * Debugging level: very low level -- thread creation, memory allocation.
+ */
 const int DLEVEL5 = 16;
+
+/**
+ * Includes all debugging levels.
+ */
+const int DLEVELALL = DLEVEL1 | DLEVEL2 | DLEVEL3 | DLEVEL4 | DLEVEL5;
+
 /**
  * Function to initialize debugging.  This is safe to call before
  * initialization of GNE, but can be called at any time (but not multiple
