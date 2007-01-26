@@ -98,6 +98,8 @@ void* Thread::threadStart(void* thread) {
   mapSync.acquire();
   mapSync.release();
 
+  gnedbg1( 5, "Thread %s starting", thr->getName().c_str() );
+
   try {
     thr->run();
     thr->end();
@@ -109,7 +111,7 @@ void* Thread::threadStart(void* thread) {
   //is started by throwing an exception, and placing a catch all here will
   //keep the debugger from starting.
 
-  gnedbg2( 5, "%x: Thread %s Ending", thr.get(), thr->getName().c_str() );
+  gnedbg1( 5, "Thread %s ending", thr->getName().c_str() );
   ThreadIDData idData = *(thr->id);
   Thread::remove( idData );
   thr.reset();
@@ -314,8 +316,6 @@ void Thread::start() {
   //this object.
   threads[ id->thread_id ] = this_;
   ++liveThreads;
-
-  gnedbgo1( 5, "Starting Thread %s", name.c_str() );
 }
 
 int Thread::getPriority() const {

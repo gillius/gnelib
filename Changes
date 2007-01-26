@@ -1,4 +1,6 @@
 GNE 0.70 to current
+  Moved a "thread starting" debugging call that was causing a deadlock,
+    typically on multi-CPU or dual-core systems.
   Included GNE debug logging symbols, even in release library.  This was done
     so that release and debug library have same symbols, and also allows user
     to explicitly call debug code if desired.  If it is not used the overhead
