@@ -45,13 +45,13 @@ http://www.stack.nl/~dimitri/doxygen/index.html
 
 1.6 Dot
 
-The dot tool from the graphvis package is an OPTIONAL dependecny. If it is
+The dot tool from the graphvis package is an OPTIONAL dependency. If it is
 detected and doxygen is detected and documentation is configured to be built,
 dot will be used.
 
 2. Installation
 
-Unfortunately, the build situtation on Windows is not as good as the one for
+Unfortunately, the build situation on Windows is not as good as the one for
 UNIX, although it is greatly improved with the introduction of CMake.
 
 After installing CMake, run the CMake program, locate the path where you
@@ -119,11 +119,11 @@ Using mingw32-make.exe, build the generated makefiles.
 
 If you want to install, run:
 
-make install
+mingw32-make install
 
 You can also prepend the above paths with DESTDIR as shown below:
 
-make install DESTDIR="/path/that/I/want"
+mingw32-make install DESTDIR="/path/that/I/want"
 
 The final path will be $DESTDIR/$CMAKE_INSTALL_PREFIX
 
