@@ -210,7 +210,7 @@ void PacketStream::setRates(int reqOutRate2, int maxInRate2) {
 }
 
 void PacketStream::waitToSendAll(int waitTime) const {
-  assert(waitTime <= (INT_MAX / 1000));
+  assert(waitTime <= (std::numeric_limits<int>::max() / 1000));
   assert(waitTime > 0);
 
   Time t = Timer::getCurrentTime();

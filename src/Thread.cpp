@@ -186,8 +186,8 @@ bool Thread::waitForAllThreads( int ms ) {
   //we can only call this from the main thread.
   assert( !Thread::currentThread() );
 
-  if (ms > INT_MAX / 1000)
-    ms = INT_MAX / 1000;
+  if (ms > std::numeric_limits<int>::max() / 1000)
+    ms = std::numeric_limits<int>::max() / 1000;
 
   Time t = Timer::getCurrentTime();
   t += ms * 1000;

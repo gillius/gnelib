@@ -79,8 +79,8 @@ int EventThread::getTimeout() const {
 
 void EventThread::setTimeout(int ms) {
   int microsec;
-  if (ms > INT_MAX / 1000)
-    microsec = INT_MAX / 1000;
+  if (ms > std::numeric_limits<int>::max() / 1000)
+    microsec = std::numeric_limits<int>::max() / 1000;
   else
     microsec = ms * 1000;
 

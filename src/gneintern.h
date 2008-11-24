@@ -56,6 +56,7 @@
 #include <map>
 #include <queue>
 #include <algorithm>
+#include <limits>
 
 //Boost includes
 #include <boost/shared_ptr.hpp>

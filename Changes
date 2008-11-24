@@ -1,4 +1,7 @@
 GNE 0.70 to current
+  Use std::numeric_limits<int>::max() instead of INT_MAX where INT_MAX was
+    used. This caused compiler errors on GCC 4.3 because I never included
+    <climits>.
   Moved a "thread starting" debugging call that was causing a deadlock,
     typically on multi-CPU or dual-core systems.
   Included GNE debug logging symbols, even in release library.  This was done
