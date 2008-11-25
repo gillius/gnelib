@@ -528,7 +528,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\gnelib\gneintern.h"
+				RelativePath=".\src\gneintern.h"
 				>
 			</File>
 			<File

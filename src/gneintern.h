@@ -35,6 +35,7 @@
 //Include system headers
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX //prevent compiler errors with MSVC and std::numeric_limits<T>::max()
 #include <sys/timeb.h>
 #include <windows.h>
 #include <process.h>
