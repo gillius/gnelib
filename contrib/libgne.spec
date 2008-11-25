@@ -24,7 +24,7 @@
 
 Summary: Game Networking Engine
 Name: libgne
-Version: 0.70
+Version: 0.75
 Release: 1.%{disttag}%{distver}
 License: LGPL
 Group: Libraries/Networking
