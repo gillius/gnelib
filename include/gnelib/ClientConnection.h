@@ -36,9 +36,13 @@ class SyncConnection;
 /**
  * @ingroup midlevel
  *
- * A class that can connect to a remote target.
+ * A class that can connect to a remote target. The fact that a
+ * ClientConnection is a Thread is an implementation detail and should not be
+ * used outside of this class's implementation. Originally it was private, but
+ * this presented a compatibility issue with Boost 1.36. Long-term, the Thread
+ * will be encapsulated as a private object, rather than inheritance abuse.
  */
-class ClientConnection : public Connection, private Thread {
+class ClientConnection : public Connection, public Thread {
 protected:
   /**
    * Initializes this ClientConnection.
