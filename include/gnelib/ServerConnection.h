@@ -38,8 +38,14 @@ class ConnectionParams;
  * A GNE "internal" class.  Users will use this class, but probably only as
  * its base class -- a Connection.  This class is created by
  * ServerConnectionListener when incoming connections are comming in.
+ *
+ * The fact that a ServerConnection is a Thread is an implementation detail
+ * and should not be used outside of this class's implementation. Originally
+ * it was private, but this presented a compatibility issue with Boost 1.36.
+ * Long-term, the Thread will be encapsulated as a private object, rather than
+ * inheritance abuse.
  */
-class ServerConnection : public Connection, private Thread {
+class ServerConnection : public Connection, public Thread {
 protected:
   /**
    * We need information gained from setThisPointer to initialize, so the real
