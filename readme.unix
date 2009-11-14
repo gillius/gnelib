@@ -28,19 +28,20 @@ libNL.so and libhawknl.so.
 
 Install Boost, version 1.32 or later.  GNE does not make use of any of the
 compiled parts of Boost, so no compilation is needed.  On Debian-based
-systems, libboost-dev will work just fine.
+systems, libboost-dev will work just fine, which you can install via:
+
+sudo aptitude install libboost-dev
 
 1.4 CMake
 
-GNE requires CMake 2.2 or later for its build process.  This is included as
-package "cmake" in Debian-based distributions.  Debian sarge (currently the
-stable as of this writing) unfortunately only includes 2.0, which is just
-slightly not enough for my script, so if anyone wants to backport, please do
-so!
+GNE requires CMake 2.4 or later for its build process.  This is included as
+package "cmake" in Debian-based distributions. Ubuntu 8.04 LTS and Debian
+stable branches both have CMake >= 2.4 at the time of writing. Therefore,
+on these systems you may run `sudo aptitude install cmake`.
 
 You may want to install a direct copy of CMake if:
 
- * Your distribution does not include CMake 2.2 or later
+ * Your distribution does not include CMake 2.4 or later
  * You cannot install software on your machine
  * You have an older version of cmake installed that you don't want to
    interfere with.
@@ -79,26 +80,38 @@ The dot tool from the graphvis package is an OPTIONAL dependecny. If it is
 detected and doxygen is detected and documentation is configured to be built,
 dot will be used.
 
-2. Installation
+2. Building and Installation
 
 If you did not install some library into your compiler's default search
-paths, you need to give paths to the files by using the ccmake configurator.
+paths, you need to let cmake know where to find libraries like HawkNL. As an
+example, a user who is not an administrator on the machine compiled HawkNL
+but cannot install it to /usr/include and /usr/lib. By setting the environment
+variables CMAKE_INCLUDE_PATH and CMAKE_LIBRARY_PATH, s/he can have CMake
+additionally search those directories for headers and libraries.
 
-In a shell, execute:
+For example:
+export CMAKE_INCLUDE_PATH="$HOME/include/"
+export CMAKE_LIBRARY_PATH="$HOME/lib/"
+
+In a shell running in the GNE source code directory, execute:
 
 mkdir build
 cd build
 cmake ..
 
 This will set up the build environment, and configure it based on your system.
+If a library was not found, or you want to tweak specific settings, you can
+run `ccmake ..` to get an interactive tool to change parameters such as
+compiler flags or examples compilation.
 
-If you want to build to the default settings, just run `make`.
-If you want to configure the process, run `ccmake ..`, then run `make`. When
-running ccmake or cmake -i it will explain each option.
+If you want to build to the default settings, just run:
 
-To compile the library and examples. Then type:
+make
 
-make install
+To compile the library and examples. Then if you are an administrator, you can
+install the library:
+
+sudo make install
 
 To install GNE into the following locations:
 
@@ -109,10 +122,11 @@ To install GNE into the following locations:
 /usr/local/share/libgnelib-dev/docs/*
 
 If you wish to pick a different install prefix, please use ccmake to change
-CMAKE_INSTALL_PREFIX.  You can also prepend the above paths with DESTDIR as
-shown below:
+CMAKE_INSTALL_PREFIX. You can also prepend the above paths with DESTDIR as
+shown below. You will need to pick a different prefix if your account is not
+able to install to /usr/local. An example is below:
 
-make install DESTDIR="/path/that/I/want"
+make install DESTDIR="$HOME/gnelib"
 
 The final path will be $DESTDIR/$CMAKE_INSTALL_PREFIX
 

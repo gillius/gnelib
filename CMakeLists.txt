@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 2.2 )    
+CMAKE_MINIMUM_REQUIRED( VERSION 2.4 )
 PROJECT( GNE CXX C )
 
 #Set up GNE version information
@@ -70,13 +70,13 @@ ENDIF( GNE_STRIP_RESULTS )
 FIND_PACKAGE( Doxygen )
 
 IF( NOT DEFINED GNE_BUILD_DOCS )
-    IF ( DOXYGEN )
+    IF ( DOXYGEN_FOUND )
         MESSAGE( STATUS "Doxygen found at ${DOXYGEN}, so GNE_BUILD_DOCS set to ON" )
         SET( GNE_BUILD_DOCS_DEFAULT ON )
-    ELSE( DOXYGEN )
+    ELSE( DOXYGEN_FOUND )
         MESSAGE( STATUS "Doxygen was not found, so GNE_BUILD_DOCS set to OFF" )
         SET( GNE_BUILD_DOCS_DEFAULT OFF )
-    ENDIF( DOXYGEN )
+    ENDIF( DOXYGEN_FOUND )
 
     OPTION( GNE_BUILD_DOCS
         "If on, builds the GNE documentation.  Requires Doxygen to do this."
@@ -85,13 +85,13 @@ IF( NOT DEFINED GNE_BUILD_DOCS )
 ENDIF( NOT DEFINED GNE_BUILD_DOCS )
 
 IF( NOT DEFINED GNE_USE_DOT )
-    IF( DOT )
+    IF( DOXYGEN_DOT_FOUND )
         MESSAGE( STATUS "DOT tool was detected, so it will be used if GNE_BUILD_DOCS is set" )
         SET( GNE_USE_DOT_DEFAULT ON )
-    ELSE( DOT )
+    ELSE( DOXYGEN_DOT_FOUND )
         MESSAGE( STATUS "DOT tool was not detected, so it will not be used if GNE_BUILD_DOCS is set" )
         SET( GNE_USE_DOT_DEFAULT OFF )
-    ENDIF( DOT )
+    ENDIF( DOXYGEN_DOT_FOUND )
 
     OPTION( GNE_USE_DOT
         "If set, uses dot when the documentation is built. Only matters if GNE_BUILD_DOCS is ON"
@@ -100,18 +100,12 @@ ENDIF( NOT DEFINED GNE_USE_DOT )
 
 #Library detection section: HawkNL, curses, and Boost
 
-IF( UNIX )
-    SET( LIB_SEARCH_PATHS /lib /usr/lib /usr/local/lib )
-    SET( INCLUDE_SEARCH_PATHS /include /usr/include /usr/local/include )
-ENDIF( UNIX )
-
 FIND_LIBRARY( HAWKNL_LIBRARY
     NAMES hawknl NL
-    PATHS ${LIB_SEARCH_PATHS} )
+    DOC "Path to the HawkNL shared object/DLL library" )
 
 FIND_PATH( HAWKNL_INCLUDE_PATH
     nl.h
-    ${INCLUDE_SEARCH_PATHS}
     DOC "Path that contains the HawkNL include file, nl.h" )
 
 IF( NOT HAWKNL_LIBRARY OR NOT HAWKNL_INCLUDE_PATH )
@@ -120,17 +114,8 @@ ENDIF( NOT HAWKNL_LIBRARY OR NOT HAWKNL_INCLUDE_PATH )
 
 MESSAGE( STATUS "HawkNL: ${HAWKNL_LIBRARY} ${HAWKNL_INCLUDE_PATH}/nl.h" )
 
-#Boost detection -- FindBoost is 2.4 or later only :(
-FIND_PATH( BOOST_INCLUDE_PATH
-    boost/config.hpp
-    ${INCLUDE_SEARCH_PATHS}
-    DOC "Path that contains Boost." )
-
-IF( NOT BOOST_INCLUDE_PATH )
-    MESSAGE( SEND_ERROR "The Boost library was not found.  Version 1.32 or later required.  Please set BOOST_INCLUDE_PATH manually." )
-ENDIF( NOT BOOST_INCLUDE_PATH )
-
-MESSAGE( STATUS "Boost found at: ${BOOST_INCLUDE_PATH}" )
+#Boost detection -- FindBoost is 2.4 or later only
+FIND_PACKAGE( Boost REQUIRED )
 
 #Curses detection
 IF( UNIX )
@@ -139,7 +124,7 @@ ENDIF( UNIX )
 
 #Set up global include paths
 SET( GNE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include )
-INCLUDE_DIRECTORIES( ${GNE_INCLUDE_DIR} ${BOOST_INCLUDE_PATH} ${HAWKNL_INCLUDE_PATH} ${CURSES_INCLUDE_PATH} )
+INCLUDE_DIRECTORIES( ${GNE_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${HAWKNL_INCLUDE_PATH} ${CURSES_INCLUDE_PATH} )
 
 
 SUBDIRS( src include )
