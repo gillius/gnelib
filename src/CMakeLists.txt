@@ -15,7 +15,7 @@ SET_SOURCE_FILES_PROPERTIES(
     ${GNELIB_SRCS} PROPERTIES COMPILE_FLAGS "${GNE_COMMON_FLAGS}" )
 
 INSTALL( TARGETS gnelib
-         ARCHIVE DESTINATION /lib )
+         ARCHIVE DESTINATION lib )
 #Old 2.2.x and earlier command
 #INSTALL_TARGETS( /lib gnelib )
 
@@ -49,11 +49,12 @@ IF( GNE_BUILD_DOCS )
         DEPENDS ${CMAKE_BINARY_DIR}/docs/build-stamp
         )
 
-    CONFIGURE_FILE(
-        ${CMAKE_CURRENT_SOURCE_DIR}/docsInstall.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/docsInstall.cmake @ONLY )
+    FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/docs )
 
-    SET_TARGET_PROPERTIES(
-        gnedocs PROPERTIES POST_INSTALL_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/docsInstall.cmake )
+    INSTALL(
+        DIRECTORY ${CMAKE_BINARY_DIR}/docs
+        DESTINATION share/${GNE_PACKAGE_NAME}
+        PATTERN "build-stamp" EXCLUDE )
+
 ENDIF( GNE_BUILD_DOCS )
 
