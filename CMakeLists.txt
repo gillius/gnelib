@@ -124,7 +124,10 @@ ENDIF( UNIX )
 
 #Set up global include paths
 SET( GNE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include )
-INCLUDE_DIRECTORIES( ${GNE_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${HAWKNL_INCLUDE_PATH} ${CURSES_INCLUDE_PATH} )
+#Somewhere between CMake 2.4 and 2.8, The BOOST* variables became Boost*, and
+#that breaks backwards-compatibility. So, we include both on the line below,
+#expecting that one of them won't be defined.
+INCLUDE_DIRECTORIES( ${GNE_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${HAWKNL_INCLUDE_PATH} ${CURSES_INCLUDE_PATH} )
 
 
 SUBDIRS( src include )

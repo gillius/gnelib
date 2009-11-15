@@ -6,7 +6,8 @@ Compilers:
   * GCC: General requirements are GCC version 3.x or higher with a modern
     libstdc++. Make is also required.  GCC version 4.0.3 and 3.4.2 were tested
     with GNE.
-  * MSVC: MSVC 2005 tested, 2002 and 2003 expected to work
+  * MSVC: MSVC 2005 and 2008 (Express Edition) tested, 2002 and 2003 expected
+    to work.
 
 GCC 2.9x was recently supported but is deprecated and has not been tested
 since GNE 0.70.
