@@ -26,12 +26,14 @@ compiled parts of Boost, so no compilation is needed.
 
 1.3 CMake
 
-GNE requires CMake 2.4 or later for its build process under Windows.
+GNE requires CMake a 2.4 or later for its build process under Windows. Earlier
+2.4 versions seem to have a problem building GNE's docs target; at least 2.4.7
+works.
 
 Installing CMake is VERY easy! Just head to the download page and get the
-latest version (2.4.3 at the time of writing):
+latest version (2.8.0 at the time of writing):
 
-http://www.cmake.org/HTML/Download.html
+http://cmake.org/cmake/resources/software.html
 
 1.4 Doxygen
 
@@ -65,7 +67,7 @@ Boost and HawkNL will not be detected.  My experience is that if Doxygen and
 dot are installed as default, they will be detected by CMake, but please check
 those paths as well.
 
-If CMake fails to find anything (it probably will), then you will see error
+If CMake fails to find something (it probably will), then you will see error
 messages come up -- but don't worry!  Let them come by and then define the
 variables that are NOTFOUND, minimally those for Boost and HawkNL.
 
@@ -109,9 +111,9 @@ of the following:
  * Documentation generation with Doxygen is not supported
  * There is no "installation" target
 
-It is suggested that end-users use the normal MSVC method.  The only advantage
-to the MSVC 2005 workspace is for GNE developers as it supports precompiled
-headers.
+It is suggested that end-users who just want to compile GNE use CMake. The
+only advantage to the hand-built MSVC 2005 workspace is for GNE developers
+as it supports precompiled headers.
 
 2.3 Installation -- MinGW
 
