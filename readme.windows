@@ -22,8 +22,15 @@ it -- but if you get it compiled it should work.
 
 1.2 Boost
 
-Install Boost, version 1.32 or later.  GNE does not make use of any of the
-compiled parts of Boost, so no compilation is needed.
+Install Boost, version 1.32 or later. Version 1.40.0 was also recenlty tested
+and worked. GNE does not make use of any of the compiled parts of Boost, so no
+compilation is needed.
+
+Recent CMake versions (tested with 2.8.0) seem to find Boost automatically if
+it is in a directory like C:\Program Files\boost\boost_1_40_0. It also appears
+that setting BOOST_ROOT environment variable works. If CMake cannot find Boost,
+look for BOOST_INCLUDE_DIR in advanced CMake settings and point it to Boost's
+location.
 
 1.3 CMake
 
