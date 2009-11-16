@@ -1,4 +1,5 @@
 GNE 0.70 to current
+  Support building shared object version under UNIX/Linux type systems.
   Changed ClientConnection's private inheritance on Thread into public, to
     fix a compatibility issue with smart pointers and Boost 1.36.
   Use std::numeric_limits<int>::max() instead of INT_MAX where INT_MAX was
