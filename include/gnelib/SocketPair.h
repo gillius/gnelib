@@ -87,7 +87,10 @@ public:
    *
    * @param reliable select which socket to perform read on.
    * @param buf data arrives in this buffer.
-   * @return number of bytes read, and the new limit for buf
+   *
+   * @return number of bytes read, and the new limit for buf, or NL_INVALID
+   *         if there was an error. If NL_INVALID is returned, the Buffer
+   *         given was still cleared.
    */
   int rawRead(bool reliable, Buffer& buf) const;
 

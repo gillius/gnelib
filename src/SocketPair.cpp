@@ -106,7 +106,9 @@ int SocketPair::rawRead(bool reliable, Buffer& buf) const {
 
   buf.clear();
   int read = nlRead( act, (NLvoid*)buf.getData(), (NLint)buf.getCapacity() );
-  buf.setLimit( read );
+  if (NL_INVALID != read) {
+     buf.setLimit( read );
+  }
   return read;
 }
 

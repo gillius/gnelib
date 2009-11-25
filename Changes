@@ -1,4 +1,6 @@
 GNE 0.70 to current
+  Fixed error in SocketPair that caused InvalidBufferLimit error when NL
+    returned error code. Thanks to David Guthrie for a patch.
   Support building shared object version under UNIX/Linux type systems.
   Changed ClientConnection's private inheritance on Thread into public, to
     fix a compatibility issue with smart pointers and Boost 1.36.

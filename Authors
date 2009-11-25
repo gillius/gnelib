@@ -18,3 +18,9 @@ Peter Hull
 July, 2006
 Luigi Auriemma (aluigi_at_autistici dot org) http://aluigi.org/
   Reported security bug in ConsoleStreambuf
+
+November, 2009
+David Guthrie
+Alion Science and Technology
+BMH Operation
+  Provided patches to fix error handling NL return codes in SocketPair.
