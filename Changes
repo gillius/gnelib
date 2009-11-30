@@ -17,7 +17,7 @@ GNE 0.70 to current
   Removed completely the OLD_CPP functionality used for GCC 2.9x.
   Added some more checks to string copys in debug log code and game name
     checking to enhance security.
-  Complete rearchitecture of build system, using CMake 2.2 or higher.
+  Complete rearchitecture of build system, using CMake 2.4 or higher.
   Fixed crashing bug in SyncConnection when trying to print a SmartPtr with
     debugging macros.
   Fixed one compile warning in Mutex when compiling in debug mode.
