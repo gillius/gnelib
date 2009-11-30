@@ -30,7 +30,7 @@ LowLevelError::LowLevelError(ErrorCode newCode)
 : Error(newCode), hawkError(NL_NO_ERROR), sysError(0) {
 
   NLenum error = nlGetError();
-  if (error == NL_SOCKET_ERROR || error == NL_SOCK_DISCONNECT)
+  if (error == NL_SOCKET_ERROR || error == NL_SOCK_DISCONNECT || error == NL_SYSTEM_ERROR)
     sysError = nlGetSystemError();
   else
     hawkError = error;

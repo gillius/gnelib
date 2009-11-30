@@ -85,8 +85,11 @@ void ConnectionEventGenerator::run() {
       } else {
         //The only valid error is NL_INVALID_SOCKET which happens if we close
         //a socket while nlPollGroup is using it.
-        if (nlGetError() != NL_INVALID_SOCKET) {
-          gnedbgo1(1, "%s", LowLevelError().toString().c_str());
+        // The system error 9 (bad file descriptor) should be flagged as NL_INVALID_SOCKET in hawknl, but it's not.
+        if (nlGetError() != NL_INVALID_SOCKET &&
+            !(nlGetError() == NL_SYSTEM_ERROR && nlGetSystemError() == 9)) {
+          const std::string error = LowLevelError().toString();
+          gnedbgo1(1, "%s", error.c_str());
           assert(false);
         }
       }

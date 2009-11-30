@@ -23,4 +23,5 @@ November, 2009
 David Guthrie
 Alion Science and Technology
 BMH Operation
-  Provided patches to fix error handling NL return codes in SocketPair.
+  Provided various patches to fix bugs in GNE (see SVN revision history for
+  the specific changes).

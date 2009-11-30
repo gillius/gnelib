@@ -1,4 +1,10 @@
 GNE 0.70 to current
+  GNE generates the appropriate error message when a HawkNL method returns
+    NL_SYSTEM_ERROR, when it did not include the details before. Thanks to
+    David Guthrie for the patch.
+  Workaround issue when HawkNL returns a system error code 9 when it should
+    have reported NL_INVALID_SOCKET. Appears that this happens only on
+    UNIX-like systems. Thanks to David Guthrie for the patch.
   Fixed error in SocketPair that caused InvalidBufferLimit error when NL
     returned error code. Thanks to David Guthrie for a patch.
   Support building shared object version under UNIX/Linux type systems.
