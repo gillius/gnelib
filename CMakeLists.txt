@@ -17,11 +17,11 @@ MESSAGE( STATUS "GNE Version ${GNE_VERSION_STR}" )
 SET( GNE_PACKAGE_NAME "libgnelib-dev" )
 
 #Set up build type and build options, including build flags
-IF( NOT CMAKE_BUILD_TYPE )
+IF( NOT MSVC AND NOT CMAKE_BUILD_TYPE )
     SET( CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
         "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
         FORCE )
-ENDIF( NOT CMAKE_BUILD_TYPE )
+ENDIF( NOT MSVC AND NOT CMAKE_BUILD_TYPE )
 
 OPTION( GNE_EXTRA_DEBUG_MODE
     "If on, sets on GNE's debugging mode, which adds extra checks and asserts"
@@ -110,8 +110,19 @@ FIND_PATH( HAWKNL_INCLUDE_PATH
     nl.h
     DOC "Path that contains the HawkNL include file, nl.h" )
 
+IF( NOT HAWKNL_LIBRARY AND NOT HAWKNL_INCLUDE_PATH AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/hawknl )
+  #We've not detected a system-installed version and we've found an embedded
+  #version, so try to compile this.
+  MESSAGE( STATUS "Detected embedded HawkNL installation; attempting to use" )
+  ADD_SUBDIRECTORY( hawknl )
+  SET( HAWKNL_INCLUDE_PATH hawknl/include
+       CACHE STRING "Using embedded version" FORCE )
+  SET( HAWKNL_LIBRARY hawknl
+       CACHE STRING "Using embedded version" FORCE )
+ENDIF( NOT HAWKNL_LIBRARY AND NOT HAWKNL_INCLUDE_PATH AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/hawknl )
+
 IF( NOT HAWKNL_LIBRARY OR NOT HAWKNL_INCLUDE_PATH )
-    MESSAGE( SEND_ERROR "The library HawkNL version 1.68 or higher was not found. You will need to set HAWKNL_LIBRARY and HAWKNL_INCLUDE_PATH manually." )
+    MESSAGE( SEND_ERROR "The library HawkNL version 1.68 or higher was not found. You will need to set HAWKNL_LIBRARY and HAWKNL_INCLUDE_PATH manually. Or, you can place a copy of the CMake-buildable branch of HawkNL 1.68 or later in directory ${CMAKE_CURRENT_SOURCE_DIR}/hawknl" )
 ENDIF( NOT HAWKNL_LIBRARY OR NOT HAWKNL_INCLUDE_PATH )
 
 MESSAGE( STATUS "HawkNL: ${HAWKNL_LIBRARY} ${HAWKNL_INCLUDE_PATH}/nl.h" )
@@ -132,8 +143,9 @@ SET( GNE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include )
 INCLUDE_DIRECTORIES( ${GNE_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${HAWKNL_INCLUDE_PATH} ${CURSES_INCLUDE_PATH} )
 
 
-SUBDIRS( src include )
+ADD_SUBDIRECTORY( src )
+ADD_SUBDIRECTORY( include )
 
 IF( GNE_BUILD_EXAMPLES )
-    SUBDIRS( examples )
+  ADD_SUBDIRECTORY( examples )
 ENDIF( GNE_BUILD_EXAMPLES )

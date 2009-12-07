@@ -1,3 +1,4 @@
-INSTALL_FILES( /include FILES gnelib.h )
+INSTALL( FILES gnelib.h 
+         DESTINATION include )
 
-SUBDIRS( gnelib )
+ADD_SUBDIRECTORY( gnelib )

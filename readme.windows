@@ -20,6 +20,15 @@ earler version, you should compile with NL_WIN_THREADS defined (this became
 default in 1.67).  1.7 beta would work but I've seen compile problems with
 it -- but if you get it compiled it should work.
 
+Alternatively, you can use the new CMake build-based distribution from
+Jason Winnebeck. You can build HawkNL separately in this case and install it,
+and in UNIX-like systems CMake will detect it when compiling GNE. You can
+also "embed" HawkNL to build with GNE by placing its source into a folder
+called "hawknl" under GNE's root. If HawkNL is not detected in the traditional
+manner, then GNE will compile hawknl found in this directory and use that.
+When installing GNE, HawkNL's libraries will come alongside GNE's in the "lib"
+directory.
+
 1.2 Boost
 
 Install Boost, version 1.32 or later. Version 1.40.0 was also recenlty tested

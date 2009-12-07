@@ -1,4 +1,6 @@
 GNE 0.70 to current
+  GNE can also build HawkNL with itself if the CMake build-based branch of
+    HawkNL is placed into the directory "hawknl" at the top-level GNE folder.
   GNE generates the appropriate error message when a HawkNL method returns
     NL_SYSTEM_ERROR, when it did not include the details before. Thanks to
     David Guthrie for the patch.
