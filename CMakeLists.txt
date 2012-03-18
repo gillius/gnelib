@@ -110,9 +110,8 @@ FIND_PATH( HAWKNL_INCLUDE_PATH
     nl.h
     DOC "Path that contains the HawkNL include file, nl.h" )
 
-IF( NOT HAWKNL_LIBRARY AND NOT HAWKNL_INCLUDE_PATH AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/hawknl )
-  #We've not detected a system-installed version and we've found an embedded
-  #version, so try to compile this.
+IF( IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/hawknl )
+  #We've found an embedded version, so try to compile this.
   MESSAGE( STATUS "Detected embedded HawkNL installation; attempting to use" )
   ADD_SUBDIRECTORY( hawknl )
   SET( HAWKNL_INCLUDE_PATH hawknl/include
