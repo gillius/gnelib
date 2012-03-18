@@ -107,7 +107,7 @@ CMAKE_INSTALL_PREFIX.
 
 Currently there is no uninstall functionality provided, but this may be
 corrected in a future version.  For the moment you could manually delete the
-GNE directory -- nothing outside of that was modified nor where any registry
+GNE directory -- nothing outside of that was modified nor were any registry
 entries made.
 
 2.1 Installation -- MSVC
