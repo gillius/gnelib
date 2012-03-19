@@ -1,4 +1,5 @@
 GNE 0.70 to current
+  Fix compile bug with INT_MAX in examples, due to missing <climits> include.
   GNE can also build HawkNL with itself if the CMake build-based branch of
     HawkNL is placed into the directory "hawknl" at the top-level GNE folder.
   GNE generates the appropriate error message when a HawkNL method returns

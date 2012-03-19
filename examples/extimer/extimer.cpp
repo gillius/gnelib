@@ -19,6 +19,7 @@
 
 #include <gnelib.h>
 #include <cassert>
+#include <climits>
 
 using namespace std;
 using namespace GNE;

@@ -28,6 +28,7 @@
 
 #include <gnelib.h>
 #include <cassert>
+#include <climits>
 
 #include <sys/timeb.h>
 
