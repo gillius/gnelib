@@ -118,7 +118,7 @@ IF( IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/hawknl )
        CACHE STRING "Using embedded version" FORCE )
   SET( HAWKNL_LIBRARY hawknl
        CACHE STRING "Using embedded version" FORCE )
-ENDIF( NOT HAWKNL_LIBRARY AND NOT HAWKNL_INCLUDE_PATH AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/hawknl )
+ENDIF( IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/hawknl )
 
 IF( NOT HAWKNL_LIBRARY OR NOT HAWKNL_INCLUDE_PATH )
     MESSAGE( SEND_ERROR "The library HawkNL version 1.68 or higher was not found. You will need to set HAWKNL_LIBRARY and HAWKNL_INCLUDE_PATH manually. Or, you can place a copy of the CMake-buildable branch of HawkNL 1.68 or later in directory ${CMAKE_CURRENT_SOURCE_DIR}/hawknl" )
@@ -131,6 +131,7 @@ FIND_PACKAGE( Boost REQUIRED )
 
 #Curses detection
 IF( UNIX )
+    SET( CURSES_USE_NCURSES TRUE )
     FIND_PACKAGE( Curses REQUIRED )
 ENDIF( UNIX )
 
