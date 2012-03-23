@@ -38,6 +38,10 @@ OPTION( GNE_BUILD_EXAMPLES
     "If on, builds the example programs, to be installed to /share/${GNE_PACKAGE_NAME}/examples"
     OFF )
 
+OPTION( GNE_TESTS
+    "If on, builds the test program, which is not installed but can be run via `make test`"
+    OFF )
+
 SET( GNE_COMMON_FLAGS "" ) #make sure this is defined
 
 #Set compile flags to be used in common across all of our code.
@@ -149,3 +153,7 @@ ADD_SUBDIRECTORY( include )
 IF( GNE_BUILD_EXAMPLES )
   ADD_SUBDIRECTORY( examples )
 ENDIF( GNE_BUILD_EXAMPLES )
+
+IF( GNE_TESTS )
+  ADD_SUBDIRECTORY( tests )
+ENDIF( GNE_TESTS )
