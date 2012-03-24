@@ -190,6 +190,8 @@ GNEProtocolVersionNumber getGNEProtocolVersion() {
   GNEProtocolVersionNumber ret;
   ret.version = 0;
   ret.subVersion = 0;
+  //Consider keeping this number under 255 to detect endian issues, due to a
+  //historial bug
   ret.build = 7;
 
   return ret;
