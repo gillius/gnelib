@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( gne_types_check ) {
   BOOST_CHECK_EQUAL( sizeof(gdouble), 8 );
 }
 
-BOOST_AUTO_TEST_CASE( endian_check ) {
+BOOST_AUTO_TEST_CASE( hawknl_endian_define_check ) {
   gint16 val = 0x1122;
   gbyte* valraw = (gbyte*)&val;
 #ifdef NL_LITTLE_ENDIAN
@@ -62,6 +62,7 @@ BOOST_AUTO_TEST_CASE( gne_first_packet ) {
   val = nlSwaps( val ); //now val should be little endian
   gbyte* valraw = (gbyte*)&val;
   BOOST_CHECK_MESSAGE( 0x22 == valraw[0], "nlSwaps did not convert value to little endian as expected, check HawkNL code" );
+  BOOST_CHECK_EQUAL( 0x22, valraw[0] );
 
   Buffer buf = Buffer();
   TestConnection conn = TestConnection();

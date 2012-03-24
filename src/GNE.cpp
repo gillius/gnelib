@@ -57,15 +57,13 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)), int time
     ObjectBrokerClient::staticInit();
     timeToWait = timeToClose;
 
-    //This is a little hacky, but I checked the HawkNL source to make sure this
-    //worked before I did this.
-    nlEnable(NL_LITTLE_ENDIAN_DATA);
 
     if (networkType != NO_NET) {
       if (nlInit() == NL_FALSE)
         return true;
       if (nlSelectNetwork(networkType) == NL_FALSE)
         return true;
+      nlEnable(NL_LITTLE_ENDIAN_DATA);
       nlEnable(NL_BLOCKING_IO);
       nlEnable(NL_TCP_NO_DELAY);
       //GNE sends its data in little endian format.
@@ -73,6 +71,10 @@ bool initGNE(NLenum networkType, int (*atexit_ptr)(void (*func)(void)), int time
       eGen = ConnectionEventGenerator::create();
       eGen->start();
       initialized = true; //We need only to set this to true if we are using HawkNL
+    } else {
+      //This is a little hacky, but I checked the HawkNL source to make sure this
+      //worked before I did this.
+      nlEnable(NL_LITTLE_ENDIAN_DATA);
     }
 
 #ifndef WIN32

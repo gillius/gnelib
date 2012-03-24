@@ -25,3 +25,9 @@ Alion Science and Technology
 BMH Operation
   Provided various patches to fix bugs in GNE (see SVN revision history for
   the specific changes).
+
+March, 2012
+Héber Costa Ferreira
+  Discovered the HawkNL/GNE incompatibility between 32 and 64 bit Linux clients,
+  which actually ended up being an endian detection error, and provided
+  suggested fixes and testing of those fixes for both HawkNL and GNE.  
