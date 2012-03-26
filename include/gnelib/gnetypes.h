@@ -21,6 +21,7 @@
  */
 
 //Header file containing GNE-wide typedefs.
+#include <boost/cstdint.hpp>
 
 namespace GNE {
   /**
@@ -28,8 +29,8 @@ namespace GNE {
    * implementations (as defined in the GNE protocol document).
    * "u" type variables denote unsigned versions.
    */
-  typedef signed   char  gint8;
-  typedef unsigned char  guint8;
+  typedef boost::int8_t  gint8;
+  typedef boost::uint8_t guint8;
   typedef guint8         gbyte;
 
   /**
@@ -46,11 +47,11 @@ namespace GNE {
    */
   const gbool gFalse = 0;
   
-  typedef signed   short gint16;
-  typedef unsigned short guint16;
+  typedef boost::int16_t  gint16;
+  typedef boost::uint16_t guint16;
   
-  typedef signed   int   gint32;
-  typedef unsigned int   guint32;
+  typedef boost::int32_t  gint32;
+  typedef boost::uint32_t  guint32;
   
   /**
    * A single precision 32-bit IEEE 754 floating point variable.
